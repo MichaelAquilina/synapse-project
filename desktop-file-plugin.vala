@@ -1,0 +1,205 @@
+
+namespace Sezen
+{
+  errordomain DesktopFileError
+  {
+    UNINTERESTING_ENTRY
+  }
+
+  public class DesktopFileInfo: Object, Match
+  {
+    // for Match interface
+    public string title { get; construct set; }
+    public string description { get; set; default = ""; }
+    public string icon_name { get; construct set; default = ""; }
+    public bool has_thumbnail { get; construct set; default = false; }
+
+    private string? title_folded = null;
+    public unowned string get_title_folded ()
+    {
+      if (title_folded == null) title_folded = title.casefold ();
+      return title_folded;
+    }
+
+    public void execute ()
+    {
+      debug ("running %s", full_path);
+    }
+
+    public string full_path { get; construct set; }
+    public string exec { get; set; }
+
+    public bool is_valid { get; private set; default = true; }
+
+    private static string GROUP = "Desktop Entry";
+
+    public DesktopFileInfo.for_keyfile (string path, KeyFile keyfile)
+    {
+      Object (full_path: path);
+
+      init_from_keyfile (keyfile);
+    }
+
+    private void init_from_keyfile (KeyFile keyfile)
+    {
+      try
+      {
+        if (keyfile.get_string (GROUP, "Type") != "Application")
+        {
+          throw new DesktopFileError.UNINTERESTING_ENTRY ("Not Application-type desktop entry");
+        }
+
+        title = keyfile.get_locale_string (GROUP, "Name");
+        exec = keyfile.get_string (GROUP, "Exec");
+        // check for hidden desktop files
+        if (keyfile.has_key (GROUP, "Hidden") &&
+          keyfile.get_boolean (GROUP, "Hidden"))
+        {
+          is_valid = false;
+          return;
+        }
+        if (keyfile.has_key (GROUP, "NoDisplay") &&
+          keyfile.get_boolean (GROUP, "NoDisplay"))
+        {
+          is_valid = false;
+          return;
+        }
+        if (keyfile.has_key (GROUP, "Comment"))
+        {
+          description = keyfile.get_locale_string (GROUP, "Comment");
+        }
+        if (keyfile.has_key (GROUP, "Icon"))
+        {
+          icon_name = keyfile.get_locale_string (GROUP, "Icon");
+        }
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+        is_valid = false;
+      }
+    }
+  }
+
+  public class DesktopFilePlugin: DataPlugin
+  {
+    private Gee.List<DesktopFileInfo> desktop_files;
+
+    construct
+    {
+      desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
+
+      load_all_desktop_files ();
+    }
+
+    public signal void load_complete ();
+    private bool loading_in_progress = false;
+
+    private async void load_all_desktop_files ()
+    {
+      string[] data_dirs = Environment.get_system_data_dirs ();
+      data_dirs += Environment.get_user_data_dir ();
+
+      loading_in_progress = true;
+
+      foreach (unowned string data_dir in data_dirs)
+      {
+        string dir_path = Path.build_filename (data_dir, "applications", null);
+        try
+        {
+          var directory = File.new_for_path (dir_path);
+          if (!directory.query_exists ()) continue;
+          var enumerator = yield directory.enumerate_children_async (
+            FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
+          var files = yield enumerator.next_files_async (1024, 0);
+          foreach (var f in files)
+          {
+            unowned string name = f.get_name ();
+            if (name.has_suffix (".desktop"))
+            {
+              yield load_desktop_file (directory.get_child (name));
+            }
+          }
+        } 
+        catch (Error err)
+        {
+          warning ("%s", err.message);
+        }
+      }
+
+      loading_in_progress = false;
+      debug ("Loading complete...");
+      load_complete ();
+    }
+
+    private async void load_desktop_file (File file)
+    {
+      try
+      {
+        size_t len;
+        string contents;
+        bool success = yield file.load_contents_async (null, 
+                                                       out contents, out len);
+        if (success)
+        {
+          var keyfile = new KeyFile ();
+          keyfile.load_from_data (contents, len, 0);
+          var dfi = new DesktopFileInfo.for_keyfile (file.get_path(), keyfile);
+          if (dfi.is_valid) desktop_files.add (dfi);
+        }
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
+    }
+
+    private ResultSet simple_search (Query q)
+    {
+      // search method used for 1 letter searches
+      unowned string query = q.query_string_folded;
+      var results = new ResultSet ();
+
+      foreach (var dfi in desktop_files)
+      {
+        if (dfi.get_title_folded ().has_prefix (query))
+        {
+          results.add (dfi, 90);
+        }
+        else if (dfi.exec.has_prefix (q.query_string))
+        {
+          results.add (dfi, 60);
+        }
+      }
+
+      return results;
+    }
+
+    public override async ResultSet? search (Query q)
+    {
+      if (loading_in_progress)
+      {
+        // wait
+        ulong signal_id = this.load_complete.connect (() =>
+        {
+          search.callback ();
+        });
+        yield;
+        SignalHandler.disconnect (this, signal_id);
+      }
+
+      if (q.is_cancelled ()) return null;
+
+      // FIXME: spawn new thread and do the search there?
+      var result = new ResultSet ();
+
+      if (q.query_string.length == 1)
+      {
+        result.add_all (simple_search (q));
+      }
+
+      debug ("processing search...");
+      return result;
+    }
+  }
+}
