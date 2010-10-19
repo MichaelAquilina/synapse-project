@@ -52,7 +52,7 @@ namespace Sezen
       {
         unowned Gee.Map.Entry<Match, int> e1 = (Gee.Map.Entry<Match, int>) a;
         unowned Gee.Map.Entry<Match, int> e2 = (Gee.Map.Entry<Match, int>) b;
-        return e1.value - e2.value;
+        return e2.value - e1.value;
       });
 
       var sorted_list = new Gee.ArrayList<Match> ();
@@ -70,17 +70,37 @@ namespace Sezen
     public abstract async ResultSet? search (Query query);
   }
 
+  [Flags]
+  public enum QueryFlags
+  {
+    LOCAL_ONLY    = 1 << 0,
+
+    APPLICATIONS  = 1 << 1,
+    ACTIONS       = 1 << 2,
+    AUDIO         = 1 << 3,
+    VIDEO         = 1 << 4,
+    DOCUMENTS     = 1 << 5,
+    IMAGES        = 1 << 6,
+    INTERNET      = 1 << 7,
+
+    UNCATEGORIZED = 1 << 15,
+
+    LOCAL_CONTENT = 0xFF | QueryFlags.UNCATEGORIZED,
+    ALL           = 0xFE | QueryFlags.UNCATEGORIZED
+  }
+
   public struct Query
   {
     string query_string;
     string query_string_folded;
     Cancellable cancellable;
-    // TODO: subtype.. etc
+    QueryFlags query_type;
 
-    public Query (string query)
+    public Query (string query, QueryFlags flags = QueryFlags.LOCAL_CONTENT)
     {
       this.query_string = query;
       this.query_string_folded = query.casefold ();
+      this.query_type = flags;
     }
 
     public bool is_cancelled ()
@@ -124,16 +144,20 @@ namespace Sezen
       register_plugin (new DesktopFilePlugin ());
     }
 
+    public signal void search_complete ();
+
     private void search_done (Object? obj, AsyncResult res)
     {
+      // FIXME: process results from all plugins
       debug ("search finished");
       var plugin = obj as DataPlugin;
       var results = plugin.search.end (res);
       foreach (var match in results.get_sorted_list ())
       {
-        debug ("found match: %s (%s)", match.title, 
-                                       match.description);
+        debug ("got match: %s (%s)", match.title, match.description);
       }
+
+      search_complete ();
     }
 
     public async void search (string query)
@@ -163,6 +187,7 @@ int main (string[] argv)
     string query = argv[1];
     debug (@"Searching for $query");
     sink.search (query);
+    sink.search_complete.connect (() => { loop.quit (); });
 
     loop.run ();
   }

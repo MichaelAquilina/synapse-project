@@ -7,5 +7,8 @@ $(OUTPUT): $(SRC_FILES)
 
 all: $(OUTPUT)
 
+cdebug:
+	valac $(VALA_FLAGS) -C $(SRC_FILES)
+
 clean:
 	rm -f $(OUTPUT)

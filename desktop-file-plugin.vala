@@ -23,7 +23,15 @@ namespace Sezen
 
     public void execute ()
     {
-      debug ("running %s", full_path);
+      var de = new DesktopAppInfo.from_filename (full_path);
+      try
+      {
+        de.launch (null, null); // de.launch (null, new Gdk.AppLaunchContext ());
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
     }
 
     public string full_path { get; construct set; }
@@ -51,6 +59,7 @@ namespace Sezen
 
         title = keyfile.get_locale_string (GROUP, "Name");
         exec = keyfile.get_string (GROUP, "Exec");
+
         // check for hidden desktop files
         if (keyfile.has_key (GROUP, "Hidden") &&
           keyfile.get_boolean (GROUP, "Hidden"))
@@ -175,8 +184,120 @@ namespace Sezen
       return results;
     }
 
+    private ResultSet full_search (Query q)
+    {
+      /* create a couple of regexes and try to match the titles
+       * match with these regular expressions (with descending score):
+       * 1) ^query
+       * 2) \bquery
+       * 4) split query and search \bq.+\bu.+\be.+\br.+\by
+       * 3) split query to length parts and search \bq.*u.*e.*r.*.*y
+       * 5) try to match with exec
+       */
+      unowned string query = q.query_string_folded;
+      long query_length = q.query_string.length;
+      var results = new ResultSet ();
+
+      //Regex? re1 = new Regex ("^" + query, RegexCompileFlags.OPTIMIZE);
+      Regex? re2;
+      Regex? re3 = null;
+      Regex? re4 = null;
+      try
+      {
+        re2 = new Regex ("\\b" + Regex.escape_string (query),
+                         RegexCompileFlags.OPTIMIZE);
+      }
+      catch (RegexError err)
+      {
+        re2 = null;
+      }
+
+      if (query_length <= 5)
+      {
+        string pattern = "\\b";
+        for (long offset = 0; offset < query_length; offset++)
+        {
+          bool is_last = offset == query_length - 1;
+          unichar u = query.offset (offset).get_char_validated ();
+          if (u != -1 && u != -2) // is valid unichar
+          {
+            pattern += Regex.escape_string (u.to_string ());
+          }
+          if (!is_last) pattern += ".+\\b";
+        }
+        try
+        {
+          re3 = new Regex (pattern, RegexCompileFlags.OPTIMIZE);
+        }
+        catch (RegexError err)
+        {
+          re3 = null;
+        }
+      }
+
+      if (true)
+      {
+        string pattern = "\\b";
+        for (long offset = 0; offset < query_length; offset++)
+        {
+          bool is_last = offset == query_length - 1;
+          unichar u = query.offset (offset).get_char_validated ();
+          if (u != -1 && u != -2) // valid unichar
+          {
+            pattern += Regex.escape_string (u.to_string ());
+          }
+          if (!is_last) pattern += ".*";
+        }
+        try
+        {
+          re4 = new Regex (pattern, RegexCompileFlags.OPTIMIZE);
+        }
+        catch (RegexError err)
+        {
+          re4 = null;
+        }
+      }
+
+      foreach (var dfi in desktop_files)
+      {
+        unowned string folded_title = dfi.get_title_folded ();
+        if (folded_title.has_prefix (query))
+        {
+          debug ("prefix match - %s", folded_title);
+          results.add (dfi, 90);
+        }
+        else if (re2.match (folded_title))
+        {
+          debug ("re2 match - %s", folded_title);
+          results.add (dfi, 75);
+        }
+        else if (re3 != null && re3.match (folded_title))
+        {
+          debug ("re3 match - %s", folded_title);
+          results.add (dfi, 70);
+        }
+        else if (re4 != null && re4.match (folded_title))
+        {
+          debug ("re4 match - %s", folded_title);
+          // FIXME: we need to do much smarter relevancy computation here
+          // "sysmon" matching "System Monitor" is very good as opposed to
+          // "seto" matching "System Monitor"
+          results.add (dfi, 55);
+        }
+        else if (dfi.exec.has_prefix (query))
+        {
+          debug ("exec match - %s", dfi.exec);
+          results.add (dfi, dfi.exec == query ? 80 : 60);
+        }
+      }
+
+      return results;
+    }
+
     public override async ResultSet? search (Query q)
     {
+      if (!(QueryFlags.APPLICATIONS in q.query_type)) return null;
+
       if (loading_in_progress)
       {
         // wait
@@ -187,18 +308,34 @@ namespace Sezen
         yield;
         SignalHandler.disconnect (this, signal_id);
       }
+      else
+      {
+        // we'll do this so other plugins can send their DBus requests etc.
+        // and they don't have to wait for our blocking (though fast) search
+        // to finish
+        Idle.add (search.callback);
+        yield;
+      }
 
       if (q.is_cancelled ()) return null;
 
       // FIXME: spawn new thread and do the search there?
       var result = new ResultSet ();
+      debug ("processing search...");
+
+      var timer = new Timer ();
 
       if (q.query_string.length == 1)
       {
         result.add_all (simple_search (q));
       }
+      else
+      {
+        result.add_all (full_search (q));
+      }
 
-      debug ("processing search...");
+      debug ("searching took %g seconds", timer.elapsed ());
+
       return result;
     }
   }
