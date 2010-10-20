@@ -13,6 +13,7 @@ namespace Sezen
     public string description { get; set; default = ""; }
     public string icon_name { get; construct set; default = ""; }
     public bool has_thumbnail { get; construct set; default = false; }
+    public string thumbnail_path { get; construct set; }
 
     private string? title_folded = null;
     public unowned string get_title_folded ()
@@ -137,7 +138,6 @@ namespace Sezen
       }
 
       loading_in_progress = false;
-      debug ("Loading complete...");
       load_complete ();
     }
 
@@ -163,11 +163,10 @@ namespace Sezen
       }
     }
 
-    private ResultSet simple_search (Query q)
+    private void simple_search (Query q, ResultSet results)
     {
       // search method used for 1 letter searches
       unowned string query = q.query_string_folded;
-      var results = new ResultSet ();
 
       foreach (var dfi in desktop_files)
       {
@@ -180,11 +179,9 @@ namespace Sezen
           results.add (dfi, 60);
         }
       }
-
-      return results;
     }
 
-    private ResultSet full_search (Query q)
+    private void full_search (Query q, ResultSet results)
     {
       /* create a couple of regexes and try to match the titles
        * match with these regular expressions (with descending score):
@@ -196,7 +193,6 @@ namespace Sezen
        */
       unowned string query = q.query_string_folded;
       long query_length = q.query_string.length;
-      var results = new ResultSet ();
 
       //Regex? re1 = new Regex ("^" + query, RegexCompileFlags.OPTIMIZE);
       Regex? re2;
@@ -290,11 +286,9 @@ namespace Sezen
           results.add (dfi, dfi.exec == query ? 80 : 60);
         }
       }
-
-      return results;
     }
 
-    public override async ResultSet? search (Query q)
+    public override async ResultSet? search (Query q) throws SearchError
     {
       if (!(QueryFlags.APPLICATIONS in q.query_type)) return null;
 
@@ -317,24 +311,30 @@ namespace Sezen
         yield;
       }
 
-      if (q.is_cancelled ()) return null;
+      if (q.is_cancelled ())
+      {
+        throw new SearchError.SEARCH_CANCELLED ("Cancelled");
+      }
 
       // FIXME: spawn new thread and do the search there?
       var result = new ResultSet ();
-      debug ("processing search...");
 
       var timer = new Timer ();
 
       if (q.query_string.length == 1)
       {
-        result.add_all (simple_search (q));
+        simple_search (q, result);
       }
       else
       {
-        result.add_all (full_search (q));
+        full_search (q, result);
       }
 
-      debug ("searching took %g seconds", timer.elapsed ());
+      message ("Search in desktop entries took %g seconds", timer.elapsed ());
+      if (q.is_cancelled ())
+      {
+        throw new SearchError.SEARCH_CANCELLED ("Cancelled");
+      }
 
       return result;
     }

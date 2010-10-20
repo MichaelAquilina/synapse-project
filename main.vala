@@ -8,6 +8,7 @@ namespace Sezen
     public abstract string description { get; set; }
     public abstract string icon_name { get; construct set; }
     public abstract bool has_thumbnail { get; construct set; }
+    public abstract string thumbnail_path { get; construct set; }
 
     public abstract void execute ();
   }
@@ -52,7 +53,10 @@ namespace Sezen
       {
         unowned Gee.Map.Entry<Match, int> e1 = (Gee.Map.Entry<Match, int>) a;
         unowned Gee.Map.Entry<Match, int> e2 = (Gee.Map.Entry<Match, int>) b;
-        return e2.value - e1.value;
+        int relevancy_delta = e2.value - e1.value;
+        if (relevancy_delta != 0) return relevancy_delta;
+        // FIXME: utf8 compare!
+        else return e1.key.title.ascii_casecmp (e2.key.title);
       });
 
       var sorted_list = new Gee.ArrayList<Match> ();
@@ -65,9 +69,15 @@ namespace Sezen
     }
   }
 
+  errordomain SearchError
+  {
+    SEARCH_CANCELLED,
+    UNKNOWN_ERROR
+  }
+
   public abstract class DataPlugin : Object
   {
-    public abstract async ResultSet? search (Query query);
+    public abstract async ResultSet? search (Query query) throws SearchError;
   }
 
   [Flags]
@@ -142,6 +152,7 @@ namespace Sezen
     {
       // FIXME!
       register_plugin (new DesktopFilePlugin ());
+      register_plugin (new ZeitgeistPlugin ());
     }
 
     public signal void search_complete ();
@@ -151,10 +162,18 @@ namespace Sezen
       // FIXME: process results from all plugins
       debug ("search finished");
       var plugin = obj as DataPlugin;
-      var results = plugin.search.end (res);
-      foreach (var match in results.get_sorted_list ())
+      try
       {
-        debug ("got match: %s (%s)", match.title, match.description);
+        var results = plugin.search.end (res);
+        foreach (var match in results.get_sorted_list ())
+        {
+          debug ("got match: %s (%s)", match.title, match.description);
+        }
+      }
+      catch (SearchError err)
+      {
+        warning ("%s returned error: %s",
+                 plugin.get_type ().name (), err.message);
       }
 
       search_complete ();
@@ -187,7 +206,7 @@ int main (string[] argv)
     string query = argv[1];
     debug (@"Searching for $query");
     sink.search (query);
-    sink.search_complete.connect (() => { loop.quit (); });
+    //sink.search_complete.connect (() => { loop.quit (); });
 
     loop.run ();
   }
