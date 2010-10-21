@@ -1,48 +1,56 @@
 
 namespace Sezen
 {
-  public class ZeitgeistMatchObject: Object, Match
-  {
-    // for Match interface
-    public string title { get; construct set; }
-    public string description { get; set; default = ""; }
-    public string icon_name { get; construct set; default = ""; }
-    public bool has_thumbnail { get; construct set; default = false; }
-    public string thumbnail_path { get; construct set; }
-
-    private string uri;
-
-    public void execute ()
-    {
-      var f = File.new_for_uri (uri);
-      var app_info = f.query_default_handler (null);
-      List<File> files = new List<File> ();
-      files.prepend (f);
-      app_info.launch (files, new Gdk.AppLaunchContext ());
-    }
-
-    public ZeitgeistMatchObject (Zeitgeist.Event event,
-                                 string? thumbnail_path,
-                                 string? icon)
-    {
-      Object (has_thumbnail: thumbnail_path != null,
-              icon_name: icon ?? "",
-              thumbnail_path: thumbnail_path ?? "");
-
-      init_from_event (event);
-    }
-
-    private void init_from_event (Zeitgeist.Event event)
-    {
-      var subject = event.get_subject (0);
-      this.title = subject.get_text ();
-      this.description = Uri.unescape_string (subject.get_uri ());
-      this.uri = subject.get_uri ();
-    }
-  }
-
   public class ZeitgeistPlugin: DataPlugin
   {
+    private class MatchObject: Object, Match
+    {
+      // for Match interface
+      public string title { get; construct set; }
+      public string description { get; set; default = ""; }
+      public string icon_name { get; construct set; default = ""; }
+      public bool has_thumbnail { get; construct set; default = false; }
+      public string thumbnail_path { get; construct set; }
+
+      private string uri;
+
+      public void execute ()
+      {
+        var f = File.new_for_uri (uri);
+        var app_info = f.query_default_handler (null);
+        List<File> files = new List<File> ();
+        files.prepend (f);
+        app_info.launch (files, new Gdk.AppLaunchContext ());
+      }
+
+      public MatchObject (Zeitgeist.Event event,
+                          string? thumbnail_path,
+                          string? icon)
+      {
+        Object (has_thumbnail: thumbnail_path != null,
+                icon_name: icon ?? "",
+                thumbnail_path: thumbnail_path ?? "");
+
+        init_from_event (event);
+      }
+
+      private void init_from_event (Zeitgeist.Event event)
+      {
+        var subject = event.get_subject (0);
+        this.description = Uri.unescape_string (subject.get_uri ());
+        this.uri = subject.get_uri ();
+        unowned string text = subject.get_text ();
+        if (text == null || text == "")
+        {
+          this.title = this.description;
+        }
+        else
+        {
+          this.title = text;
+        }
+      }
+    }
+
     private Zeitgeist.Index zg_index;
 
     construct
@@ -81,14 +89,12 @@ namespace Sezen
               var fi = yield f.query_info_async (interesting_attributes,
                                                  0, 0,
                                                  cancellable);
+
+              icon = fi.get_icon ().to_string ();
               if (fi.has_attribute (FILE_ATTRIBUTE_THUMBNAIL_PATH))
               {
                 thumbnail_path =
                   fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH);
-              }
-              else
-              {
-                icon = fi.get_icon ().to_string ();
               }
             }
             catch (Error err)
@@ -97,9 +103,17 @@ namespace Sezen
               else continue; // file doesn't exist
             }
           }
-          var match_obj = new ZeitgeistMatchObject (event,
-                                                    thumbnail_path,
-                                                    icon);
+          else
+          {
+            unowned string mimetype = subject.get_mimetype ();
+            if (mimetype != null && mimetype != "")
+            {
+              icon = g_content_type_get_icon (mimetype).to_string ();
+            }
+          }
+          var match_obj = new MatchObject (event,
+                                           thumbnail_path,
+                                           icon);
           results.add (match_obj, 65); // FIXME: relevancy?!
         }
       }
@@ -224,7 +238,6 @@ namespace Sezen
                                         (owned) templates,
                                         0,
                                         96,
-                                        //Zeitgeist.ResultType.RELEVANCY,
                                         Zeitgeist.ResultType.MOST_RECENT_SUBJECTS,
                                         q.cancellable);
 

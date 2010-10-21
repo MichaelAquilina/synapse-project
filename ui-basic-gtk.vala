@@ -39,7 +39,9 @@ namespace Sezen
         
         if (!search_empty)
         {
-          data_sink.search (this.search_string, this.search_ready);
+          data_sink.cancel_search ();
+          data_sink.search (this.search_string, QueryFlags.LOCAL_CONTENT,
+                            this.search_ready);
         }
         else
         {
@@ -51,16 +53,23 @@ namespace Sezen
 
     private void search_ready (GLib.Object? obj, AsyncResult res)
     {
-      var results = data_sink.search.end (res);
-      if (results.size > 0)
+      try
       {
-        focus_match (results[0]);
+        var results = data_sink.search.end (res);
+        if (results.size > 0)
+        {
+          focus_match (results[0]);
+        }
+        else
+        {
+          focus_match (null);
+          main_image.set_from_icon_name ("unknown", IconSize.DIALOG);
+          main_label.set_text ("No results");
+        }
       }
-      else
+      catch (SearchError err)
       {
-        focus_match (null);
-        main_image.set_from_icon_name ("unknown", IconSize.DIALOG);
-        main_label.set_text ("No results");
+        // most likely cancelled
       }
       /*
       foreach (var match in results)

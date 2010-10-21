@@ -125,9 +125,15 @@ namespace Sezen
     {
     }
 
+    private Gee.Set<DataPlugin> plugins;
+    private Gee.List<Cancellable> cancellables;
+
     construct
     {
-      enumerate_plugins ();
+      plugins = new Gee.HashSet<DataPlugin> ();
+      cancellables = new Gee.ArrayList<Cancellable> ();
+
+      load_plugins ();
     }
 
     private static DataSink? instance = null;
@@ -140,70 +146,74 @@ namespace Sezen
       return instance;
     }
 
-    private Gee.Set<DataPlugin> plugins = new Gee.HashSet<DataPlugin> ();
-
     // FIXME: public? really?
     public void register_plugin (DataPlugin plugin)
     {
       plugins.add (plugin);
     }
 
-    private void enumerate_plugins ()
+    private void load_plugins ()
     {
       // FIXME!
       register_plugin (new DesktopFilePlugin ());
       register_plugin (new ZeitgeistPlugin ());
+      register_plugin (new HybridSearchPlugin ());
     }
 
-    public signal void search_complete ();
-
-    private void search_done (Object? obj, AsyncResult res)
+    public void cancel_search ()
     {
-      // FIXME: process results from all plugins
-      var plugin = obj as DataPlugin;
-      debug ("%s finished search", plugin.get_type ().name ());
-      try
-      {
-        var results = plugin.search.end (res);
-        current_result_set.add_all (results);
-      }
-      catch (SearchError err)
-      {
-        warning ("%s returned error: %s",
-                 plugin.get_type ().name (), err.message);
-      }
-
-      if (--search_size == 0)
-      {
-        search_complete ();
-      }
+      foreach (var c in cancellables) c.cancel ();
     }
 
-    private ResultSet current_result_set;
-    private int search_size;
-
-    public async Gee.List<Match> search (string query)
+    public async Gee.List<Match> search (string query,
+                                         QueryFlags flags) throws SearchError
     {
-      var q = Query (query);
+      var q = Query (query, flags);
 
-      current_result_set = new ResultSet ();
-      search_size = plugins.size;
+      // clear current cancellables
+      cancellables.clear ();
 
-      foreach (var plugin in plugins)
+      var current_result_set = new ResultSet ();
+      int search_size = plugins.size;
+      bool waiting = false;
+      var current_cancellable = new Cancellable ();
+      cancellables.add (current_cancellable);
+
+      foreach (var data_plugin in plugins)
       {
-        // we need to pass separate cancellable to each plugin
+        // we need to pass separate cancellable to each plugin, because we're
+        // running them in parallel
         var c = new Cancellable ();
+        cancellables.add (c);
         q.cancellable = c;
-        plugin.search (q, search_done);
+        // magic comes here
+        data_plugin.search.begin (q, (src_obj, res) =>
+        {
+          var plugin = src_obj as DataPlugin;
+          try
+          {
+            var results = plugin.search.end (res);
+            current_result_set.add_all (results);
+          }
+          catch (SearchError err)
+          {
+            if (!(err is SearchError.SEARCH_CANCELLED))
+            {
+              warning ("%s returned error: %s",
+                       plugin.get_type ().name (), err.message);
+            }
+          }
+
+          if (--search_size == 0 && waiting) search.callback ();
+        });
       }
 
-      if (search_size > 0)
+      waiting = true;
+      if (search_size > 0) yield;
+
+      if (current_cancellable.is_cancelled ())
       {
-        ulong sig_id = this.search_complete.connect (() =>
-          { search.callback (); }
-        );
-        yield;
-        SignalHandler.disconnect (this, sig_id);
+        throw new SearchError.SEARCH_CANCELLED ("Cancelled");
       }
 
       return current_result_set.get_sorted_list ();
@@ -216,7 +226,7 @@ int main (string[] argv)
 {
   if (argv.length <= 1)
   {
-    warning ("We need more params...");
+    warning ("Enter search string as command line argument!");
   }
   else
   {
@@ -225,7 +235,6 @@ int main (string[] argv)
     string query = argv[1];
     debug (@"Searching for $query");
     sink.search (query);
-    //sink.search_complete.connect (() => { loop.quit (); });
 
     loop.run ();
   }
