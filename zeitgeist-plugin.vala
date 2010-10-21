@@ -14,7 +14,11 @@ namespace Sezen
 
     public void execute ()
     {
-      debug ("xdg-open %s", uri);
+      var f = File.new_for_uri (uri);
+      var app_info = f.query_default_handler (null);
+      List<File> files = new List<File> ();
+      files.prepend (f);
+      app_info.launch (files, new Gdk.AppLaunchContext ());
     }
 
     public ZeitgeistMatchObject (Zeitgeist.Event event,

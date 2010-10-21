@@ -314,8 +314,6 @@ namespace Sezen
       // FIXME: spawn new thread and do the search there?
       var result = new ResultSet ();
 
-      var timer = new Timer ();
-
       if (q.query_string.length == 1)
       {
         simple_search (q, result);
@@ -325,7 +323,6 @@ namespace Sezen
         full_search (q, result);
       }
 
-      message ("Search in desktop entries took %g seconds", timer.elapsed ());
       if (q.is_cancelled ())
       {
         throw new SearchError.SEARCH_CANCELLED ("Cancelled");

@@ -9,6 +9,7 @@ namespace Sezen
       GLib.Object (border_width: 4);
 
       build_ui ();
+      this.set_position (WindowPosition.CENTER);
     }
 
     private IMContext im_context;
@@ -28,8 +29,15 @@ namespace Sezen
 
       this.notify["search-string"].connect (() =>
       {
-        debug ("searching \"%s\"", this.search_string);
-        if (search_string != "")
+        bool search_empty = search_string == null || search_string == "";
+
+        string search_type = "Local content"; // FIXME: un-hardcode
+        string label = search_empty ?
+          "Search > %s".printf (search_type) :
+          "Search > %s > %s".printf (search_type, search_string);
+        head_label.set_text (label);
+        
+        if (!search_empty)
         {
           data_sink.search (this.search_string, this.search_ready);
         }
@@ -50,6 +58,7 @@ namespace Sezen
       }
       else
       {
+        focus_match (null);
         main_image.set_from_icon_name ("unknown", IconSize.DIALOG);
         main_label.set_text ("No results");
       }
@@ -88,6 +97,7 @@ namespace Sezen
 
     private int ICON_SIZE = 128;
 
+    private Label head_label;
     private Image main_image;
     private Label main_label;
     private Image action_image;
@@ -97,9 +107,10 @@ namespace Sezen
     {
       int im_size = ICON_SIZE * 5 / 4;
       var main_vbox = new VBox (false, 0);
-      var label = new Label ("Search Local content");
-      label.xalign =  0.0f;
-      main_vbox.pack_start (label, false);
+      head_label = new Label ("Search > Local content");
+      head_label.xalign =  0.0f;
+      head_label.xpad = 2; head_label.ypad = 2;
+      main_vbox.pack_start (head_label, false);
 
       var left_vbox = new VBox (false, 4);
       main_image = new Image ();
@@ -108,6 +119,7 @@ namespace Sezen
       main_image.set_from_icon_name ("search", IconSize.DIALOG);
 
       main_label = new Label ("Type to search");
+      main_label.set_ellipsize (Pango.EllipsizeMode.END);
       left_vbox.pack_start (main_image, false, true);
       left_vbox.pack_start (main_label, false, true);
 
@@ -134,12 +146,30 @@ namespace Sezen
       this.add (frame);
     }
 
-    public void focus_match (Match match)
+    private Match? current_match = null;
+
+    public void focus_match (Match? match)
     {
-      GLib.Icon icon = GLib.Icon.new_for_string (match.has_thumbnail ?
-        match.thumbnail_path : match.icon_name);
-      main_image.set_from_gicon (icon, IconSize.DIALOG);
-      main_label.set_text (match.title);
+      current_match = match;
+      if (match != null)
+      {
+        try
+        {
+          GLib.Icon icon = GLib.Icon.new_for_string (match.has_thumbnail ?
+            match.thumbnail_path : match.icon_name);
+          main_image.set_from_gicon (icon, IconSize.DIALOG);
+        }
+        catch (Error err)
+        {
+          main_image.set_from_icon_name ("missing-image", IconSize.DIALOG);
+        }
+        main_label.set_text (match.title);
+      }
+    }
+
+    private void quit ()
+    {
+      Gtk.main_quit ();
     }
 
     protected override bool key_press_event (Gdk.EventKey event)
@@ -153,6 +183,11 @@ namespace Sezen
         case Gdk.KeySyms.KP_Enter:
         case Gdk.KeySyms.ISO_Enter:
           debug ("enter pressed");
+          if (current_match != null)
+          {
+            current_match.execute ();
+            quit (); // FIXME: just debug
+          }
           break;
         case Gdk.KeySyms.Delete:
         case Gdk.KeySyms.BackSpace:
@@ -161,7 +196,14 @@ namespace Sezen
           break;
         case Gdk.KeySyms.Escape:
           debug ("escape");
-          search_reset ();
+          if (search_string != "")
+          {
+            search_reset ();
+          }
+          else
+          {
+            quit (); // FIXME: just debug
+          }
           break;
         default:
           debug ("im_context didn't filter...");
