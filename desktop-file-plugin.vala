@@ -259,22 +259,18 @@ namespace Sezen
         unowned string folded_title = dfi.get_title_folded ();
         if (folded_title.has_prefix (query))
         {
-          debug ("prefix match - %s", folded_title);
           results.add (dfi, 90);
         }
         else if (re2.match (folded_title))
         {
-          debug ("re2 match - %s", folded_title);
           results.add (dfi, 75);
         }
         else if (re3 != null && re3.match (folded_title))
         {
-          debug ("re3 match - %s", folded_title);
           results.add (dfi, 70);
         }
         else if (re4 != null && re4.match (folded_title))
         {
-          debug ("re4 match - %s", folded_title);
           // FIXME: we need to do much smarter relevancy computation here
           // "sysmon" matching "System Monitor" is very good as opposed to
           // "seto" matching "System Monitor"
@@ -282,7 +278,6 @@ namespace Sezen
         }
         else if (dfi.exec.has_prefix (query))
         {
-          debug ("exec match - %s", dfi.exec);
           results.add (dfi, dfi.exec == query ? 80 : 60);
         }
       }

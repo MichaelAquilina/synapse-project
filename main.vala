@@ -160,15 +160,12 @@ namespace Sezen
     private void search_done (Object? obj, AsyncResult res)
     {
       // FIXME: process results from all plugins
-      debug ("search finished");
       var plugin = obj as DataPlugin;
+      debug ("%s finished search", plugin.get_type ().name ());
       try
       {
         var results = plugin.search.end (res);
-        foreach (var match in results.get_sorted_list ())
-        {
-          debug ("got match: %s (%s)", match.title, match.description);
-        }
+        current_result_set.add_all (results);
       }
       catch (SearchError err)
       {
@@ -176,23 +173,45 @@ namespace Sezen
                  plugin.get_type ().name (), err.message);
       }
 
-      search_complete ();
+      if (--search_size == 0)
+      {
+        search_complete ();
+      }
     }
 
-    public async void search (string query)
+    private ResultSet current_result_set;
+    private int search_size;
+
+    public async Gee.List<Match> search (string query)
     {
       var q = Query (query);
+
+      current_result_set = new ResultSet ();
+      search_size = plugins.size;
+
       foreach (var plugin in plugins)
       {
-        // we should pass separate cancellable to each plugin
+        // we need to pass separate cancellable to each plugin
         var c = new Cancellable ();
         q.cancellable = c;
         plugin.search (q, search_done);
       }
+
+      if (search_size > 0)
+      {
+        ulong sig_id = this.search_complete.connect (() =>
+          { search.callback (); }
+        );
+        yield;
+        SignalHandler.disconnect (this, sig_id);
+      }
+
+      return current_result_set.get_sorted_list ();
     }
   }
 }
 
+#if CMD_LINE_UI
 int main (string[] argv)
 {
   if (argv.length <= 1)
@@ -213,3 +232,4 @@ int main (string[] argv)
 
   return 0;
 }
+#endif

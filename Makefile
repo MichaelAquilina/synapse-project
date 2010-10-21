@@ -1,4 +1,4 @@
-SRC_FILES = $(wildcard *.vala)
+SRC_FILES = $(wildcard *.vala) keysyms.vapi
 VALA_FLAGS = --pkg zeitgeist-1.0 --pkg gtk+-2.0 --pkg gio-unix-2.0 --pkg gee-1.0
 OUTPUT = sezen2
 
