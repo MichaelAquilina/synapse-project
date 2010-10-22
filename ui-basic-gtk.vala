@@ -36,10 +36,11 @@ namespace Sezen
           "Search > %s".printf (search_type) :
           "Search > %s > %s".printf (search_type, search_string);
         head_label.set_text (label);
-        
+
+        data_sink.cancel_search ();
+
         if (!search_empty)
         {
-          data_sink.cancel_search ();
           data_sink.search (this.search_string, QueryFlags.LOCAL_CONTENT,
                             this.search_ready);
         }
@@ -195,12 +196,12 @@ namespace Sezen
           if (current_match != null)
           {
             current_match.execute ();
-            quit (); // FIXME: just debug
+            hide ();
+            search_reset ();
           }
           break;
         case Gdk.KeySyms.Delete:
         case Gdk.KeySyms.BackSpace:
-          debug ("backspace");
           search_delete_char ();
           break;
         case Gdk.KeySyms.Escape:
@@ -211,7 +212,7 @@ namespace Sezen
           }
           else
           {
-            quit (); // FIXME: just debug
+            hide ();
           }
           break;
         default:
@@ -227,6 +228,33 @@ namespace Sezen
       Gtk.init (ref argv);
       var window = new SezenWindow ();
       window.show_all ();
+
+      var registry = GtkHotkey.Registry.get_default ();
+      GtkHotkey.Info hotkey;
+      try
+      {
+        if (registry.has_hotkey ("sezen2", "activate"))
+        {
+          hotkey = registry.get_hotkey ("sezen2", "activate");
+        }
+        else
+        {
+          hotkey = new GtkHotkey.Info ("sezen2", "activate",
+                                       "<Control>space", null);
+          registry.store_hotkey (hotkey);
+        }
+        debug ("Binding activation to %s", hotkey.signature);
+        hotkey.bind ();
+        hotkey.activated.connect ((event_time) =>
+        {
+          window.show ();
+          window.present_with_time (event_time);
+        });
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
 
       Gtk.main ();
       return 0;

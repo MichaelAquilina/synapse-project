@@ -14,6 +14,7 @@ namespace Sezen
     public string icon_name { get; construct set; default = ""; }
     public bool has_thumbnail { get; construct set; default = false; }
     public string thumbnail_path { get; construct set; }
+    public string uri { get; set; }
 
     private string? title_folded = null;
     public unowned string get_title_folded ()
@@ -306,10 +307,7 @@ namespace Sezen
         yield;
       }
 
-      if (q.is_cancelled ())
-      {
-        throw new SearchError.SEARCH_CANCELLED ("Cancelled");
-      }
+      q.check_cancellable ();
 
       // FIXME: spawn new thread and do the search there?
       var result = new ResultSet ();
@@ -323,10 +321,7 @@ namespace Sezen
         full_search (q, result);
       }
 
-      if (q.is_cancelled ())
-      {
-        throw new SearchError.SEARCH_CANCELLED ("Cancelled");
-      }
+      q.check_cancellable ();
 
       return result;
     }

@@ -11,8 +11,7 @@ namespace Sezen
       public string icon_name { get; construct set; default = ""; }
       public bool has_thumbnail { get; construct set; default = false; }
       public string thumbnail_path { get; construct set; }
-
-      private string uri;
+      public string uri { get; set; }
 
       public void execute ()
       {
@@ -252,10 +251,8 @@ namespace Sezen
       }
 
       message ("Zeitgeist search took %g seconds", timer.elapsed ());
-      if (q.is_cancelled ())
-      {
-        throw new SearchError.SEARCH_CANCELLED ("Cancelled");
-      }
+
+      q.check_cancellable ();
 
       return result;
     }

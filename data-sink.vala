@@ -9,6 +9,7 @@ namespace Sezen
     public abstract string icon_name { get; construct set; }
     public abstract bool has_thumbnail { get; construct set; }
     public abstract string thumbnail_path { get; construct set; }
+    public abstract string uri { get; set; }
 
     public abstract void execute ();
   }
@@ -77,6 +78,8 @@ namespace Sezen
 
   public abstract class DataPlugin : Object
   {
+    public unowned DataSink data_sink { get; construct; }
+
     public abstract async ResultSet? search (Query query) throws SearchError;
   }
 
@@ -117,6 +120,14 @@ namespace Sezen
     {
       return cancellable.is_cancelled ();
     }
+
+    public void check_cancellable () throws SearchError
+    {
+      if (cancellable.is_cancelled ())
+      {
+        throw new SearchError.SEARCH_CANCELLED ("Cancelled");
+      }
+    }
   }
 
   public class DataSink : Object
@@ -154,15 +165,21 @@ namespace Sezen
 
     private void load_plugins ()
     {
-      // FIXME!
-      register_plugin (new DesktopFilePlugin ());
-      register_plugin (new ZeitgeistPlugin ());
-      register_plugin (new HybridSearchPlugin ());
+      // FIXME: turn into proper modules
+      register_plugin (Object.new (typeof (DesktopFilePlugin),
+                       "data-sink", this, null) as DataPlugin);
+      register_plugin (Object.new (typeof (ZeitgeistPlugin),
+                       "data-sink", this, null) as DataPlugin);
+      register_plugin (Object.new (typeof (HybridSearchPlugin),
+                       "data-sink", this, null) as DataPlugin);
     }
+
+    public signal void plugin_search_done (DataPlugin plugin, ResultSet rs);
 
     public void cancel_search ()
     {
       foreach (var c in cancellables) c.cancel ();
+      cancellables.clear ();
     }
 
     public async Gee.List<Match> search (string query,
@@ -171,7 +188,7 @@ namespace Sezen
       var q = Query (query, flags);
 
       // clear current cancellables
-      cancellables.clear ();
+      cancellables.clear (); // FIXME: really?
 
       var current_result_set = new ResultSet ();
       int search_size = plugins.size;
@@ -193,6 +210,7 @@ namespace Sezen
           try
           {
             var results = plugin.search.end (res);
+            plugin_search_done (plugin, results);
             current_result_set.add_all (results);
           }
           catch (SearchError err)
