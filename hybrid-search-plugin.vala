@@ -236,12 +236,36 @@ namespace Sezen
       }
     }
 
+    private Gee.List<FileInfo> get_extra_results (Query q,
+                                                  ResultSet original_rs,
+                                                  Gee.Collection<string> dirs)
+    {
+      var results = new Gee.ArrayList<FileInfo> ();
+
+      var possible_uris = new Gee.HashSet<string> ();
+      foreach (var directory in dirs)
+      {
+        possible_uris.add_all (directory_contents[directory].files.keys);
+        // FIXME: only add the uri if it matches our query
+        // foreach (var uri in directory_contents[directory].files.keys)
+        // 
+      }
+      foreach (var match in original_rs)
+      {
+        possible_uris.remove (match.key.uri);
+      }
+
+      foreach (var uri in possible_uris) debug ("possible_uri: %s", uri);
+
+      return results;
+    }
+
     private string? current_query = null;
     public override async ResultSet? search (Query q) throws SearchError
     {
       var result = new ResultSet ();
 
-      // what about deleting one character?
+      // FIXME: what about deleting one character?
       if (current_query != null && !q.query_string.has_prefix (current_query))
       {
         hit_level = 0;
@@ -271,18 +295,22 @@ namespace Sezen
       q.check_cancellable ();
 
       // we weren't cancelled and we should have some directories and hits
-      if (hit_level > 1)
+      if (hit_level > 1 && q.query_string.length >= 3)
       {
         // we want [current_level_uris / last_level_uris > 0.66]
         if (current_level_uris * 3 > 2 * last_level_uris)
         {
           var directories = get_most_likely_dirs ();
-          debug ("we're in level: %d and we'd crawl these dirs >\n%s",
-                 hit_level, string.joinv ("; ", directories.to_array ()));
+          if (!directories.is_empty)
+          {
+            debug ("we're in level: %d and we'd crawl these dirs >\n%s",
+                   hit_level, string.joinv ("; ", directories.to_array ()));
+          }
           yield process_directories (directories);
 
           // directory contents are updated now, we can take a look if any
           // files match our query
+          var file_info_list = get_extra_results (q, original_rs, directories);
         }
       }
 

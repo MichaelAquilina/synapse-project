@@ -131,7 +131,7 @@ namespace Sezen
               yield load_desktop_file (directory.get_child (name));
             }
           }
-        } 
+        }
         catch (Error err)
         {
           warning ("%s", err.message);
@@ -184,102 +184,28 @@ namespace Sezen
 
     private void full_search (Query q, ResultSet results)
     {
-      /* create a couple of regexes and try to match the titles
-       * match with these regular expressions (with descending score):
-       * 1) ^query
-       * 2) \bquery
-       * 4) split query and search \bq.+\bu.+\be.+\br.+\by
-       * 3) split query to length parts and search \bq.*u.*e.*r.*.*y
-       * 5) try to match with exec
-       */
-      unowned string query = q.query_string_folded;
-      long query_length = q.query_string.length;
-
-      //Regex? re1 = new Regex ("^" + query, RegexCompileFlags.OPTIMIZE);
-      Regex? re2;
-      Regex? re3 = null;
-      Regex? re4 = null;
-      try
-      {
-        re2 = new Regex ("\\b" + Regex.escape_string (query),
-                         RegexCompileFlags.OPTIMIZE);
-      }
-      catch (RegexError err)
-      {
-        re2 = null;
-      }
-
-      if (query_length <= 5)
-      {
-        string pattern = "\\b";
-        for (long offset = 0; offset < query_length; offset++)
-        {
-          bool is_last = offset == query_length - 1;
-          unichar u = query.offset (offset).get_char_validated ();
-          if (u != -1 && u != -2) // is valid unichar
-          {
-            pattern += Regex.escape_string (u.to_string ());
-          }
-          if (!is_last) pattern += ".+\\b";
-        }
-        try
-        {
-          re3 = new Regex (pattern, RegexCompileFlags.OPTIMIZE);
-        }
-        catch (RegexError err)
-        {
-          re3 = null;
-        }
-      }
-
-      if (true)
-      {
-        string pattern = "\\b";
-        for (long offset = 0; offset < query_length; offset++)
-        {
-          bool is_last = offset == query_length - 1;
-          unichar u = query.offset (offset).get_char_validated ();
-          if (u != -1 && u != -2) // valid unichar
-          {
-            pattern += Regex.escape_string (u.to_string ());
-          }
-          if (!is_last) pattern += ".*";
-        }
-        try
-        {
-          re4 = new Regex (pattern, RegexCompileFlags.OPTIMIZE);
-        }
-        catch (RegexError err)
-        {
-          re4 = null;
-        }
-      }
+      // try to match against global matchers and if those fail, try also exec
+      var matchers = Query.get_matchers_for_query (q.query_string_folded);
 
       foreach (var dfi in desktop_files)
       {
         unowned string folded_title = dfi.get_title_folded ();
-        if (folded_title.has_prefix (query))
+        bool matched = false;
+        // FIXME: we need to do much smarter relevancy computation in fuzzy re
+        // "sysmon" matching "System Monitor" is very good as opposed to
+        // "seto" matching "System Monitor"
+        foreach (var matcher in matchers)
         {
-          results.add (dfi, 90);
+          if (matcher.key.match (folded_title))
+          {
+            results.add (dfi, matcher.value);
+            matched = true;
+            break;
+          }
         }
-        else if (re2.match (folded_title))
+        if (!matched && dfi.exec.has_prefix (q.query_string))
         {
-          results.add (dfi, 75);
-        }
-        else if (re3 != null && re3.match (folded_title))
-        {
-          results.add (dfi, 70);
-        }
-        else if (re4 != null && re4.match (folded_title))
-        {
-          // FIXME: we need to do much smarter relevancy computation here
-          // "sysmon" matching "System Monitor" is very good as opposed to
-          // "seto" matching "System Monitor"
-          results.add (dfi, 55);
-        }
-        else if (dfi.exec.has_prefix (query))
-        {
-          results.add (dfi, dfi.exec == query ? 80 : 60);
+          results.add (dfi, dfi.exec == q.query_string ? 85 : 65);
         }
       }
     }
