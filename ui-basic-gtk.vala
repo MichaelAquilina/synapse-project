@@ -1,3 +1,4 @@
+#if !CMD_LINE_UI
 using Gtk;
 
 namespace Sezen
@@ -261,3 +262,4 @@ namespace Sezen
     }
   }
 }
+#endif

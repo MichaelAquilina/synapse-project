@@ -32,6 +32,10 @@ namespace Sezen
     {
       get { return matches.element_type; }
     }
+    public int size
+    {
+      get { return matches.size; }
+    }
     public Gee.Set<Match> keys
     {
       owned get { return matches.keys; }
@@ -374,24 +378,3 @@ namespace Sezen
   }
 }
 
-#if CMD_LINE_UI
-int main (string[] argv)
-{
-  if (argv.length <= 1)
-  {
-    warning ("Enter search string as command line argument!");
-  }
-  else
-  {
-    var loop = new MainLoop ();
-    var sink = Sezen.DataSink.get_default ();
-    string query = argv[1];
-    debug (@"Searching for $query");
-    sink.search (query);
-
-    loop.run ();
-  }
-
-  return 0;
-}
-#endif

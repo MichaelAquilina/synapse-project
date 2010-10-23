@@ -83,7 +83,7 @@ namespace Sezen
 
           current_level_uris = uris.size;
           hit_level = current_hit_level+1;
-          debug ("Hit_level: %d - %d uris", hit_level, current_level_uris);
+          //debug ("Hit_level: %d - %d uris", hit_level, current_level_uris);
 
           hits_updated (rs);
         });
@@ -243,19 +243,34 @@ namespace Sezen
       var results = new Gee.ArrayList<FileInfo> ();
 
       var possible_uris = new Gee.HashSet<string> ();
+      var flags = RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS;
+      // FIXME: uri escape!
+      var matchers = Query.get_matchers_for_query (q.query_string,
+                                                   false,
+                                                   flags);
       foreach (var directory in dirs)
       {
-        possible_uris.add_all (directory_contents[directory].files.keys);
-        // FIXME: only add the uri if it matches our query
-        // foreach (var uri in directory_contents[directory].files.keys)
-        // 
+        // only add the uri if it matches our query
+        foreach (string uri in directory_contents[directory].files.keys)
+        {
+          foreach (var matcher in matchers)
+          {
+            if (matcher.key.match (uri))
+            {
+              possible_uris.add ((owned) uri);
+              break;
+            }
+          }
+        }
       }
       foreach (var match in original_rs)
       {
         possible_uris.remove (match.key.uri);
       }
 
-      foreach (var uri in possible_uris) debug ("possible_uri: %s", uri);
+      debug ("%s found %d extra uris (ZG returned %d)",
+        this.get_type ().name (), possible_uris.size, original_rs.size);
+      //foreach (string s in possible_uris) print ("%s\n", s);
 
       return results;
     }
@@ -301,11 +316,11 @@ namespace Sezen
         if (current_level_uris * 3 > 2 * last_level_uris)
         {
           var directories = get_most_likely_dirs ();
-          if (!directories.is_empty)
+          /*if (!directories.is_empty)
           {
             debug ("we're in level: %d and we'd crawl these dirs >\n%s",
                    hit_level, string.joinv ("; ", directories.to_array ()));
-          }
+          }*/
           yield process_directories (directories);
 
           // directory contents are updated now, we can take a look if any
