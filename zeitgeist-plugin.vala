@@ -65,7 +65,8 @@ namespace Sezen
 
     private async void process_results (Zeitgeist.ResultSet events,
                                         Cancellable cancellable,
-                                        ResultSet results)
+                                        ResultSet results,
+                                        bool local_only)
     {
       Gee.Set<string> uris = new Gee.HashSet<string> ();
 
@@ -101,6 +102,10 @@ namespace Sezen
               if (cancellable.is_cancelled ()) return;
               else continue; // file doesn't exist
             }
+          }
+          else if (local_only)
+          {
+            continue;
           }
           else
           {
@@ -242,7 +247,8 @@ namespace Sezen
 
         if (!q.is_cancelled ())
         {
-          yield process_results (rs, q.cancellable, result);
+          yield process_results (rs, q.cancellable, result,
+                                 QueryFlags.LOCAL_ONLY in q.query_type);
         }
       }
       catch (Error err)

@@ -41,8 +41,23 @@ namespace Sezen
 
         if (!search_empty)
         {
+          uint timer_id;
+          timer_id = Timeout.add (150, () =>
+          {
+            debug ("search is taking quite long, we should display something");
+            timer_id = 0;
+            return false;
+          });
           data_sink.search (this.search_string, QueryFlags.LOCAL_CONTENT,
-                            this.search_ready);
+                            (obj, res) =>
+          {
+            if (timer_id != 0)
+            {
+              Source.remove (timer_id);
+              debug ("the search was fast enough");
+            }
+            this.search_ready (obj, res);
+          });
         }
         else
         {
