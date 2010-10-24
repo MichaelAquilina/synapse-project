@@ -267,7 +267,6 @@ namespace Sezen
       return true;
     }
 
-#if !CMD_LINE_UI
     public static int main (string[] argv)
     {
       Gtk.init (ref argv);
@@ -301,6 +300,5 @@ namespace Sezen
       window.destroy ();
       return 0;
     }
-#endif
   }
 }

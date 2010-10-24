@@ -79,12 +79,91 @@ namespace Sezen
     {
       directory_hits = new Gee.HashMap<string, int> ();
       directory_contents = new Gee.HashMap<string, FileInfo?> ();
+
+      analyze_recent_documents ();
     }
 
     protected override void constructed ()
     {
       // FIXME: if zeitgeist-plugin available
       data_sink.plugin_search_done.connect (this.zg_plugin_search_done);
+    }
+
+    private const string RECENT_XML_NAME = ".recently-used.xbel";
+    private const int MAX_RECENT_DIRS = 10;
+
+    private async void analyze_recent_documents ()
+    {
+      var recent = File.new_for_path (
+        "%s/%s".printf (Environment.get_home_dir (), RECENT_XML_NAME)
+      );
+
+      try
+      {
+        string contents;
+        size_t len;
+
+        bool load_ok = yield recent.load_contents_async (null, 
+                                                         out contents,
+                                                         out len);
+        if (load_ok)
+        {
+          // load all uris from recently-used bookmark file
+          var bf = new BookmarkFile ();
+          bf.load_from_data (contents, len);
+          string[] uris = bf.get_uris ();
+
+          // make a <string, int> map of directory occurences for the uris
+          Gee.Map<string, int> dir_hits = new Gee.HashMap<string, int> ();
+
+          foreach (unowned string uri in uris)
+          {
+            var f = File.new_for_uri (uri);
+            string? parent_path = f.get_parent ().get_path ();
+            if (parent_path == null) continue;
+            dir_hits[parent_path] = dir_hits[parent_path]+1;
+          }
+
+          // sort the map according to hits
+          Gee.List<Gee.Map.Entry<string, int>> sorted_dirs = new Gee.ArrayList<Gee.Map.Entry<string, int>> ();
+          sorted_dirs.add_all (dir_hits.entries);
+          sorted_dirs.sort ((a, b) =>
+          {
+            unowned Gee.Map.Entry<string, int> e1 =
+              (Gee.Map.Entry<string, int>) a;
+            unowned Gee.Map.Entry<string, int> e2 = 
+              (Gee.Map.Entry<string, int>) b;
+            return e2.value - e1.value;
+          });
+
+          // pick first MAX_RECENT_DIRS items and scan those
+          Gee.List<string> directories = new Gee.ArrayList<string> ();
+          for (int i=0;
+               i<sorted_dirs.size && directories.size<MAX_RECENT_DIRS; i++)
+          {
+            string dir_path = sorted_dirs[i].key;
+            if (dir_path.has_prefix ("/tmp")) continue;
+            var dir_f = File.new_for_path (dir_path);
+            if (dir_f.is_native () && dir_f.query_exists ()) // FIXME: async!
+            {
+              directories.add (dir_path);
+            }
+          }
+
+          yield process_directories (directories);
+
+          int z = 0;
+          foreach (var x in directory_contents)
+          {
+            z += x.value.files.size;
+          }
+          debug ("we now have %d file names", z);
+        }
+      }
+      catch (Error err)
+      {
+        warning ("Unable to parse ~/%s", RECENT_XML_NAME);
+      }
     }
 
     private void zg_plugin_search_done (DataPlugin plugin, ResultSet rs)
@@ -244,6 +323,7 @@ namespace Sezen
             directory_contents[dir_path] = di;
           }
 
+          debug ("Scanning %s...", dir_path);
           var enumerator = yield directory.enumerate_children_async (
             FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
           var files = yield enumerator.next_files_async (1024, 0);

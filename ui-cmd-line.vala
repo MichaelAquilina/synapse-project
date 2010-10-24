@@ -19,8 +19,6 @@
  *
  */
 
-#if CMD_LINE_UI
-
 MainLoop loop;
 
 int main (string[] argv)
@@ -54,4 +52,4 @@ int main (string[] argv)
 
   return 0;
 }
-#endif
+
