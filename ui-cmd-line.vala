@@ -1,5 +1,8 @@
 
 #if CMD_LINE_UI
+
+MainLoop loop;
+
 int main (string[] argv)
 {
   if (argv.length <= 1)
@@ -8,8 +11,8 @@ int main (string[] argv)
   }
   else
   {
-    var loop = new MainLoop ();
-    var sink = Sezen.DataSink.get_default ();
+    loop = new MainLoop ();
+    var sink = new Sezen.DataSink ();
     string query = argv[1];
     debug (@"Searching for $query");
     sink.search (query, Sezen.QueryFlags.LOCAL_CONTENT, (obj, res) =>

@@ -271,8 +271,13 @@ namespace Sezen
 
   public class DataSink : Object
   {
-    private DataSink ()
+    public DataSink ()
     {
+    }
+
+    ~DataSink ()
+    {
+      debug ("DataSink died...");
     }
 
     private Gee.Set<DataPlugin> plugins;
@@ -284,16 +289,6 @@ namespace Sezen
       cancellables = new Gee.ArrayList<Cancellable> ();
 
       load_plugins ();
-    }
-
-    private static DataSink? instance = null;
-    public static unowned DataSink get_default ()
-    {
-      if (instance == null)
-      {
-        instance = new DataSink ();
-      }
-      return instance;
     }
 
     // FIXME: public? really?

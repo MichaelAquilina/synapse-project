@@ -1,4 +1,3 @@
-#if !CMD_LINE_UI
 using Gtk;
 
 namespace Sezen
@@ -18,7 +17,7 @@ namespace Sezen
 
     construct
     {
-      data_sink = DataSink.get_default ();
+      data_sink = new DataSink ();
 
       set_decorated (false);
       set_resizable (false);
@@ -169,6 +168,7 @@ namespace Sezen
           GLib.Icon icon = GLib.Icon.new_for_string (match.has_thumbnail ?
             match.thumbnail_path : match.icon_name);
           main_image.set_from_gicon (icon, IconSize.DIALOG);
+          icon.unref ();
         }
         catch (Error err)
         {
@@ -181,6 +181,12 @@ namespace Sezen
     private void quit ()
     {
       Gtk.main_quit ();
+    }
+
+    public void activate (uint event_time)
+    {
+      show ();
+      present_with_time (event_time);
     }
 
     protected override bool key_press_event (Gdk.EventKey event)
@@ -214,6 +220,7 @@ namespace Sezen
           else
           {
             hide ();
+            //quit (); // for debug
           }
           break;
         default:
@@ -224,6 +231,7 @@ namespace Sezen
       return true;
     }
 
+#if !CMD_LINE_UI
     public static int main (string[] argv)
     {
       Gtk.init (ref argv);
@@ -246,11 +254,7 @@ namespace Sezen
         }
         debug ("Binding activation to %s", hotkey.signature);
         hotkey.bind ();
-        hotkey.activated.connect ((event_time) =>
-        {
-          window.show ();
-          window.present_with_time (event_time);
-        });
+        hotkey.activated.connect (window.activate);
       }
       catch (Error err)
       {
@@ -258,8 +262,9 @@ namespace Sezen
       }
 
       Gtk.main ();
+      window.destroy ();
       return 0;
     }
+#endif
   }
 }
-#endif
