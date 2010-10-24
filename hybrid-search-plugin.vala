@@ -66,11 +66,11 @@ namespace Sezen
     {
       public string path;
       public TimeVal last_update;
-      public Gee.Map<string, FileInfo?> files;
+      public Gee.Map<unowned string, FileInfo?> files;
 
       public DirectoryInfo (string path)
       {
-        this.files = new Gee.HashMap<string, FileInfo?> ();
+        this.files = new Gee.HashMap<unowned string, FileInfo?> ();
         this.path = path;
       }
     }
@@ -295,7 +295,9 @@ namespace Sezen
       {
         unowned string name = f.get_name ();
         var child = directory.get_child (name);
-        di.files[child.get_uri ()] = null;
+        var file_info = new FileInfo (child.get_uri ());
+        di.files[file_info.uri] = file_info;
+        //di.files[child.get_uri ()] = null;
       }
     }
 
@@ -338,7 +340,8 @@ namespace Sezen
 
     private Gee.List<FileInfo> get_extra_results (Query q,
                                                   ResultSet original_rs,
-                                                  Gee.Collection<string> dirs)
+                                                  Gee.Collection<string>? dirs)
+      throws SearchError
     {
       var results = new Gee.ArrayList<FileInfo> ();
 
@@ -348,24 +351,23 @@ namespace Sezen
       var matchers = Query.get_matchers_for_query (q.query_string,
                                                    false,
                                                    flags);
-      foreach (var directory in dirs)
+      Gee.Collection<string> directories = dirs ?? directory_contents.keys;
+      foreach (var directory in directories)
       {
         // only add the uri if it matches our query
-        foreach (string uri in directory_contents[directory].files.keys)
+        foreach (unowned string uri in directory_contents[directory].files.keys)
         {
           foreach (var matcher in matchers)
           {
             if (matcher.key.match (uri))
             {
-              possible_uris.add (uri);
+              if (!original_rs.contains_uri (uri)) possible_uris.add (uri);
               break;
             }
           }
         }
-      }
-      foreach (var match in original_rs)
-      {
-        possible_uris.remove (match.key.uri);
+
+        q.check_cancellable ();
       }
 
       debug ("%s found %d extra uris (ZG returned %d)",
@@ -378,6 +380,7 @@ namespace Sezen
     private string? current_query = null;
     public override async ResultSet? search (Query q) throws SearchError
     {
+      var start_time = new Timer ();
       var result = new ResultSet ();
 
       // FIXME: what about deleting one character?
@@ -422,12 +425,19 @@ namespace Sezen
                    hit_level, string.joinv ("; ", directories.to_array ()));
           }*/
           yield process_directories (directories);
-
-          // directory contents are updated now, we can take a look if any
-          // files match our query
-          var file_info_list = get_extra_results (q, original_rs, directories);
+          q.check_cancellable ();
         }
       }
+
+      // directory contents are updated now, we can take a look if any
+      // files match our query
+      var t = new Timer ();
+      // FIXME: run this sooner, it doesn't need to wait for the signal
+      var file_info_list = get_extra_results (q, original_rs, null);
+      debug ("%s ran matching %d ms (total %d ms)",
+             this.get_type ().name (),
+             (int) (t.elapsed ()*1000),
+             (int) (start_time.elapsed ()*1000));
 
       return result;
     }

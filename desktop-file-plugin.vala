@@ -45,7 +45,7 @@ namespace Sezen
 
     public void execute ()
     {
-      var de = new DesktopAppInfo.from_filename (full_path);
+      var de = new DesktopAppInfo.from_filename (uri);
       try
       {
         de.launch (null, null); // de.launch (null, new Gdk.AppLaunchContext ());
@@ -56,7 +56,6 @@ namespace Sezen
       }
     }
 
-    public string full_path { get; construct set; }
     public string exec { get; set; }
 
     public bool is_valid { get; private set; default = true; }
@@ -65,7 +64,7 @@ namespace Sezen
 
     public DesktopFileInfo.for_keyfile (string path, KeyFile keyfile)
     {
-      Object (full_path: path);
+      Object (uri: path);
 
       init_from_keyfile (keyfile);
     }
