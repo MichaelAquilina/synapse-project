@@ -118,13 +118,13 @@ namespace Sezen
       string[] individual_words = Regex.split_simple ("\\s+", query);
       if (individual_words.length >= 2)
       {
-        string pattern = "\\b";
-        for (int i = 0; i < individual_words.length; i++)
+        string[] escaped_words = {};
+        foreach (unowned string word in individual_words)
         {
-          bool is_last = i == individual_words.length - 1;
-          pattern += Regex.escape_string (individual_words[i]);
-          if (!is_last) pattern += ".+\\b";
+          escaped_words += Regex.escape_string (word);
         }
+        string pattern = "\\b%s".printf (string.joinv (".+\\b", escaped_words));
+
         try
         {
           re = new Regex (pattern, flags);
@@ -132,6 +132,23 @@ namespace Sezen
         }
         catch (RegexError err)
         {
+        }
+
+        // FIXME: do something generic here
+        if (escaped_words.length == 2)
+        {
+          var reversed = "\\b%s".printf (string.join (".+\\b",
+                                                      escaped_words[1],
+                                                      escaped_words[0],
+                                                      null));
+          try
+          {
+            re = new Regex (reversed, flags);
+            results[re] = 78;
+          }
+          catch (RegexError err)
+          {
+          }
         }
       }
 
