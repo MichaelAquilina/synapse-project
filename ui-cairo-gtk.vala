@@ -220,9 +220,10 @@ namespace Sezen
       GtkContainerOverlayed gco = new GtkContainerOverlayed();
       main_image_overlay = new Image();
       main_image_overlay.set_pixel_size (ICON_SIZE / 2);
-      main_image_overlay.set_from_icon_name ("search", IconSize.DIALOG);
       main_image = new Image ();
+      main_image.set_size_request (ICON_SIZE, ICON_SIZE);
       main_image.set_pixel_size (ICON_SIZE);
+      main_image.set_from_icon_name ("search", IconSize.DIALOG);
       gco.add( main_image );
       gco.add( main_image_overlay );
       top_hbox.pack_start (gco, false);
@@ -808,7 +809,6 @@ namespace Sezen
       set_allocation (alloc);    
       main.size_allocate (allocation);
       overlay.size_allocate (aoverlay);
-      debug ("sizealloc");
     }
     public override void forall_internal (bool b, Gtk.Callback callback)
     {
