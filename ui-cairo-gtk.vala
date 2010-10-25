@@ -22,6 +22,7 @@
 
 using Gtk;
 using Cairo;
+using Gee;
 
 namespace Sezen
 {
@@ -35,7 +36,7 @@ namespace Sezen
     private const int UI_WIDTH = 550 + PADDING * 2;
     private const int UI_HEIGHT = ICON_SIZE + PADDING * 2;
     private const int UI_LIST_WIDTH = 400;
-    private const int UI_LIST_HEIGHT = 300;
+    private const int UI_LIST_HEIGHT = (35 + 4) * 5 + 2;
     private const int LIST_BORDER_RADIUS = 3;
     private const int TOP_SPACING = UI_HEIGHT * 4 / 10;
     
@@ -44,7 +45,7 @@ namespace Sezen
                                              QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.INTERNET};
     
     /* STATUS */
-    private bool list_visible = false;
+    private bool list_visible = true;
 
     public SezenWindow ()
     {
@@ -146,10 +147,13 @@ namespace Sezen
         ctx.paint ();
         ctx.set_operator (Cairo.Operator.OVER);
 
+        int top_SPACING = TOP_SPACING;
+        if (!w.is_composited())
+          top_SPACING = 0;
         /* Prepare bg's colors using GtkStyle */
         Gtk.Style style = w.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
-        Pattern pat = new Pattern.linear(0, TOP_SPACING, 0, UI_HEIGHT);
+        Pattern pat = new Pattern.linear(0, top_SPACING, 0, UI_HEIGHT);
         color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                     double.min(g + 0.15, 1),
@@ -160,13 +164,13 @@ namespace Sezen
                                     double.max(b - 0.15, 0),
                                     0.95);
         /* Prepare and draw top bg's rect */
-        int PAD = 2;
-        rounded_rect (ctx, PAD, TOP_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - TOP_SPACING - PAD * 2, BORDER_RADIUS);
+        int PAD = 1;
+        rounded_rect (ctx, PAD, top_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - top_SPACING - PAD * 2, BORDER_RADIUS);
         ctx.set_source (pat);
         ctx.fill ();
         /* Add border */
-        rounded_rect (ctx, PAD, TOP_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - TOP_SPACING - PAD * 2, BORDER_RADIUS);
-        ctx.set_line_width (2.5);
+        rounded_rect (ctx, PAD, top_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - top_SPACING - PAD * 2, BORDER_RADIUS);
+        ctx.set_line_width (2);
         ctx.set_source_rgba (1-r, 1-g, 1-b, 0.8);
         ctx.stroke ();
 
@@ -186,6 +190,9 @@ namespace Sezen
     private Image action_image;
     private Label action_label;
     private SezenTypeSelector sts;
+    private ResultBox result_box;
+    private HBox list_hbox;
+    private HBox top_hbox;
 
     private void build_ui ()
     {
@@ -195,16 +202,16 @@ namespace Sezen
       var main_vbox = new VBox (false, 0);
       main_vbox.set_size_request (UI_WIDTH, UI_HEIGHT+UI_LIST_HEIGHT);
       /* top_hbox: HBox, to separate Top Area contents */
-      var top_hbox = new HBox (false, 0);
+      top_hbox = new HBox (false, 0);
       top_hbox.border_width = PADDING;
       top_hbox.set_size_request (UI_WIDTH, UI_HEIGHT);
       /* list_hbox: HBox, to separate List Area contents*/
-      var list_hbox = new HBox (false, 0);
+      list_hbox = new HBox (false, 0);
       list_hbox.set_size_request (UI_LIST_WIDTH, UI_LIST_HEIGHT);
       
       this.add (main_vbox);
       main_vbox.pack_start (top_hbox, false);
-      main_vbox.pack_start (list_hbox, false);
+      main_vbox.pack_start (list_hbox);
       
       /* Constructing Top Area */
       
@@ -253,6 +260,17 @@ namespace Sezen
       action_image.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
       action_image.set_from_icon_name ("system-run", IconSize.DIALOG);
       right_hbox.pack_start (action_image, false);
+      
+      /* ResultBox */
+      result_box = new ResultBox(UI_LIST_WIDTH);
+      var spacerleft = new Label("");
+      var spacerright = new Label("");
+      spacerright.set_size_request ((UI_WIDTH-UI_LIST_WIDTH) / 2, 10);
+      spacerleft.set_size_request ((UI_WIDTH-UI_LIST_WIDTH) / 2, 10);
+      list_hbox.pack_start (spacerleft,false);
+      list_hbox.pack_start (result_box);
+      list_hbox.pack_start (spacerright,false);
+      list_hbox.name = "list_hbox";
 
       this.show_all();
     }
@@ -299,12 +317,40 @@ namespace Sezen
           sts.select_next ();
           this.search_string = search_string;
           break;
+        case Gdk.KeySyms.Up:
+          int i = result_box.move_selection (-1);
+          if (i < 0)
+            focus_match (null);
+          else
+            focus_match (results[i]);
+          set_list_visible (true);
+          break;
+        case Gdk.KeySyms.Down:
+          int i = result_box.move_selection (1);
+          if (i < 0)
+            focus_match (null);
+          else
+            focus_match (results[i]);
+          set_list_visible (true);
+          break;
         default:
           debug ("im_context didn't filter...");
           break;
       }
 
       return true;
+    }
+    private void set_list_visible (bool b)
+    {
+      if (b==this.list_visible)
+        return;
+      this.list_visible = b;
+      debug ("Set list %s visible", b?"yes": "no");
+      if (b)
+        list_hbox.show();
+      else
+        list_hbox.hide();
+      set_mask ();
     }
     
     private void quit ()
@@ -340,20 +386,24 @@ namespace Sezen
         }
         else
         {
+          result_box.update_matches (null);
+          set_list_visible (false);
           main_image.set_from_icon_name ("search", IconSize.DIALOG);
           main_label.set_markup (markup_string_with_search (" "," "));
           main_label_description.set_markup (get_description_markup ("Type to search..."));
         }
       });
     }
+    Gee.List<Match> results;
     private void search_ready (GLib.Object? obj, AsyncResult res)
     {
       try
       {
-        var results = data_sink.search.end (res);
+        results = data_sink.search.end (res);
         if (results.size > 0)
         {
           focus_match (results[0]);
+          result_box.update_matches (results);
           /*
           foreach (var match in results)
           {
@@ -363,6 +413,8 @@ namespace Sezen
         }
         else
         {
+          result_box.update_matches (null);
+          set_list_visible (false);
           focus_match (null);
           main_image.set_from_icon_name ("unknown", IconSize.DIALOG);
         }
@@ -475,11 +527,14 @@ namespace Sezen
           markup += text.substring(i,1);
         }
       }
-      markup += text.substring(i);
-      markup = "<span size=\"xx-large\">"+markup+"</span>";
       if (j < pattern.length)
       {
-        markup = "<span size=\"medium\">"+pattern+"</span>\n"+markup;
+        markup = "<span size=\"medium\">"+pattern+"</span>\n<span size=\"xx-large\">"+text+"</span>";
+      }
+      else
+      {
+        markup += text.substring(i);
+        markup = "<span size=\"xx-large\">"+markup+"</span>";
       }
 
       return markup;
@@ -490,11 +545,17 @@ namespace Sezen
       return "<span size=\"medium\"><i>" + s + "</i></span>";
     }
     
+    public void show_sezen ()
+    {
+      this.show_all ();
+      set_list_visible (false);
+    }
+    
     public static int main (string[] argv)
     {
       Gtk.init (ref argv);
       var window = new SezenWindow ();
-      window.show_all ();
+      window.show_sezen();
 
       var registry = GtkHotkey.Registry.get_default ();
       GtkHotkey.Info hotkey;
@@ -573,6 +634,142 @@ namespace Sezen
       this.selected = sel;
       this.set_markup (s);
       this.queue_draw ();
+    }
+  }
+  /* Result List stuff */
+  public class ResultBox: EventBox
+  {
+    private const int VISIBLE_RESULTS = 5;
+    private const int ICON_SIZE = 35;
+    private int mwidth;
+    private bool no_results;
+    
+    public ResultBox (int width)
+    {
+      this.mwidth = width;
+      no_results = true;
+      build_ui();
+    }
+    
+    private enum Column {
+			IconColumn = 0,
+			NameColumn = 1,
+		}
+		
+		private TreeView view;
+		ListStore results;
+		
+    private void build_ui()
+    {
+      var vbox = new VBox (false, 0);
+      vbox.border_width = 1;
+      this.add (vbox);
+      var resultsScrolledWindow = new ScrolledWindow (null, null);
+      resultsScrolledWindow.set_policy (PolicyType.NEVER, PolicyType.NEVER);
+      vbox.pack_start (resultsScrolledWindow);
+      
+      view = new TreeView ();
+			view.enable_search = false;
+			view.headers_visible = false;
+			// If this is not set the tree will call IconDataFunc for all rows to 
+			// determine the total height of the tree
+			view.fixed_height_mode = true;
+			resultsScrolledWindow.add (view);
+			view.show();
+      // Model
+      view.model = results = new ListStore(2, typeof(GLib.Icon), typeof(string));
+
+      var column = new TreeViewColumn ();
+			column.sizing = Gtk.TreeViewColumnSizing.FIXED;
+
+			var crp = new CellRendererPixbuf ();
+      crp.set_fixed_size (ICON_SIZE, ICON_SIZE);
+      crp.stock_size = IconSize.DND;
+			column.pack_start (crp, false);
+			column.add_attribute (crp, "gicon", (int) Column.IconColumn);
+			
+			var ctxt = new CellRendererText ();
+			ctxt.ellipsize = Pango.EllipsizeMode.END;
+			ctxt.set_fixed_size (mwidth - ICON_SIZE, ICON_SIZE);
+			column.pack_start (ctxt, false);
+      column.add_attribute (ctxt, "markup", (int) Column.NameColumn);
+      
+      view.append_column (column);
+    }    
+    public void update_matches (Gee.List<Sezen.Match>? rs)
+    {
+      results.clear();
+      if (rs==null)
+      {
+        no_results = true;
+        return;
+      }
+      no_results = false;
+      TreeIter iter;
+      foreach (Match m in rs)
+      {
+        results.append (out iter);
+        results.set (iter, Column.IconColumn, GLib.Icon.new_for_string(m.icon_name), Column.NameColumn, 
+                     Markup.printf_escaped ("<span><b>%s</b></span>\n<span size=\"small\">%s</span>",m.title, m.description));
+      }
+      var sel = view.get_selection ();
+      sel.select_path (new TreePath.first());
+    }
+    public int move_selection (int val)
+    {
+      if (no_results)
+        return -1;
+      var sel = view.get_selection ();
+      int index = -1, oindex = -1;
+      GLib.List<TreePath> sel_paths = sel.get_selected_rows(null);
+      TreePath path = sel_paths.first ().data;
+      TreePath opath = path;
+      try {oindex = path.to_string().to_int();} catch {}
+      if (val > 0)
+        path.next ();
+      else if (val < 0)
+        path.prev ();
+      try {
+        index = path.to_string().to_int();
+      } catch {}
+      if (index < 0 || index >= results.length)
+      {
+        index = oindex;
+        path = opath;
+      }
+      /* Scroll to path */
+      var time = new TimeoutSource(1);
+      time.set_callback(() => {
+          sel.unselect_all ();
+          sel.select_path (path);
+          view.scroll_to_cell (path, null, true, 0.5F, 0.0F);
+          return false;
+      });
+      time.attach(null);
+      return index;
+    }
+  }
+
+  public class SezenIconProvider
+  {
+    public static Gdk.Pixbuf get_icon_pixbuf (string name, int size)
+    {
+      Gdk.Pixbuf pixbuf = null;
+			string name_noext;
+
+      IconTheme theme = IconTheme.get_default();
+
+			try	{
+				if (theme.has_icon (name)) {  
+					pixbuf = theme.load_icon (name, size, 0);
+				} else if (name == "gnome-mime-text-plain" && theme.has_icon ("gnome-mime-text")) { 
+					pixbuf = theme.load_icon ("gnome-mime-text", size, 0);
+				}
+			} catch {
+				pixbuf = null;
+			}
+		
+			return pixbuf;
     }
   }
 }
