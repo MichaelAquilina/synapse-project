@@ -36,7 +36,7 @@ namespace Sezen
     private const int UI_WIDTH = 550 + PADDING * 2;
     private const int UI_HEIGHT = ICON_SIZE + PADDING * 2;
     private const int UI_LIST_WIDTH = 400;
-    private const int UI_LIST_HEIGHT = (35 + 4) * 6 + 2;
+    private const int UI_LIST_HEIGHT = (35 + 4) * 5 + 2;
     private const int LIST_BORDER_RADIUS = 3;
     private const int TOP_SPACING = UI_HEIGHT * 4 / 10;
     
@@ -147,10 +147,13 @@ namespace Sezen
         ctx.paint ();
         ctx.set_operator (Cairo.Operator.OVER);
 
+        int top_SPACING = TOP_SPACING;
+        if (!w.is_composited())
+          top_SPACING = 0;
         /* Prepare bg's colors using GtkStyle */
         Gtk.Style style = w.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
-        Pattern pat = new Pattern.linear(0, TOP_SPACING, 0, UI_HEIGHT);
+        Pattern pat = new Pattern.linear(0, top_SPACING, 0, UI_HEIGHT);
         color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                     double.min(g + 0.15, 1),
@@ -162,11 +165,11 @@ namespace Sezen
                                     0.95);
         /* Prepare and draw top bg's rect */
         int PAD = 1;
-        rounded_rect (ctx, PAD, TOP_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - TOP_SPACING - PAD * 2, BORDER_RADIUS);
+        rounded_rect (ctx, PAD, top_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - top_SPACING - PAD * 2, BORDER_RADIUS);
         ctx.set_source (pat);
         ctx.fill ();
         /* Add border */
-        rounded_rect (ctx, PAD, TOP_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - TOP_SPACING - PAD * 2, BORDER_RADIUS);
+        rounded_rect (ctx, PAD, top_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - top_SPACING - PAD * 2, BORDER_RADIUS);
         ctx.set_line_width (2);
         ctx.set_source_rgba (1-r, 1-g, 1-b, 0.8);
         ctx.stroke ();
@@ -347,6 +350,7 @@ namespace Sezen
         list_hbox.show();
       else
         list_hbox.hide();
+      set_mask ();
     }
     
     private void quit ()
