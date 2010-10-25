@@ -89,7 +89,7 @@ namespace Sezen
 
       try
       {
-        re = new Regex ("^" + Regex.escape_string (query) + "$", flags);
+        re = new Regex ("^(%s)$".printf (Regex.escape_string (query)), flags);
         results[re] = 100;
       }
       catch (RegexError err)
@@ -98,7 +98,7 @@ namespace Sezen
 
       try
       {
-        re = new Regex ("^" + Regex.escape_string (query), flags);
+        re = new Regex ("^(%s)".printf (Regex.escape_string (query)), flags);
         results[re] = 90;
       }
       catch (RegexError err)
@@ -107,7 +107,7 @@ namespace Sezen
 
       try
       {
-        re = new Regex ("\\b" + Regex.escape_string (query), flags);
+        re = new Regex ("\\b(%s)".printf (Regex.escape_string (query)), flags);
         results[re] = 85;
       }
       catch (RegexError err)
@@ -123,7 +123,8 @@ namespace Sezen
         {
           escaped_words += Regex.escape_string (word);
         }
-        string pattern = "\\b%s".printf (string.joinv (".+\\b", escaped_words));
+        string pattern = "\\b(%s)".printf (string.joinv (").+\\b(",
+                                                         escaped_words));
 
         try
         {
@@ -137,7 +138,7 @@ namespace Sezen
         // FIXME: do something generic here
         if (escaped_words.length == 2)
         {
-          var reversed = "\\b%s".printf (string.join (".+\\b",
+          var reversed = "\\b(%s)".printf (string.join (").+\\b(",
                                                       escaped_words[1],
                                                       escaped_words[0],
                                                       null));
@@ -154,16 +155,16 @@ namespace Sezen
 
       // split to individual chars
       string[] individual_chars = Regex.split_simple ("\\s*", query);
+      string[] escaped_chars = {};
+      foreach (unowned string word in individual_chars)
+      {
+        escaped_chars += Regex.escape_string (word);
+      }
 
       if (individual_chars.length <= 5)
       {
-        string pattern = "\\b";
-        for (int i = 0; i < individual_chars.length; i++)
-        {
-          bool is_last = i == individual_chars.length - 1;
-          pattern += Regex.escape_string (individual_chars[i]);
-          if (!is_last) pattern += ".+\\b";
-        }
+        string pattern = "\\b(%s)".printf (string.joinv (").+\\b(",
+                                                         escaped_chars));
         try
         {
           re = new Regex (pattern, flags);
@@ -176,13 +177,8 @@ namespace Sezen
 
       if (fuzzy_re)
       {
-        string pattern = "\\b";
-        for (int i = 0; i < individual_chars.length; i++)
-        {
-          bool is_last = i == individual_chars.length - 1;
-          pattern += Regex.escape_string (individual_chars[i]);
-          if (!is_last) pattern += ".*";
-        }
+        string pattern = "\\b(%s)".printf (string.joinv (").*(",
+                                                         escaped_chars));
         try
         {
           re = new Regex (pattern, flags);
