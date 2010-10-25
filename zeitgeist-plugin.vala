@@ -248,6 +248,7 @@ namespace Sezen
 
       var templates = new PtrArray ();
       var event_templates = create_templates (q.query_type);
+      if (event_templates.length == 0) return result; // nothing to search for
       for (int i=0; i<event_templates.length; i++)
       {
         templates.add (event_templates[i]);

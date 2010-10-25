@@ -480,16 +480,6 @@ namespace Sezen
       }
     }
 
-    /* UTILITY HERE */
-    private long strpos (string s, string find)
-    {
-      string? s2 = s.str(find);
-      if (s2 == null)
-        return -1;
-      else
-        return s.length - s2.length;
-    }
-    
     private string markup_string_with_search (string text, string pattern)
     {
       if (pattern == "")
@@ -501,47 +491,44 @@ namespace Sezen
       {
         return Markup.printf_escaped ("<span size=\"medium\">%s</span>\n<span size=\"xx-large\"><b><u> </u></b></span>",pattern);
       }
-      string t = text.up();
-      string p = pattern.up();
-      
-      // try to find the pattern in the text
-      long pos = strpos (t, p);
-      if ( pos >= 0)
+
+      // FIXME: we need to escape also the pattern right?
+      var matchers = Query.get_matchers_for_query (pattern, true, 
+        RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
+      string? highlighted = null;
+      string escaped_text = Markup.escape_text (text);
+      foreach (var matcher in matchers)
       {
-        return Markup.printf_escaped("<span size=\"xx-large\">%s<u><b>%s</b></u>%s</span>",
-                                     text.substring(0,pos),
-                                     text.substring(pos, p.length),
-                                     text.substring(pos+p.length));
-      }
-      // not found => search for each char
-      string markup = "";
-      int j = 0;
-      int i = 0;
-      for (; i < text.length && j < pattern.length; ++i)
-      {
-        if (t[i]==p[j])
+        if (matcher.key.match (escaped_text))
         {
-          markup += Markup.printf_escaped("<u><b>%s</b></u>", text.substring(i,1));
-          ++j;
-        }
-        else
-        {
-          markup += text.substring(i,1);
+          highlighted = matcher.key.replace_eval (escaped_text, -1, 0, 0, (mi, res) =>
+          {
+            int start_pos;
+            int end_pos;
+            int last_pos = 0;
+            int cnt = mi.get_match_count ();
+            for (int i = 1; i < cnt; i++)
+            {
+              mi.fetch_pos (i, out start_pos, out end_pos);
+              res.append (escaped_text.substring (last_pos, start_pos - last_pos));
+              last_pos = end_pos;
+              res.append ("<u><b>%s</b></u>".printf (mi.fetch (i)));
+            }
+          });
+          break;
         }
       }
-      if (j < pattern.length)
+      if (highlighted != null)
       {
-        markup = "<span size=\"medium\">"+pattern+"</span>\n<span size=\"xx-large\">"+text+"</span>";
+        return "<span size=\"xx-large\">%s</span>".printf (highlighted);
       }
       else
       {
-        markup += text.substring(i);
-        markup = "<span size=\"xx-large\">"+markup+"</span>";
+        return Markup.printf_escaped ("<span size=\"medium\">%s</span>\n" +
+          "<span size=\"xx-large\">%s</span>", pattern, text);
       }
-
-      return markup;
     }
-    
+
     private string get_description_markup (string s)
     {
       return "<span size=\"medium\"><i>" + s + "</i></span>";
@@ -775,6 +762,7 @@ namespace Sezen
 			return pixbuf;
     }
   }
+
   public class GtkContainerOverlayed: Gtk.Container
   {
     public float scale {get; set; default = 0.25f;}

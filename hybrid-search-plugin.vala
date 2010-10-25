@@ -119,7 +119,9 @@ namespace Sezen
           foreach (unowned string uri in uris)
           {
             var f = File.new_for_uri (uri);
-            string? parent_path = f.get_parent ().get_path ();
+            File? parent = f.get_parent ();
+            if (parent == null) continue;
+            string? parent_path = parent.get_path ();
             if (parent_path == null) continue;
             dir_hits[parent_path] = dir_hits[parent_path]+1;
           }
