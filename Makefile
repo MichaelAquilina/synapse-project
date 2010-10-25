@@ -25,5 +25,8 @@ gtk: all
 cmd: SRC_FILES += ui-cmd-line.vala
 cmd: all
 
+cairo: SRC_FILES += ui-cairo-gtk.vala
+cairo: all
+
 clean:
 	rm -f $(OUTPUT)
