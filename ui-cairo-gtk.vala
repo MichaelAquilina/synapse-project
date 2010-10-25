@@ -514,7 +514,7 @@ namespace Sezen
             for (int i = 1; i < cnt; i++)
             {
               mi.fetch_pos (i, out start_pos, out end_pos);
-              res.append (escaped_text.substring (last_pos, start_pos - last_pos));
+              if (i > 1) res.append (escaped_text.substring (last_pos, start_pos - last_pos));
               last_pos = end_pos;
               res.append ("<u><b>%s</b></u>".printf (mi.fetch (i)));
             }
