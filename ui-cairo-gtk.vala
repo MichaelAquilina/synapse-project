@@ -185,6 +185,7 @@ namespace Sezen
     /* UI shared components */
     private Label cat_label;
     private Image main_image;
+    private Image main_image_overlay;
     private Label main_label;
     private Label main_label_description;
     private Image action_image;
@@ -217,10 +218,13 @@ namespace Sezen
       
       /* Match Icon */
       GtkContainerOverlayed gco = new GtkContainerOverlayed();
+      main_image_overlay = new Image();
+      main_image_overlay.set_pixel_size (ICON_SIZE / 2);
+      main_image_overlay.set_from_icon_name ("search", IconSize.DIALOG);
       main_image = new Image ();
       main_image.set_pixel_size (ICON_SIZE);
-      main_image.set_from_icon_name ("search", IconSize.DIALOG);
       gco.add( main_image );
+      gco.add( main_image_overlay );
       top_hbox.pack_start (gco, false);
       
       /* VBox to push down the right area */
@@ -776,22 +780,22 @@ namespace Sezen
     }
     public override void size_request (out Requisition requisition)
     {
-      int w = 0, h = 0;
+      Requisition req = {0, 0};
       requisition.width = 1;
       requisition.height = 1;
       if (main != null)
       {
-        main.get_size_request (out w, out h);
-        requisition.width = int.max(w, requisition.width);
-        requisition.height = int.max(h, requisition.height);
+        main.size_request (out req);
+        requisition.width = int.max(req.width, requisition.width);
+        requisition.height = int.max(req.height, requisition.height);
       }
       if (overlay != null)
       {
-        overlay.get_size_request (out w, out h);
-        requisition.width = int.max(w, requisition.width);
-        requisition.height = int.max(h, requisition.height);
+        overlay.size_request (out req);
+        requisition.width = int.max(req.width, requisition.width);
+        requisition.height = int.max(req.height, requisition.height);
       }
-      debug ("size alloc");
+      debug ("size req %d %d",requisition.width,requisition.height);
     }
     public override void size_allocate (Gdk.Rectangle allocation)
     {
