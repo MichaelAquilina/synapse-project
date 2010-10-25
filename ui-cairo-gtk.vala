@@ -673,16 +673,16 @@ namespace Sezen
 			resultsScrolledWindow.add (view);
 			view.show();
       // Model
-      view.model = results = new ListStore(2, typeof(string), typeof(string));
+      view.model = results = new ListStore(2, typeof(GLib.Icon), typeof(string));
 
       var column = new TreeViewColumn ();
 			column.sizing = Gtk.TreeViewColumnSizing.FIXED;
 
-			var crp = new ThemedIconCellRenderer ();
+			var crp = new CellRendererPixbuf ();
       crp.set_fixed_size (ICON_SIZE, ICON_SIZE);
-      crp.size = ICON_SIZE;
+      crp.stock_size = IconSize.DND;
 			column.pack_start (crp, false);
-			column.add_attribute (crp, "name", (int) Column.IconColumn);
+			column.add_attribute (crp, "gicon", (int) Column.IconColumn);
 			
 			var ctxt = new CellRendererText ();
 			ctxt.ellipsize = Pango.EllipsizeMode.END;
@@ -705,7 +705,7 @@ namespace Sezen
       foreach (Match m in rs)
       {
         results.append (out iter);
-        results.set (iter, Column.IconColumn, m.icon_name, Column.NameColumn, 
+        results.set (iter, Column.IconColumn, GLib.Icon.new_for_string(m.icon_name), Column.NameColumn, 
                      Markup.printf_escaped ("<span><b>%s</b></span>\n<span size=\"small\">%s</span>",m.title, m.description));
       }
       var sel = view.get_selection ();
@@ -734,7 +734,7 @@ namespace Sezen
         path = opath;
       }
       /* Scroll to path */
-      var time = new TimeoutSource(50);
+      var time = new TimeoutSource(1);
       time.set_callback(() => {
           sel.unselect_all ();
           sel.select_path (path);
@@ -743,51 +743,6 @@ namespace Sezen
       });
       time.attach(null);
       return index;
-    }
-  }
-  class ThemedIconCellRenderer : CellRenderer {
-
-    /* icon property set by the tree column */
-    public string name { get; set; default = "unknown"; }
-    public int size { get; set; default = 0; }
-
-    public ThemedIconCellRenderer () {
-        GLib.Object ();
-    }
-
-    public override void get_size (Widget widget, Gdk.Rectangle? cell_area,
-                                   out int x_offset, out int y_offset,
-                                   out int width, out int height)
-    {
-        /* Guards needed to check if the 'out' parameters are null */
-        if (&x_offset != null) x_offset = 0;
-        if (&y_offset != null) y_offset = 0;
-        if (&width != null) width = size > 0 ? size : 48;
-        if (&height != null) height = size > 0 ? size : 48;
-    }
-
-    /* render method */
-    public override void render (Gdk.Window window, Widget widget,
-                                 Gdk.Rectangle background_area,
-                                 Gdk.Rectangle cell_area,
-                                 Gdk.Rectangle expose_area,
-                                 CellRendererState flags)
-    {
-      var ctx = Gdk.cairo_create (window);
-      Gdk.cairo_rectangle (ctx, expose_area);
-      ctx.clip ();
-      
-      Gdk.Pixbuf icon = SezenIconProvider.get_icon_pixbuf (name, size);
-      if (icon == null)
-        return;
-      Gdk.cairo_rectangle (ctx, background_area);
-      if (icon != null) {
-          /* draw a pixbuf on a cairo context */
-          Gdk.cairo_set_source_pixbuf (ctx, icon,
-                                       background_area.x,
-                                       background_area.y);
-          ctx.fill ();
-      }
     }
   }
 
