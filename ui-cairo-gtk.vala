@@ -36,7 +36,7 @@ namespace Sezen
     private const int UI_WIDTH = 550 + PADDING * 2;
     private const int UI_HEIGHT = ICON_SIZE + PADDING * 2;
     private const int UI_LIST_WIDTH = 400;
-    private const int UI_LIST_HEIGHT = 300;
+    private const int UI_LIST_HEIGHT = (35 + 4) * 6 + 2;
     private const int LIST_BORDER_RADIUS = 3;
     private const int TOP_SPACING = UI_HEIGHT * 4 / 10;
     
@@ -719,17 +719,29 @@ namespace Sezen
       int index = -1, oindex = -1;
       GLib.List<TreePath> sel_paths = sel.get_selected_rows(null);
       TreePath path = sel_paths.first ().data;
+      TreePath opath = path;
       try {oindex = path.to_string().to_int();} catch {}
       if (val > 0)
         path.next ();
       else if (val < 0)
         path.prev ();
-      sel.select_path (path);
       try {
         index = path.to_string().to_int();
       } catch {}
       if (index < 0 || index >= results.length)
-        return oindex;
+      {
+        index = oindex;
+        path = opath;
+      }
+      /* Scroll to path */
+      var time = new TimeoutSource(50);
+      time.set_callback(() => {
+          sel.unselect_all ();
+          sel.select_path (path);
+          view.scroll_to_cell (path, null, true, 0.5F, 0.0F);
+          return false;
+      });
+      time.attach(null);
       return index;
     }
   }
