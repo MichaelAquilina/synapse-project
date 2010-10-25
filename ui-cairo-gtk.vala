@@ -193,7 +193,7 @@ namespace Sezen
     private ResultBox result_box;
     private HBox list_hbox;
     private HBox top_hbox;
-
+    
     private void build_ui ()
     {
       /* Constructing Main Areas*/
@@ -216,10 +216,12 @@ namespace Sezen
       /* Constructing Top Area */
       
       /* Match Icon */
+      GtkContainerOverlayed gco = new GtkContainerOverlayed();
       main_image = new Image ();
       main_image.set_pixel_size (ICON_SIZE);
       main_image.set_from_icon_name ("search", IconSize.DIALOG);
-      top_hbox.pack_start (main_image, false);
+      gco.add( main_image );
+      top_hbox.pack_start (gco, false);
       
       /* VBox to push down the right area */
       var top_right_vbox = new VBox (false, 0);
@@ -661,6 +663,7 @@ namespace Sezen
 		
     private void build_ui()
     {
+      this.sensitive = false;
       var vbox = new VBox (false, 0);
       vbox.border_width = 1;
       this.add (vbox);
@@ -770,6 +773,71 @@ namespace Sezen
 			}
 		
 			return pixbuf;
+    }
+  }
+  public class GtkContainerOverlayed: Gtk.Container
+  {
+    public float scale {get; set; default = 0.25f;}
+    public Widget main {get; set; default = null;}
+    public Widget overlay {get; set; default = null;}
+    public GtkContainerOverlayed ()
+    {
+      GLib.Object ();
+      set_has_window(false);
+      set_redraw_on_allocate(false);
+    }
+    public override void size_request (out Requisition requisition)
+    {
+      int w = 0, h = 0;
+      requisition.width = 1;
+      requisition.height = 1;
+      if (main != null)
+      {
+        main.get_size_request (out w, out h);
+        requisition.width = int.max(w, requisition.width);
+        requisition.height = int.max(h, requisition.height);
+      }
+      if (overlay != null)
+      {
+        overlay.get_size_request (out w, out h);
+        requisition.width = int.max(w, requisition.width);
+        requisition.height = int.max(h, requisition.height);
+      }
+      debug ("size alloc");
+    }
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      Gdk.Rectangle aoverlay = {allocation.x + allocation.width / 2,
+                                allocation.y + allocation.height / 2,
+                                allocation.width / 2,
+                                allocation.height / 2
+                                };
+      Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
+      set_allocation (alloc);    
+      main.size_allocate (allocation);
+      overlay.size_allocate (aoverlay);
+      debug ("sizealloc");
+    }
+    public override void forall_internal (bool b, Gtk.Callback callback)
+    {
+      if (main != null)
+        callback (main);
+      if (overlay != null)
+        callback (overlay);
+    }
+
+    public override void add (Widget widget)
+    {
+      if (main == null)
+      {
+        main = widget;
+        main.set_parent (this);
+      }
+      else if (overlay == null)
+      {
+        overlay = widget;
+        overlay.set_parent (this);
+      }
     }
   }
 }

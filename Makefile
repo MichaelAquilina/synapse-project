@@ -17,6 +17,7 @@ $(OUTPUT): $(SRC_FILES)
 all: $(OUTPUT)
 
 cdebug: VALA_FLAGS += -C
+cdebug: SRC_FILES += ui-cairo-gtk.vala
 cdebug: all
 
 gtk: SRC_FILES += ui-basic-gtk.vala
