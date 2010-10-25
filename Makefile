@@ -10,7 +10,7 @@ VALA_FLAGS = --pkg zeitgeist-1.0 --pkg gtk+-2.0 --pkg gio-unix-2.0 --pkg gee-1.0
 VAPIS = keysyms.vapi cancellable-fix.vapi
 OUTPUT = sezen2
 
-$(OUTPUT): $(SRC_FILES)
+$(OUTPUT): $(SRC_FILES) FORCE
 	valac $(VALA_FLAGS) $(VAPIS) -g -o $@ $(SRC_FILES)
 
 .PHONY: all
@@ -27,6 +27,8 @@ cmd: all
 
 cairo: SRC_FILES += ui-cairo-gtk.vala
 cairo: all
+
+FORCE:
 
 clean:
 	rm -f $(OUTPUT)
