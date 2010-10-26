@@ -168,7 +168,7 @@ namespace Sezen
       {
         try
         {
-          re = new Regex (Regex.escape_string (query), flags);
+          re = new Regex ("(%s)".printf (Regex.escape_string (query)), flags);
           results[re] = 75;
         }
         catch (RegexError err)
