@@ -202,11 +202,25 @@ namespace Sezen
     private Label main_label_description;
     private Image action_image;
     private Label action_label;
-    private SezenTypeSelector sts;
+    private HSelectionContainer sts;
     private ResultBox result_box;
     private HBox list_hbox;
     private HBox top_hbox;
     
+    private static void _hilight_label (Widget w, bool b)
+    {
+      Label l = (Label) w;
+      if (b)
+      {
+        string s = l.get_text();
+        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><u><b>%s</b></u></span>", s));
+      }
+      else
+      {
+        string s = l.get_text();
+        l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
+      }
+    }
     private void build_ui ()
     {
       /* Constructing Main Areas*/
@@ -247,7 +261,9 @@ namespace Sezen
       var spacer = new Label("");
       spacer.set_size_request (10, TOP_SPACING - PADDING + 10);
       /* STS */
-      sts = new SezenTypeSelector(this.categories);
+      sts = new HSelectionContainer(_hilight_label, 15);
+      foreach (string s in this.categories)
+        sts.add (new Label(s));
       /* HBox for the right area */
       var right_hbox = new HBox (false, 0);
       top_right_vbox.pack_start (spacer, false);
@@ -468,7 +484,7 @@ namespace Sezen
     private void search_reset ()
     {
       search_string = "";
-      sts.set_selected (0);
+      sts.select (0);
     }
     
     private Match? current_match = null;
@@ -809,29 +825,6 @@ namespace Sezen
       return index;
     }
   }
-
-  public class SezenIconProvider
-  {
-    public static Gdk.Pixbuf get_icon_pixbuf (string name, int size)
-    {
-      Gdk.Pixbuf pixbuf = null;
-			string name_noext;
-
-      IconTheme theme = IconTheme.get_default();
-
-			try	{
-				if (theme.has_icon (name)) {  
-					pixbuf = theme.load_icon (name, size, 0);
-				} else if (name == "gnome-mime-text-plain" && theme.has_icon ("gnome-mime-text")) { 
-					pixbuf = theme.load_icon ("gnome-mime-text", size, 0);
-				}
-			} catch {
-				pixbuf = null;
-			}
-		
-			return pixbuf;
-    }
-  }
 }
 
 namespace Gtk
@@ -871,7 +864,6 @@ namespace Gtk
                            }
     public ContainerOverlayed ()
     {
-      GLib.Object ();
       set_has_window(false);
       set_redraw_on_allocate(false);
     }
@@ -923,6 +915,131 @@ namespace Gtk
       {
         overlay = widget;
       }
+    }
+  }
+  
+  /* HSelectionContainer */
+  public class HSelectionContainer: Gtk.Container
+  {
+    public delegate void SelectWidget (Widget w, bool select);
+    private ArrayList<Widget> childs;
+    
+    private SelectWidget func;
+    private int padding;
+    private int selection = 0;
+    private int[] allocations = {};
+    private bool[] visibles = {};
+    
+    public HSelectionContainer (SelectWidget func, int padding)
+    {
+      this.func = func;
+      this.padding = padding;
+      childs = new ArrayList<Widget>();
+      set_has_window(false);
+      set_redraw_on_allocate(false);
+    }
+    
+    public void select_next () {select(selection+1);}
+    public void select_prev () {select(selection-1);}
+    
+    public void select (int index)
+    {
+      if (index < 0 || childs.size <= index)
+        return;
+      
+      func (childs.get(selection), false);
+      func (childs.get(index), true);
+      this.selection = index;
+      this.queue_resize();
+      foreach (Widget w in childs)
+        w.queue_draw();
+    }
+    
+    public int get_selected ()
+    {
+      return selection;
+    }
+    
+    public override void size_request (out Requisition requisition)
+    {
+      Requisition req = {0, 0};
+      requisition.width = 1;
+      requisition.height = 1;
+      foreach (Widget w in childs)
+      {
+        w.size_request (out req);
+        requisition.width = int.max(req.width, requisition.width);
+        requisition.height = int.max(req.height, requisition.height);
+      }
+    }
+
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
+      set_allocation (alloc);
+      int lastx = 0;
+      Requisition req = {0, 0};
+      int i = 0;
+      // update relative coords
+      foreach (Widget w in childs)
+      {
+        w.size_request (out req);
+        this.allocations[i] = lastx;
+        lastx += padding + req.width;
+        ++i;
+      }
+      int offset = allocation.width / 2 - allocations[selection];
+      childs.get (selection).size_request (out req);
+      offset -= req.width / 2;
+      // update widget allocations and visibility
+      i = 0;
+      int pos = 0;
+      foreach (Widget w in childs)
+      {
+        w.size_request (out req);
+        pos = offset + allocations[i];
+        if (pos < 0 || pos + req.width > alloc.width)
+        {
+          visibles[i] = false;
+          w.hide ();
+        }
+        else
+        {
+          visibles[i] = true;
+          allocation.x = alloc.x + pos;
+          allocation.width = req.width;
+          allocation.height = req.height;
+          allocation.y = alloc.y + (alloc.height - req.height) / 2;
+          w.size_allocate (allocation);
+          w.show_all ();
+        }
+        ++i;
+      }
+    }
+    public override void forall_internal (bool b, Gtk.Callback callback)
+    {
+      int i = 0;
+      foreach (Widget w in childs)
+      {
+        if ( visibles[i] )
+          callback (w);
+        ++i;
+      }
+    }
+
+    public override void add (Widget widget)
+    {
+      childs.add (widget);
+      widget.set_parent (this);
+      this.allocations += 0;
+      this.visibles += true;
+      if (childs.size==1)
+      {
+        this.selection = 0;
+        func (widget, true);
+      }
+      else
+        func (widget, false);
     }
   }
 }
