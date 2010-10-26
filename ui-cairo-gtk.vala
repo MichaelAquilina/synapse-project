@@ -33,10 +33,10 @@ namespace Sezen
     private const int BORDER_RADIUS = 10;
     private const int ICON_SIZE = 172;
     private const int ACTION_ICON_SIZE = 64;
-    private const int UI_WIDTH = 550 + PADDING * 2;
+    private const int UI_WIDTH = 480 + ACTION_ICON_SIZE*1 + PADDING * 2;
     private const int UI_HEIGHT = ICON_SIZE + PADDING * 2;
     private const int UI_LIST_WIDTH = 400;
-    private const int UI_LIST_HEIGHT = (35 + 4) * 5 + 2;
+    private const int UI_LIST_HEIGHT = (35/*icon_size*/ + 4 /*row border*/) * 5 + 15 /*statusbar*/ + 2 /* Result box Border*/;
     private const int LIST_BORDER_RADIUS = 3;
     private const int TOP_SPACING = UI_HEIGHT * 4 / 10;
     
@@ -69,24 +69,24 @@ namespace Sezen
       ctx.arc (x+r, y2-r, r, Math.PI * 0.5, Math.PI);
     }
     
-    private void get_shape (Cairo.Context ctx)
+    private void get_shape (Cairo.Context ctx, bool mask_for_composited = false)
     {
       ctx.set_source_rgba (0,0,0,1);
+      if (mask_for_composited)
+      {
+        ctx.rectangle (0, 0, UI_WIDTH, UI_HEIGHT + UI_LIST_HEIGHT);
+        ctx.fill ();
+        return;
+      }
       get_shape_main (ctx);
       get_shape_list (ctx);
     }
     
     private void get_shape_main (Cairo.Context ctx)
     {
-      if (this.is_composited ())
-      {
-        rounded_rect (ctx, 0, TOP_SPACING, UI_WIDTH, UI_HEIGHT - TOP_SPACING, BORDER_RADIUS);
-        ctx.fill ();
-        ctx.rectangle (PADDING, PADDING, ICON_SIZE, ICON_SIZE);
-        ctx.fill ();
-      }
-      else
-        rounded_rect (ctx, 0, 0, UI_WIDTH, UI_HEIGHT, BORDER_RADIUS);
+      rounded_rect (ctx, 0, TOP_SPACING, UI_WIDTH, UI_HEIGHT - TOP_SPACING, BORDER_RADIUS);
+      ctx.fill ();
+      rounded_rect (ctx, 0, 0,  ICON_SIZE + PADDING * 2, ICON_SIZE, BORDER_RADIUS);
       ctx.fill ();
     }
     
@@ -105,30 +105,35 @@ namespace Sezen
 
     private void on_composited_changed (Widget w)
     {
+      bool is_composited = true;
       Gdk.Colormap? cm = w.get_screen ().get_rgba_colormap();
-      debug ("Setting colormap rgba %s", cm==null?"No":"si");
       if (cm == null)
+      {
+        is_composited = false;
         cm = w.get_screen ().get_rgb_colormap();
+      }
       this.set_colormap (cm);
+      if (is_composited)
+        set_mask (true);
       set_mask ();
     }
     
-    private void color_to_rgb (Gdk.Color col, double *r, double *g, double *b)
+    public static void color_to_rgb (Gdk.Color col, double *r, double *g, double *b)
     {
       *r = col.red / (double)65535;
       *g = col.green / (double)65535;
       *b = col.blue / (double)65535;
     }
     
-    private void set_mask ()
+    private void set_mask (bool mask_for_composited = false)
     {
       var bitmap = new Gdk.Pixmap (null, UI_WIDTH, UI_HEIGHT+UI_LIST_HEIGHT, 1);
       var ctx = Gdk.cairo_create (bitmap);
       ctx.set_operator (Cairo.Operator.CLEAR);
       ctx.paint ();
       ctx.set_operator (Cairo.Operator.OVER);
-      get_shape (ctx);
-      if (this.is_composited())
+      get_shape (ctx, mask_for_composited);
+      if (this.is_composited() && !mask_for_composited)
       {
         this.input_shape_combine_mask (null, 0, 0);
         this.input_shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
@@ -140,6 +145,37 @@ namespace Sezen
       }
     }
     
+    private void _cairo_path_for_main (Cairo.Context ctx, bool composited)
+    {
+      int PAD = 1;
+      if (composited)
+        rounded_rect (ctx, PAD, TOP_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - TOP_SPACING - PAD * 2, BORDER_RADIUS);
+      else
+      {
+        /*
+         __               y1
+        |  |_______________ y2
+        |                  |
+        |__________________|y3
+        x1 x3            x4
+        */
+        double x1 = PAD,
+               x3 = PADDING * 2 + ICON_SIZE - PAD,
+               x4 = UI_WIDTH - PAD,
+               y1 = PAD,
+               y2 = PAD + TOP_SPACING,
+               y3 = UI_HEIGHT - PAD,
+               r = BORDER_RADIUS;
+        ctx.move_to (x1, y3 - r);
+        ctx.arc (x1+r, y1+r, r, Math.PI, Math.PI * 1.5);
+        ctx.arc (x3-r, y1+r, r, Math.PI * 1.5, Math.PI * 2.0);
+        ctx.line_to (x3, y2);
+        ctx.arc (x4-r, y2+r, r, Math.PI * 1.5, Math.PI * 2.0);
+        ctx.arc (x4-r, y3-r, r, 0, Math.PI * 0.5);
+        ctx.arc (x1+r, y3-r, r, Math.PI * 0.5, Math.PI);
+      }
+    }
+    
     private bool on_expose (Widget w, Gdk.EventExpose event) {
         var ctx = Gdk.cairo_create (w.window);
         /* Clear Stage */
@@ -147,13 +183,10 @@ namespace Sezen
         ctx.paint ();
         ctx.set_operator (Cairo.Operator.OVER);
 
-        int top_SPACING = TOP_SPACING;
-        if (!w.is_composited())
-          top_SPACING = 0;
         /* Prepare bg's colors using GtkStyle */
         Gtk.Style style = w.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
-        Pattern pat = new Pattern.linear(0, top_SPACING, 0, UI_HEIGHT);
+        Pattern pat = new Pattern.linear(0, TOP_SPACING, 0, UI_HEIGHT);
         color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                     double.min(g + 0.15, 1),
@@ -164,15 +197,27 @@ namespace Sezen
                                     double.max(b - 0.15, 0),
                                     0.95);
         /* Prepare and draw top bg's rect */
-        int PAD = 1;
-        rounded_rect (ctx, PAD, top_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - top_SPACING - PAD * 2, BORDER_RADIUS);
+        _cairo_path_for_main (ctx, w.is_composited());
         ctx.set_source (pat);
         ctx.fill ();
         /* Add border */
-        rounded_rect (ctx, PAD, top_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - top_SPACING - PAD * 2, BORDER_RADIUS);
+        _cairo_path_for_main (ctx, w.is_composited());
         ctx.set_line_width (2);
         ctx.set_source_rgba (1-r, 1-g, 1-b, 0.8);
         ctx.stroke ();
+        
+        if (list_visible && w.is_composited())
+        {
+          color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
+          pat = new Pattern.linear((UI_WIDTH - UI_LIST_WIDTH) / 2 - 10, UI_HEIGHT, (UI_WIDTH - UI_LIST_WIDTH) / 2 + UI_LIST_WIDTH + 10, UI_HEIGHT);
+          pat.add_color_stop_rgba (0, r, g, b, 0);
+          pat.add_color_stop_rgba (10.0 / UI_LIST_WIDTH, r, g, b, 1);
+          pat.add_color_stop_rgba (1 - 10.0 / UI_LIST_WIDTH, r, g, b, 1);
+          pat.add_color_stop_rgba (1, r, g, b, 0);
+          ctx.rectangle (0, UI_HEIGHT, UI_WIDTH, UI_LIST_HEIGHT);
+          ctx.set_source (pat);
+          ctx.fill ();
+        }
 
         /* Propagate Expose */               
         Container c = (w is Container) ? (Container) w : null;
@@ -183,18 +228,38 @@ namespace Sezen
     }
     
     /* UI shared components */
-    private Label cat_label;
     private Image main_image;
     private Image main_image_overlay;
     private Label main_label;
     private Label main_label_description;
     private Image action_image;
-    private Label action_label;
-    private SezenTypeSelector sts;
+    private HSelectionContainer sts;
     private ResultBox result_box;
     private HBox list_hbox;
     private HBox top_hbox;
     
+    private static void _hilight_label (Widget w, bool b)
+    {
+      Label l = (Label) w;
+      if (b)
+      {
+        string s = l.get_text();
+        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><u><b>%s</b></u></span>", s));
+        l.sensitive = true;
+      }
+      else
+      {
+        string s = l.get_text();
+        l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
+        l.sensitive = false;
+      }
+    }
+    
+    private static void _hilight_image (Widget w, bool b)
+    {
+      w.sensitive = b;
+    }
+
     private void build_ui ()
     {
       /* Constructing Main Areas*/
@@ -217,15 +282,15 @@ namespace Sezen
       /* Constructing Top Area */
       
       /* Match Icon */
-      GtkContainerOverlayed gco = new GtkContainerOverlayed();
+      Gtk.ContainerOverlayed gco = new Gtk.ContainerOverlayed();
       main_image_overlay = new Image();
       main_image_overlay.set_pixel_size (ICON_SIZE / 2);
       main_image = new Image ();
       main_image.set_size_request (ICON_SIZE, ICON_SIZE);
       main_image.set_pixel_size (ICON_SIZE);
       main_image.set_from_icon_name ("search", IconSize.DIALOG);
-      gco.add( main_image );
-      gco.add( main_image_overlay );
+      gco.main = main_image;
+      gco.overlay = main_image_overlay;
       top_hbox.pack_start (gco, false);
       
       /* VBox to push down the right area */
@@ -235,7 +300,10 @@ namespace Sezen
       var spacer = new Label("");
       spacer.set_size_request (10, TOP_SPACING - PADDING + 10);
       /* STS */
-      sts = new SezenTypeSelector(this.categories);
+      sts = new HSelectionContainer(_hilight_label, 15);
+      //sts.set_selection_align (HSelectionContainer.SelectionAlign.LEFT);
+      foreach (string s in this.categories)
+        sts.add (new Label(s));
       /* HBox for the right area */
       var right_hbox = new HBox (false, 0);
       top_right_vbox.pack_start (spacer, false);
@@ -325,20 +393,33 @@ namespace Sezen
           this.search_string = search_string;
           break;
         case Gdk.KeySyms.Up:
-          int i = result_box.move_selection (-1);
+          int old_index = 0;
+          int i = result_box.move_selection (-1, out old_index);
+          if (i < 0)
+            focus_match (null);
+          else
+            focus_match (results[i]);
+          if (old_index == i && i == 0)
+            set_list_visible (false);
+          else
+            set_list_visible (i >= 0);
+          break;
+        case Gdk.KeySyms.Down:
+          if (!list_visible)
+          {
+            set_list_visible (true);
+            break;
+          }
+          int old_index = 0;
+          int i = result_box.move_selection (1, out old_index);
           if (i < 0)
             focus_match (null);
           else
             focus_match (results[i]);
           set_list_visible (true);
           break;
-        case Gdk.KeySyms.Down:
-          int i = result_box.move_selection (1);
-          if (i < 0)
-            focus_match (null);
-          else
-            focus_match (results[i]);
-          set_list_visible (true);
+        case Gdk.KeySyms.Tab:
+          ;
           break;
         default:
           debug ("im_context didn't filter...");
@@ -352,7 +433,6 @@ namespace Sezen
       if (b==this.list_visible)
         return;
       this.list_visible = b;
-      debug ("Set list %s visible", b?"yes": "no");
       if (b)
         list_hbox.show();
       else
@@ -360,11 +440,6 @@ namespace Sezen
       set_mask ();
     }
     
-    private void quit ()
-    {
-      Gtk.main_quit ();
-    }
-
     /* SEZEN STUFFS HERE */
     private IMContext im_context;
     private DataSink data_sink;
@@ -457,7 +532,7 @@ namespace Sezen
     private void search_reset ()
     {
       search_string = "";
-      sts.set_selected (0);
+      sts.select (0);
     }
     
     private Match? current_match = null;
@@ -622,7 +697,6 @@ namespace Sezen
     
     public void set_selected (int sel)
     {
-      int i = 0, j = 0;
       if (sel < 0)
         sel = types.length - 1;
       else if (sel >= types.length)
@@ -657,15 +731,61 @@ namespace Sezen
 		
 		private TreeView view;
 		ListStore results;
+		private Label status;
+		
+		private bool on_expose (Widget w, Gdk.EventExpose event) {
+        var ctx = Gdk.cairo_create (w.window);
+        /* Clear Stage */
+        ctx.set_operator (Cairo.Operator.CLEAR);
+        ctx.paint ();
+        ctx.set_operator (Cairo.Operator.OVER);
+
+        /* Prepare bg's colors using GtkStyle */
+        Gtk.Style style = w.get_style();
+        double r = 0.0, g = 0.0, b = 0.0;
+        Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
+        SezenWindow.color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+        pat.add_color_stop_rgba (1.0 - 15.0 / w.allocation.height, double.min(r + 0.15, 1),
+                                    double.min(g + 0.15, 1),
+                                    double.min(b + 0.15, 1),
+                                    0.95);
+        pat.add_color_stop_rgba (1, double.max(r - 0.15, 0),
+                                    double.max(g - 0.15, 0),
+                                    double.max(b - 0.15, 0),
+                                    0.95);
+        /* Prepare and draw top bg's rect */
+        ctx.rectangle (0, 0, w.allocation.width, w.allocation.height);
+        ctx.set_source (pat);
+        ctx.fill ();
+
+        /* Propagate Expose */               
+        Container c = (w is Container) ? (Container) w : null;
+        if (c != null)
+          c.propagate_expose (this.get_child(), event);
+        
+        return true;
+    }
 		
     private void build_ui()
     {
       var vbox = new VBox (false, 0);
+      this.expose_event.connect (on_expose);
       vbox.border_width = 1;
       this.add (vbox);
       var resultsScrolledWindow = new ScrolledWindow (null, null);
       resultsScrolledWindow.set_policy (PolicyType.NEVER, PolicyType.NEVER);
       vbox.pack_start (resultsScrolledWindow);
+      var tb = new HBox (false, 0);
+      tb.set_size_request (mwidth, 15);
+      vbox.pack_start (tb, false);
+      status = new Label ("");
+      status.set_alignment (0, 0);
+      status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
+      var logo = new Label ("");
+      logo.set_alignment (1, 0);
+      logo.set_markup (Markup.printf_escaped ("<i>Sezen 2 </i>"));
+      tb.pack_start (status, true, true, 10);
+      tb.pack_start (logo, false, false, 10);
       
       view = new TreeView ();
 			view.enable_search = false;
@@ -701,6 +821,7 @@ namespace Sezen
       if (rs==null)
       {
         no_results = true;
+        status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
         return;
       }
       no_results = false;
@@ -713,8 +834,9 @@ namespace Sezen
       }
       var sel = view.get_selection ();
       sel.select_path (new TreePath.first());
+      status.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", results.length));
     }
-    public int move_selection (int val)
+    public int move_selection (int val, out int old_index)
     {
       if (no_results)
         return -1;
@@ -723,14 +845,16 @@ namespace Sezen
       GLib.List<TreePath> sel_paths = sel.get_selected_rows(null);
       TreePath path = sel_paths.first ().data;
       TreePath opath = path;
-      try {oindex = path.to_string().to_int();} catch {}
+      oindex = path.to_string().to_int();
+      old_index = oindex;
+      if (val == 0)
+        return oindex;
       if (val > 0)
         path.next ();
       else if (val < 0)
         path.prev ();
-      try {
-        index = path.to_string().to_int();
-      } catch {}
+      
+      index = path.to_string().to_int();
       if (index < 0 || index >= results.length)
       {
         index = oindex;
@@ -744,42 +868,50 @@ namespace Sezen
           view.scroll_to_cell (path, null, true, 0.5F, 0.0F);
           return false;
       });
+      status.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", index + 1, results.length));
       time.attach(null);
       return index;
     }
   }
+}
 
-  public class SezenIconProvider
-  {
-    public static Gdk.Pixbuf get_icon_pixbuf (string name, int size)
-    {
-      Gdk.Pixbuf pixbuf = null;
-			string name_noext;
-
-      IconTheme theme = IconTheme.get_default();
-
-			try	{
-				if (theme.has_icon (name)) {  
-					pixbuf = theme.load_icon (name, size, 0);
-				} else if (name == "gnome-mime-text-plain" && theme.has_icon ("gnome-mime-text")) { 
-					pixbuf = theme.load_icon ("gnome-mime-text", size, 0);
-				}
-			} catch {
-				pixbuf = null;
-			}
-		
-			return pixbuf;
-    }
-  }
-
-  public class GtkContainerOverlayed: Gtk.Container
+namespace Gtk
+{
+  public class ContainerOverlayed: Gtk.Container
   {
     public float scale {get; set; default = 0.25f;}
-    public Widget main {get; set; default = null;}
-    public Widget overlay {get; set; default = null;}
-    public GtkContainerOverlayed ()
+    private Widget _main = null;
+    private Widget _overlay = null;
+    public Widget main { get {return _main;}
+                         set {
+                               if(_main!=null)
+                               {
+                                 _main.unparent();
+                                 _main = null;
+                               }
+                               if(value!=null)
+                               {
+                                 _main = value;
+                                 _main.set_parent(this);
+                               }
+                             }
+                       }
+    public Widget overlay  { get {return _overlay;}
+                             set {
+                                   if(_overlay!=null)
+                                   {
+                                     _overlay.unparent();
+                                     _overlay = null;
+                                   }
+                                   if(value!=null)
+                                   {
+                                     _overlay = value;
+                                     _overlay.set_parent(this);
+                                   }
+                                 }
+                           }
+    public ContainerOverlayed ()
     {
-      GLib.Object ();
       set_has_window(false);
       set_redraw_on_allocate(false);
     }
@@ -800,7 +932,6 @@ namespace Sezen
         requisition.width = int.max(req.width, requisition.width);
         requisition.height = int.max(req.height, requisition.height);
       }
-      debug ("size req %d %d",requisition.width,requisition.height);
     }
     public override void size_allocate (Gdk.Rectangle allocation)
     {
@@ -827,13 +958,215 @@ namespace Sezen
       if (main == null)
       {
         main = widget;
-        main.set_parent (this);
       }
       else if (overlay == null)
       {
         overlay = widget;
-        overlay.set_parent (this);
       }
+    }
+  }
+  
+  /* HSelectionContainer */
+  public class HSelectionContainer: Gtk.Container
+  {
+    public delegate void SelectWidget (Widget w, bool select);
+    private ArrayList<Widget> childs;
+    
+    private SelectWidget func;
+    private int padding;
+    private int selection = 0;
+    private int[] allocations = {};
+    private bool[] visibles = {};
+    private bool direction = true;
+    
+    public enum SelectionAlign
+    {
+      LEFT = 0,
+      CENTER = 1,
+      RIGHT = 2
+    }
+    private int align;
+    
+    
+    public HSelectionContainer (SelectWidget? func, int padding)
+    {
+      this.func = func;
+      this.padding = padding;
+      this.align = SelectionAlign.CENTER;
+      childs = new ArrayList<Widget>();
+      set_has_window(false);
+      set_redraw_on_allocate(false);
+    }
+    
+    public void set_selection_align (SelectionAlign align)
+    {
+      this.align = align;
+    }
+    
+    public void select_next_circular ()
+    {
+      int sel = selection;
+      sel += direction ? 1 : -1;
+      if (sel < 0)
+      {
+        sel = 1;
+        direction = true;
+      }
+      else if (sel >= childs.size)
+      {
+        sel = childs.size - 2;
+        direction = false;
+      }
+      select (sel);
+    }
+    public void select_next () {select(selection+1);}
+    public void select_prev () {select(selection-1);}
+    
+    public void select (int index)
+    {
+      if (index < 0 || childs.size <= index)
+        return;
+      
+      if (func != null)
+      {
+        func (childs.get(selection), false);
+        func (childs.get(index), true);
+      }
+      this.selection = index;
+      this.queue_resize();
+      foreach (Widget w in childs)
+        w.queue_draw();
+    }
+    
+    public int get_selected ()
+    {
+      return selection;
+    }
+    
+    public override void size_request (out Requisition requisition)
+    {
+      Requisition req = {0, 0};
+      requisition.width = 1;
+      requisition.height = 1;
+      foreach (Widget w in childs)
+      {
+        w.size_request (out req);
+        requisition.width = int.max(req.width, requisition.width);
+        requisition.height = int.max(req.height, requisition.height);
+      }
+    }
+
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
+      set_allocation (alloc);
+      int lastx = 0;
+      Requisition req = {0, 0};
+      int i = 0;
+      // update relative coords
+      foreach (Widget w in childs)
+      {
+        w.size_request (out req);
+        this.allocations[i] = lastx;
+        lastx += padding + req.width;
+        ++i;
+      }
+      int offset = 0;
+      switch (this.align)
+      {
+        case SelectionAlign.LEFT:
+          offset = - allocations[selection];
+          break;
+        case SelectionAlign.RIGHT:
+          offset = allocation.width - allocations[selection];
+          childs.get (selection).size_request (out req);
+          offset -= req.width;
+          break;
+        default:
+          offset = allocation.width / 2 - allocations[selection];
+          childs.get (selection).size_request (out req);
+          offset -= req.width / 2;
+          break;
+      }
+      // update widget allocations and visibility
+      i = 0;
+      int pos = 0;
+      foreach (Widget w in childs)
+      {
+        w.size_request (out req);
+        pos = offset + allocations[i];
+        if (pos < 0 || pos + req.width > alloc.width)
+        {
+          visibles[i] = false;
+          w.hide ();
+        }
+        else
+        {
+          visibles[i] = true;
+          allocation.x = alloc.x + pos;
+          allocation.width = req.width;
+          allocation.height = req.height;
+          allocation.y = alloc.y + (alloc.height - req.height) / 2;
+          w.size_allocate (allocation);
+          w.show_all ();
+        }
+        ++i;
+      }
+    }
+    public override void forall_internal (bool b, Gtk.Callback callback)
+    {
+      int i = 0;
+      if (this.align == SelectionAlign.LEFT)
+      {
+        for (i = childs.size - 1; i >= 0; ++i)
+        {
+          if ( visibles[i] )
+            callback (childs.get(i));
+        }
+      }
+      else if (this.align == SelectionAlign.RIGHT)
+      {
+        foreach (Widget w in childs)
+        {
+          if ( visibles[i] )
+            callback (w);
+          ++i;
+        }
+      }
+      else //align center
+      {
+        int j;
+        j = i = selection;
+        ArrayList<Widget> reordered = new ArrayList<Widget>();
+        reordered.add (childs.get(i));
+        while (j >= 0 || i < childs.size)
+        {
+          --j;
+          ++i;
+          if (j >= 0)
+            reordered.add (childs.get(j));
+          if (i < childs.size)
+            reordered.add (childs.get(i));
+        }
+        for (i = reordered.size - 1; i >= 0; --i)
+          callback (reordered.get(i));
+      }
+    }
+
+    public override void add (Widget widget)
+    {
+      childs.add (widget);
+      widget.set_parent (this);
+      this.allocations += 0;
+      this.visibles += true;
+      if (childs.size==1)
+      {
+        this.selection = 0;
+        if (func != null)
+          func (widget, true);
+      }
+      else if (func != null)      
+        func (widget, false);
     }
   }
 }
