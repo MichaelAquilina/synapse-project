@@ -106,7 +106,6 @@ namespace Sezen
     private void on_composited_changed (Widget w)
     {
       Gdk.Colormap? cm = w.get_screen ().get_rgba_colormap();
-      debug ("Setting colormap rgba %s", cm==null?"No":"si");
       if (cm == null)
         cm = w.get_screen ().get_rgb_colormap();
       this.set_colormap (cm);
@@ -352,7 +351,6 @@ namespace Sezen
       if (b==this.list_visible)
         return;
       this.list_visible = b;
-      debug ("Set list %s visible", b?"yes": "no");
       if (b)
         list_hbox.show();
       else
@@ -775,8 +773,10 @@ namespace Sezen
   public class GtkContainerOverlayed: Gtk.Container
   {
     public float scale {get; set; default = 0.25f;}
-    public Widget main {get; set; default = null;}
-    public Widget overlay {get; set; default = null;}
+    private Widget _main = null;
+    private Widget _overlay = null;
+    public Widget main {get{return _main;} set{ if(value!=null){_main=value;_main.set_parent(this);}}}
+    public Widget overlay {get{return _overlay;} set{ if(value!=null){_overlay=value;_overlay.set_parent(this);}}}
     public GtkContainerOverlayed ()
     {
       GLib.Object ();
@@ -800,7 +800,6 @@ namespace Sezen
         requisition.width = int.max(req.width, requisition.width);
         requisition.height = int.max(req.height, requisition.height);
       }
-      debug ("size req %d %d",requisition.width,requisition.height);
     }
     public override void size_allocate (Gdk.Rectangle allocation)
     {
