@@ -59,6 +59,7 @@ namespace Sezen
           string.join (",", FILE_ATTRIBUTE_STANDARD_TYPE,
                             FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
                             FILE_ATTRIBUTE_STANDARD_ICON,
+                            FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
                             FILE_ATTRIBUTE_THUMBNAIL_PATH,
                             null);
       }
@@ -66,14 +67,16 @@ namespace Sezen
       public string uri;
       public string parse_name;
       // FIXME: we need also type!
+      public QueryFlags file_type;
       public MatchObject? match_obj;
-      public bool initialized;
+      private bool initialized;
 
       public FileInfo (string uri)
       {
         this.uri = uri;
         this.match_obj = null;
         this.initialized = false;
+        this.file_type = QueryFlags.UNCATEGORIZED;
 
         var f = File.new_for_uri (uri);
         this.parse_name = f.get_parse_name ();
@@ -81,7 +84,7 @@ namespace Sezen
       
       public bool is_initialized ()
       {
-        return this.match_obj != null;
+        return this.initialized;
       }
       
       public async void initialize ()
@@ -99,7 +102,35 @@ namespace Sezen
               fi.get_icon ().to_string ());
             match_obj.uri = uri;
             match_obj.title = fi.get_display_name ();
-            match_obj.description = Uri.unescape_string (uri);
+            match_obj.description = f.get_parse_name ();
+            
+            // let's determine the file type
+            unowned string mime_type = 
+              fi.get_attribute_string (FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
+            if (g_content_type_is_unknown (mime_type))
+            {
+              file_type = QueryFlags.UNCATEGORIZED;
+            }
+            else if (g_content_type_is_a (mime_type, "audio/*"))
+            {
+              file_type = QueryFlags.AUDIO;
+            }
+            else if (g_content_type_is_a (mime_type, "video/*"))
+            {
+              file_type = QueryFlags.VIDEO;
+            }
+            else if (g_content_type_is_a (mime_type, "image/*"))
+            {
+              file_type = QueryFlags.IMAGES;
+            }
+            else if (g_content_type_is_a (mime_type, "text/*"))
+            {
+              file_type = QueryFlags.DOCUMENTS;
+            }
+            else if (g_content_type_is_a (mime_type, "application/*"))
+            {
+              file_type = QueryFlags.DOCUMENTS;
+            }
           }
         }
         catch (Error err)
@@ -215,7 +246,7 @@ namespace Sezen
       }
     }
 
-    private void zg_plugin_search_done (DataPlugin plugin, ResultSet rs)
+    private void zg_plugin_search_done (DataPlugin plugin, ResultSet? rs)
     {
       if (plugin.get_type ().name ().has_prefix ("SezenZeitgeistPlugin"))
       {
@@ -389,9 +420,8 @@ namespace Sezen
       var results = new ResultSet ();
 
       var flags = RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS;
-      // FIXME: uri escape!
       var matchers = Query.get_matchers_for_query (q.query_string,
-                                                   false,
+                                                   MatcherFlags.NO_FUZZY | MatcherFlags.NO_PARTIAL,
                                                    flags);
       Gee.Collection<string> directories = dirs ?? directory_contents.keys;
       foreach (var directory in directories)
@@ -401,20 +431,19 @@ namespace Sezen
         {
           foreach (var matcher in matchers)
           {
-            unowned string parse_name = entry.value.parse_name;
-            if (matcher.key.match (parse_name))
+            FileInfo fi = entry.value;
+            if (matcher.key.match (fi.parse_name))
             {
-              if (!original_rs.contains_uri (parse_name))
+              if (!original_rs.contains_uri (fi.uri))
               {
-                FileInfo fi = entry.value;
                 if (!fi.is_initialized ())
                 {
                   yield fi.initialize ();
                 }
                 // FIXME: check if it matches query_type
-                if (fi.match_obj != null)
+                if (fi.match_obj != null && fi.file_type in q.query_type)
                 {
-                  results.add (fi.match_obj, matcher.value);
+                  results.add (fi.match_obj, matcher.value - 10);
                 }
               }
               break;
@@ -438,7 +467,8 @@ namespace Sezen
         | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
       // FIXME: APPLICATIONS?
       var common_flags = q.query_type & our_results;
-      if (common_flags == 0) return null;
+      // ignore short searches
+      if (common_flags == 0 || q.query_string.length <= 1) return null;
       
       var start_time = new Timer ();
 

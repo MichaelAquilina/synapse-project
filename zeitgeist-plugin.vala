@@ -56,8 +56,10 @@ namespace Sezen
       private void init_from_event (Zeitgeist.Event event)
       {
         var subject = event.get_subject (0);
-        this.description = Uri.unescape_string (subject.get_uri ());
         this.uri = subject.get_uri ();
+        var f = File.new_for_uri (this.uri);
+        this.description = f.get_parse_name ();
+
         unowned string text = subject.get_text ();
         if (text == null || text == "")
         {
