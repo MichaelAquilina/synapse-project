@@ -195,13 +195,11 @@ namespace Sezen
     }
     
     /* UI shared components */
-    private Label cat_label;
     private Image main_image;
     private Image main_image_overlay;
     private Label main_label;
     private Label main_label_description;
     private Image action_image;
-    private Label action_label;
     private HSelectionContainer sts;
     private ResultBox result_box;
     private HBox list_hbox;
@@ -262,6 +260,7 @@ namespace Sezen
       spacer.set_size_request (10, TOP_SPACING - PADDING + 10);
       /* STS */
       sts = new HSelectionContainer(_hilight_label, 15);
+      //sts.set_selection_align (HSelectionContainer.SelectionAlign.LEFT);
       foreach (string s in this.categories)
         sts.add (new Label(s));
       /* HBox for the right area */
@@ -387,11 +386,6 @@ namespace Sezen
       set_mask ();
     }
     
-    private void quit ()
-    {
-      Gtk.main_quit ();
-    }
-
     /* SEZEN STUFFS HERE */
     private IMContext im_context;
     private DataSink data_sink;
@@ -649,7 +643,6 @@ namespace Sezen
     
     public void set_selected (int sel)
     {
-      int i = 0, j = 0;
       if (sel < 0)
         sel = types.length - 1;
       else if (sel >= types.length)
@@ -707,7 +700,6 @@ namespace Sezen
                                     double.max(b - 0.15, 0),
                                     0.95);
         /* Prepare and draw top bg's rect */
-        int PAD = 1;
         ctx.rectangle (0, 0, w.allocation.width, w.allocation.height);
         ctx.set_source (pat);
         ctx.fill ();
@@ -799,16 +791,15 @@ namespace Sezen
       GLib.List<TreePath> sel_paths = sel.get_selected_rows(null);
       TreePath path = sel_paths.first ().data;
       TreePath opath = path;
-      try {oindex = path.to_string().to_int();} catch {}
+      oindex = path.to_string().to_int();
       if (val == 0)
         return oindex;
       if (val > 0)
         path.next ();
       else if (val < 0)
         path.prev ();
-      try {
-        index = path.to_string().to_int();
-      } catch {}
+      
+      index = path.to_string().to_int();
       if (index == 0 && oindex == 0)
         index = oindex = -1; //hide list
       if (index < 0 || index >= results.length)
@@ -934,13 +925,28 @@ namespace Gtk
     private int[] allocations = {};
     private bool[] visibles = {};
     
+    public enum SelectionAlign
+    {
+      LEFT = 0,
+      CENTER = 1,
+      RIGHT = 2
+    }
+    private int align;
+    
+    
     public HSelectionContainer (SelectWidget func, int padding)
     {
       this.func = func;
       this.padding = padding;
+      this.align = SelectionAlign.CENTER;
       childs = new ArrayList<Widget>();
       set_has_window(false);
       set_redraw_on_allocate(false);
+    }
+    
+    public void set_selection_align (SelectionAlign align)
+    {
+      this.align = align;
     }
     
     public void select_next () {select(selection+1);}
@@ -992,9 +998,23 @@ namespace Gtk
         lastx += padding + req.width;
         ++i;
       }
-      int offset = allocation.width / 2 - allocations[selection];
-      childs.get (selection).size_request (out req);
-      offset -= req.width / 2;
+      int offset = 0;
+      switch (this.align)
+      {
+        case SelectionAlign.LEFT:
+          offset = - allocations[selection];
+          break;
+        case SelectionAlign.RIGHT:
+          offset = allocation.width - allocations[selection];
+          childs.get (selection).size_request (out req);
+          offset -= req.width;
+          break;
+        default:
+          offset = allocation.width / 2 - allocations[selection];
+          childs.get (selection).size_request (out req);
+          offset -= req.width / 2;
+          break;
+      }
       // update widget allocations and visibility
       i = 0;
       int pos = 0;
