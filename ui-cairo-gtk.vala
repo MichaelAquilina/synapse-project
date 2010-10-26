@@ -185,6 +185,7 @@ namespace Sezen
     /* UI shared components */
     private Label cat_label;
     private Image main_image;
+    private Image main_image_overlay;
     private Label main_label;
     private Label main_label_description;
     private Image action_image;
@@ -193,7 +194,7 @@ namespace Sezen
     private ResultBox result_box;
     private HBox list_hbox;
     private HBox top_hbox;
-
+    
     private void build_ui ()
     {
       /* Constructing Main Areas*/
@@ -216,10 +217,16 @@ namespace Sezen
       /* Constructing Top Area */
       
       /* Match Icon */
+      GtkContainerOverlayed gco = new GtkContainerOverlayed();
+      main_image_overlay = new Image();
+      main_image_overlay.set_pixel_size (ICON_SIZE / 2);
       main_image = new Image ();
+      main_image.set_size_request (ICON_SIZE, ICON_SIZE);
       main_image.set_pixel_size (ICON_SIZE);
       main_image.set_from_icon_name ("search", IconSize.DIALOG);
-      top_hbox.pack_start (main_image, false);
+      gco.add( main_image );
+      gco.add( main_image_overlay );
+      top_hbox.pack_start (gco, false);
       
       /* VBox to push down the right area */
       var top_right_vbox = new VBox (false, 0);
@@ -389,6 +396,7 @@ namespace Sezen
           result_box.update_matches (null);
           set_list_visible (false);
           main_image.set_from_icon_name ("search", IconSize.DIALOG);
+          main_image_overlay.clear();
           main_label.set_markup (markup_string_with_search (" "," "));
           main_label_description.set_markup (get_description_markup ("Type to search..."));
         }
@@ -417,6 +425,7 @@ namespace Sezen
           set_list_visible (false);
           focus_match (null);
           main_image.set_from_icon_name ("unknown", IconSize.DIALOG);
+          main_image_overlay.clear ();
         }
       }
       catch (SearchError err)
@@ -460,13 +469,16 @@ namespace Sezen
       {
         try
         {
-          GLib.Icon icon = GLib.Icon.new_for_string (match.has_thumbnail ?
-            match.thumbnail_path : match.icon_name);
-          main_image.set_from_gicon (icon, IconSize.DIALOG);
+          main_image.set_from_gicon (GLib.Icon.new_for_string (match.icon_name), IconSize.DIALOG);
+          if (match.has_thumbnail)
+            main_image_overlay.set_from_gicon (GLib.Icon.new_for_string (match.thumbnail_path), IconSize.DIALOG);
+          else
+            main_image_overlay.clear ();
         }
         catch (Error err)
         {
           main_image.set_from_icon_name ("missing-image", IconSize.DIALOG);
+          main_image_overlay.clear ();
         }
         main_label.set_markup (markup_string_with_search (match.title, search_string));
         main_label_description.set_markup (get_description_markup (match.description));
@@ -757,6 +769,71 @@ namespace Sezen
 			}
 		
 			return pixbuf;
+    }
+  }
+
+  public class GtkContainerOverlayed: Gtk.Container
+  {
+    public float scale {get; set; default = 0.25f;}
+    public Widget main {get; set; default = null;}
+    public Widget overlay {get; set; default = null;}
+    public GtkContainerOverlayed ()
+    {
+      GLib.Object ();
+      set_has_window(false);
+      set_redraw_on_allocate(false);
+    }
+    public override void size_request (out Requisition requisition)
+    {
+      Requisition req = {0, 0};
+      requisition.width = 1;
+      requisition.height = 1;
+      if (main != null)
+      {
+        main.size_request (out req);
+        requisition.width = int.max(req.width, requisition.width);
+        requisition.height = int.max(req.height, requisition.height);
+      }
+      if (overlay != null)
+      {
+        overlay.size_request (out req);
+        requisition.width = int.max(req.width, requisition.width);
+        requisition.height = int.max(req.height, requisition.height);
+      }
+      debug ("size req %d %d",requisition.width,requisition.height);
+    }
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      Gdk.Rectangle aoverlay = {allocation.x + allocation.width / 2,
+                                allocation.y + allocation.height / 2,
+                                allocation.width / 2,
+                                allocation.height / 2
+                                };
+      Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
+      set_allocation (alloc);    
+      main.size_allocate (allocation);
+      overlay.size_allocate (aoverlay);
+    }
+    public override void forall_internal (bool b, Gtk.Callback callback)
+    {
+      if (main != null)
+        callback (main);
+      if (overlay != null)
+        callback (overlay);
+    }
+
+    public override void add (Widget widget)
+    {
+      if (main == null)
+      {
+        main = widget;
+        main.set_parent (this);
+      }
+      else if (overlay == null)
+      {
+        overlay = widget;
+        overlay.set_parent (this);
+      }
     }
   }
 }
