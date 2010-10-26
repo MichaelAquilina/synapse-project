@@ -57,6 +57,8 @@ namespace Sezen
       {
         interesting_attributes =
           string.join (",", FILE_ATTRIBUTE_STANDARD_TYPE,
+                            FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
+                            FILE_ATTRIBUTE_STANDARD_IS_BACKUP,
                             FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
                             FILE_ATTRIBUTE_STANDARD_ICON,
                             FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
@@ -95,7 +97,9 @@ namespace Sezen
         {
           var fi = yield f.query_info_async (interesting_attributes,
                                              0, 0, null);
-          if (fi.get_file_type () == FileType.REGULAR)
+          if (fi.get_file_type () == FileType.REGULAR &&
+              !fi.get_is_hidden () &&
+              !fi.get_is_backup ())
           {
             match_obj = new MatchObject (
               fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH),
