@@ -660,7 +660,6 @@ namespace Sezen
 		
     private void build_ui()
     {
-      this.sensitive = false;
       var vbox = new VBox (false, 0);
       vbox.border_width = 1;
       this.add (vbox);
