@@ -69,24 +69,24 @@ namespace Sezen
       ctx.arc (x+r, y2-r, r, Math.PI * 0.5, Math.PI);
     }
     
-    private void get_shape (Cairo.Context ctx)
+    private void get_shape (Cairo.Context ctx, bool mask_for_composited = false)
     {
       ctx.set_source_rgba (0,0,0,1);
+      if (mask_for_composited)
+      {
+        ctx.rectangle (0, 0, UI_WIDTH, UI_HEIGHT + UI_LIST_HEIGHT);
+        ctx.fill ();
+        return;
+      }
       get_shape_main (ctx);
       get_shape_list (ctx);
     }
     
     private void get_shape_main (Cairo.Context ctx)
     {
-      if (this.is_composited ())
-      {
-        rounded_rect (ctx, 0, TOP_SPACING, UI_WIDTH, UI_HEIGHT - TOP_SPACING, BORDER_RADIUS);
-        ctx.fill ();
-        ctx.rectangle (PADDING, PADDING, ICON_SIZE, ICON_SIZE);
-        ctx.fill ();
-      }
-      else
-        rounded_rect (ctx, 0, 0, UI_WIDTH, UI_HEIGHT, BORDER_RADIUS);
+      rounded_rect (ctx, 0, TOP_SPACING, UI_WIDTH, UI_HEIGHT - TOP_SPACING, BORDER_RADIUS);
+      ctx.fill ();
+      rounded_rect (ctx, 0, 0,  ICON_SIZE + PADDING * 2, ICON_SIZE, BORDER_RADIUS);
       ctx.fill ();
     }
     
@@ -105,10 +105,16 @@ namespace Sezen
 
     private void on_composited_changed (Widget w)
     {
+      bool is_composited = true;
       Gdk.Colormap? cm = w.get_screen ().get_rgba_colormap();
       if (cm == null)
+      {
+        is_composited = false;
         cm = w.get_screen ().get_rgb_colormap();
+      }
       this.set_colormap (cm);
+      if (is_composited)
+        set_mask (true);
       set_mask ();
     }
     
@@ -119,15 +125,15 @@ namespace Sezen
       *b = col.blue / (double)65535;
     }
     
-    private void set_mask ()
+    private void set_mask (bool mask_for_composited = false)
     {
       var bitmap = new Gdk.Pixmap (null, UI_WIDTH, UI_HEIGHT+UI_LIST_HEIGHT, 1);
       var ctx = Gdk.cairo_create (bitmap);
       ctx.set_operator (Cairo.Operator.CLEAR);
       ctx.paint ();
       ctx.set_operator (Cairo.Operator.OVER);
-      get_shape (ctx);
-      if (this.is_composited())
+      get_shape (ctx, mask_for_composited);
+      if (this.is_composited() && !mask_for_composited)
       {
         this.input_shape_combine_mask (null, 0, 0);
         this.input_shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
@@ -139,6 +145,37 @@ namespace Sezen
       }
     }
     
+    private void _cairo_path_for_main (Cairo.Context ctx, bool composited)
+    {
+      int PAD = 1;
+      if (composited)
+        rounded_rect (ctx, PAD, TOP_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - TOP_SPACING - PAD * 2, BORDER_RADIUS);
+      else
+      {
+        /*
+         __               y1
+        |  |_______________ y2
+        |                  |
+        |__________________|y3
+        x1 x3            x4
+        */
+        double x1 = PAD,
+               x3 = PADDING * 2 + ICON_SIZE - PAD,
+               x4 = UI_WIDTH - PAD,
+               y1 = PAD,
+               y2 = PAD + TOP_SPACING,
+               y3 = UI_HEIGHT - PAD,
+               r = BORDER_RADIUS;
+        ctx.move_to (x1, y3 - r);
+        ctx.arc (x1+r, y1+r, r, Math.PI, Math.PI * 1.5);
+        ctx.arc (x3-r, y1+r, r, Math.PI * 1.5, Math.PI * 2.0);
+        ctx.line_to (x3, y2);
+        ctx.arc (x4-r, y2+r, r, Math.PI * 1.5, Math.PI * 2.0);
+        ctx.arc (x4-r, y3-r, r, 0, Math.PI * 0.5);
+        ctx.arc (x1+r, y3-r, r, Math.PI * 0.5, Math.PI);
+      }
+    }
+    
     private bool on_expose (Widget w, Gdk.EventExpose event) {
         var ctx = Gdk.cairo_create (w.window);
         /* Clear Stage */
@@ -146,13 +183,10 @@ namespace Sezen
         ctx.paint ();
         ctx.set_operator (Cairo.Operator.OVER);
 
-        int top_SPACING = TOP_SPACING;
-        if (!w.is_composited())
-          top_SPACING = 0;
         /* Prepare bg's colors using GtkStyle */
         Gtk.Style style = w.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
-        Pattern pat = new Pattern.linear(0, top_SPACING, 0, UI_HEIGHT);
+        Pattern pat = new Pattern.linear(0, TOP_SPACING, 0, UI_HEIGHT);
         color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                     double.min(g + 0.15, 1),
@@ -163,12 +197,11 @@ namespace Sezen
                                     double.max(b - 0.15, 0),
                                     0.95);
         /* Prepare and draw top bg's rect */
-        int PAD = 1;
-        rounded_rect (ctx, PAD, top_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - top_SPACING - PAD * 2, BORDER_RADIUS);
+        _cairo_path_for_main (ctx, w.is_composited());
         ctx.set_source (pat);
         ctx.fill ();
         /* Add border */
-        rounded_rect (ctx, PAD, top_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - top_SPACING - PAD * 2, BORDER_RADIUS);
+        _cairo_path_for_main (ctx, w.is_composited());
         ctx.set_line_width (2);
         ctx.set_source_rgba (1-r, 1-g, 1-b, 0.8);
         ctx.stroke ();
