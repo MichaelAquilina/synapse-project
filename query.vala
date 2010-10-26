@@ -39,6 +39,15 @@ namespace Sezen
     LOCAL_CONTENT = 0xFF | QueryFlags.UNCATEGORIZED,
     ALL           = 0xFE | QueryFlags.UNCATEGORIZED
   }
+  
+  [Flags]
+  public enum MatcherFlags
+  {
+    NO_REVERSED   = 1 << 0,
+    NO_SUBSTRING  = 1 << 1,
+    NO_PARTIAL    = 1 << 2,
+    NO_FUZZY      = 1 << 3
+  }
 
   public struct Query
   {
@@ -69,7 +78,7 @@ namespace Sezen
 
     public static Gee.List<Gee.Map.Entry<Regex, int>>
     get_matchers_for_query (string query,
-                            bool fuzzy_re = true,
+                            MatcherFlags match_flags = 0,
                             RegexCompileFlags flags = RegexCompileFlags.OPTIMIZE)
     {
       /* create a couple of regexes and try to help with matching
@@ -78,10 +87,11 @@ namespace Sezen
        * 2) ^query
        * 3) \bquery
        * 4) split to words and seach \bword1.+\bword2 (if there are 2+ words)
-       * 5) split to characters and search \bq.+\bu.+\be.+\br.+\by
-       * 6) split to characters to length parts and search \bq.*u.*e.*r.*y
+       * 5) query
+       * 6) split to characters and search \bq.+\bu.+\be.+\br.+\by
+       * 7) split to characters and search \bq.*u.*e.*r.*y
        *
-       * The last regular expression is only returned if fuzzy_re is true.
+       * The set of returned regular expressions depends on MatcherFlags.
        */
 
       var results = new Gee.HashMap<Regex, int> ();
@@ -136,7 +146,8 @@ namespace Sezen
         }
 
         // FIXME: do something generic here
-        if (escaped_words.length == 2)
+        if (!(MatcherFlags.NO_REVERSED in match_flags) &&
+            escaped_words.length == 2)
         {
           var reversed = "\\b(%s)".printf (string.join (").+\\b(",
                                                       escaped_words[1],
@@ -152,6 +163,18 @@ namespace Sezen
           }
         }
       }
+      
+      if (!(MatcherFlags.NO_SUBSTRING in match_flags))
+      {
+        try
+        {
+          re = new Regex (Regex.escape_string (query), flags);
+          results[re] = 75;
+        }
+        catch (RegexError err)
+        {
+        }
+      }
 
       // split to individual chars
       string[] individual_chars = Regex.split_simple ("\\s*", query);
@@ -161,21 +184,22 @@ namespace Sezen
         escaped_chars += Regex.escape_string (word);
       }
 
-      if (individual_chars.length <= 5)
+      if (!(MatcherFlags.NO_PARTIAL in match_flags) &&
+          individual_chars.length <= 5)
       {
         string pattern = "\\b(%s)".printf (string.joinv (").+\\b(",
                                                          escaped_chars));
         try
         {
           re = new Regex (pattern, flags);
-          results[re] = 75;
+          results[re] = 70;
         }
         catch (RegexError err)
         {
         }
       }
 
-      if (fuzzy_re)
+      if (!(MatcherFlags.NO_FUZZY in match_flags))
       {
         string pattern = "\\b(%s)".printf (string.joinv (").*(",
                                                          escaped_chars));

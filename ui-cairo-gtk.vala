@@ -578,7 +578,7 @@ namespace Sezen
       }
 
       // FIXME: we need to escape also the pattern right?
-      var matchers = Query.get_matchers_for_query (pattern, true, 
+      var matchers = Query.get_matchers_for_query (pattern, 0,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
       string? highlighted = null;
       string escaped_text = Markup.escape_text (text);
