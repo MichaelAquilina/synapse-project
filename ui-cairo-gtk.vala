@@ -964,6 +964,20 @@ namespace Gtk
         overlay = widget;
       }
     }
+    public override void remove (Widget widget)
+    {
+      if (overlay == widget)
+      {
+        widget.unparent ();
+        overlay = null;
+        return;
+      }
+      if (main == widget)
+      {
+        widget.unparent ();
+        main = null;
+      }
+    }
   }
   
   /* HSelectionContainer */
@@ -1167,6 +1181,16 @@ namespace Gtk
       }
       else if (func != null)      
         func (widget, false);
+    }
+    
+    public override void remove (Widget widget)
+    {
+      if (childs.remove (widget))
+      {
+        widget.unparent ();
+        this.allocations.resize (this.allocations.length);
+        this.visibles.resize (this.visibles.length);
+      }
     }
   }
 }
