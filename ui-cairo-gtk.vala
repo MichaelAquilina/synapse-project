@@ -396,6 +396,7 @@ namespace Sezen
           result_box.update_matches (null);
           set_list_visible (false);
           main_image.set_from_icon_name ("search", IconSize.DIALOG);
+          main_image_overlay.clear();
           main_label.set_markup (markup_string_with_search (" "," "));
           main_label_description.set_markup (get_description_markup ("Type to search..."));
         }
@@ -424,6 +425,7 @@ namespace Sezen
           set_list_visible (false);
           focus_match (null);
           main_image.set_from_icon_name ("unknown", IconSize.DIALOG);
+          main_image_overlay.clear ();
         }
       }
       catch (SearchError err)
@@ -467,13 +469,16 @@ namespace Sezen
       {
         try
         {
-          GLib.Icon icon = GLib.Icon.new_for_string (match.has_thumbnail ?
-            match.thumbnail_path : match.icon_name);
-          main_image.set_from_gicon (icon, IconSize.DIALOG);
+          main_image.set_from_gicon (GLib.Icon.new_for_string (match.icon_name), IconSize.DIALOG);
+          if (match.has_thumbnail)
+            main_image_overlay.set_from_gicon (GLib.Icon.new_for_string (match.thumbnail_path), IconSize.DIALOG);
+          else
+            main_image_overlay.clear ();
         }
         catch (Error err)
         {
           main_image.set_from_icon_name ("missing-image", IconSize.DIALOG);
+          main_image_overlay.clear ();
         }
         main_label.set_markup (markup_string_with_search (match.title, search_string));
         main_label_description.set_markup (get_description_markup (match.description));
