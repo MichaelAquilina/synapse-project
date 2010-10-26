@@ -36,7 +36,7 @@ namespace Sezen
     private const int UI_WIDTH = 550 + PADDING * 2;
     private const int UI_HEIGHT = ICON_SIZE + PADDING * 2;
     private const int UI_LIST_WIDTH = 400;
-    private const int UI_LIST_HEIGHT = (35 + 4) * 5 + 2;
+    private const int UI_LIST_HEIGHT = (35/*icon_size*/ + 4 /*row border*/) * 5 + 15 /*statusbar*/ + 2 /* Result box Border*/;
     private const int LIST_BORDER_RADIUS = 3;
     private const int TOP_SPACING = UI_HEIGHT * 4 / 10;
     
@@ -112,7 +112,7 @@ namespace Sezen
       set_mask ();
     }
     
-    private void color_to_rgb (Gdk.Color col, double *r, double *g, double *b)
+    public static void color_to_rgb (Gdk.Color col, double *r, double *g, double *b)
     {
       *r = col.red / (double)65535;
       *g = col.green / (double)65535;
@@ -172,6 +172,19 @@ namespace Sezen
         ctx.set_line_width (2);
         ctx.set_source_rgba (1-r, 1-g, 1-b, 0.8);
         ctx.stroke ();
+        
+        if (list_visible && w.is_composited())
+        {
+          color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
+          pat = new Pattern.linear((UI_WIDTH - UI_LIST_WIDTH) / 2 - 10, UI_HEIGHT, (UI_WIDTH - UI_LIST_WIDTH) / 2 + UI_LIST_WIDTH + 10, UI_HEIGHT);
+          pat.add_color_stop_rgba (0, r, g, b, 0);
+          pat.add_color_stop_rgba (10.0 / UI_LIST_WIDTH, r, g, b, 1);
+          pat.add_color_stop_rgba (1 - 10.0 / UI_LIST_WIDTH, r, g, b, 1);
+          pat.add_color_stop_rgba (1, r, g, b, 0);
+          ctx.rectangle (0, UI_HEIGHT, UI_WIDTH, UI_LIST_HEIGHT);
+          ctx.set_source (pat);
+          ctx.fill ();
+        }
 
         /* Propagate Expose */               
         Container c = (w is Container) ? (Container) w : null;
@@ -216,15 +229,15 @@ namespace Sezen
       /* Constructing Top Area */
       
       /* Match Icon */
-      GtkContainerOverlayed gco = new GtkContainerOverlayed();
+      Gtk.ContainerOverlayed gco = new Gtk.ContainerOverlayed();
       main_image_overlay = new Image();
       main_image_overlay.set_pixel_size (ICON_SIZE / 2);
       main_image = new Image ();
       main_image.set_size_request (ICON_SIZE, ICON_SIZE);
       main_image.set_pixel_size (ICON_SIZE);
       main_image.set_from_icon_name ("search", IconSize.DIALOG);
-      gco.add( main_image );
-      gco.add( main_image_overlay );
+      gco.main = main_image;
+      gco.overlay = main_image_overlay;
       top_hbox.pack_start (gco, false);
       
       /* VBox to push down the right area */
@@ -655,15 +668,62 @@ namespace Sezen
 		
 		private TreeView view;
 		ListStore results;
+		private Label status;
+		
+		private bool on_expose (Widget w, Gdk.EventExpose event) {
+        var ctx = Gdk.cairo_create (w.window);
+        /* Clear Stage */
+        ctx.set_operator (Cairo.Operator.CLEAR);
+        ctx.paint ();
+        ctx.set_operator (Cairo.Operator.OVER);
+
+        /* Prepare bg's colors using GtkStyle */
+        Gtk.Style style = w.get_style();
+        double r = 0.0, g = 0.0, b = 0.0;
+        Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
+        SezenWindow.color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+        pat.add_color_stop_rgba (1.0 - 15.0 / w.allocation.height, double.min(r + 0.15, 1),
+                                    double.min(g + 0.15, 1),
+                                    double.min(b + 0.15, 1),
+                                    0.95);
+        pat.add_color_stop_rgba (1, double.max(r - 0.15, 0),
+                                    double.max(g - 0.15, 0),
+                                    double.max(b - 0.15, 0),
+                                    0.95);
+        /* Prepare and draw top bg's rect */
+        int PAD = 1;
+        ctx.rectangle (0, 0, w.allocation.width, w.allocation.height);
+        ctx.set_source (pat);
+        ctx.fill ();
+
+        /* Propagate Expose */               
+        Container c = (w is Container) ? (Container) w : null;
+        if (c != null)
+          c.propagate_expose (this.get_child(), event);
+        
+        return true;
+    }
 		
     private void build_ui()
     {
       var vbox = new VBox (false, 0);
+      this.expose_event.connect (on_expose);
       vbox.border_width = 1;
       this.add (vbox);
       var resultsScrolledWindow = new ScrolledWindow (null, null);
       resultsScrolledWindow.set_policy (PolicyType.NEVER, PolicyType.NEVER);
       vbox.pack_start (resultsScrolledWindow);
+      var tb = new HBox (false, 0);
+      tb.set_size_request (mwidth, 15);
+      vbox.pack_start (tb, false);
+      status = new Label ("");
+      status.set_alignment (0, 0);
+      status.set_markup (Markup.printf_escaped ("<b> </b>"));
+      var logo = new Label ("");
+      logo.set_alignment (1, 0);
+      logo.set_markup (Markup.printf_escaped ("<i>Sezen 2 </i>"));
+      tb.pack_start (status, true, true, 10);
+      tb.pack_start (logo, false, false, 10);
       
       view = new TreeView ();
 			view.enable_search = false;
@@ -699,6 +759,7 @@ namespace Sezen
       if (rs==null)
       {
         no_results = true;
+        status.set_markup (Markup.printf_escaped ("<b>%s</b>", "Sezen 2"));
         return;
       }
       no_results = false;
@@ -711,6 +772,7 @@ namespace Sezen
       }
       var sel = view.get_selection ();
       sel.select_path (new TreePath.first());
+      status.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", results.length));
     }
     public int move_selection (int val)
     {
@@ -742,6 +804,7 @@ namespace Sezen
           view.scroll_to_cell (path, null, true, 0.5F, 0.0F);
           return false;
       });
+      status.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", index + 1, results.length));
       time.attach(null);
       return index;
     }
@@ -769,15 +832,44 @@ namespace Sezen
 			return pixbuf;
     }
   }
+}
 
-  public class GtkContainerOverlayed: Gtk.Container
+namespace Gtk
+{
+  public class ContainerOverlayed: Gtk.Container
   {
     public float scale {get; set; default = 0.25f;}
     private Widget _main = null;
     private Widget _overlay = null;
-    public Widget main {get{return _main;} set{ if(value!=null){_main=value;_main.set_parent(this);}}}
-    public Widget overlay {get{return _overlay;} set{ if(value!=null){_overlay=value;_overlay.set_parent(this);}}}
-    public GtkContainerOverlayed ()
+    public Widget main { get {return _main;}
+                         set {
+                               if(_main!=null)
+                               {
+                                 _main.unparent();
+                                 _main = null;
+                               }
+                               if(value!=null)
+                               {
+                                 _main = value;
+                                 _main.set_parent(this);
+                               }
+                             }
+                       }
+    public Widget overlay  { get {return _overlay;}
+                             set {
+                                   if(_overlay!=null)
+                                   {
+                                     _overlay.unparent();
+                                     _overlay = null;
+                                   }
+                                   if(value!=null)
+                                   {
+                                     _overlay = value;
+                                     _overlay.set_parent(this);
+                                   }
+                                 }
+                           }
+    public ContainerOverlayed ()
     {
       GLib.Object ();
       set_has_window(false);
@@ -826,12 +918,10 @@ namespace Sezen
       if (main == null)
       {
         main = widget;
-        main.set_parent (this);
       }
       else if (overlay == null)
       {
         overlay = widget;
-        overlay.set_parent (this);
       }
     }
   }
