@@ -52,13 +52,56 @@ namespace Sezen
 
     private class FileInfo
     {
+      private static string interesting_attributes;
+      static construct
+      {
+        interesting_attributes =
+          string.join (",", FILE_ATTRIBUTE_STANDARD_TYPE,
+                            FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
+                            FILE_ATTRIBUTE_STANDARD_ICON,
+                            FILE_ATTRIBUTE_THUMBNAIL_PATH,
+                            null);
+      }
+      
       public string uri;
+      // FIXME: we need also type!
       public MatchObject? match_obj;
+      public bool initialized;
 
       public FileInfo (string uri)
       {
         this.uri = uri;
         this.match_obj = null;
+        this.initialized = false;
+      }
+      
+      public bool is_initialized ()
+      {
+        return this.match_obj != null;
+      }
+      
+      public async void initialize ()
+      {
+        initialized = true;
+        var f = File.new_for_uri (uri);
+        try
+        {
+          var fi = yield f.query_info_async (interesting_attributes,
+                                             0, 0, null);
+          if (fi.get_file_type () == FileType.REGULAR)
+          {
+            match_obj = new MatchObject (
+              fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH),
+              fi.get_icon ().to_string ());
+            match_obj.uri = uri;
+            match_obj.title = fi.get_display_name ();
+            match_obj.description = Uri.unescape_string (uri);
+          }
+        }
+        catch (Error err)
+        {
+          warning ("%s", err.message);
+        }
       }
     }
 
@@ -238,12 +281,6 @@ namespace Sezen
       }
     }
 
-    private string interesting_attributes =
-      string.join (",", FILE_ATTRIBUTE_STANDARD_TYPE,
-                        FILE_ATTRIBUTE_STANDARD_ICON,
-                        FILE_ATTRIBUTE_THUMBNAIL_PATH,
-                        null);
-
     private Gee.List<string> get_most_likely_dirs ()
     {
       int MAX_ITEMS = 2;
@@ -340,14 +377,13 @@ namespace Sezen
       }
     }
 
-    private Gee.List<FileInfo> get_extra_results (Query q,
-                                                  ResultSet original_rs,
-                                                  Gee.Collection<string>? dirs)
+    private async ResultSet get_extra_results (Query q,
+                                               ResultSet original_rs,
+                                               Gee.Collection<string>? dirs)
       throws SearchError
     {
-      var results = new Gee.ArrayList<FileInfo> ();
+      var results = new ResultSet ();
 
-      var possible_uris = new Gee.HashSet<string> ();
       var flags = RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS;
       // FIXME: uri escape!
       var matchers = Query.get_matchers_for_query (q.query_string,
@@ -357,13 +393,26 @@ namespace Sezen
       foreach (var directory in directories)
       {
         // only add the uri if it matches our query
-        foreach (unowned string uri in directory_contents[directory].files.keys)
+        foreach (var entry in directory_contents[directory].files)
         {
           foreach (var matcher in matchers)
           {
+            unowned string uri = entry.key;
             if (matcher.key.match (uri))
             {
-              if (!original_rs.contains_uri (uri)) possible_uris.add (uri);
+              if (!original_rs.contains_uri (uri))
+              {
+                FileInfo fi = entry.value;
+                if (!fi.is_initialized ())
+                {
+                  yield fi.initialize ();
+                }
+                // FIXME: check if it matches query_type
+                if (fi.match_obj != null)
+                {
+                  results.add (fi.match_obj, matcher.value);
+                }
+              }
               break;
             }
           }
@@ -373,8 +422,7 @@ namespace Sezen
       }
 
       debug ("%s found %d extra uris (ZG returned %d)",
-        this.get_type ().name (), possible_uris.size, original_rs.size);
-      //foreach (string s in possible_uris) print ("%s\n", s);
+        this.get_type ().name (), results.size, original_rs.size);
 
       return results;
     }
@@ -382,8 +430,13 @@ namespace Sezen
     private string? current_query = null;
     public override async ResultSet? search (Query q) throws SearchError
     {
+      var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
+        | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
+      // FIXME: APPLICATIONS?
+      var common_flags = q.query_type & our_results;
+      if (common_flags == 0) return null;
+      
       var start_time = new Timer ();
-      var result = new ResultSet ();
 
       // FIXME: what about deleting one character?
       if (current_query != null && !q.query_string.has_prefix (current_query))
@@ -435,7 +488,7 @@ namespace Sezen
       // files match our query
       var t = new Timer ();
       // FIXME: run this sooner, it doesn't need to wait for the signal
-      var file_info_list = get_extra_results (q, original_rs, null);
+      var result = yield get_extra_results (q, original_rs, null);
       debug ("%s ran matching %d ms (total %d ms)",
              this.get_type ().name (),
              (int) (t.elapsed ()*1000),

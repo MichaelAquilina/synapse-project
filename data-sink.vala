@@ -87,8 +87,9 @@ namespace Sezen
       }
     }
 
-    public void add_all (ResultSet rs)
+    public void add_all (ResultSet? rs)
     {
+      if (rs == null) return;
       matches.set_all (rs.matches);
       uris.add_all (rs.uris);
     }
