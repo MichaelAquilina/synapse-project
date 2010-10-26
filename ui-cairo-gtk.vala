@@ -33,7 +33,7 @@ namespace Sezen
     private const int BORDER_RADIUS = 10;
     private const int ICON_SIZE = 172;
     private const int ACTION_ICON_SIZE = 64;
-    private const int UI_WIDTH = 550 + PADDING * 2;
+    private const int UI_WIDTH = 480 + ACTION_ICON_SIZE*3 + PADDING * 2;
     private const int UI_HEIGHT = ICON_SIZE + PADDING * 2;
     private const int UI_LIST_WIDTH = 400;
     private const int UI_LIST_HEIGHT = (35/*icon_size*/ + 4 /*row border*/) * 5 + 15 /*statusbar*/ + 2 /* Result box Border*/;
@@ -201,6 +201,7 @@ namespace Sezen
     private Label main_label_description;
     private Image action_image;
     private HSelectionContainer sts;
+    private HSelectionContainer action_selector;
     private ResultBox result_box;
     private HBox list_hbox;
     private HBox top_hbox;
@@ -220,6 +221,11 @@ namespace Sezen
         l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
         l.sensitive = false;
       }
+    }
+    
+    private static void _hilight_image (Widget w, bool b)
+    {
+      w.sensitive = b;
     }
 
     private void build_ui ()
@@ -292,11 +298,19 @@ namespace Sezen
       labels_vbox.pack_end (main_label, false);
       
       /* Action Area */
+      action_selector = new HSelectionContainer(_hilight_image, - (int)Math.floor (ACTION_ICON_SIZE / 1.8));
+      action_selector.set_selection_align (HSelectionContainer.SelectionAlign.CENTER);
+      action_selector.set_size_request (ACTION_ICON_SIZE*3, ACTION_ICON_SIZE);
+      string names[3] = {"system-run","system-shutdown","pidgin"};
+      for (int x = 0; x < 3; ++x)
+      {
       action_image = new Image ();
       action_image.set_pixel_size (ACTION_ICON_SIZE);
       action_image.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
-      action_image.set_from_icon_name ("system-run", IconSize.DIALOG);
-      right_hbox.pack_start (action_image, false);
+      action_image.set_from_icon_name (names[x], IconSize.DIALOG);
+      action_selector.add (action_image);
+      }
+      right_hbox.pack_start (action_selector, false);
       
       /* ResultBox */
       result_box = new ResultBox(UI_LIST_WIDTH);
@@ -379,6 +393,9 @@ namespace Sezen
           else
             focus_match (results[i]);
           set_list_visible (true);
+          break;
+        case Gdk.KeySyms.Tab:
+          action_selector.select_next_circular ();
           break;
         default:
           debug ("im_context didn't filter...");
@@ -936,6 +953,7 @@ namespace Gtk
     private int selection = 0;
     private int[] allocations = {};
     private bool[] visibles = {};
+    private bool direction = true;
     
     public enum SelectionAlign
     {
@@ -946,7 +964,7 @@ namespace Gtk
     private int align;
     
     
-    public HSelectionContainer (SelectWidget func, int padding)
+    public HSelectionContainer (SelectWidget? func, int padding)
     {
       this.func = func;
       this.padding = padding;
@@ -961,6 +979,22 @@ namespace Gtk
       this.align = align;
     }
     
+    public void select_next_circular ()
+    {
+      int sel = selection;
+      sel += direction ? 1 : -1;
+      if (sel < 0)
+      {
+        sel = 1;
+        direction = true;
+      }
+      else if (sel >= childs.size)
+      {
+        sel = childs.size - 2;
+        direction = false;
+      }
+      select (sel);
+    }
     public void select_next () {select(selection+1);}
     public void select_prev () {select(selection-1);}
     
@@ -969,8 +1003,11 @@ namespace Gtk
       if (index < 0 || childs.size <= index)
         return;
       
-      func (childs.get(selection), false);
-      func (childs.get(index), true);
+      if (func != null)
+      {
+        func (childs.get(selection), false);
+        func (childs.get(index), true);
+      }
       this.selection = index;
       this.queue_resize();
       foreach (Widget w in childs)
@@ -1055,11 +1092,40 @@ namespace Gtk
     public override void forall_internal (bool b, Gtk.Callback callback)
     {
       int i = 0;
-      foreach (Widget w in childs)
+      if (this.align == SelectionAlign.LEFT)
       {
-        if ( visibles[i] )
-          callback (w);
-        ++i;
+        for (i = childs.size - 1; i >= 0; ++i)
+        {
+          if ( visibles[i] )
+            callback (childs.get(i));
+        }
+      }
+      else if (this.align == SelectionAlign.RIGHT)
+      {
+        foreach (Widget w in childs)
+        {
+          if ( visibles[i] )
+            callback (w);
+          ++i;
+        }
+      }
+      else //align center
+      {
+        int j;
+        j = i = selection;
+        ArrayList<Widget> reordered = new ArrayList<Widget>();
+        reordered.add (childs.get(i));
+        while (j >= 0 || i < childs.size)
+        {
+          --j;
+          ++i;
+          if (j >= 0)
+            reordered.add (childs.get(j));
+          if (i < childs.size)
+            reordered.add (childs.get(i));
+        }
+        for (i = reordered.size - 1; i >= 0; --i)
+          callback (reordered.get(i));
       }
     }
 
@@ -1072,9 +1138,10 @@ namespace Gtk
       if (childs.size==1)
       {
         this.selection = 0;
-        func (widget, true);
+        if (func != null)
+          func (widget, true);
       }
-      else
+      else if (func != null)      
         func (widget, false);
     }
   }
