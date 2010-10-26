@@ -64,6 +64,7 @@ namespace Sezen
       }
       
       public string uri;
+      public string parse_name;
       // FIXME: we need also type!
       public MatchObject? match_obj;
       public bool initialized;
@@ -73,6 +74,9 @@ namespace Sezen
         this.uri = uri;
         this.match_obj = null;
         this.initialized = false;
+
+        var f = File.new_for_uri (uri);
+        this.parse_name = f.get_parse_name ();
       }
       
       public bool is_initialized ()
@@ -397,10 +401,10 @@ namespace Sezen
         {
           foreach (var matcher in matchers)
           {
-            unowned string uri = entry.key;
-            if (matcher.key.match (uri))
+            unowned string parse_name = entry.value.parse_name;
+            if (matcher.key.match (parse_name))
             {
-              if (!original_rs.contains_uri (uri))
+              if (!original_rs.contains_uri (parse_name))
               {
                 FileInfo fi = entry.value;
                 if (!fi.is_initialized ())
