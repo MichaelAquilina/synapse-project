@@ -358,7 +358,7 @@ namespace Sezen
             focus_match (null);
           else
             focus_match (results[i]);
-          set_list_visible (true);
+          set_list_visible (i >= 0);
           break;
         case Gdk.KeySyms.Down:
           int i = result_box.move_selection (1);
@@ -734,7 +734,7 @@ namespace Sezen
       vbox.pack_start (tb, false);
       status = new Label ("");
       status.set_alignment (0, 0);
-      status.set_markup (Markup.printf_escaped ("<b> </b>"));
+      status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
       var logo = new Label ("");
       logo.set_alignment (1, 0);
       logo.set_markup (Markup.printf_escaped ("<i>Sezen 2 </i>"));
@@ -775,7 +775,7 @@ namespace Sezen
       if (rs==null)
       {
         no_results = true;
-        status.set_markup (Markup.printf_escaped ("<b>%s</b>", "Sezen 2"));
+        status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
         return;
       }
       no_results = false;
@@ -807,6 +807,8 @@ namespace Sezen
       try {
         index = path.to_string().to_int();
       } catch {}
+      if (index == 0 && oindex == 0)
+        index = oindex = -1; //hide list
       if (index < 0 || index >= results.length)
       {
         index = oindex;
