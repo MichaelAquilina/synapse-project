@@ -800,6 +800,8 @@ namespace Sezen
       TreePath path = sel_paths.first ().data;
       TreePath opath = path;
       try {oindex = path.to_string().to_int();} catch {}
+      if (val == 0)
+        return oindex;
       if (val > 0)
         path.next ();
       else if (val < 0)
