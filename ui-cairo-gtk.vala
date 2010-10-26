@@ -33,7 +33,7 @@ namespace Sezen
     private const int BORDER_RADIUS = 10;
     private const int ICON_SIZE = 172;
     private const int ACTION_ICON_SIZE = 64;
-    private const int UI_WIDTH = 480 + ACTION_ICON_SIZE*3 + PADDING * 2;
+    private const int UI_WIDTH = 480 + ACTION_ICON_SIZE*1 + PADDING * 2;
     private const int UI_HEIGHT = ICON_SIZE + PADDING * 2;
     private const int UI_LIST_WIDTH = 400;
     private const int UI_LIST_HEIGHT = (35/*icon_size*/ + 4 /*row border*/) * 5 + 15 /*statusbar*/ + 2 /* Result box Border*/;
@@ -201,7 +201,6 @@ namespace Sezen
     private Label main_label_description;
     private Image action_image;
     private HSelectionContainer sts;
-    private HSelectionContainer action_selector;
     private ResultBox result_box;
     private HBox list_hbox;
     private HBox top_hbox;
@@ -298,19 +297,11 @@ namespace Sezen
       labels_vbox.pack_end (main_label, false);
       
       /* Action Area */
-      action_selector = new HSelectionContainer(_hilight_image, - (int)Math.floor (ACTION_ICON_SIZE / 1.8));
-      action_selector.set_selection_align (HSelectionContainer.SelectionAlign.CENTER);
-      action_selector.set_size_request (ACTION_ICON_SIZE*3, ACTION_ICON_SIZE);
-      string names[3] = {"system-run","system-shutdown","pidgin"};
-      for (int x = 0; x < 3; ++x)
-      {
       action_image = new Image ();
       action_image.set_pixel_size (ACTION_ICON_SIZE);
       action_image.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
-      action_image.set_from_icon_name (names[x], IconSize.DIALOG);
-      action_selector.add (action_image);
-      }
-      right_hbox.pack_start (action_selector, false);
+      action_image.set_from_icon_name ("system-run", IconSize.DIALOG);
+      right_hbox.pack_start (action_image, false);
       
       /* ResultBox */
       result_box = new ResultBox(UI_LIST_WIDTH);
@@ -395,7 +386,7 @@ namespace Sezen
           set_list_visible (true);
           break;
         case Gdk.KeySyms.Tab:
-          action_selector.select_next_circular ();
+          ;
           break;
         default:
           debug ("im_context didn't filter...");
