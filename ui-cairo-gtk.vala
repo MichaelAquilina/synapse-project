@@ -352,15 +352,25 @@ namespace Sezen
           this.search_string = search_string;
           break;
         case Gdk.KeySyms.Up:
-          int i = result_box.move_selection (-1);
+          int old_index = 0;
+          int i = result_box.move_selection (-1, out old_index);
           if (i < 0)
             focus_match (null);
           else
             focus_match (results[i]);
-          set_list_visible (i >= 0);
+          if (old_index == i && i == 0)
+            set_list_visible (false);
+          else
+            set_list_visible (i >= 0);
           break;
         case Gdk.KeySyms.Down:
-          int i = result_box.move_selection (1);
+          if (!list_visible)
+          {
+            set_list_visible (true);
+            break;
+          }
+          int old_index = 0;
+          int i = result_box.move_selection (1, out old_index);
           if (i < 0)
             focus_match (null);
           else
@@ -782,7 +792,7 @@ namespace Sezen
       sel.select_path (new TreePath.first());
       status.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", results.length));
     }
-    public int move_selection (int val)
+    public int move_selection (int val, out int old_index)
     {
       if (no_results)
         return -1;
@@ -792,6 +802,7 @@ namespace Sezen
       TreePath path = sel_paths.first ().data;
       TreePath opath = path;
       oindex = path.to_string().to_int();
+      old_index = oindex;
       if (val == 0)
         return oindex;
       if (val > 0)
@@ -800,8 +811,6 @@ namespace Sezen
         path.prev ();
       
       index = path.to_string().to_int();
-      if (index == 0 && oindex == 0)
-        index = oindex = -1; //hide list
       if (index < 0 || index >= results.length)
       {
         index = oindex;
