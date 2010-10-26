@@ -212,13 +212,16 @@ namespace Sezen
       {
         string s = l.get_text();
         l.set_markup (Markup.printf_escaped ("<span size=\"large\"><u><b>%s</b></u></span>", s));
+        l.sensitive = true;
       }
       else
       {
         string s = l.get_text();
         l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
+        l.sensitive = false;
       }
     }
+
     private void build_ui ()
     {
       /* Constructing Main Areas*/
