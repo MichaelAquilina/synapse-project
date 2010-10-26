@@ -101,6 +101,12 @@ namespace Sezen
         if (keyfile.has_key (GROUP, "Icon"))
         {
           icon_name = keyfile.get_locale_string (GROUP, "Icon");
+          if (icon_name.has_suffix (".png") ||
+              icon_name.has_suffix (".svg") ||
+              icon_name.has_suffix (".xpm"))
+          {
+            icon_name = icon_name.ndup (icon_name.size () - 4);
+          }
         }
       }
       catch (Error err)
