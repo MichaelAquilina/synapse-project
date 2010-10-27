@@ -131,6 +131,7 @@ namespace Sezen
           }
           else
           {
+            if (f.get_uri_scheme () == "data") continue;
             unowned string mimetype = subject.get_mimetype ();
             if (mimetype != null && mimetype != "")
             {
