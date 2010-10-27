@@ -933,7 +933,7 @@ namespace Gtk
     }
     public override void size_allocate (Gdk.Rectangle allocation)
     {
-      Gdk.Rectangle aoverlay = {allocation.x + allocation.width / 2,
+      Gdk.Rectangle aoverlay = {allocation.x,
                                 allocation.y + allocation.height / 2,
                                 allocation.width / 2,
                                 allocation.height / 2
