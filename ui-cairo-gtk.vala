@@ -861,15 +861,13 @@ namespace Sezen
         path = opath;
       }
       /* Scroll to path */
-      var time = new TimeoutSource(1);
-      time.set_callback(() => {
+      Timeout.add(1, () => {
           sel.unselect_all ();
           sel.select_path (path);
           view.scroll_to_cell (path, null, true, 0.5F, 0.0F);
           return false;
       });
       status.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", index + 1, results.length));
-      time.attach(null);
       return index;
     }
   }
