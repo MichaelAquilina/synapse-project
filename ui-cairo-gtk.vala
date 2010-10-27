@@ -34,7 +34,8 @@ namespace Sezen
     private const int ICON_SIZE = 172;
     private const int ACTION_ICON_SIZE = 64;
     private const int UI_WIDTH = 480 + ACTION_ICON_SIZE*1 + PADDING * 2;
-    private const int UI_HEIGHT = ICON_SIZE + PADDING * 2;
+    private const int DESCRIPTION_HEIGHT = 14;
+    private const int UI_HEIGHT = ICON_SIZE + PADDING * 2 + DESCRIPTION_HEIGHT;
     private const int UI_LIST_WIDTH = 400;
     private const int UI_LIST_HEIGHT = (35/*icon_size*/ + 4 /*row border*/) * 5 + 15 /*statusbar*/ + 2 /* Result box Border*/;
     private const int LIST_BORDER_RADIUS = 3;
@@ -231,8 +232,10 @@ namespace Sezen
     private Image main_image;
     private Image main_image_overlay;
     private Label main_label;
+    private Label pattern_label;
     private Label main_label_description;
     private Image action_image;
+    private Label action_label;
     private HSelectionContainer sts;
     private ResultBox result_box;
     private HBox list_hbox;
@@ -268,15 +271,18 @@ namespace Sezen
       var main_vbox = new VBox (false, 0);
       main_vbox.set_size_request (UI_WIDTH, UI_HEIGHT+UI_LIST_HEIGHT);
       /* top_hbox: HBox, to separate Top Area contents */
+      var top_vbox = new VBox (false, 0);
       top_hbox = new HBox (false, 0);
-      top_hbox.border_width = PADDING;
-      top_hbox.set_size_request (UI_WIDTH, UI_HEIGHT);
+      top_hbox.border_width = PADDING / 2;
+      top_vbox.border_width = PADDING / 2;
+      top_vbox.set_size_request (UI_WIDTH, UI_HEIGHT);
       /* list_hbox: HBox, to separate List Area contents*/
       list_hbox = new HBox (false, 0);
       list_hbox.set_size_request (UI_LIST_WIDTH, UI_LIST_HEIGHT);
       
       this.add (main_vbox);
-      main_vbox.pack_start (top_hbox, false);
+      top_vbox.pack_start (top_hbox);
+      main_vbox.pack_start (top_vbox, false);
       main_vbox.pack_start (list_hbox);
       
       /* Constructing Top Area */
@@ -315,19 +321,33 @@ namespace Sezen
       right_hbox.pack_start (labels_vbox);
       
       /* Match Title and Description */
-      main_label = new Label ("");
-      main_label.set_alignment (0, 0);
-      main_label.set_markup (markup_string_with_search (" ", " "));
-      main_label.set_ellipsize (Pango.EllipsizeMode.END);
-      //--
       main_label_description = new Label ("");
       main_label_description.set_markup (get_description_markup ("Type to search..."));
       main_label_description.set_alignment (0, 0);
       main_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
       main_label_description.set_line_wrap (true);
-      //--
-      labels_vbox.pack_end (main_label_description, false);
-      labels_vbox.pack_end (main_label, false);
+      main_label_description.xpad = PADDING;
+      main_label_description.set_size_request (UI_WIDTH - PADDING*2, DESCRIPTION_HEIGHT);
+      top_vbox.pack_start (main_label_description, false);
+      //labels_vbox.pack_end (main_label_description, false);
+      
+      main_label = new Label ("");
+      main_label.set_alignment (0, 0);
+      main_label.set_markup (markup_string_with_search (" ", " "));
+      main_label.set_ellipsize (Pango.EllipsizeMode.END);
+
+      pattern_label = new Label ("");
+      pattern_label.set_alignment (0, 1.0f);
+      pattern_label.set_ellipsize (Pango.EllipsizeMode.END);
+      action_label = new Label ("");
+      action_label.set_alignment (1.0f, 1.0f);
+      action_label.set_markup ("<span size=\"medium\"><b>Open </b></span>");
+      var hbox_pattern_action = new HBox(false, 0);
+      hbox_pattern_action.pack_start (pattern_label);
+      hbox_pattern_action.pack_start (action_label, false);
+      
+      labels_vbox.pack_end (main_label, false, false, 10);
+      labels_vbox.pack_end (hbox_pattern_action);
       
       /* Action Area */
       action_image = new Image ();
@@ -564,17 +584,24 @@ namespace Sezen
         main_label_description.set_markup (get_description_markup ("Match not found."));
       }
     }
+    
+    private void show_pattern (string pat)
+    {
+      pattern_label.set_markup (Markup.printf_escaped ("<span size=\"medium\">%s</span>", pat));
+    }
 
     private string markup_string_with_search (string text, string pattern)
     {
       if (pattern == "")
       {
+        show_pattern ("");
         return Markup.printf_escaped ("<span size=\"xx-large\"><b><u>%s</u></b></span>",text);
       }
       // if no text found, use pattern
       if (text == "")
       {
-        return Markup.printf_escaped ("<span size=\"medium\">%s</span>\n<span size=\"xx-large\"><b><u> </u></b></span>",pattern);
+        show_pattern (pattern);
+        return Markup.printf_escaped ("<span size=\"xx-large\"><b><u> </u></b></span>");
       }
 
       // FIXME: we need to escape also the pattern right?
@@ -605,18 +632,19 @@ namespace Sezen
       }
       if (highlighted != null)
       {
+        show_pattern ("");
         return "<span size=\"xx-large\">%s</span>".printf (highlighted);
       }
       else
       {
-        return Markup.printf_escaped ("<span size=\"medium\">%s</span>\n" +
-          "<span size=\"xx-large\">%s</span>", pattern, text);
+        show_pattern (pattern);
+        return Markup.printf_escaped ("<span size=\"xx-large\">%s</span>", text);
       }
     }
 
     private string get_description_markup (string s)
     {
-      return "<span size=\"medium\"><i>" + s + "</i></span>";
+      return "<span size=\"medium\">" + s + "</span>";
     }
     
     public void show_sezen ()
