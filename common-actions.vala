@@ -48,8 +48,8 @@ namespace Sezen
                 match_type: MatchType.ACTION,
                 default_relevancy: 100);
       }
-      
-      public virtual void execute (Match? match)
+
+      public void execute (Match? match)
       {
         if (match.match_type == MatchType.DESKTOP_ENTRY)
         {
@@ -87,12 +87,12 @@ namespace Sezen
       public Opener ()
       {
         Object (title: "Open", // FIXME: i18n
-                icon_name: "open", has_thumbnail: false,
+                icon_name: "fileopen", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: 100);
       }
 
-      public virtual void execute (Match? match)
+      public void execute (Match? match)
       {
         var f = File.new_for_uri (match.uri);
         var app_info = f.query_default_handler (null);
@@ -118,12 +118,12 @@ namespace Sezen
       public OpenFolder ()
       {
         Object (title: "Open folder", // FIXME: i18n
-                icon_name: "open", has_thumbnail: false,
+                icon_name: "folder-open", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: 70);
       }
 
-      public virtual void execute (Match? match)
+      public void execute (Match? match)
       {
         var f = File.new_for_uri (match.uri);
         f = f.get_parent ();
