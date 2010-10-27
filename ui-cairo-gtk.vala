@@ -273,8 +273,8 @@ namespace Sezen
       /* top_hbox: HBox, to separate Top Area contents */
       var top_vbox = new VBox (false, 0);
       top_hbox = new HBox (false, 0);
-      top_hbox.border_width = PADDING / 2;
-      top_vbox.border_width = PADDING / 2;
+      top_hbox.border_width = PADDING / 4;
+      top_vbox.border_width = PADDING * 3 / 4;
       top_vbox.set_size_request (UI_WIDTH, UI_HEIGHT);
       /* list_hbox: HBox, to separate List Area contents*/
       list_hbox = new HBox (false, 0);
