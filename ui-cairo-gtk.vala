@@ -148,9 +148,16 @@ namespace Sezen
     
     private void _cairo_path_for_main (Cairo.Context ctx, bool composited)
     {
-      int PAD = 1;
+      double w = UI_WIDTH, h = UI_HEIGHT;
+      if (top_vbox != null)
+      {
+        w = top_vbox.allocation.width;
+        h = top_vbox.allocation.height;
+      }
+      
+      double PAD = 1;
       if (composited)
-        rounded_rect (ctx, PAD, TOP_SPACING + PAD, UI_WIDTH - PAD * 2, UI_HEIGHT - TOP_SPACING - PAD * 2, BORDER_RADIUS);
+        rounded_rect (ctx, PAD, TOP_SPACING + PAD, w - PAD * 2, h - TOP_SPACING - PAD * 2, BORDER_RADIUS);
       else
       {
         /*
@@ -162,10 +169,10 @@ namespace Sezen
         */
         double x1 = PAD,
                x3 = PADDING * 2 + ICON_SIZE - PAD,
-               x4 = UI_WIDTH - PAD,
+               x4 = w - PAD,
                y1 = PAD,
                y2 = PAD + TOP_SPACING,
-               y3 = UI_HEIGHT - PAD,
+               y3 = h - PAD,
                r = BORDER_RADIUS;
         ctx.move_to (x1, y3 - r);
         ctx.arc (x1+r, y1+r, r, Math.PI, Math.PI * 1.5);
@@ -177,15 +184,15 @@ namespace Sezen
       }
     }
     
-    private bool on_expose (Widget w, Gdk.EventExpose event) {
-        var ctx = Gdk.cairo_create (w.window);
+    private bool on_expose (Widget widget, Gdk.EventExpose event) {
+        var ctx = Gdk.cairo_create (widget.window);
         /* Clear Stage */
         ctx.set_operator (Cairo.Operator.CLEAR);
         ctx.paint ();
         ctx.set_operator (Cairo.Operator.OVER);
 
         /* Prepare bg's colors using GtkStyle */
-        Gtk.Style style = w.get_style();
+        Gtk.Style style = widget.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
         Pattern pat = new Pattern.linear(0, TOP_SPACING, 0, UI_HEIGHT);
         color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
@@ -198,48 +205,55 @@ namespace Sezen
                                     double.max(b - 0.15, 0),
                                     0.95);
         /* Prepare and draw top bg's rect */
-        _cairo_path_for_main (ctx, w.is_composited());
+        _cairo_path_for_main (ctx, widget.is_composited());
         ctx.set_source (pat);
         ctx.fill ();
         /* Add border */
-        _cairo_path_for_main (ctx, w.is_composited());
+        _cairo_path_for_main (ctx, widget.is_composited());
         ctx.set_line_width (2);
         ctx.set_source_rgba (1-r, 1-g, 1-b, 0.8);
         ctx.stroke ();
         
-        if (list_visible && w.is_composited())
+        if (list_visible && widget.is_composited())
         {
+          double w = UI_WIDTH, h = UI_HEIGHT;
+          if (top_vbox != null)
+          {
+            w = top_vbox.allocation.width;
+            h = top_vbox.allocation.height;
+          }
           color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
-          pat = new Pattern.linear((UI_WIDTH - UI_LIST_WIDTH) / 2 - 10, UI_HEIGHT, (UI_WIDTH - UI_LIST_WIDTH) / 2 + UI_LIST_WIDTH + 10, UI_HEIGHT);
+          pat = new Pattern.linear((w - UI_LIST_WIDTH) / 2 - 10, h, (UI_WIDTH - UI_LIST_WIDTH) / 2 + UI_LIST_WIDTH + 10, h);
           pat.add_color_stop_rgba (0, r, g, b, 0);
           pat.add_color_stop_rgba (10.0 / UI_LIST_WIDTH, r, g, b, 1);
           pat.add_color_stop_rgba (1 - 10.0 / UI_LIST_WIDTH, r, g, b, 1);
           pat.add_color_stop_rgba (1, r, g, b, 0);
-          ctx.rectangle (0, UI_HEIGHT, UI_WIDTH, UI_LIST_HEIGHT);
+          ctx.rectangle (0, h, UI_WIDTH, UI_LIST_HEIGHT);
           ctx.set_source (pat);
           ctx.fill ();
         }
 
         /* Propagate Expose */               
-        Container c = (w is Container) ? (Container) w : null;
+        Bin c = (widget is Bin) ? (Bin) widget : null;
         if (c != null)
-          c.propagate_expose (this.get_child(), event);
+          c.propagate_expose (c.get_child(), event);
         
         return true;
     }
     
     /* UI shared components */
-    private Image main_image;
-    private Image main_image_overlay;
-    private Label main_label;
-    private Label pattern_label;
-    private Label main_label_description;
-    private Image action_image;
-    private Label action_label;
-    private HSelectionContainer sts;
-    private ResultBox result_box;
-    private HBox list_hbox;
-    private HBox top_hbox;
+    private Image main_image = null;
+    private Image main_image_overlay = null;
+    private Label main_label = null;
+    private Label pattern_label = null;
+    private Label main_label_description = null;
+    private Image action_image = null;
+    private Label action_label = null;
+    private HSelectionContainer sts = null;
+    private ResultBox result_box = null;
+    private HBox list_hbox = null;
+    private HBox top_hbox = null;
+    private VBox top_vbox = null;
     
     private static void _hilight_label (Widget w, bool b)
     {
@@ -269,16 +283,13 @@ namespace Sezen
       
       /* main_vbox: VBox, to separate Top Area from List Area */
       var main_vbox = new VBox (false, 0);
-      main_vbox.set_size_request (UI_WIDTH, UI_HEIGHT+UI_LIST_HEIGHT);
       /* top_hbox: HBox, to separate Top Area contents */
-      var top_vbox = new VBox (false, 0);
+      top_vbox = new VBox (false, 0);
       top_hbox = new HBox (false, 0);
       top_hbox.border_width = PADDING / 4;
       top_vbox.border_width = PADDING * 3 / 4;
-      top_vbox.set_size_request (UI_WIDTH, UI_HEIGHT);
       /* list_hbox: HBox, to separate List Area contents*/
       list_hbox = new HBox (false, 0);
-      list_hbox.set_size_request (UI_LIST_WIDTH, UI_LIST_HEIGHT);
       
       this.add (main_vbox);
       top_vbox.pack_start (top_hbox);
@@ -327,9 +338,7 @@ namespace Sezen
       main_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
       main_label_description.set_line_wrap (true);
       main_label_description.xpad = PADDING;
-      main_label_description.set_size_request (UI_WIDTH - PADDING*2, DESCRIPTION_HEIGHT);
       top_vbox.pack_start (main_label_description, false);
-      //labels_vbox.pack_end (main_label_description, false);
       
       main_label = new Label ("");
       main_label.set_alignment (0, 0);
