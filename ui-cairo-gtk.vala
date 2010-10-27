@@ -305,7 +305,6 @@ namespace Sezen
       main_image = new Image ();
       main_image.set_size_request (ICON_SIZE, ICON_SIZE);
       main_image.set_pixel_size (ICON_SIZE);
-      main_image.set_from_icon_name ("search", IconSize.DIALOG);
       gco.main = main_image;
       gco.overlay = main_image_overlay;
       top_hbox.pack_start (gco, false);
@@ -333,24 +332,21 @@ namespace Sezen
       
       /* Match Title and Description */
       main_label_description = new Label ("");
-      main_label_description.set_markup (get_description_markup ("Type to search..."));
       main_label_description.set_alignment (0, 0);
       main_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
       main_label_description.set_line_wrap (true);
       main_label_description.xpad = PADDING;
       top_vbox.pack_start (main_label_description, false);
       
-      main_label = new Label ("");
+      main_label = new Label (null);
       main_label.set_alignment (0, 0);
-      main_label.set_markup (markup_string_with_search (" ", " "));
       main_label.set_ellipsize (Pango.EllipsizeMode.END);
 
-      pattern_label = new Label ("");
+      pattern_label = new Label (null);
       pattern_label.set_alignment (0, 1.0f);
       pattern_label.set_ellipsize (Pango.EllipsizeMode.END);
-      action_label = new Label ("");
+      action_label = new Label (null);
       action_label.set_alignment (1.0f, 1.0f);
-      action_label.set_markup ("<span size=\"medium\"><b>Open </b></span>");
       var hbox_pattern_action = new HBox(false, 0);
       hbox_pattern_action.pack_start (pattern_label);
       hbox_pattern_action.pack_start (action_label, false);
@@ -362,8 +358,10 @@ namespace Sezen
       action_image = new Image ();
       action_image.set_pixel_size (ACTION_ICON_SIZE);
       action_image.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
-      action_image.set_from_icon_name ("system-run", IconSize.DIALOG);
       right_hbox.pack_start (action_image, false);
+
+      /* Initialize contents of the labels and images */
+      reset_search ();
       
       /* ResultBox */
       result_box = new ResultBox(UI_LIST_WIDTH);
@@ -393,7 +391,7 @@ namespace Sezen
           debug ("enter pressed");
           if (current_match != null)
           {
-            current_match.execute ();
+            action_match.execute (current_match);
             hide ();
             search_reset ();
           }
@@ -406,11 +404,12 @@ namespace Sezen
           debug ("escape");
           if (search_string != "")
           {
-            search_reset ();
+            search_reset (false);
           }
           else
           {
             hide ();
+            search_reset (true);
           }
           break;
         case Gdk.KeySyms.Left:
@@ -499,13 +498,37 @@ namespace Sezen
         {
           result_box.update_matches (null);
           set_list_visible (false);
-          main_image.set_from_icon_name ("search", IconSize.DIALOG);
-          main_image_overlay.clear();
-          main_label.set_markup (markup_string_with_search (" "," "));
-          main_label_description.set_markup (get_description_markup ("Type to search..."));
+          reset_search ();
         }
       });
     }
+
+    private void reset_search (bool reset_main = true,
+                               bool reset_action = true)
+    {
+      if (reset_main)
+      {
+        main_image.set_from_icon_name ("search", IconSize.DIALOG);
+        main_image_overlay.clear ();
+        main_label.set_markup (
+          Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",
+                                 "Type to search..."));
+        //main_label.set_markup (markup_string_with_search (" ", " "));
+        main_label_description.set_markup (
+          Markup.printf_escaped ("<span size=\"medium\"> </span>" +
+                                 "<span size=\"smaller\">%s</span>",
+                                 "Powered by Zeitgeist"));
+        //main_label_description.set_markup (get_description_markup ("Powered by Zeitgeist"));
+        show_pattern ("");
+      }
+      if (reset_action)
+      {
+        action_image.set_sensitive (false);
+        action_image.set_from_icon_name ("system-run", IconSize.DIALOG);
+        action_label.set_markup ("<span size=\"medium\"><b></b></span>");
+      }
+    }
+
     Gee.List<Match> results;
     private void search_ready (GLib.Object? obj, AsyncResult res)
     {
@@ -516,12 +539,6 @@ namespace Sezen
         {
           focus_match (results[0]);
           result_box.update_matches (results);
-          /*
-          foreach (var match in results)
-          {
-            debug ("got match: %s", match.title);
-          }
-          /**/
         }
         else
         {
@@ -530,6 +547,7 @@ namespace Sezen
           focus_match (null);
           main_image.set_from_icon_name ("unknown", IconSize.DIALOG);
           main_image_overlay.clear ();
+          reset_search (false);
         }
       }
       catch (SearchError err)
@@ -558,13 +576,14 @@ namespace Sezen
       }
     }
 
-    private void search_reset ()
+    private void search_reset (bool deselect_type = true)
     {
       search_string = "";
-      sts.select (0);
+      if (deselect_type) sts.select (0);
     }
     
     private Match? current_match = null;
+    private Match? action_match = null;
 
     public void focus_match (Match? match)
     {
@@ -586,11 +605,18 @@ namespace Sezen
         }
         main_label.set_markup (markup_string_with_search (match.title, search_string));
         main_label_description.set_markup (get_description_markup (match.description));
+
+        var actions = data_sink.find_action_for_match (match, null);
+        action_match = actions[0];
+        action_image.set_from_gicon (GLib.Icon.new_for_string (action_match.icon_name), IconSize.DIALOG);
+        action_image.set_sensitive (true);
+        action_label.set_markup (Markup.printf_escaped ("<span size=\"medium\"><b>%s</b></span>", action_match.title));
       }
       else
       {
         main_label.set_markup (markup_string_with_search ("", search_string));
         main_label_description.set_markup (get_description_markup ("Match not found."));
+        reset_search (false);
       }
     }
     
