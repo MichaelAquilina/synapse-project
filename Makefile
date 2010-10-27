@@ -1,4 +1,5 @@
 SRC_FILES = \
+	common-actions.vala \
 	data-sink.vala \
 	desktop-file-plugin.vala \
 	hybrid-search-plugin.vala \
@@ -17,7 +18,7 @@ $(OUTPUT): $(SRC_FILES) FORCE
 all: $(OUTPUT)
 
 cdebug: VALA_FLAGS += -C
-cdebug: SRC_FILES += ui-cairo-gtk.vala
+#cdebug: SRC_FILES += ui-cairo-gtk.vala
 cdebug: all
 
 gtk: SRC_FILES += ui-basic-gtk.vala

@@ -35,25 +35,13 @@ namespace Sezen
     public bool has_thumbnail { get; construct set; default = false; }
     public string thumbnail_path { get; construct set; }
     public string uri { get; set; }
+    public MatchType match_type { get; construct set; }
 
     private string? title_folded = null;
     public unowned string get_title_folded ()
     {
       if (title_folded == null) title_folded = title.casefold ();
       return title_folded;
-    }
-
-    public void execute ()
-    {
-      var de = new DesktopAppInfo.from_filename (uri);
-      try
-      {
-        de.launch (null, null); // de.launch (null, new Gdk.AppLaunchContext ());
-      }
-      catch (Error err)
-      {
-        warning ("%s", err.message);
-      }
     }
 
     public string exec { get; set; }
@@ -64,7 +52,7 @@ namespace Sezen
 
     public DesktopFileInfo.for_keyfile (string path, KeyFile keyfile)
     {
-      Object (uri: path);
+      Object (uri: path, match_type: MatchType.DESKTOP_ENTRY);
 
       init_from_keyfile (keyfile);
     }

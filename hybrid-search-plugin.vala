@@ -32,19 +32,12 @@ namespace Sezen
       public bool has_thumbnail { get; construct set; default = false; }
       public string thumbnail_path { get; construct set; }
       public string uri { get; set; }
-
-      public void execute ()
-      {
-        var f = File.new_for_uri (uri);
-        var app_info = f.query_default_handler (null);
-        List<File> files = new List<File> ();
-        files.prepend (f);
-        app_info.launch (files, new Gdk.AppLaunchContext ());
-      }
+      public MatchType match_type { get; construct set; }
 
       public MatchObject (string? thumbnail_path, string? icon)
       {
-        Object (has_thumbnail: thumbnail_path != null,
+        Object (match_type: MatchType.GENERIC_URI,
+                has_thumbnail: thumbnail_path != null,
                 icon_name: icon ?? "",
                 thumbnail_path: thumbnail_path ?? "");
       }
@@ -305,7 +298,7 @@ namespace Sezen
         }
       }
 
-      int q_len = (int) current_query.length;
+      int q_len = current_query == null ? 1 : (int) current_query.length;
       foreach (var dir in dirs)
       {
         if (dir in directory_hits)

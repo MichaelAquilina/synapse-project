@@ -21,6 +21,14 @@
 
 namespace Sezen
 {
+  public enum MatchType
+  {
+    UNKNOWN = 0,
+    DESKTOP_ENTRY,
+    GENERIC_URI,
+    ACTION
+  }
+  
   public interface Match: Object
   {
     // properties
@@ -30,8 +38,12 @@ namespace Sezen
     public abstract bool has_thumbnail { get; construct set; }
     public abstract string thumbnail_path { get; construct set; }
     public abstract string uri { get; set; }
+    public abstract MatchType match_type { get; construct set; }
 
-    public abstract void execute ();
+    public virtual void execute (Match? match)
+    {
+      warning ("%s.execute () is not implemented", this.get_type ().name ());
+    }
   }
 
   public class ResultSet : Object, Gee.Iterable <Gee.Map.Entry <Match, int>>
@@ -136,6 +148,17 @@ namespace Sezen
 
     public abstract async ResultSet? search (Query query) throws SearchError;
   }
+  
+  public abstract class ActionPlugin : DataPlugin
+  {
+    // FIXME: should this even be async?
+    public abstract ResultSet find_for_match (Query query, Match match);
+    public override async ResultSet? search (Query query) throws SearchError
+    {
+      assert_not_reached ();
+      return null;
+    }
+  }
 
   public class DataSink : Object
   {
@@ -149,11 +172,13 @@ namespace Sezen
     }
 
     private Gee.Set<DataPlugin> plugins;
+    private Gee.Set<ActionPlugin> actions;
     private Gee.List<Cancellable> cancellables;
 
     construct
     {
       plugins = new Gee.HashSet<DataPlugin> ();
+      actions = new Gee.HashSet<ActionPlugin> ();
       cancellables = new Gee.ArrayList<Cancellable> ();
 
       load_plugins ();
@@ -162,7 +187,14 @@ namespace Sezen
     // FIXME: public? really?
     public void register_plugin (DataPlugin plugin)
     {
-      plugins.add (plugin);
+      if (plugin is ActionPlugin)
+      {
+        actions.add (plugin as ActionPlugin);
+      }
+      else
+      {
+        plugins.add (plugin);
+      }
     }
 
     private void load_plugins ()
@@ -173,6 +205,9 @@ namespace Sezen
       register_plugin (Object.new (typeof (ZeitgeistPlugin),
                        "data-sink", this, null) as DataPlugin);
       register_plugin (Object.new (typeof (HybridSearchPlugin),
+                       "data-sink", this, null) as DataPlugin);
+                       
+      register_plugin (Object.new (typeof (CommonActions),
                        "data-sink", this, null) as DataPlugin);
     }
 
@@ -237,6 +272,18 @@ namespace Sezen
       }
 
       return current_result_set.get_sorted_list ();
+    }
+
+    public Gee.List<Match> find_action_for_match (Match match, string? query)
+    {
+      var rs = new ResultSet ();
+      var q = Query (query ?? "");
+      foreach (var action_plugin in actions)
+      {
+        rs.add_all (action_plugin.find_for_match (q, match));
+      }
+      
+      return rs.get_sorted_list ();
     }
   }
 }

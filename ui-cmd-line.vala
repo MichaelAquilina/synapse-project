@@ -38,7 +38,12 @@ int main (string[] argv)
       try
       {
         var rs = sink.search.end (res);
-        foreach (var match in rs) debug ("%s", match.title);
+        foreach (var match in rs)
+        {
+          print (">> %s\n", match.title);
+          var actions = sink.find_action_for_match (match, null);
+          print ("  > %s\n", actions[0].title);
+        }
       }
       catch (Error err)
       {
