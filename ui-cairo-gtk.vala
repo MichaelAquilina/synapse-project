@@ -653,7 +653,7 @@ namespace Sezen
 
     private string get_description_markup (string s)
     {
-      return "<span size=\"medium\">" + s + "</span>";
+      return Markup.printf_escaped ("<span size=\"medium\">%s</span>", s);
     }
     
     public void show_sezen ()
