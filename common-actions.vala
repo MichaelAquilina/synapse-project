@@ -37,6 +37,12 @@ namespace Sezen
       public int default_relevancy { get; set; }
       
       public abstract bool valid_for_match (Match match);
+      // stupid Vala...
+      public abstract void execute_internal (Match? match);
+      public void execute (Match? match)
+      {
+        execute_internal (match);
+      }
     }
     
     private class Runner: Action
@@ -49,7 +55,7 @@ namespace Sezen
                 default_relevancy: 100);
       }
 
-      public void execute (Match? match)
+      public override void execute_internal (Match? match)
       {
         if (match.match_type == MatchType.DESKTOP_ENTRY)
         {
@@ -92,7 +98,7 @@ namespace Sezen
                 default_relevancy: 100);
       }
 
-      public void execute (Match? match)
+      public override void execute_internal (Match? match)
       {
         var f = File.new_for_uri (match.uri);
         var app_info = f.query_default_handler (null);
@@ -123,7 +129,7 @@ namespace Sezen
                 default_relevancy: 70);
       }
 
-      public void execute (Match? match)
+      public override void execute_internal (Match? match)
       {
         var f = File.new_for_uri (match.uri);
         f = f.get_parent ();
