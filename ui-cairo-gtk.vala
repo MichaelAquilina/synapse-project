@@ -377,7 +377,7 @@ namespace Sezen
       this.show_all();
     }
     /* SEZEN STUFFS HERE */
-    private void update_results (SezenMatchInterface.ResultType t, Gee.List<Match>? results, Match? focus)
+    private void update_results (SezenMatchInterface.ResultType t, Gee.List<Match>? results, Match? focus, int focus_index)
     {
       if (t == SezenMatchInterface.ResultType.MATCH)
       {
@@ -386,8 +386,10 @@ namespace Sezen
         if (smi.search_type == SezenMatchInterface.ResultType.MATCH)
         {
           if (focus != null)
+          {
             this.result_box.update_matches (results);
-          else
+            this.result_box.move_selection_to_index (focus_index);
+          }else
             this.result_box.update_matches (null);
         }
       }
@@ -398,7 +400,10 @@ namespace Sezen
         if (smi.search_type == SezenMatchInterface.ResultType.ACTION)
         {
           if (focus != null)
+          {
             this.result_box.update_matches (results);
+            this.result_box.move_selection_to_index (focus_index);
+          }
           else
             this.result_box.update_matches (null);
         }
@@ -909,6 +914,18 @@ namespace Sezen
       var sel = view.get_selection ();
       sel.select_path (new TreePath.first());
       status.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", results.length));
+    }
+    public void move_selection_to_index (int i)
+    {
+      var sel = view.get_selection ();
+      Gtk.TreePath path = new TreePath.from_string( i.to_string() );
+      /* Scroll to path */
+      Timeout.add(1, () => {
+          sel.unselect_all ();
+          sel.select_path (path);
+          view.scroll_to_cell (path, null, true, 0.5F, 0.0F);
+          return false;
+      });
     }
     public int move_selection (int val, out int old_index)
     {

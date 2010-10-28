@@ -34,6 +34,7 @@ namespace Sezen
       ACTION
     }
     private Match focus[2];
+    private int focus_index[2];
     private Gee.List<Match> results[2];
     private string _search[2];
     private QueryFlags flag;
@@ -45,6 +46,7 @@ namespace Sezen
       flag = QueryFlags.ALL;
       focus = {null, null};
       results = {null, null};
+      focus_index = {0, 0};
       _search = {"", ""};
       search_type = ResultType.MATCH;
       //result_ready.connect (debug_ready);
@@ -72,12 +74,14 @@ namespace Sezen
         if (search_type == ResultType.MATCH)
         {
           focus[ResultType.MATCH] = null;
+          focus_index[ResultType.MATCH] = 0;
           results[ResultType.MATCH] = null;
           
           _search[ResultType.ACTION] = "";
         }
         results[ResultType.ACTION] = null;
         focus[ResultType.ACTION] = null;
+        focus_index[ResultType.ACTION] = 0;
         
         start_search (search_type);
       }
@@ -87,9 +91,11 @@ namespace Sezen
       if (index < 0 || results[search_type]==null || index >= results[search_type].size)
       {
         focus[search_type] = null;
+        focus_index[search_type] = 0;
         return null;
       }
       focus[search_type] = results[search_type].get (index);
+      focus_index[search_type] = index;
       if (search_type == ResultType.MATCH)
       {
         //send new actions!
@@ -100,9 +106,9 @@ namespace Sezen
     public void resend_results (bool match = true, bool action = true)
     {
       if (match)
-        result_ready (ResultType.MATCH, results[ResultType.MATCH], focus[ResultType.MATCH]);
+        result_ready (ResultType.MATCH, results[ResultType.MATCH], focus[ResultType.MATCH], focus_index[ResultType.MATCH]);
       if (action)
-        result_ready (ResultType.ACTION, results[ResultType.ACTION], focus[ResultType.ACTION]);
+        result_ready (ResultType.ACTION, results[ResultType.ACTION], focus[ResultType.ACTION], focus_index[ResultType.ACTION]);
     }
     private void start_search (ResultType t, bool update_type = true)
     {
@@ -117,27 +123,32 @@ namespace Sezen
           {
             results[ResultType.ACTION] = data_sink.find_action_for_match (focus[ResultType.MATCH], _search[ResultType.ACTION]);
             if (results[ResultType.ACTION].size > 0)
+            {
               focus[ResultType.ACTION] = results[ResultType.ACTION].first();
+            }
             else
+            {
               focus[ResultType.ACTION] = null;
+            }
           }
           else
           {
             results[ResultType.ACTION] = null;
             focus[ResultType.ACTION] = null;
           }
+          focus_index[ResultType.ACTION] = 0;
           /* If we are here, we are searching for Actions */
-          result_ready (ResultType.ACTION, results[ResultType.ACTION], focus[ResultType.ACTION]);
+          result_ready (ResultType.ACTION, results[ResultType.ACTION], focus[ResultType.ACTION], focus_index[ResultType.ACTION]);
           return;
         }
         /* string is empty -> send both null results */
-        result_ready (ResultType.MATCH, results[ResultType.MATCH], focus[ResultType.MATCH]);
-        result_ready (ResultType.ACTION, results[ResultType.ACTION], focus[ResultType.ACTION]);
+        result_ready (ResultType.MATCH, results[ResultType.MATCH], focus[ResultType.MATCH], focus_index[ResultType.MATCH]);
+        result_ready (ResultType.ACTION, results[ResultType.ACTION], focus[ResultType.ACTION], focus_index[ResultType.ACTION]);
         return;
       }
       data_sink.search (_search[t], flag, _search_ready);
     }
-    public signal void result_ready (ResultType t, Gee.List<Match>? results, Match? focus);
+    public signal void result_ready (ResultType t, Gee.List<Match>? results, Match? focus, int focus_index);
     
     /*private void debug_ready (ResultType t, Gee.List<Match>? results, Match? focus)
     {
@@ -159,7 +170,8 @@ namespace Sezen
           focus[ResultType.MATCH] = null;
         }
         /* If we are here, we are searching for Matches */
-        result_ready (ResultType.MATCH, results[ResultType.MATCH], focus[ResultType.MATCH]);
+        focus_index[ResultType.MATCH] = 0;
+        result_ready (ResultType.MATCH, results[ResultType.MATCH], focus[ResultType.MATCH], focus_index[ResultType.MATCH]);
         /* Send also actions */
         start_search (ResultType.ACTION, false);
       }
