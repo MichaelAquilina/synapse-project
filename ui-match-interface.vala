@@ -90,6 +90,11 @@ namespace Sezen
         return null;
       }
       focus[search_type] = results[search_type].get (index);
+      if (search_type == ResultType.MATCH)
+      {
+        //send new actions!
+        start_search (ResultType.ACTION, false);
+      }
       return focus[search_type];
     }
     public void resend_results (bool match = true, bool action = true)
