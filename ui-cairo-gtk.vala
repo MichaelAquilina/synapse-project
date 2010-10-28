@@ -284,11 +284,6 @@ namespace Sezen
         l.sensitive = false;
       }
     }
-    
-    private static void _hilight_image (Widget w, bool b)
-    {
-      w.sensitive = b;
-    }
 
     private void build_ui ()
     {
@@ -462,6 +457,7 @@ namespace Sezen
         {
           main_image.set_from_icon_name ("search", IconSize.DIALOG);
           main_image_overlay.clear ();
+          show_pattern ("");
           main_label.set_markup (
             Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",
                                    "Type to search..."));
@@ -469,7 +465,6 @@ namespace Sezen
             Markup.printf_escaped ("<span size=\"medium\"> </span>" +
                                    "<span size=\"smaller\">%s</span>",
                                    "Powered by Zeitgeist"));
-          show_pattern ("");
         }
         //focus_action (null);
       }
@@ -481,7 +476,7 @@ namespace Sezen
       {
         action_image.set_sensitive (false);
         action_image.set_from_icon_name ("system-run", IconSize.DIALOG);
-        action_label.set_markup ("<span size=\"medium\"><b></b></span>");
+        action_label.set_markup (markup_string_with_search ("", ""));
       }
       else
       {
@@ -494,7 +489,9 @@ namespace Sezen
         {
           action_image.set_from_icon_name ("missing-image", IconSize.DIALOG);
         }
-        action_label.set_markup (get_action_markup(match.title));
+        action_label.set_markup (markup_string_with_search (match.title,
+                                 smi.search_type == SezenMatchInterface.ResultType.ACTION ? 
+                                 smi.search : ""));
       }
     }
     
@@ -647,12 +644,11 @@ namespace Sezen
       pattern_label.set_markup (Markup.printf_escaped ("<span size=\"medium\">%s</span>", pat));
     }
 
-    private string markup_string_with_search (string text, string pattern)
+    private string markup_string_with_search (string text, string pattern, string size = "xx-large")
     {
       if (pattern == "")
       {
-        show_pattern ("");
-        return Markup.printf_escaped ("<span size=\"xx-large\"><b><u>%s</u></b></span>",text);
+        return Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",text);
       }
       // if no text found, use pattern
       if (text == "")
@@ -694,7 +690,8 @@ namespace Sezen
       }
       else
       {
-        show_pattern (pattern);
+        // FIXME: mhr3, this doesn't work, but I don't know why: why highlighted = null always??
+        // show_pattern (pattern);
         return Markup.printf_escaped ("<span size=\"xx-large\">%s</span>", text);
       }
     }
@@ -702,11 +699,6 @@ namespace Sezen
     private string get_description_markup (string s)
     {
       return Markup.printf_escaped ("<span size=\"medium\">%s</span>", s);
-    }
-    
-    private string get_action_markup (string s)
-    {
-      return Markup.printf_escaped ("<span size=\"medium\"><b>%s</b></span>", s);
     }
     
     public void show_sezen ()

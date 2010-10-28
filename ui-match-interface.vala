@@ -47,7 +47,7 @@ namespace Sezen
       results = {null, null};
       _search = {"", ""};
       search_type = ResultType.MATCH;
-      result_ready.connect (debug_ready);
+      //result_ready.connect (debug_ready);
     }
     public QueryFlags search_flag {
       get { return flag; }
@@ -69,7 +69,6 @@ namespace Sezen
           _search[search_type] = value;
         else
           _search[search_type] = "";
-        debug ("Cerco risultati per %s", search_type == ResultType.ACTION ? "ACTION":"MATCH");
         if (search_type == ResultType.MATCH)
         {
           focus[ResultType.MATCH] = null;
@@ -131,15 +130,14 @@ namespace Sezen
         result_ready (ResultType.ACTION, results[ResultType.ACTION], focus[ResultType.ACTION]);
         return;
       }
-      debug ("Starting search: %s", _search[t]);
       data_sink.search (_search[t], flag, _search_ready);
     }
     public signal void result_ready (ResultType t, Gee.List<Match>? results, Match? focus);
     
-    private void debug_ready (ResultType t, Gee.List<Match>? results, Match? focus)
+    /*private void debug_ready (ResultType t, Gee.List<Match>? results, Match? focus)
     {
-      debug ("Invio risultati per %s", t == ResultType.ACTION ? "ACTION":"MATCH");
-    }
+      debug ("Sending results for %s", t == ResultType.ACTION ? "ACTION":"MATCH");
+    }*/
     
     private void _search_ready (GLib.Object? obj, AsyncResult res)
     {
@@ -147,7 +145,6 @@ namespace Sezen
       {
         Gee.List<Match> list = data_sink.search.end (res);
         results[ResultType.MATCH] = list;
-        debug ("Found %d results.", list.size);
         if (list.size > 0)
         {
           focus[ResultType.MATCH] = results[ResultType.MATCH].first();
