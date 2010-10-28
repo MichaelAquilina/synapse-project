@@ -1,14 +1,16 @@
 SRC_FILES = \
 	common-actions.vala \
 	data-sink.vala \
+	match.vala \
+	query.vala \
+	dbus-service.vala \
 	desktop-file-plugin.vala \
 	hybrid-search-plugin.vala \
-	query.vala \
+	gnome-session-plugin.vala \
 	zeitgeist-plugin.vala \
-	ui-match-interface.vala \
 	$(NULL)
 
-VALA_FLAGS = --pkg zeitgeist-1.0 --pkg gtk+-2.0 --pkg gio-unix-2.0 --pkg gee-1.0 --pkg gtkhotkey-1.0 --vapidir ./
+VALA_FLAGS = --pkg zeitgeist-1.0 --pkg dbus-glib-1 --pkg gtk+-2.0 --pkg gio-unix-2.0 --pkg gee-1.0 --pkg gtkhotkey-1.0 --vapidir ./
 VAPIS = keysyms.vapi cancellable-fix.vapi
 OUTPUT = sezen2
 
@@ -28,7 +30,7 @@ gtk: all
 cmd: SRC_FILES += ui-cmd-line.vala
 cmd: all
 
-cairo: SRC_FILES += ui-cairo-gtk.vala
+cairo: SRC_FILES += ui-cairo-gtk.vala ui-match-interface.vala
 cairo: all
 
 FORCE:

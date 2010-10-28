@@ -21,31 +21,6 @@
 
 namespace Sezen
 {
-  public enum MatchType
-  {
-    UNKNOWN = 0,
-    DESKTOP_ENTRY,
-    GENERIC_URI,
-    ACTION
-  }
-  
-  public interface Match: Object
-  {
-    // properties
-    public abstract string title { get; construct set; }
-    public abstract string description { get; set; }
-    public abstract string icon_name { get; construct set; }
-    public abstract bool has_thumbnail { get; construct set; }
-    public abstract string thumbnail_path { get; construct set; }
-    public abstract string uri { get; set; }
-    public abstract MatchType match_type { get; construct set; }
-
-    public virtual void execute (Match? match)
-    {
-      warning ("%s.execute () is not implemented", this.get_type ().name ());
-    }
-  }
-
   public class ResultSet : Object, Gee.Iterable <Gee.Map.Entry <Match, int>>
   {
     protected Gee.Map<Match, int> matches;
@@ -206,7 +181,9 @@ namespace Sezen
                        "data-sink", this, null) as DataPlugin);
       register_plugin (Object.new (typeof (HybridSearchPlugin),
                        "data-sink", this, null) as DataPlugin);
-                       
+      register_plugin (Object.new (typeof (GnomeSessionPlugin),
+                       "data-sink", this, null) as DataPlugin);
+
       register_plugin (Object.new (typeof (CommonActions),
                        "data-sink", this, null) as DataPlugin);
     }
