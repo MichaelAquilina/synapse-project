@@ -5,6 +5,7 @@ SRC_FILES = \
 	hybrid-search-plugin.vala \
 	query.vala \
 	zeitgeist-plugin.vala \
+	ui-match-interface.vala \
 	$(NULL)
 
 VALA_FLAGS = --pkg zeitgeist-1.0 --pkg gtk+-2.0 --pkg gio-unix-2.0 --pkg gee-1.0 --pkg gtkhotkey-1.0 --vapidir ./
