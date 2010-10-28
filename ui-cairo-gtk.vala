@@ -72,7 +72,7 @@ namespace Sezen
       im_context.commit.connect (this.search_add_char);
       im_context.focus_in ();
     }
-
+    
     private void rounded_rect (Cairo.Context ctx, double x, double y, double w, double h, double r)
     {
       double y2 = y+h, x2 = x+w;
@@ -82,7 +82,7 @@ namespace Sezen
       ctx.arc (x2-r, y2-r, r, 0, Math.PI * 0.5);
       ctx.arc (x+r, y2-r, r, Math.PI * 0.5, Math.PI);
     }
-    
+
     private void get_shape (Cairo.Context ctx, bool mask_for_composited = false)
     {
       ctx.set_source_rgba (0,0,0,1);
@@ -235,15 +235,10 @@ namespace Sezen
             w = top_vbox.allocation.width;
             h = top_vbox.allocation.height;
           }
-          color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
-          pat = new Pattern.linear((w - UI_LIST_WIDTH) / 2 - 10, h, (UI_WIDTH - UI_LIST_WIDTH) / 2 + UI_LIST_WIDTH + 10, h);
-          pat.add_color_stop_rgba (0, r, g, b, 0);
-          pat.add_color_stop_rgba (10.0 / UI_LIST_WIDTH, r, g, b, 1);
-          pat.add_color_stop_rgba (1 - 10.0 / UI_LIST_WIDTH, r, g, b, 1);
-          pat.add_color_stop_rgba (1, r, g, b, 0);
-          ctx.rectangle (0, h, UI_WIDTH, UI_LIST_HEIGHT);
-          ctx.set_source (pat);
-          ctx.fill ();
+          ctx.rectangle ((w - UI_LIST_WIDTH) / 2 + 1, h, UI_LIST_WIDTH - 2, UI_LIST_HEIGHT);
+          ctx.set_line_width (2.5);
+          ctx.set_source_rgba (1-r, 1-g, 1-b, 0.8);
+          ctx.stroke ();
         }
 
         /* Propagate Expose */               
@@ -367,16 +362,13 @@ namespace Sezen
       action_image.set_pixel_size (ACTION_ICON_SIZE);
       action_image.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
       right_hbox.pack_start (action_image, false);
-
-      /* Initialize contents of the labels and images */
-      //reset_search ();
       
       /* ResultBox */
       result_box = new ResultBox(UI_LIST_WIDTH);
       var spacerleft = new Label("");
       var spacerright = new Label("");
-      spacerright.set_size_request ((UI_WIDTH-UI_LIST_WIDTH) / 2, 10);
-      spacerleft.set_size_request ((UI_WIDTH-UI_LIST_WIDTH) / 2, 10);
+      spacerright.set_size_request ((UI_WIDTH-UI_LIST_WIDTH) / 2 + 2, 10);
+      spacerleft.set_size_request ((UI_WIDTH-UI_LIST_WIDTH) / 2 + 2, 10);
       list_hbox.pack_start (spacerleft,false);
       list_hbox.pack_start (result_box);
       list_hbox.pack_start (spacerright,false);
