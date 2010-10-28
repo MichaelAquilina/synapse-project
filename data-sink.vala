@@ -218,6 +218,8 @@ namespace Sezen
       foreach (var c in cancellables) c.cancel ();
       cancellables.clear ();
     }
+    
+    private ResultSet partial_result_set;
 
     public async Gee.List<Match> search (string query,
                                          QueryFlags flags) throws SearchError
@@ -228,6 +230,7 @@ namespace Sezen
       cancellables.clear (); // FIXME: really?
 
       var current_result_set = new ResultSet ();
+      partial_result_set = current_result_set;
       int search_size = plugins.size;
       bool waiting = false;
       var current_cancellable = new Cancellable ();
@@ -272,6 +275,12 @@ namespace Sezen
       }
 
       return current_result_set.get_sorted_list ();
+    }
+    
+    // this will return Matches found so far while search is running
+    public Gee.List<Match> get_partial_results ()
+    {
+      return partial_result_set.get_sorted_list ();
     }
 
     public Gee.List<Match> find_action_for_match (Match match, string? query)

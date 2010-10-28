@@ -226,6 +226,7 @@ namespace Sezen
 
     public override async ResultSet? search (Query q) throws SearchError
     {
+      // we only search for applications
       if (!(QueryFlags.APPLICATIONS in q.query_type)) return null;
 
       if (loading_in_progress)
