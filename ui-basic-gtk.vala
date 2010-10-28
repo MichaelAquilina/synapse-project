@@ -238,7 +238,7 @@ namespace Sezen
           debug ("enter pressed");
           if (current_match != null)
           {
-            current_match.execute ();
+            current_match.execute (null);
             hide ();
             search_reset ();
           }
