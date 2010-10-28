@@ -44,9 +44,11 @@ namespace Sezen
     private string[] categories = {"All", "Applications", "Actions", "Audio", "Video", "Documents", "Images", "Internet"};
     private QueryFlags[] categories_query = {QueryFlags.ALL, QueryFlags.APPLICATIONS, QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.VIDEO,
                                              QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.INTERNET};
-    
+
     /* STATUS */
     private bool list_visible = true;
+    private SezenMatchInterface smi;
+    private IMContext im_context;
 
     public SezenWindow ()
     {
@@ -58,8 +60,19 @@ namespace Sezen
       set_decorated (false);
       set_resizable (false);
       this.build_ui ();
+      
+      /* SEZEN */
+      smi = new SezenMatchInterface ();
+      smi.result_ready.connect (update_results);
+      
+      im_context = new IMMulticontext ();
+      im_context.set_use_preedit (false);
+      im_context.commit.connect (this.search_add_char);
+      im_context.focus_in ();
+      
+      smi.search = "";
     }
-    
+
     private void rounded_rect (Cairo.Context ctx, double x, double y, double w, double h, double r)
     {
       double y2 = y+h, x2 = x+w;
@@ -361,7 +374,7 @@ namespace Sezen
       right_hbox.pack_start (action_image, false);
 
       /* Initialize contents of the labels and images */
-      reset_search ();
+      //reset_search ();
       
       /* ResultBox */
       result_box = new ResultBox(UI_LIST_WIDTH);
@@ -376,8 +389,151 @@ namespace Sezen
 
       this.show_all();
     }
+    /* SEZEN STUFFS HERE */
+    private void update_results (SezenMatchInterface.ResultType t, Gee.List<Match>? results, Match? focus)
+    {
+      if (t == SezenMatchInterface.ResultType.MATCH)
+      {
+        focus_match (focus);
+        /* if we are searching for MATCH update result list */
+        if (smi.search_type == SezenMatchInterface.ResultType.MATCH)
+        {
+          if (focus != null)
+            this.result_box.update_matches (results);
+          else
+            this.result_box.update_matches (null);
+        }
+      }
+      else
+      {
+        focus_action (focus);
+        /* if we are searching for ACTION update result list */
+        if (smi.search_type == SezenMatchInterface.ResultType.ACTION)
+        {
+          if (focus != null)
+            this.result_box.update_matches (results);
+          else
+            this.result_box.update_matches (null);
+        }
+      }
+    }
+    
+    private void focus_dispatcher (Match? match)
+    {
+      if (smi.search_type == SezenMatchInterface.ResultType.ACTION)
+        focus_action (match);
+      else
+        focus_match (match);
+    }
+
+    public void focus_match (Match? match)
+    {
+      if (match != null)
+      {
+        try
+        {
+          main_image.set_from_gicon (GLib.Icon.new_for_string (match.icon_name), IconSize.DIALOG);
+          if (match.has_thumbnail)
+            main_image_overlay.set_from_gicon (GLib.Icon.new_for_string (match.thumbnail_path), IconSize.DIALOG);
+          else
+            main_image_overlay.clear ();
+        }
+        catch (Error err)
+        {
+          main_image.set_from_icon_name ("missing-image", IconSize.DIALOG);
+          main_image_overlay.clear ();
+        }
+        main_label.set_markup (markup_string_with_search (match.title, smi.search));
+        main_label_description.set_markup (get_description_markup (match.description));
+        
+        /* Get Actions */
+        //focus_action (action_results.size > 0 ? action_results.first() : null);
+      }
+      else
+      {
+        if (smi.search.length > 0)
+        {
+          main_label.set_markup (markup_string_with_search ("", smi.search));
+          main_label_description.set_markup (get_description_markup ("Match not found."));
+          main_image.set_from_icon_name ("search", IconSize.DIALOG);
+          main_image_overlay.clear ();
+        }
+        else
+        {
+          main_image.set_from_icon_name ("search", IconSize.DIALOG);
+          main_image_overlay.clear ();
+          main_label.set_markup (
+            Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",
+                                   "Type to search..."));
+          main_label_description.set_markup (
+            Markup.printf_escaped ("<span size=\"medium\"> </span>" +
+                                   "<span size=\"smaller\">%s</span>",
+                                   "Powered by Zeitgeist"));
+          show_pattern ("");
+        }
+        //focus_action (null);
+      }
+    }
+    
+    public void focus_action (Match? match)
+    {
+      if (match == null)
+      {
+        action_image.set_sensitive (false);
+        action_image.set_from_icon_name ("system-run", IconSize.DIALOG);
+        action_label.set_markup ("<span size=\"medium\"><b></b></span>");
+      }
+      else
+      {
+        action_image.set_sensitive (true);
+        try
+        {
+          action_image.set_from_gicon (GLib.Icon.new_for_string (match.icon_name), IconSize.DIALOG);
+        }
+        catch (Error err)
+        {
+          action_image.set_from_icon_name ("missing-image", IconSize.DIALOG);
+        }
+        action_label.set_markup (get_action_markup(match.title));
+      }
+    }
     
     /* EVENTS HANDLING HERE */
+    private void search_add_char (string chr)
+    {
+      smi.search += chr;
+    }
+    private void search_delete_char ()
+    {
+      long len = smi.search.length;
+      if (len > 0)
+      {
+        smi.search = smi.search.substring (0, len - 1);
+      }
+      else
+      {
+        smi.search = "";
+      }
+    }
+    
+    private void update_search_type ()
+    {
+      /* This method is for graphical purpose only !! */
+      bool b = smi.search_type == SezenMatchInterface.ResultType.ACTION;
+      main_image.sensitive = !b;
+      main_image_overlay.sensitive = !b;
+      main_label.sensitive = !b;
+    }
+    
+    private void hide_and_reset ()
+    {
+      hide ();
+      set_list_visible (false);
+      smi.search_type = SezenMatchInterface.ResultType.MATCH;
+      update_search_type ();
+      smi.search = "";
+    }
+    
     protected override bool key_press_event (Gdk.EventKey event)
     {
       if (im_context.filter_keypress (event)) return true;
@@ -389,11 +545,9 @@ namespace Sezen
         case Gdk.KeySyms.KP_Enter:
         case Gdk.KeySyms.ISO_Enter:
           debug ("enter pressed");
-          if (current_match != null)
+          if (smi.execute ())
           {
-            action_match.execute (current_match);
-            hide ();
-            search_reset ();
+            hide_and_reset ();
           }
           break;
         case Gdk.KeySyms.Delete:
@@ -402,31 +556,39 @@ namespace Sezen
           break;
         case Gdk.KeySyms.Escape:
           debug ("escape");
-          if (search_string != "")
+          if (smi.search_type == SezenMatchInterface.ResultType.ACTION)
           {
-            search_reset (false);
+            smi.search = "";
+            smi.search_type = SezenMatchInterface.ResultType.MATCH;
+            update_search_type ();
+            smi.resend_results ();
+          }
+          else if (smi.search != "")
+          {
+            smi.search = "";
+            set_list_visible (false);
           }
           else
           {
-            hide ();
-            search_reset (true);
+            hide_and_reset ();
           }
           break;
         case Gdk.KeySyms.Left:
           sts.select_prev ();
-          this.search_string = search_string;
+          smi.search_type = SezenMatchInterface.ResultType.MATCH;
+          update_search_type ();
+          smi.search_flag = categories_query [sts.get_selected()];
           break;
         case Gdk.KeySyms.Right:
           sts.select_next ();
-          this.search_string = search_string;
+          smi.search_type = SezenMatchInterface.ResultType.MATCH;
+          update_search_type ();
+          smi.search_flag = categories_query [sts.get_selected()];
           break;
         case Gdk.KeySyms.Up:
           int old_index = 0;
           int i = result_box.move_selection (-1, out old_index);
-          if (i < 0)
-            focus_match (null);
-          else
-            focus_match (results[i]);
+          focus_dispatcher (smi.focus_match_at (i));
           if (old_index == i && i == 0)
             set_list_visible (false);
           else
@@ -440,14 +602,26 @@ namespace Sezen
           }
           int old_index = 0;
           int i = result_box.move_selection (1, out old_index);
-          if (i < 0)
-            focus_match (null);
-          else
-            focus_match (results[i]);
+          focus_dispatcher (smi.focus_match_at (i));
           set_list_visible (true);
           break;
         case Gdk.KeySyms.Tab:
-          ;
+          if (smi.search_type == SezenMatchInterface.ResultType.MATCH)
+          {
+            if (smi.get_focused_match () != null)
+            {
+              smi.search_type = SezenMatchInterface.ResultType.ACTION;
+              smi.resend_results (false);
+            }
+            else
+              return true;
+          }
+          else
+          {
+            smi.search_type = SezenMatchInterface.ResultType.MATCH;
+            smi.resend_results (true, false);
+          }
+          update_search_type ();
           break;
         default:
           debug ("im_context didn't filter...");
@@ -466,159 +640,7 @@ namespace Sezen
       else
         list_hbox.hide();
       set_mask ();
-    }
-    
-    /* SEZEN STUFFS HERE */
-    private IMContext im_context;
-    private DataSink data_sink;
-    construct
-    {
-      data_sink = new DataSink();
-
-      set_decorated (false);
-      set_resizable (false);
-
-      im_context = new IMMulticontext ();
-      im_context.set_use_preedit (false);
-      im_context.commit.connect (this.search_add_char);
-      im_context.focus_in ();
-
-      this.notify["search-string"].connect (() =>
-      {
-        bool search_empty = search_string == null || search_string == "";
-
-        data_sink.cancel_search ();
-
-        if (!search_empty)
-        {
-          data_sink.search (this.search_string, categories_query[sts.get_selected()],
-                            this.search_ready);
-        }
-        else
-        {
-          result_box.update_matches (null);
-          set_list_visible (false);
-          reset_search ();
-        }
-      });
-    }
-
-    private void reset_search (bool reset_main = true,
-                               bool reset_action = true)
-    {
-      if (reset_main)
-      {
-        main_image.set_from_icon_name ("search", IconSize.DIALOG);
-        main_image_overlay.clear ();
-        main_label.set_markup (
-          Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",
-                                 "Type to search..."));
-        //main_label.set_markup (markup_string_with_search (" ", " "));
-        main_label_description.set_markup (
-          Markup.printf_escaped ("<span size=\"medium\"> </span>" +
-                                 "<span size=\"smaller\">%s</span>",
-                                 "Powered by Zeitgeist"));
-        //main_label_description.set_markup (get_description_markup ("Powered by Zeitgeist"));
-        show_pattern ("");
-      }
-      if (reset_action)
-      {
-        action_image.set_sensitive (false);
-        action_image.set_from_icon_name ("system-run", IconSize.DIALOG);
-        action_label.set_markup ("<span size=\"medium\"><b></b></span>");
-      }
-    }
-
-    Gee.List<Match> results;
-    private void search_ready (GLib.Object? obj, AsyncResult res)
-    {
-      try
-      {
-        results = data_sink.search.end (res);
-        if (results.size > 0)
-        {
-          focus_match (results[0]);
-          result_box.update_matches (results);
-        }
-        else
-        {
-          result_box.update_matches (null);
-          set_list_visible (false);
-          focus_match (null);
-          main_image.set_from_icon_name ("unknown", IconSize.DIALOG);
-          main_image_overlay.clear ();
-          reset_search (false);
-        }
-      }
-      catch (SearchError err)
-      {
-        // most likely cancelled
-      }
-    }
-
-    public string search_string { get; private set; default = ""; }
-
-    private void search_add_char (string chr)
-    {
-      search_string += chr;
-    }
-    
-    private void search_delete_char ()
-    {
-      long len = search_string.length;
-      if (len > 0)
-      {
-        search_string = search_string.substring (0, len - 1);
-      }
-      else
-      {
-        search_string = "";
-      }
-    }
-
-    private void search_reset (bool deselect_type = true)
-    {
-      search_string = "";
-      if (deselect_type) sts.select (0);
-    }
-    
-    private Match? current_match = null;
-    private Match? action_match = null;
-
-    public void focus_match (Match? match)
-    {
-      current_match = match;
-      if (match != null)
-      {
-        try
-        {
-          main_image.set_from_gicon (GLib.Icon.new_for_string (match.icon_name), IconSize.DIALOG);
-          if (match.has_thumbnail)
-            main_image_overlay.set_from_gicon (GLib.Icon.new_for_string (match.thumbnail_path), IconSize.DIALOG);
-          else
-            main_image_overlay.clear ();
-        }
-        catch (Error err)
-        {
-          main_image.set_from_icon_name ("missing-image", IconSize.DIALOG);
-          main_image_overlay.clear ();
-        }
-        main_label.set_markup (markup_string_with_search (match.title, search_string));
-        main_label_description.set_markup (get_description_markup (match.description));
-
-        var actions = data_sink.find_action_for_match (match, null);
-        action_match = actions[0];
-        action_image.set_from_gicon (GLib.Icon.new_for_string (action_match.icon_name), IconSize.DIALOG);
-        action_image.set_sensitive (true);
-        action_label.set_markup (Markup.printf_escaped ("<span size=\"medium\"><b>%s</b></span>", action_match.title));
-      }
-      else
-      {
-        main_label.set_markup (markup_string_with_search ("", search_string));
-        main_label_description.set_markup (get_description_markup ("Match not found."));
-        reset_search (false);
-      }
-    }
+    }   
     
     private void show_pattern (string pat)
     {
@@ -680,6 +702,11 @@ namespace Sezen
     private string get_description_markup (string s)
     {
       return Markup.printf_escaped ("<span size=\"medium\">%s</span>", s);
+    }
+    
+    private string get_action_markup (string s)
+    {
+      return Markup.printf_escaped ("<span size=\"medium\"><b>%s</b></span>", s);
     }
     
     public void show_sezen ()
