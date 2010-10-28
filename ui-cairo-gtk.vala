@@ -60,6 +60,8 @@ namespace Sezen
       set_decorated (false);
       set_resizable (false);
       this.build_ui ();
+      focus_action (null);
+      focus_match (null);
       
       /* SEZEN */
       smi = new SezenMatchInterface ();
@@ -69,8 +71,6 @@ namespace Sezen
       im_context.set_use_preedit (false);
       im_context.commit.connect (this.search_add_char);
       im_context.focus_in ();
-      
-      smi.search = "";
     }
 
     private void rounded_rect (Cairo.Context ctx, double x, double y, double w, double h, double r)
