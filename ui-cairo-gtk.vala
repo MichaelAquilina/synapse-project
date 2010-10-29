@@ -472,8 +472,13 @@ namespace Sezen
       var spacerright = new Label("");
       spacerright.set_size_request ((UI_WIDTH-UI_LIST_WIDTH) / 2 + 2, 10);
       spacerleft.set_size_request ((UI_WIDTH-UI_LIST_WIDTH) / 2 + 2, 10);
+      var vb = new VBox (false, 0);
+      var spacer_bottom = new Label("");
+      spacer_bottom.set_size_request (2,2);
+      vb.pack_start (result_box);
+      vb.pack_start (spacer_bottom, false);
       list_hbox.pack_start (spacerleft,false);
-      list_hbox.pack_start (result_box);
+      list_hbox.pack_start (vb);
       list_hbox.pack_start (spacerright,false);
       list_hbox.name = "list_hbox";
 
@@ -585,6 +590,11 @@ namespace Sezen
             set_list_visible (false);
           break;
         case Gdk.KeySyms.Down:
+          if (!list_visible)
+          {
+            set_list_visible (true);
+            return true;
+          }
           if (searching_for_matches)
             select_next_match ();
           else
