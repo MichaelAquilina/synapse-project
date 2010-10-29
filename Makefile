@@ -33,6 +33,10 @@ cmd: all
 cairo: SRC_FILES += ui-cairo-gtk.vala ui-interface.vala ui-utils.vala
 cairo: all
 
+cairodebug: VALA_FLAGS += -C
+cairodebug: SRC_FILES += ui-cairo-gtk.vala ui-interface.vala ui-utils.vala
+cairodebug: all
+
 FORCE:
 
 clean:
