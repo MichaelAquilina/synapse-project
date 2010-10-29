@@ -55,9 +55,9 @@ namespace Sezen
     private const int LIST_BORDER_RADIUS = 3;
     private const int TOP_SPACING = UI_HEIGHT * 4 / 10;
     
-    private string[] categories = {"All", "Applications", "Actions", "Audio", "Video", "Documents", "Images", "Internet"};
-    private QueryFlags[] categories_query = {QueryFlags.ALL, QueryFlags.APPLICATIONS, QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.VIDEO,
-                                             QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.INTERNET};
+    private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
+    private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
+                                             QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.VIDEO, QueryFlags.INTERNET};
 
     /* STATUS */
     private bool list_visible = true;
@@ -424,6 +424,7 @@ namespace Sezen
       //sts.set_selection_align (HSelectionContainer.SelectionAlign.LEFT);
       foreach (string s in this.categories)
         sts.add (new Label(s));
+      sts.select (3);
       /* HBox for the right area */
       var right_hbox = new HBox (false, 0);
       top_right_vbox.pack_start (spacer, false);
@@ -511,7 +512,7 @@ namespace Sezen
     {
       window.hide ();
       set_list_visible (false);
-      sts.select (0);
+      sts.select (3);
       reset_search ();
     }
     
