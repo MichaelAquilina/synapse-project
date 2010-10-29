@@ -94,6 +94,9 @@ namespace Sezen
     private void cairo_make_shadow_for_rect (Cairo.Context ctx, double x1, double y1, double w, double h, double rad,
                                              double r, double g, double b, double a, double size)
     {
+      ctx.save ();
+      ctx.translate (0.5, 0.5);
+      w -= 1; h -= 1;
       double x2 = x1+rad,
              x3 = x1+w-rad,
              x4 = x1+w,
@@ -203,6 +206,8 @@ namespace Sezen
       ctx.rectangle (x2, y1-size, x3-x2, size);
       ctx.clip ();
       ctx.paint ();
+      ctx.restore ();
+      
       ctx.restore ();
     }
   }
