@@ -125,15 +125,7 @@ namespace Sezen
       }
 
       // split to individual chars
-      string[] individual_words = Regex.split_simple ("\\s+", query);
-      if (individual_words.length >= 2)
-      {
-        // special-case queries which end with whitespace
-        if (individual_words[individual_words.length-1] == "")
-        {
-          individual_words = individual_words[0:individual_words.length-1];
-        }
-      }
+      string[] individual_words = Regex.split_simple ("\\s+", query.strip ());
       if (individual_words.length >= 2)
       {
         string[] escaped_words = {};

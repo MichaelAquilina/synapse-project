@@ -50,6 +50,7 @@ namespace Sezen
       public Runner ()
       {
         Object (title: "Run", // FIXME: i18n
+                description: "Run an application, action or script",
                 icon_name: "system-run", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: 100);
@@ -93,6 +94,7 @@ namespace Sezen
       public Opener ()
       {
         Object (title: "Open", // FIXME: i18n
+                description: "Open using default application",
                 icon_name: "fileopen", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: 100);
@@ -124,6 +126,7 @@ namespace Sezen
       public OpenFolder ()
       {
         Object (title: "Open folder", // FIXME: i18n
+                description: "Open folder containing this file",
                 icon_name: "folder-open", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: 70);

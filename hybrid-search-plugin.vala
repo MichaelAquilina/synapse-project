@@ -440,7 +440,7 @@ namespace Sezen
                 // FIXME: check if it matches query_type
                 if (fi.match_obj != null && fi.file_type in q.query_type)
                 {
-                  results.add (fi.match_obj, matcher.value - 10);
+                  results.add (fi.match_obj, matcher.value - Match.URI_PENALTY);
                 }
               }
               break;
