@@ -9,11 +9,13 @@ SRC_FILES = \
 	gnome-session-plugin.vala \
 	upower-plugin.vala \
 	zeitgeist-plugin.vala \
+	test-slow-plugin.vala \
 	$(NULL)
 
 VALA_FLAGS = --pkg zeitgeist-1.0 --pkg dbus-glib-1 --pkg gtk+-2.0 --pkg gio-unix-2.0 --pkg gee-1.0 --pkg gtkhotkey-1.0 --vapidir ./
 VAPIS = keysyms.vapi cancellable-fix.vapi
 OUTPUT = sezen2
+VALA_FLAGS += -D TEST_PLUGINS
 
 $(OUTPUT): $(SRC_FILES) FORCE
 	valac $(VALA_FLAGS) $(VAPIS) -g -o $@ $(SRC_FILES)

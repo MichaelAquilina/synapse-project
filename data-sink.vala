@@ -185,6 +185,10 @@ namespace Sezen
                        "data-sink", this, null) as DataPlugin);
       register_plugin (Object.new (typeof (UPowerPlugin),
                        "data-sink", this, null) as DataPlugin);
+#if TEST_PLUGINS
+      register_plugin (Object.new (typeof (TestSlowPlugin),
+                       "data-sink", this, null) as DataPlugin);
+#endif
 
       register_plugin (Object.new (typeof (CommonActions),
                        "data-sink", this, null) as DataPlugin);
