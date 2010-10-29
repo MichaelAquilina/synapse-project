@@ -216,7 +216,10 @@ namespace Sezen
     private void search_for_actions ()
     {
       if (focus[T.MATCH] == null)
+      {
+        update_action_result_list (null, 0, null);
         return;
+      }
       results[T.ACTION] = data_sink.find_action_for_match (focus[T.MATCH], search[T.ACTION]);
       if (results[T.ACTION].size > 0)
       {
