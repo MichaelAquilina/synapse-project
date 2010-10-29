@@ -353,7 +353,6 @@ namespace Sezen
     private Image main_image = null;
     private Image main_image_overlay = null;
     private Label main_label = null;
-    private Label pattern_label = null;
     private Label main_label_description = null;
     private Image action_image = null;
     private Label action_label = null;
@@ -361,6 +360,7 @@ namespace Sezen
     private ResultBox result_box = null;
     private HBox list_hbox = null;
     private HBox top_hbox = null;
+    private HBox right_hbox = null;
     private VBox top_vbox = null;
     private ContainerOverlayed gco_main = null;
     
@@ -426,7 +426,7 @@ namespace Sezen
         sts.add (new Label(s));
       sts.select (3);
       /* HBox for the right area */
-      var right_hbox = new HBox (false, 0);
+      right_hbox = new HBox (false, 0);
       top_right_vbox.pack_start (spacer, false);
       top_right_vbox.pack_start (sts, false);
       top_right_vbox.pack_start (right_hbox);
@@ -447,24 +447,20 @@ namespace Sezen
       main_label.set_alignment (0, 0);
       main_label.set_ellipsize (Pango.EllipsizeMode.END);
 
-      pattern_label = new Label (null);
-      pattern_label.set_alignment (0, 1.0f);
-      pattern_label.set_ellipsize (Pango.EllipsizeMode.END);
       action_label = new Label (null);
       action_label.set_alignment (1.0f, 0.5f);
-      var hbox_pattern_action = new HBox(false, 0);
-      hbox_pattern_action.pack_start (pattern_label);
-      hbox_pattern_action.pack_start (action_label, false);
+      action_label.set_ellipsize (Pango.EllipsizeMode.START);
       action_label.xpad = 10;
       
       labels_vbox.pack_end (main_label, false, false, 10);
-      labels_vbox.pack_start (hbox_pattern_action);
+      labels_vbox.pack_start (action_label);
       
       /* Action Area */
       action_image = new Image ();
       action_image.set_pixel_size (ACTION_ICON_SIZE);
-      action_image.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
-      right_hbox.pack_start (action_image, false, false, 10);
+      action_image.set_size_request (ACTION_ICON_SIZE + 8, ACTION_ICON_SIZE);
+      action_image.xpad = 8;
+      right_hbox.pack_start (action_image, false);
       
       /* ResultBox */
       result_box = new ResultBox(UI_LIST_WIDTH);
@@ -617,10 +613,10 @@ namespace Sezen
           }
           else
           {
+            get_match_focus (out i, out m);
+            focus_match (i, m); 
             get_action_focus (out i, out m);
             update_action_result_list (get_action_results (), i, m);
-            get_match_focus (out i, out m);
-            focus_match (i, m);
           }
           window.queue_draw ();
           break;
@@ -643,11 +639,6 @@ namespace Sezen
       set_mask ();
     }   
     
-    private void show_pattern (string pat)
-    {
-      pattern_label.set_markup (Markup.printf_escaped ("<span size=\"medium\">%s</span>", pat));
-    }
-
     private string markup_string_with_search (string text, string pattern, string size = "xx-large")
     {
       if (pattern == "")
@@ -657,8 +648,7 @@ namespace Sezen
       // if no text found, use pattern
       if (text == "")
       {
-        show_pattern (pattern);
-        return Markup.printf_escaped ("<span size=\"%s\"><b><u> </u></b></span>", size);
+        return Markup.printf_escaped ("<span size=\"%s\">%s<b> </b></span>", size, pattern);
       }
 
       var matchers = Query.get_matchers_for_query (
@@ -689,12 +679,10 @@ namespace Sezen
       }
       if (highlighted != null)
       {
-        show_pattern ("");
         return "<span size=\"%s\">%s</span>".printf (size,highlighted);
       }
       else
       {
-        show_pattern (pattern);
         return Markup.printf_escaped ("<span size=\"%s\">%s</span>", size, text);
       }
     }
@@ -735,7 +723,6 @@ namespace Sezen
             Markup.printf_escaped ("<span size=\"medium\"> </span>" +
                                    "<span size=\"smaller\">%s</span>",
                                    "Powered by Zeitgeist"));
-          show_pattern ("");
         }
       }
       else
@@ -765,7 +752,7 @@ namespace Sezen
       {
         action_image.set_sensitive (false);
         action_image.set_from_icon_name ("system-run", IconSize.DIALOG);
-        action_label.set_markup (markup_string_with_search ("", "", size));
+        action_label.set_markup (markup_string_with_search ("", get_action_search(), size));
       }
       else
       {
@@ -983,6 +970,7 @@ namespace Sezen
           view.scroll_to_cell (path, null, true, 0.5F, 0.0F);
           return false;
       });
+      status.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", i + 1, results.length));
     }
     public int move_selection (int val, out int old_index)
     {
@@ -1015,7 +1003,7 @@ namespace Sezen
           view.scroll_to_cell (path, null, true, 0.5F, 0.0F);
           return false;
       });
-      status.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", index + 1, results.length));
+      
       return index;
     }
   }
