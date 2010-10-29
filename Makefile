@@ -30,7 +30,7 @@ gtk: all
 cmd: SRC_FILES += ui-cmd-line.vala
 cmd: all
 
-cairo: SRC_FILES += ui-cairo-gtk.vala ui-interface.vala
+cairo: SRC_FILES += ui-cairo-gtk.vala ui-interface.vala ui-utils.vala
 cairo: all
 
 FORCE:

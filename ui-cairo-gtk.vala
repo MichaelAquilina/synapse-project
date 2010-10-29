@@ -54,6 +54,7 @@ namespace Sezen
     public SezenWindow ()
     {
       window = new Gtk.Window ();
+      Utils.ensure_transparent_bg (window);
       window.set_position (WindowPosition.CENTER);
       window.expose_event.connect (on_expose);
       on_composited_changed (window);
