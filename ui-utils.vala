@@ -66,6 +66,30 @@ namespace Sezen
       widget.style_set.connect (on_style_set);
       widget.composited_changed.connect (on_composited_change);
     }
+
+    public static void gdk_color_to_rgb (Gdk.Color col, double *r, double *g, double *b)
+    {
+      *r = col.red / (double)65535;
+      *g = col.green / (double)65535;
+      *b = col.blue / (double)65535;
+    }
+
+    public static void rgb_invert_color (out double r, out double g, out double b)
+    {
+      if (r >= 0.5) r /= 4; else r = 1 - r / 4;
+      if (g >= 0.5) g /= 4; else g = 1 - g / 4;
+      if (b >= 0.5) b /= 4; else b = 1 - b / 4;
+    }
+    
+    private void cairo_rounded_rect (Cairo.Context ctx, double x, double y, double w, double h, double r)
+    {
+      double y2 = y+h, x2 = x+w;
+      ctx.move_to (x, y2 - r);
+      ctx.arc (x+r, y+r, r, Math.PI, Math.PI * 1.5);
+      ctx.arc (x2-r, y+r, r, Math.PI * 1.5, Math.PI * 2.0);
+      ctx.arc (x2-r, y2-r, r, 0, Math.PI * 0.5);
+      ctx.arc (x+r, y2-r, r, Math.PI * 0.5, Math.PI);
+    }
   }
 }
 

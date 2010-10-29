@@ -26,20 +26,6 @@ using Gee;
 
 namespace Sezen
 {
-  /* Utils */
-  public static void gdk_color_to_rgb (Gdk.Color col, double *r, double *g, double *b)
-  {
-    *r = col.red / (double)65535;
-    *g = col.green / (double)65535;
-    *b = col.blue / (double)65535;
-  }
-  public static void invert_color (out double r, out double g, out double b)
-  {
-    if (r >= 0.5) r /= 4; else r = 1 - r / 4;
-    if (g >= 0.5) g /= 4; else g = 1 - g / 4;
-    if (b >= 0.5) b /= 4; else b = 1 - b / 4;
-  }
-
   public class SezenWindow: UIInterface
   {
     /* CONSTANTS */
@@ -89,16 +75,6 @@ namespace Sezen
       im_context.commit.connect (search_add_char);
       im_context.focus_in ();
     }
-    
-    private void rounded_rect (Cairo.Context ctx, double x, double y, double w, double h, double r)
-    {
-      double y2 = y+h, x2 = x+w;
-      ctx.move_to (x, y2 - r);
-      ctx.arc (x+r, y+r, r, Math.PI, Math.PI * 1.5);
-      ctx.arc (x2-r, y+r, r, Math.PI * 1.5, Math.PI * 2.0);
-      ctx.arc (x2-r, y2-r, r, 0, Math.PI * 0.5);
-      ctx.arc (x+r, y2-r, r, Math.PI * 0.5, Math.PI);
-    }
 
     private void get_shape (Cairo.Context ctx, bool mask_for_composited = false)
     {
@@ -115,9 +91,9 @@ namespace Sezen
     
     private void get_shape_main (Cairo.Context ctx)
     {
-      rounded_rect (ctx, 0, TOP_SPACING, UI_WIDTH, UI_HEIGHT - TOP_SPACING, BORDER_RADIUS);
+      Utils.cairo_rounded_rect (ctx, 0, TOP_SPACING, UI_WIDTH, UI_HEIGHT - TOP_SPACING, BORDER_RADIUS);
       ctx.fill ();
-      rounded_rect (ctx, 0, 0,  ICON_SIZE + PADDING * 2, ICON_SIZE, BORDER_RADIUS);
+      Utils.cairo_rounded_rect (ctx, 0, 0,  ICON_SIZE + PADDING * 2, ICON_SIZE, BORDER_RADIUS);
       ctx.fill ();
     }
     
@@ -125,11 +101,11 @@ namespace Sezen
     {
       if (list_visible)
       {
-        rounded_rect (ctx, (UI_WIDTH - UI_LIST_WIDTH) / 2,
-                            UI_HEIGHT,
-                            UI_LIST_WIDTH,
-                            UI_LIST_HEIGHT,
-                            LIST_BORDER_RADIUS);
+        Utils.cairo_rounded_rect (ctx, (UI_WIDTH - UI_LIST_WIDTH) / 2,
+                                  UI_HEIGHT,
+                                  UI_LIST_WIDTH,
+                                  UI_LIST_HEIGHT,
+                                  LIST_BORDER_RADIUS);
         ctx.fill ();
       }
     }
@@ -180,7 +156,7 @@ namespace Sezen
       
       double PAD = 1;
       if (composited)
-        rounded_rect (ctx, PAD, TOP_SPACING + PAD, w - PAD * 2, h - TOP_SPACING - PAD * 2, BORDER_RADIUS);
+        Utils.cairo_rounded_rect (ctx, PAD, TOP_SPACING + PAD, w - PAD * 2, h - TOP_SPACING - PAD * 2, BORDER_RADIUS);
       else
       {
         /*
@@ -218,7 +194,7 @@ namespace Sezen
         Gtk.Style style = widget.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
         Pattern pat = new Pattern.linear(0, TOP_SPACING, 0, UI_HEIGHT);
-        gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                     double.min(g + 0.15, 1),
                                     double.min(b + 0.15, 1),
@@ -234,7 +210,7 @@ namespace Sezen
         /* Add border */
         _cairo_path_for_main (ctx, widget.is_composited());
         ctx.set_line_width (2);
-        invert_color (out r, out g, out b);
+        Utils.rgb_invert_color (out r, out g, out b);
         ctx.set_source_rgba (r, g, b, 0.8);
         ctx.stroke ();
         
@@ -293,7 +269,7 @@ namespace Sezen
       Gtk.Style style = widget.get_style();
       double red = 0.0, green = 0.0, blue = 0.0;
       ctx.set_operator (Cairo.Operator.OVER);
-      gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &red, &green, &blue);
+      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &red, &green, &blue);
       var pat = new Pattern.linear(0, y1, 0, y3);
       pat.add_color_stop_rgba (0.7, red,
                                   green,
@@ -335,7 +311,7 @@ namespace Sezen
       Gtk.Style style = widget.get_style();
       double red = 0.0, green = 0.0, blue = 0.0;
       ctx.set_operator (Cairo.Operator.OVER);
-      gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &red, &green, &blue);
+      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &red, &green, &blue);
       var pat = new Pattern.linear(0, y3, 0, y1);
       pat.add_color_stop_rgba (0.2, red,
                                   green,
@@ -868,7 +844,7 @@ namespace Sezen
         Gtk.Style style = w.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
         Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
-        gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         pat.add_color_stop_rgba (1.0 - 15.0 / w.allocation.height, double.min(r + 0.15, 1),
                                     double.min(g + 0.15, 1),
                                     double.min(b + 0.15, 1),
