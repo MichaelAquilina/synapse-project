@@ -26,6 +26,20 @@ using Gee;
 
 namespace Sezen
 {
+  /* Utils */
+  public static void gdk_color_to_rgb (Gdk.Color col, double *r, double *g, double *b)
+  {
+    *r = col.red / (double)65535;
+    *g = col.green / (double)65535;
+    *b = col.blue / (double)65535;
+  }
+  public static void invert_color (out double r, out double g, out double b)
+  {
+    if (r >= 0.5) r /= 4; else r = 1 - r / 4;
+    if (g >= 0.5) g /= 4; else g = 1 - g / 4;
+    if (b >= 0.5) b /= 4; else b = 1 - b / 4;
+  }
+
   public class SezenWindow: UIInterface
   {
     /* CONSTANTS */
@@ -134,13 +148,6 @@ namespace Sezen
       set_mask ();
     }
     
-    public static void color_to_rgb (Gdk.Color col, double *r, double *g, double *b)
-    {
-      *r = col.red / (double)65535;
-      *g = col.green / (double)65535;
-      *b = col.blue / (double)65535;
-    }
-    
     private void set_mask (bool mask_for_composited = false)
     {
       var bitmap = new Gdk.Pixmap (null, UI_WIDTH, UI_HEIGHT+UI_LIST_HEIGHT, 1);
@@ -210,7 +217,7 @@ namespace Sezen
         Gtk.Style style = widget.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
         Pattern pat = new Pattern.linear(0, TOP_SPACING, 0, UI_HEIGHT);
-        color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+        gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                     double.min(g + 0.15, 1),
                                     double.min(b + 0.15, 1),
@@ -226,7 +233,8 @@ namespace Sezen
         /* Add border */
         _cairo_path_for_main (ctx, widget.is_composited());
         ctx.set_line_width (2);
-        ctx.set_source_rgba (1-r, 1-g, 1-b, 0.8);
+        invert_color (out r, out g, out b);
+        ctx.set_source_rgba (r, g, b, 0.8);
         ctx.stroke ();
         
         if (list_visible && widget.is_composited())
@@ -239,7 +247,7 @@ namespace Sezen
           }
           ctx.rectangle ((w - UI_LIST_WIDTH) / 2 + 1, h, UI_LIST_WIDTH - 2, UI_LIST_HEIGHT);
           ctx.set_line_width (2.5);
-          ctx.set_source_rgba (1-r, 1-g, 1-b, 0.8);
+          ctx.set_source_rgba (r, g, b, 0.8);
           ctx.stroke ();
         }
         
@@ -284,7 +292,7 @@ namespace Sezen
       Gtk.Style style = widget.get_style();
       double red = 0.0, green = 0.0, blue = 0.0;
       ctx.set_operator (Cairo.Operator.OVER);
-      color_to_rgb (style.bg[Gtk.StateType.SELECTED], &red, &green, &blue);
+      gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &red, &green, &blue);
       var pat = new Pattern.linear(0, y1, 0, y3);
       pat.add_color_stop_rgba (0.7, red,
                                   green,
@@ -326,7 +334,7 @@ namespace Sezen
       Gtk.Style style = widget.get_style();
       double red = 0.0, green = 0.0, blue = 0.0;
       ctx.set_operator (Cairo.Operator.OVER);
-      color_to_rgb (style.bg[Gtk.StateType.SELECTED], &red, &green, &blue);
+      gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &red, &green, &blue);
       var pat = new Pattern.linear(0, y3, 0, y1);
       pat.add_color_stop_rgba (0.2, red,
                                   green,
@@ -354,7 +362,7 @@ namespace Sezen
     private HBox list_hbox = null;
     private HBox top_hbox = null;
     private VBox top_vbox = null;
-    private Gtk.ContainerOverlayed gco_main = null;
+    private ContainerOverlayed gco_main = null;
     
     private static void _hilight_label (Widget w, bool b)
     {
@@ -362,7 +370,7 @@ namespace Sezen
       if (b)
       {
         string s = l.get_text();
-        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><u><b>%s</b></u></span>", s));
+        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><b>%s</b></span>", s));
         l.sensitive = true;
       }
       else
@@ -395,7 +403,7 @@ namespace Sezen
       /* Constructing Top Area */
       
       /* Match Icon */
-      gco_main = new Gtk.ContainerOverlayed();
+      gco_main = new ContainerOverlayed();
       main_image_overlay = new Image();
       main_image_overlay.set_pixel_size (ICON_SIZE / 2);
       main_image = new Image ();
@@ -826,52 +834,6 @@ namespace Sezen
     }
   }
   
-  /* Support Classes */
-  public class SezenTypeSelector: Label
-  {
-    private string[] types;
-    private int[] lens;
-    private int selected = 0;
-
-    public SezenTypeSelector (string[] types_array)
-    {
-      this.types = types_array;
-      this.lens.resize (types.length);
-      this.set_markup ("");
-      this.set_alignment (0, 0);
-      this.set_ellipsize (Pango.EllipsizeMode.END);
-      this.set_selected (0);
-    }
-    
-    public void select_next ()
-    {
-      set_selected (selected + 1);
-    }
-    
-    public void select_prev ()
-    {
-      set_selected (selected - 1);
-    }
-    
-    public int get_selected ()
-    {
-      return selected;
-    }
-    
-    public void set_selected (int sel)
-    {
-      if (sel < 0)
-        sel = types.length - 1;
-      else if (sel >= types.length)
-        sel = 0;
-
-      string s = Markup.printf_escaped ("<span size=\"large\">Search Type: &gt; <b>%s</b> &lt;</span>", types[sel]);
-
-      this.selected = sel;
-      this.set_markup (s);
-      this.queue_draw ();
-    }
-  }
   /* Result List stuff */
   public class ResultBox: EventBox
   {
@@ -907,7 +869,7 @@ namespace Sezen
         Gtk.Style style = w.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
         Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
-        SezenWindow.color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+        gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         pat.add_color_stop_rgba (1.0 - 15.0 / w.allocation.height, double.min(r + 0.15, 1),
                                     double.min(g + 0.15, 1),
                                     double.min(b + 0.15, 1),
@@ -1046,10 +1008,8 @@ namespace Sezen
       return index;
     }
   }
-}
 
-namespace Gtk
-{
+
   public class ContainerOverlayed: Gtk.Container
   {
     public float scale {get; set; default = 0.25f;}
@@ -1241,6 +1201,7 @@ namespace Gtk
         requisition.width = int.max(req.width, requisition.width);
         requisition.height = int.max(req.height, requisition.height);
       }
+      requisition.height += 4;
     }
 
     public override void size_allocate (Gdk.Rectangle allocation)
@@ -1293,7 +1254,7 @@ namespace Gtk
           allocation.x = alloc.x + pos;
           allocation.width = req.width;
           allocation.height = req.height;
-          allocation.y = alloc.y + (alloc.height - req.height) / 2;
+          allocation.y = alloc.y + (alloc.height - 4 - req.height) / 2;
           w.size_allocate (allocation);
           w.show_all ();
         }
@@ -1364,6 +1325,40 @@ namespace Gtk
         this.allocations.resize (this.allocations.length);
         this.visibles.resize (this.visibles.length);
       }
+    }
+    
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      base.expose_event (event);
+      var ctx = Gdk.cairo_create (this.window);
+      ctx.set_operator (Cairo.Operator.OVER);
+      ctx.set_line_width (1.0);
+      double x = this.allocation.x, y = this.allocation.y + this.allocation.height-3;
+      ctx.move_to (x, y);
+      ctx.rel_line_to (this.allocation.width, 0);
+      Gtk.Style style = this.get_style();
+      double r = 0.0, g = 0.0, b = 0.0;
+      var pat = new Pattern.linear(x, 0, x+this.allocation.width, 0);
+      gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+      pat.add_color_stop_rgba (0.1, r, g, b, 0);
+      pat.add_color_stop_rgba (0.45, r, g, b, 1.0);
+      pat.add_color_stop_rgba (0.55, r, g, b, 1.0);
+      pat.add_color_stop_rgba (0.9, r, g, b, 0);
+      var path = ctx.copy_path ();
+      ctx.set_source (pat);
+      ctx.stroke ();
+      ctx.translate (0.0, 0.5);
+      ctx.move_to (x, y);
+      ctx.rel_line_to (this.allocation.width, 0);
+      pat = new Pattern.linear(x, 0, x+this.allocation.width, 0);
+      invert_color (out r, out g, out b);
+      pat.add_color_stop_rgba (0.1, r, g, b, 0);
+      pat.add_color_stop_rgba (0.45, r, g, b, 1.0);
+      pat.add_color_stop_rgba (0.55, r, g, b, 1.0);
+      pat.add_color_stop_rgba (0.9, r, g, b, 0);
+      ctx.set_source (pat);
+      ctx.stroke ();
+      return true;
     }
   }
 }
