@@ -522,7 +522,8 @@ namespace Sezen
         case Gdk.KeySyms.KP_Enter:
         case Gdk.KeySyms.ISO_Enter:
           debug ("enter pressed");
-          execute ();
+          if (execute ())
+            hide_and_reset ();
           break;
         case Gdk.KeySyms.Delete:
         case Gdk.KeySyms.BackSpace:
@@ -685,7 +686,7 @@ namespace Sezen
     
     public void show_sezen ()
     {
-      window.show_all ();
+      window.show ();
       set_list_visible (false);
     }
     
