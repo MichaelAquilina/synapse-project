@@ -655,7 +655,8 @@ namespace Sezen
       }
 
       // FIXME: we need to escape also the pattern right?
-      var matchers = Query.get_matchers_for_query (pattern, 0,
+      var matchers = Query.get_matchers_for_query (
+        Markup.escape_text (pattern), 0,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
       string? highlighted = null;
       string escaped_text = Markup.escape_text (text);
@@ -688,7 +689,7 @@ namespace Sezen
       else
       {
         // FIXME: mhr3, this doesn't work, but I don't know why: why highlighted = null always??
-        // show_pattern (pattern);
+        show_pattern (pattern);
         return Markup.printf_escaped ("<span size=\"xx-large\">%s</span>", text);
       }
     }

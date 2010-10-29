@@ -31,6 +31,8 @@ namespace Sezen
 
   public interface Match: Object
   {
+    public const int URI_PENALTY = 10;
+    
     // properties
     public abstract string title { get; construct set; }
     public abstract string description { get; set; }

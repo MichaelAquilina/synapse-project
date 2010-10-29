@@ -125,7 +125,7 @@ namespace Sezen
       }
 
       // split to individual chars
-      string[] individual_words = Regex.split_simple ("\\s+", query);
+      string[] individual_words = Regex.split_simple ("\\s+", query.strip ());
       if (individual_words.length >= 2)
       {
         string[] escaped_words = {};
@@ -146,20 +146,42 @@ namespace Sezen
         }
 
         // FIXME: do something generic here
-        if (!(MatcherFlags.NO_REVERSED in match_flags) &&
-            escaped_words.length == 2)
+        if (!(MatcherFlags.NO_REVERSED in match_flags))
         {
-          var reversed = "\\b(%s)".printf (string.join (").+\\b(",
-                                                      escaped_words[1],
-                                                      escaped_words[0],
-                                                      null));
-          try
+          if (escaped_words.length == 2)
           {
-            re = new Regex (reversed, flags);
-            results[re] = 78;
+            var reversed = "\\b(%s)".printf (string.join (").+\\b(",
+                                                        escaped_words[1],
+                                                        escaped_words[0],
+                                                        null));
+            try
+            {
+              re = new Regex (reversed, flags);
+              results[re] = 78;
+            }
+            catch (RegexError err)
+            {
+            }
           }
-          catch (RegexError err)
+          else
           {
+            // not too nice, but is quite fast to compute
+            var orred = "\\b((?:%s))".printf (string.joinv (")|(?:", escaped_words));
+            var any_order = "";
+            for (int i=0; i<escaped_words.length; i++)
+            {
+              bool is_last = i == escaped_words.length - 1;
+              any_order += orred;
+              if (!is_last) any_order += ".+";
+            }
+            try
+            {
+              re = new Regex (any_order, flags);
+              results[re] = 76;
+            }
+            catch (RegexError err)
+            {
+            }
           }
         }
       }

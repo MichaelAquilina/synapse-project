@@ -78,12 +78,18 @@ namespace Sezen
                         FILE_ATTRIBUTE_THUMBNAIL_PATH,
                         null);
 
-    private async void process_results (Zeitgeist.ResultSet events,
+    private async void process_results (string query,
+                                        Zeitgeist.ResultSet events,
                                         Cancellable cancellable,
                                         ResultSet results,
                                         bool local_only)
     {
       Gee.Set<string> uris = new Gee.HashSet<string> ();
+
+      var matchers = Query.get_matchers_for_query (
+        query,
+        MatcherFlags.NO_FUZZY | MatcherFlags.NO_PARTIAL,
+        RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
 
       foreach (var event in events)
       {
@@ -134,7 +140,17 @@ namespace Sezen
           var match_obj = new MatchObject (event,
                                            thumbnail_path,
                                            icon);
-          results.add (match_obj, 65); // FIXME: relevancy?!
+          bool match_found = false;
+          foreach (var matcher in matchers)
+          {
+            if (matcher.key.match (match_obj.title))
+            {
+              results.add (match_obj, matcher.value - Match.URI_PENALTY);
+              match_found = true;
+              break;
+            }
+          }
+          if (!match_found) results.add (match_obj, 60);
         }
       }
     }
@@ -264,7 +280,7 @@ namespace Sezen
 
         if (!q.is_cancelled ())
         {
-          yield process_results (rs, q.cancellable, result,
+          yield process_results (q.query_string, rs, q.cancellable, result,
                                  QueryFlags.LOCAL_ONLY in q.query_type);
         }
       }
