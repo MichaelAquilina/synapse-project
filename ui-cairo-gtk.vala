@@ -1347,9 +1347,8 @@ namespace Sezen
       var path = ctx.copy_path ();
       ctx.set_source (pat);
       ctx.stroke ();
-      ctx.translate (0.0, 0.5);
-      ctx.move_to (x, y);
-      ctx.rel_line_to (this.allocation.width, 0);
+      ctx.translate (0.0, 0.75);
+      ctx.append_path (path);
       pat = new Pattern.linear(x, 0, x+this.allocation.width, 0);
       invert_color (out r, out g, out b);
       pat.add_color_stop_rgba (0.1, r, g, b, 0);
