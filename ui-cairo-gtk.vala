@@ -293,7 +293,7 @@ namespace Sezen
       pat.add_color_stop_rgba (1, red,
                                   green,
                                   blue,
-                                  0.95);
+                                  1.0);
       ctx.set_source (pat);
       ctx.clip ();
       ctx.paint ();
@@ -319,8 +319,8 @@ namespace Sezen
       ctx.arc (x1+r, y1+r, r, Math.PI, Math.PI * 1.5);
       ctx.arc (x4-r, y1 + r, r, Math.PI * 1.5, Math.PI * 2.0);
       ctx.arc (x4-r, y3-r, r, 0, Math.PI * 0.5);
-      ctx.arc (x3+r, y3-r, r, Math.PI * 0.5, Math.PI);
-      ctx.arc_negative (x3-r, y2+r, r, Math.PI * 2.0, Math.PI * 1.5);
+      ctx.arc (x3, y3-r, r, Math.PI * 0.5, Math.PI);
+      ctx.arc_negative (x3-r*2, y2+r, r, Math.PI * 2.0, Math.PI * 1.5);
       ctx.arc (x1+r, y2-r, r, Math.PI * 0.5, Math.PI);
       
       Gtk.Style style = widget.get_style();
@@ -328,14 +328,14 @@ namespace Sezen
       ctx.set_operator (Cairo.Operator.OVER);
       color_to_rgb (style.bg[Gtk.StateType.SELECTED], &red, &green, &blue);
       var pat = new Pattern.linear(0, y3, 0, y1);
-      pat.add_color_stop_rgba (0.0, red,
+      pat.add_color_stop_rgba (0.2, red,
                                   green,
                                   blue,
                                   0.0);
       pat.add_color_stop_rgba (1, red,
                                   green,
                                   blue,
-                                  0.95);
+                                  1.0);
       ctx.set_source (pat);
       ctx.clip ();
       ctx.paint ();
@@ -445,7 +445,8 @@ namespace Sezen
       action_label.set_alignment (1.0f, 0.5f);
       var hbox_pattern_action = new HBox(false, 0);
       hbox_pattern_action.pack_start (pattern_label);
-      hbox_pattern_action.pack_start (action_label);
+      hbox_pattern_action.pack_start (action_label, false);
+      action_label.xpad = 10;
       
       labels_vbox.pack_end (main_label, false, false, 10);
       labels_vbox.pack_start (hbox_pattern_action);
