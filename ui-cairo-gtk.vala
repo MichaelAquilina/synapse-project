@@ -1126,6 +1126,7 @@ namespace Sezen
     private int[] allocations = {};
     private bool[] visibles = {};
     private bool direction = true;
+    private HSeparator sep;
     
     public enum SelectionAlign
     {
@@ -1144,6 +1145,9 @@ namespace Sezen
       childs = new ArrayList<Widget>();
       set_has_window(false);
       set_redraw_on_allocate(false);
+      sep = new HSeparator();
+      sep.set_parent (this);
+      sep.show ();
     }
     
     public void set_selection_align (SelectionAlign align)
@@ -1261,10 +1265,19 @@ namespace Sezen
         }
         ++i;
       }
+      allocation.x = alloc.x;
+      allocation.y = alloc.y + alloc.height - 3;
+      allocation.height = 2;
+      allocation.width = alloc.width;
+      sep.size_allocate (allocation);
     }
     public override void forall_internal (bool b, Gtk.Callback callback)
     {
       int i = 0;
+      if (b)
+      {
+        callback (sep);
+      }
       if (this.align == SelectionAlign.LEFT)
       {
         for (i = childs.size - 1; i >= 0; ++i)
@@ -1326,39 +1339,6 @@ namespace Sezen
         this.allocations.resize (this.allocations.length);
         this.visibles.resize (this.visibles.length);
       }
-    }
-    
-    public override bool expose_event (Gdk.EventExpose event)
-    {
-      base.expose_event (event);
-      var ctx = Gdk.cairo_create (this.window);
-      ctx.set_operator (Cairo.Operator.OVER);
-      ctx.set_line_width (1.0);
-      double x = this.allocation.x, y = this.allocation.y + this.allocation.height-3;
-      ctx.move_to (x, y);
-      ctx.rel_line_to (this.allocation.width, 0);
-      Gtk.Style style = this.get_style();
-      double r = 0.0, g = 0.0, b = 0.0;
-      var pat = new Pattern.linear(x, 0, x+this.allocation.width, 0);
-      gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-      pat.add_color_stop_rgba (0.1, r, g, b, 0);
-      pat.add_color_stop_rgba (0.45, r, g, b, 1.0);
-      pat.add_color_stop_rgba (0.55, r, g, b, 1.0);
-      pat.add_color_stop_rgba (0.9, r, g, b, 0);
-      var path = ctx.copy_path ();
-      ctx.set_source (pat);
-      ctx.stroke ();
-      ctx.translate (0.0, 0.75);
-      ctx.append_path (path);
-      pat = new Pattern.linear(x, 0, x+this.allocation.width, 0);
-      invert_color (out r, out g, out b);
-      pat.add_color_stop_rgba (0.1, r, g, b, 0);
-      pat.add_color_stop_rgba (0.45, r, g, b, 1.0);
-      pat.add_color_stop_rgba (0.55, r, g, b, 1.0);
-      pat.add_color_stop_rgba (0.9, r, g, b, 0);
-      ctx.set_source (pat);
-      ctx.stroke ();
-      return true;
     }
   }
 }
