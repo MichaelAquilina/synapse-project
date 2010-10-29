@@ -522,7 +522,7 @@ namespace Sezen
         case Gdk.KeySyms.KP_Enter:
         case Gdk.KeySyms.ISO_Enter:
           debug ("enter pressed");
-          
+          execute ();
           break;
         case Gdk.KeySyms.Delete:
         case Gdk.KeySyms.BackSpace:
@@ -534,6 +534,7 @@ namespace Sezen
           {
             set_action_search ("");
             searching_for_matches = true;
+            window.queue_draw ();
           }
           else if (get_match_search() != "")
           {
@@ -547,10 +548,20 @@ namespace Sezen
           break;
         case Gdk.KeySyms.Left:
           sts.select_prev ();
+          if (!searching_for_matches)
+          {
+            searching_for_matches = true;
+            window.queue_draw ();
+          }
           update_query_flags (this.categories_query[sts.get_selected()]);
           break;
         case Gdk.KeySyms.Right:
           sts.select_next ();
+          if (!searching_for_matches)
+          {
+            searching_for_matches = true;
+            window.queue_draw ();
+          }
           update_query_flags (this.categories_query[sts.get_selected()]);
           break;
         case Gdk.KeySyms.Up:
