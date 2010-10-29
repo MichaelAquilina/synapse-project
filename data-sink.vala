@@ -183,6 +183,8 @@ namespace Sezen
                        "data-sink", this, null) as DataPlugin);
       register_plugin (Object.new (typeof (GnomeSessionPlugin),
                        "data-sink", this, null) as DataPlugin);
+      register_plugin (Object.new (typeof (UPowerPlugin),
+                       "data-sink", this, null) as DataPlugin);
 
       register_plugin (Object.new (typeof (CommonActions),
                        "data-sink", this, null) as DataPlugin);
