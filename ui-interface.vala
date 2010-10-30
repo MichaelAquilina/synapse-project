@@ -54,7 +54,7 @@ namespace Sezen
   
   public abstract class UIInterface : GLib.Object
   {
-    private const int PARTIAL_TIMEOUT = 50; //millisecond for show partial results
+    private const int PARTIAL_TIMEOUT = 80; //millisecond for show partial results
     private DataSink data_sink;
     private enum T 
     {

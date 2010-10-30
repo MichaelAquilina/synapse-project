@@ -288,6 +288,7 @@ namespace Sezen
       {
         warning ("Search in Zeitgeist's index failed: %s", err.message);
       }
+      q.check_cancellable ();
 
       debug ("ZG search took %d ms", (int)(timer.elapsed ()*1000));
 

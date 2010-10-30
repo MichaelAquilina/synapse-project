@@ -371,7 +371,20 @@ namespace Sezen
     private void search_add_char (string chr)
     {
       if (searching_for_matches)
-        set_match_search (get_match_search() + chr);
+      {
+        string s = get_match_search() + chr;
+        int i = 0;
+        Match match = null;
+        get_match_focus (out i, out match); 
+        main_label.set_markup (
+          markup_string_with_search (
+            match!=null?match.title:"",
+            s, 
+            "xx-large"
+          )
+        );
+        set_match_search (s);
+      }
       else
         set_action_search (get_action_search() + chr);
     }
@@ -387,8 +400,19 @@ namespace Sezen
       {
         s = s.substring (0, len - 1);
         if (searching_for_matches)
+        {
+          int i = 0;
+          Match match = null;
+          get_match_focus (out i, out match); 
+          main_label.set_markup (
+            markup_string_with_search (
+              match!=null?match.title:"",
+              s, 
+              "xx-large"
+            )
+          );
           set_match_search (s);
-        else
+        }else
           set_action_search (s);
       }
     }
