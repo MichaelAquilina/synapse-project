@@ -201,6 +201,7 @@ namespace Sezen
     
     private void on_composited_changed (Widget w)
     {
+      result_window.hide ();
       Gdk.Screen screen = w.get_screen ();
       bool comp = screen.is_composited ();
       Gdk.Colormap? cm = screen.get_rgba_colormap();
