@@ -54,6 +54,7 @@ namespace Sezen
   
   public abstract class UIInterface : GLib.Object
   {
+    private const int PARTIAL_TIMEOUT = 50; //millisecond for show partial results
     private DataSink data_sink;
     private enum T 
     {
@@ -65,6 +66,9 @@ namespace Sezen
     private Gee.List<Match>? results[2];
     private QueryFlags qf;
     private string search[2];
+    
+    private Source partial_result_timer;
+    
     construct
     {
       data_sink = new DataSink();
@@ -179,30 +183,63 @@ namespace Sezen
     
     private void search_for_matches ()
     {
+      /* STOP current search */
+      if (partial_result_timer != null)
+        partial_result_timer.destroy ();
+      data_sink.cancel_search ();
+
       if (search[T.MATCH] == "")
       {
         reset_search (true, false);
         return;
       }
-      data_sink.cancel_search ();
+      focus_index[T.MATCH] = 0;
+      debug ("Searching for : %s", search[T.MATCH]);
+      partial_result_timer = new TimeoutSource(PARTIAL_TIMEOUT);
+      partial_result_timer.set_callback(() => {
+          _send_partial_results ();
+          return false;
+      });
+      partial_result_timer.attach(null);
+
       data_sink.search (search[T.MATCH], qf, _search_ready);
+    }
+    
+    private void _send_partial_results ()
+    {
+      results[T.MATCH] = data_sink.get_partial_results ();
+      if (results[T.MATCH].size > 0)
+      {
+        focus[T.MATCH] = results[T.MATCH].first();
+      }
+      else
+      {
+        focus[T.MATCH] = null;
+      }
+      /* If we are here, we are searching for Matches */
+      update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);
+      /* Send also actions */
+      search_for_actions ();
     }
     
     private void _search_ready (GLib.Object? obj, AsyncResult res)
     {
+      if (partial_result_timer != null)
+      {
+        partial_result_timer.destroy ();
+      }
       try
       {
         results[T.MATCH] = data_sink.search.end (res);
         if (results[T.MATCH].size > 0)
         {
-          focus[T.MATCH] = results[T.MATCH].first();
+          focus[T.MATCH] = results[T.MATCH].get (focus_index[T.MATCH]);
         }
         else
         {
           focus[T.MATCH] = null;
         }
         /* If we are here, we are searching for Matches */
-        focus_index[T.MATCH] = 0;
         update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);
         /* Send also actions */
         search_for_actions ();

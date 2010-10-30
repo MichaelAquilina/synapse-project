@@ -32,6 +32,7 @@ namespace Sezen
 
       Timeout.add (2000, search.callback);
       yield;
+      q.check_cancellable ();
 
       debug ("finished search for \"%s\"", q.query_string);
 

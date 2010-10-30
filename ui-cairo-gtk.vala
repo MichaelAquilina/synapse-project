@@ -139,6 +139,7 @@ namespace Sezen
       /* Match Description */
       main_label_description = new Label ("descrizione");
       main_label_description.set_alignment (0, 0);
+      main_label_description.ypad = 5;
       main_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
       main_label_description.set_line_wrap (true);
       /* Packing Top Hbox with Match Desctiption into Top VBox*/
