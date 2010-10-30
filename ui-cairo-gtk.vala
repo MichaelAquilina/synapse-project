@@ -373,16 +373,9 @@ namespace Sezen
       if (searching_for_matches)
       {
         string s = get_match_search() + chr;
-        int i = 0;
-        Match match = null;
-        get_match_focus (out i, out match); 
         main_label.set_markup (
-          markup_string_with_search (
-            match!=null?match.title:"",
-            s, 
-            "xx-large"
-          )
-        );
+            markup_string_with_search (main_label.get_text(), s, "xx-large")
+          );
         set_match_search (s);
       }
       else
@@ -401,15 +394,8 @@ namespace Sezen
         s = s.substring (0, len - 1);
         if (searching_for_matches)
         {
-          int i = 0;
-          Match match = null;
-          get_match_focus (out i, out match); 
           main_label.set_markup (
-            markup_string_with_search (
-              match!=null?match.title:"",
-              s, 
-              "xx-large"
-            )
+            markup_string_with_search (main_label.get_text(), s, "xx-large")
           );
           set_match_search (s);
         }else

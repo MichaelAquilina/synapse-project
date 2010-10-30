@@ -185,7 +185,10 @@ namespace Sezen
     {
       /* STOP current search */
       if (partial_result_timer != null)
+      {
         partial_result_timer.destroy ();
+        partial_result_timer = null;
+      }
       data_sink.cancel_search ();
 
       if (search[T.MATCH] == "")
@@ -194,6 +197,8 @@ namespace Sezen
         return;
       }
       focus_index[T.MATCH] = 0;
+      focus[T.MATCH] = null;
+
       debug ("Searching for : %s", search[T.MATCH]);
       partial_result_timer = new TimeoutSource(PARTIAL_TIMEOUT);
       partial_result_timer.set_callback(() => {
@@ -205,7 +210,7 @@ namespace Sezen
       data_sink.search (search[T.MATCH], qf, _search_ready);
     }
     
-    private void _send_partial_results ()
+    private async void _send_partial_results ()
     {
       results[T.MATCH] = data_sink.get_partial_results ();
       if (results[T.MATCH].size > 0)
@@ -227,6 +232,7 @@ namespace Sezen
       if (partial_result_timer != null)
       {
         partial_result_timer.destroy ();
+        partial_result_timer = null;
       }
       try
       {
