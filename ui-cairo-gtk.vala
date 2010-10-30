@@ -75,9 +75,11 @@ namespace Sezen
       result_window.set_resizable (false);
       result_window.skip_taskbar_hint = true;
       result_window.skip_pager_hint = true;
+      
+      /* FIXME: Why this events doesn't work? */
       result_window.set_events (Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK);
-      result_window.button_press_event.connect (focus_main_window);
-      result_window.button_release_event.connect (focus_main_window);
+      result_window.button_press_event.connect (result_window_click);
+      result_window.button_release_event.connect (result_window_click);
 
       build_ui ();
 
@@ -102,9 +104,9 @@ namespace Sezen
       window.key_press_event.connect (key_press_event);
     }
     
-    private bool focus_main_window (Widget w, Gdk.EventButton event)
+    private bool result_window_click (Widget w, Gdk.EventButton event)
     {
-      debug ("pressed");
+      debug ("pressed or released");
       Utils.unpresent_window(result_window);
       Utils.present_window(window);
       return false;
