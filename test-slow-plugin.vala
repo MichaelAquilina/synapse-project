@@ -23,6 +23,25 @@ namespace Sezen
 {
   public class TestSlowPlugin: DataPlugin
   {
+    private class TestResult: Object, Match
+    {
+      public string title { get; construct set; }
+      public string description { get; set; default = ""; }
+      public string icon_name { get; construct set; default = ""; }
+      public bool has_thumbnail { get; construct set; default = false; }
+      public string thumbnail_path { get; construct set; }
+      public string uri { get; set; }
+      public MatchType match_type { get; construct set; }
+      
+      public TestResult (string query)
+      {
+        Object (title: "Test result for " + query.strip (),
+                description: "by TestSlowPlugin",
+                icon_name: "unknown", has_thumbnail: false,
+                match_type: MatchType.UNKNOWN);
+      }
+    }
+    
     public override async ResultSet? search (Query q) throws SearchError
     {
       Idle.add (search.callback);
@@ -32,13 +51,15 @@ namespace Sezen
 
       Timeout.add (2000, search.callback);
       yield;
+
       q.check_cancellable ();
 
       debug ("finished search for \"%s\"", q.query_string);
+      
+      var rs = new ResultSet ();
+      rs.add (new TestResult (q.query_string), 80);
 
-      q.check_cancellable ();
-
-      return null;
+      return rs;
     }
   }
 }
