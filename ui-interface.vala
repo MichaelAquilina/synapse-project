@@ -194,7 +194,6 @@ namespace Sezen
       {
         Source.remove (tid);
         tid = 0;
-        debug ("<== Timer removed start search.");
       }
       data_sink.cancel_search ();
 
@@ -211,13 +210,11 @@ namespace Sezen
           _send_partial_results ();
           return false;
       });
-      debug ("==> Tid: %u, Searching for : %s", tid, search[T.MATCH]);
       data_sink.search (search[T.MATCH], qf, _search_ready);
     }
     
     private async void _send_partial_results ()
     {
-      debug ("<== Send partial results.");
       results[T.MATCH] = data_sink.get_partial_results ();
       if (results[T.MATCH].size > 0)
       {
@@ -235,15 +232,14 @@ namespace Sezen
     
     private void _search_ready (GLib.Object? obj, AsyncResult res)
     {
-      if (tid != 0)
-      {
-        Source.remove (tid);
-        tid = 0;
-        debug ("<== Timer removed by ready");
-      }
       try
       {
         results[T.MATCH] = data_sink.search.end (res);
+        if (tid != 0)
+        {
+          Source.remove (tid);
+          tid = 0;
+        }
         if (results[T.MATCH].size > 0)
         {
           focus[T.MATCH] = results[T.MATCH].get (focus_index[T.MATCH]);
