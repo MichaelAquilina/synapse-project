@@ -207,6 +207,9 @@ namespace Sezen
         reset_search (true, false);
         return;
       }
+      /* we are making a new search => reset current focus */
+      focus[T.MATCH] = null;
+      focus_index[T.MATCH] = 0;
 
       tid = Timeout.add (PARTIAL_TIMEOUT, () => {
           tid = 0;
@@ -219,7 +222,6 @@ namespace Sezen
     private void _send_partial_results ()
     {
       results[T.MATCH] = data_sink.get_partial_results ();
-      focus_index[T.MATCH] = 0;
       if (results[T.MATCH].size > 0)
       {
         focus[T.MATCH] = results[T.MATCH].first();
@@ -239,13 +241,12 @@ namespace Sezen
     {
       try
       {
+        /* Search not cancelled and ready */
         set_throbber_visible (false);
+        /* set new results */
         results[T.MATCH] = data_sink.search.end (res);
         if (tid != 0)
         {
-          /* We were faster than partial result timer, so this is the first result */
-          /* Then we must select the first result in the list */
-          focus_index[T.MATCH] = 0;
           Source.remove (tid);
           tid = 0;
         }
@@ -253,7 +254,8 @@ namespace Sezen
         {
           if (focus[T.MATCH] != null)
           {
-            // focused match position
+            /* The magic is here, remove che current focus from the new list */
+            /* and then reinsert it in the current focus position */
             int i = results[T.MATCH].index_of (focus[T.MATCH]);
             if (i != focus_index[T.MATCH])
             {
