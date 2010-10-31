@@ -44,7 +44,8 @@ namespace Sezen
     private VBox top_vbox = null;
     private VBox titles_vbox = null;
     private ContainerOverlayed gco_main = null;
-    private ResultBox result_box = null; //FIXME DELETE
+    private ResultBox result_box = null;
+    private Sezen.Throbber throbber = null;
     
     private const int UI_WIDTH = 600; // height is dynamic
     private const int PADDING = 10; // assinged to top_vbox's border width
@@ -76,11 +77,6 @@ namespace Sezen
       result_window.skip_taskbar_hint = true;
       result_window.skip_pager_hint = true;
       
-      /* FIXME: Why this events doesn't work? */
-      result_window.set_events (Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK);
-      result_window.button_press_event.connect (result_window_click);
-      result_window.button_release_event.connect (result_window_click);
-
       build_ui ();
 
       Utils.ensure_transparent_bg (window);
@@ -102,14 +98,6 @@ namespace Sezen
       im_context.focus_in ();
       
       window.key_press_event.connect (key_press_event);
-    }
-    
-    private bool result_window_click (Widget w, Gdk.EventButton event)
-    {
-      debug ("pressed or released");
-      Utils.unpresent_window(result_window);
-      Utils.present_window(window);
-      return false;
     }
 
     private void update_result_window_position ()
@@ -168,10 +156,19 @@ namespace Sezen
       foreach (string s in this.categories)
         sts.add (new Label(s));
       sts.select (3);
+      /* Throbber */
+      throbber = new Sezen.Throbber ();
+      throbber.set_size_request (20, -1);
       /* HBox for titles and action icon */
       var right_hbox = new HBox (false, 0);
+      /* HBox for throbber and sts */
+      var topright_hbox = new HBox (false, 0);
+      
+      topright_hbox.pack_start (sts);
+      topright_hbox.pack_start (throbber, false);
+
       top_right_vbox.pack_start (spacer, false);
-      top_right_vbox.pack_start (sts, false);
+      top_right_vbox.pack_start (topright_hbox, false);
       top_right_vbox.pack_start (right_hbox);
       
       /* Titles box and Action icon*/
@@ -530,13 +527,10 @@ namespace Sezen
       {
         this.update_result_window_position ();
         result_window.show();
-        Utils.unpresent_window (result_window);
-        Utils.present_window (window);
       }
       else
       {
         result_window.hide();
-        Utils.present_window (window);
       }
     }   
     
@@ -594,6 +588,13 @@ namespace Sezen
     }
     
     /* UI INTERFACE IMPLEMENTATION */
+    protected override void set_throbber_visible (bool visible)
+    {
+      if (visible)
+        throbber.start ();
+      else
+        throbber.stop ();
+    }
     protected override void focus_match ( int index, Match? match )
     {
       string size = searching_for_matches ? "xx-large": "medium";
@@ -715,7 +716,6 @@ namespace Sezen
         hotkey.activated.connect ((event_time) =>
         {
           window.show();
-          window.present_with_time (event_time);
         });
       }
       catch (Error err)
@@ -1243,6 +1243,68 @@ namespace Sezen
         this.allocations.resize (this.allocations.length);
         this.visibles.resize (this.visibles.length);
       }
+    }
+  }
+  public class Throbber: Label
+  {
+    private int step;
+    private bool animate;
+    private const int TIMEOUT = 1000 / 30;
+    private const int MAX_STEP = 30;
+    construct
+    {
+      step = 0;
+      animate = false;
+    }
+
+    public void start ()
+    {
+      if (animate)
+        return;
+      animate = true;
+      Timeout.add (TIMEOUT, () => {
+        step = (step + 1) % MAX_STEP;
+        this.queue_draw ();
+        return animate;
+      } );
+    }
+    
+    public void stop ()
+    {
+      if (!animate)
+        return;
+      animate = false;
+      step = 0;
+    }
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      if (animate)
+      {
+        var ctx = Gdk.cairo_create (this.window);
+        ctx.translate (0.5, 0.5);
+        ctx.set_operator (Cairo.Operator.OVER);
+        Gtk.Style style = this.get_style();
+        double r = 0.0, g = 0.0, b = 0.0;
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
+        double xc = this.allocation.x + this.allocation.width / 2;
+        double yc = this.allocation.y + this.allocation.height / 2;
+        double rad = int.min (this.allocation.width, this.allocation.height) / 2 - 0.5;
+        var pat = new Cairo.Pattern.radial (xc, yc, 0, xc, yc, rad);
+        pat.add_color_stop_rgba (0.5, r, g, b, 0);
+        pat.add_color_stop_rgba (0.7, r, g, b, 1.0);
+        Utils.rgb_invert_color (out r, out g, out b);
+        pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
+        double gamma = Math.PI * 2.0 * step / MAX_STEP;
+        ctx.new_path ();
+        ctx.arc (xc, yc, rad, gamma, gamma + Math.PI * 2 / 3);
+        ctx.line_to (xc, yc);
+        ctx.close_path ();
+        ctx.clip ();
+        ctx.set_source (pat);
+        ctx.paint ();
+        base.expose_event (event);
+      }
+      return true;
     }
   }
 }

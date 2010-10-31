@@ -50,11 +50,15 @@ namespace Sezen
   - protected abstract void update_action_result_list (Gee.List<Match>? actions, int index, Match? action);
     This one has to update visually the action list, and then select the Action "action" in the "index" position
     The UI can choose to show the list or not.
+  - protected abstract void set_throbber_visible (bool visible);
+    This one is to notify the user that search is not yet completed
   */
   
   public abstract class UIInterface : GLib.Object
   {
-    private const int PARTIAL_TIMEOUT = 80; //millisecond for show partial results
+    // FIXME: the partial timeout should be the shortest possible
+    //        to send to the user an "instant" response
+    private const int PARTIAL_TIMEOUT = 100;
     private DataSink data_sink;
     private enum T 
     {
@@ -80,6 +84,7 @@ namespace Sezen
     protected abstract void focus_action ( int index, Match? action );
     protected abstract void update_match_result_list (Gee.List<Match>? matches, int index, Match? match);
     protected abstract void update_action_result_list (Gee.List<Match>? actions, int index, Match? action);
+    protected abstract void set_throbber_visible (bool visible);
 
     /* What this abstract class offer */
     protected void update_query_flags (QueryFlags flags)
@@ -213,7 +218,7 @@ namespace Sezen
       data_sink.search (search[T.MATCH], qf, _search_ready);
     }
     
-    private async void _send_partial_results ()
+    private void _send_partial_results ()
     {
       results[T.MATCH] = data_sink.get_partial_results ();
       if (results[T.MATCH].size > 0)
@@ -224,6 +229,7 @@ namespace Sezen
       {
         focus[T.MATCH] = null;
       }
+      set_throbber_visible (true);
       /* If we are here, we are searching for Matches */
       update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);
       /* Send also actions */
@@ -234,6 +240,7 @@ namespace Sezen
     {
       try
       {
+        set_throbber_visible (false);
         results[T.MATCH] = data_sink.search.end (res);
         if (tid != 0)
         {
@@ -242,7 +249,18 @@ namespace Sezen
         }
         if (results[T.MATCH].size > 0)
         {
-          focus[T.MATCH] = results[T.MATCH].get (focus_index[T.MATCH]);
+          if (focus[T.MATCH] != null)
+          {
+            // focused match position
+            int i = results[T.MATCH].index_of (focus[T.MATCH]);
+            if (i != focus_index[T.MATCH])
+            {
+              results[T.MATCH].remove_at (i);
+              results[T.MATCH].insert (focus_index[T.MATCH], focus[T.MATCH]);
+            }
+          }
+          else
+            focus[T.MATCH] = results[T.MATCH].get (focus_index[T.MATCH]);
         }
         else
         {
