@@ -160,6 +160,7 @@ namespace Sezen
         qf = QueryFlags.ALL;
       if (notify)
       {
+        set_throbber_visible (false);
         update_match_result_list (null, 0, null);
         update_action_result_list (null, 0, null);
       }
@@ -230,6 +231,7 @@ namespace Sezen
       {
         focus[T.MATCH] = null;
       }
+      /* Search not ready */
       set_throbber_visible (true);
       /* If we are here, we are searching for Matches */
       update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);
@@ -264,16 +266,18 @@ namespace Sezen
             }
           }
           else
+          {
             focus[T.MATCH] = results[T.MATCH].get (focus_index[T.MATCH]);
+            /* Send also actions */
+            search_for_actions ();
+          }
         }
         else
         {
           focus[T.MATCH] = null;
         }
-        /* If we are here, we are searching for Matches */
+
         update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);
-        /* Send also actions */
-        search_for_actions ();
       }
       catch (SearchError err)
       {
