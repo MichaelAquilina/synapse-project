@@ -38,10 +38,8 @@ namespace Sezen
     private Label action_label = null;
     private HSelectionContainer sts = null;
     private HBox top_hbox = null;
-    private HBox right_hbox = null;
     private VBox container = null;
     private VBox top_vbox = null;
-    private VBox titles_vbox = null;
     private ContainerOverlayed gco_main = null;
     private ResultBox result_box = null;
     private Sezen.Throbber throbber = null;
@@ -684,7 +682,8 @@ namespace Sezen
         hotkey.bind ();
         hotkey.activated.connect ((event_time) =>
         {
-          window.show();
+          window.show ();
+          window.present_with_time (event_time);
         });
       }
       catch (Error err)
@@ -705,7 +704,6 @@ namespace Sezen
     private int mwidth;
     private int nrows;
     private bool no_results;
-    private HBox status_box;
     
     public ResultBox (int width, int nrows = 5)
     {
