@@ -242,6 +242,16 @@ namespace Sezen
       {
         y += TOP_SPACING;
         h -= TOP_SPACING;
+        //draw shadow
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
+                                          r, g, b, 0.9, SHADOW_SIZE);
+        // border
+        _cairo_path_for_main (ctx, comp, x + 0.5, y + 0.5, w - 1, h - 1);
+        ctx.set_source_rgba (r, g, b, 0.9);
+        ctx.set_line_width (2.5);
+        ctx.stroke (); 
       }
       
       Pattern pat = new Pattern.linear(0, y, 0, y+h);
@@ -269,20 +279,6 @@ namespace Sezen
       Bin c = (widget is Bin) ? (Bin) widget : null;
       if (c != null)
         c.propagate_expose (c.get_child(), event);
-      
-      if (comp)
-      {
-        //draw shadow
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-        Utils.rgb_invert_color (out r, out g, out b);
-        Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
-                                          r, g, b, 0.9, SHADOW_SIZE);
-        // border
-        _cairo_path_for_main (ctx, comp, x + 0.5, y + 0.5, w - 1, h - 1);
-        ctx.set_source_rgba (r, g, b, 0.9);
-        ctx.set_line_width (1.5);
-        ctx.stroke (); 
-      }
       return true;
     }
 
