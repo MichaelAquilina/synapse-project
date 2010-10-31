@@ -67,10 +67,11 @@ namespace Sezen
     private QueryFlags qf;
     private string search[2];
     
-    private Source partial_result_timer;
+    private uint tid; //for timer
     
     construct
     {
+      tid = 0;
       data_sink = new DataSink();
       reset_search (false);
     }
@@ -141,6 +142,11 @@ namespace Sezen
     }    
     protected void reset_search (bool notify = true, bool reset_flags = true)
     {
+      if (tid != 0)
+      {
+        Source.remove (tid);
+        tid = 0;
+      }
       focus_index = {0, 0};
       focus = {null, null};
       results = {null, null};
@@ -184,10 +190,11 @@ namespace Sezen
     private void search_for_matches ()
     {
       /* STOP current search */
-      if (partial_result_timer != null)
+      if (tid != 0)
       {
-        partial_result_timer.destroy ();
-        partial_result_timer = null;
+        Source.remove (tid);
+        tid = 0;
+        debug ("<== Timer removed start search.");
       }
       data_sink.cancel_search ();
 
@@ -199,19 +206,18 @@ namespace Sezen
       focus_index[T.MATCH] = 0;
       focus[T.MATCH] = null;
 
-      debug ("Searching for : %s", search[T.MATCH]);
-      partial_result_timer = new TimeoutSource(PARTIAL_TIMEOUT);
-      partial_result_timer.set_callback(() => {
+      tid = Timeout.add (PARTIAL_TIMEOUT, () => {
+          tid = 0;
           _send_partial_results ();
           return false;
       });
-      partial_result_timer.attach(null);
-
+      debug ("==> Tid: %u, Searching for : %s", tid, search[T.MATCH]);
       data_sink.search (search[T.MATCH], qf, _search_ready);
     }
     
     private async void _send_partial_results ()
     {
+      debug ("<== Send partial results.");
       results[T.MATCH] = data_sink.get_partial_results ();
       if (results[T.MATCH].size > 0)
       {
@@ -229,10 +235,11 @@ namespace Sezen
     
     private void _search_ready (GLib.Object? obj, AsyncResult res)
     {
-      if (partial_result_timer != null)
+      if (tid != 0)
       {
-        partial_result_timer.destroy ();
-        partial_result_timer = null;
+        Source.remove (tid);
+        tid = 0;
+        debug ("<== Timer removed by ready");
       }
       try
       {
