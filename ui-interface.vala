@@ -207,8 +207,6 @@ namespace Sezen
         reset_search (true, false);
         return;
       }
-      focus_index[T.MATCH] = 0;
-      focus[T.MATCH] = null;
 
       tid = Timeout.add (PARTIAL_TIMEOUT, () => {
           tid = 0;
@@ -221,6 +219,7 @@ namespace Sezen
     private void _send_partial_results ()
     {
       results[T.MATCH] = data_sink.get_partial_results ();
+      focus_index[T.MATCH] = 0;
       if (results[T.MATCH].size > 0)
       {
         focus[T.MATCH] = results[T.MATCH].first();
@@ -244,6 +243,9 @@ namespace Sezen
         results[T.MATCH] = data_sink.search.end (res);
         if (tid != 0)
         {
+          /* We were faster than partial result timer, so this is the first result */
+          /* Then we must select the first result in the list */
+          focus_index[T.MATCH] = 0;
           Source.remove (tid);
           tid = 0;
         }
