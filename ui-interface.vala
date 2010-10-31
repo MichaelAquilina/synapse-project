@@ -54,6 +54,7 @@ namespace Sezen
   
   public abstract class UIInterface : GLib.Object
   {
+    private const int PARTIAL_TIMEOUT = 80; //millisecond for show partial results
     private DataSink data_sink;
     private enum T 
     {
@@ -65,8 +66,12 @@ namespace Sezen
     private Gee.List<Match>? results[2];
     private QueryFlags qf;
     private string search[2];
+    
+    private uint tid; //for timer
+    
     construct
     {
+      tid = 0;
       data_sink = new DataSink();
       reset_search (false);
     }
@@ -137,6 +142,11 @@ namespace Sezen
     }    
     protected void reset_search (bool notify = true, bool reset_flags = true)
     {
+      if (tid != 0)
+      {
+        Source.remove (tid);
+        tid = 0;
+      }
       focus_index = {0, 0};
       focus = {null, null};
       results = {null, null};
@@ -179,13 +189,45 @@ namespace Sezen
     
     private void search_for_matches ()
     {
+      /* STOP current search */
+      if (tid != 0)
+      {
+        Source.remove (tid);
+        tid = 0;
+      }
+      data_sink.cancel_search ();
+
       if (search[T.MATCH] == "")
       {
         reset_search (true, false);
         return;
       }
-      data_sink.cancel_search ();
+      focus_index[T.MATCH] = 0;
+      focus[T.MATCH] = null;
+
+      tid = Timeout.add (PARTIAL_TIMEOUT, () => {
+          tid = 0;
+          _send_partial_results ();
+          return false;
+      });
       data_sink.search (search[T.MATCH], qf, _search_ready);
+    }
+    
+    private async void _send_partial_results ()
+    {
+      results[T.MATCH] = data_sink.get_partial_results ();
+      if (results[T.MATCH].size > 0)
+      {
+        focus[T.MATCH] = results[T.MATCH].first();
+      }
+      else
+      {
+        focus[T.MATCH] = null;
+      }
+      /* If we are here, we are searching for Matches */
+      update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);
+      /* Send also actions */
+      search_for_actions ();
     }
     
     private void _search_ready (GLib.Object? obj, AsyncResult res)
@@ -193,16 +235,20 @@ namespace Sezen
       try
       {
         results[T.MATCH] = data_sink.search.end (res);
+        if (tid != 0)
+        {
+          Source.remove (tid);
+          tid = 0;
+        }
         if (results[T.MATCH].size > 0)
         {
-          focus[T.MATCH] = results[T.MATCH].first();
+          focus[T.MATCH] = results[T.MATCH].get (focus_index[T.MATCH]);
         }
         else
         {
           focus[T.MATCH] = null;
         }
         /* If we are here, we are searching for Matches */
-        focus_index[T.MATCH] = 0;
         update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);
         /* Send also actions */
         search_for_actions ();

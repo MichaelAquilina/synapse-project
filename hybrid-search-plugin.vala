@@ -451,6 +451,8 @@ namespace Sezen
         q.check_cancellable ();
       }
 
+      if (directories.size == 0) q.check_cancellable ();
+
       debug ("%s found %d extra uris (ZG returned %d)",
         this.get_type ().name (), results.size, original_rs.size);
 
