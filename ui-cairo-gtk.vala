@@ -204,6 +204,7 @@ namespace Sezen
     
     private void set_input_mask ()
     {
+      // TODO: set_imput mask
       /*bool composited = window.is_composited ();
       Requisition req = {0, 0};
       Requisition win_req = {0, 0};
@@ -296,27 +297,9 @@ namespace Sezen
         Utils.cairo_rounded_rect (ctx, x, y, w, h, BORDER_RADIUS);
       else
       {
-        /*
-         __               y1
-        |  |_______________ y2
-        |                  |
-        |__________________|y3
-        x1 x3            x4
-        */
-        double x1 = x,
-               x3 = x + PADDING * 2 + ICON_SIZE,
-               x4 = w,
-               y1 = y,
-               y2 = y + TOP_SPACING,
-               y3 = y + h,
-               r = BORDER_RADIUS;
-        ctx.move_to (x1, y3 - r);
-        ctx.arc (x1+r, y1+r, r, Math.PI, Math.PI * 1.5);
-        ctx.arc (x3-r, y1+r, r, Math.PI * 1.5, Math.PI * 2.0);
-        ctx.line_to (x3, y2);
-        ctx.arc (x4-r, y2+r, r, Math.PI * 1.5, Math.PI * 2.0);
-        ctx.arc (x4-r, y3-r, r, 0, Math.PI * 0.5);
-        ctx.arc (x1+r, y3-r, r, Math.PI * 0.5, Math.PI);
+        w = container.allocation.width;
+        h = container.allocation.height;
+        ctx.rectangle (x, y, w, h);
       }
     }
     
@@ -514,6 +497,7 @@ namespace Sezen
       {
         result_box.hide();
       }
+      window.queue_draw ();
     }   
     
     private string markup_string_with_search (string text, string pattern, string size = "xx-large")
