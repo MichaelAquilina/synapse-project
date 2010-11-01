@@ -110,7 +110,7 @@ namespace Sezen
       /* Top Hbox */
       top_hbox = new HBox (false, 0);
       /* Match Description */
-      match_label_description = new Label ("descrizione");
+      match_label_description = new Label (null);
       match_label_description.set_alignment (0, 0);
       match_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
       match_label_description.set_line_wrap (true);
@@ -572,8 +572,24 @@ namespace Sezen
       }
     }
 
+    private unowned string home_directory = null;
+    private unowned long home_directory_length = 0;
+
     private string get_description_markup (string s)
     {
+      if (home_directory == null)
+      {
+        home_directory = Environment.get_home_dir ();
+        home_directory_length = home_directory.length;
+      }
+      if (s.has_prefix (home_directory))
+      {
+        long offset = home_directory_length;
+        if (s.length > home_directory_length) offset++;
+        return Markup.printf_escaped ("<span size=\"medium\">%s %s</span>", 
+                                      "Home >", // FIXME: i18n
+                                      s.substring (offset));
+      }
       return Markup.printf_escaped ("<span size=\"medium\">%s</span>", s);
     }
     
