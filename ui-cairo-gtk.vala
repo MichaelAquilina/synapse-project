@@ -545,21 +545,28 @@ namespace Sezen
       {
         if (matcher.key.match (escaped_text))
         {
-          highlighted = matcher.key.replace_eval (escaped_text, -1, 0, 0, (mi, res) =>
+          try
           {
-            int start_pos;
-            int end_pos;
-            int last_pos = 0;
-            int cnt = mi.get_match_count ();
-            for (int i = 1; i < cnt; i++)
+            highlighted = matcher.key.replace_eval (escaped_text, -1, 0, 0, (mi, res) =>
             {
-              mi.fetch_pos (i, out start_pos, out end_pos);
-              if (i > 1) res.append (escaped_text.substring (last_pos, start_pos - last_pos));
-              last_pos = end_pos;
-              res.append ("<u><b>%s</b></u>".printf (mi.fetch (i)));
-            }
-          });
-          break;
+              int start_pos;
+              int end_pos;
+              int last_pos = 0;
+              int cnt = mi.get_match_count ();
+              for (int i = 1; i < cnt; i++)
+              {
+                mi.fetch_pos (i, out start_pos, out end_pos);
+                if (i > 1) res.append (escaped_text.substring (last_pos, start_pos - last_pos));
+                last_pos = end_pos;
+                res.append ("<u><b>%s</b></u>".printf (mi.fetch (i)));
+              }
+            });
+            break;
+          }
+          catch (RegexError err)
+          {
+            warn_if_reached ();
+          }
         }
       }
       if (highlighted != null)

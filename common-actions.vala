@@ -103,10 +103,17 @@ namespace Sezen
       public override void execute_internal (Match? match)
       {
         var f = File.new_for_uri (match.uri);
-        var app_info = f.query_default_handler (null);
-        List<File> files = new List<File> ();
-        files.prepend (f);
-        app_info.launch (files, new Gdk.AppLaunchContext ());
+        try
+        {
+          var app_info = f.query_default_handler (null);
+          List<File> files = new List<File> ();
+          files.prepend (f);
+          app_info.launch (files, new Gdk.AppLaunchContext ());
+        }
+        catch (Error err)
+        {
+          warning ("%s", err.message);
+        }
       }
 
       public override bool valid_for_match (Match match)
@@ -136,10 +143,17 @@ namespace Sezen
       {
         var f = File.new_for_uri (match.uri);
         f = f.get_parent ();
-        var app_info = f.query_default_handler (null);
-        List<File> files = new List<File> ();
-        files.prepend (f);
-        app_info.launch (files, new Gdk.AppLaunchContext ());
+        try
+        {
+          var app_info = f.query_default_handler (null);
+          List<File> files = new List<File> ();
+          files.prepend (f);
+          app_info.launch (files, new Gdk.AppLaunchContext ());
+        }
+        catch (Error err)
+        {
+          warning ("%s", err.message);
+        }
       }
 
       public override bool valid_for_match (Match match)
