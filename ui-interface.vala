@@ -58,7 +58,7 @@ namespace Sezen
   {
     // FIXME: the partial timeout should be the shortest possible
     //        to send to the user an "instant" response
-    private const int PARTIAL_TIMEOUT = 100;
+    private const int PARTIAL_TIMEOUT = 60;
     private DataSink data_sink;
     private enum T 
     {
@@ -152,6 +152,7 @@ namespace Sezen
         Source.remove (tid);
         tid = 0;
       }
+      data_sink.cancel_search ();
       focus_index = {0, 0};
       focus = {null, null};
       results = {null, null};
@@ -243,10 +244,11 @@ namespace Sezen
     {
       try
       {
+        results[T.MATCH] = data_sink.search.end (res);
+        /* Do not write code before this line */
+
         /* Search not cancelled and ready */
         set_throbber_visible (false);
-        /* set new results */
-        results[T.MATCH] = data_sink.search.end (res);
         if (tid != 0)
         {
           Source.remove (tid);
