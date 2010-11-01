@@ -4,6 +4,7 @@ SRC_FILES = \
 	match.vala \
 	query.vala \
 	dbus-service.vala \
+	command-plugin.vala \
 	desktop-file-plugin.vala \
 	hybrid-search-plugin.vala \
 	gnome-session-plugin.vala \

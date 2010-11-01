@@ -182,6 +182,8 @@ namespace Sezen
                        "data-sink", this, null) as DataPlugin);
       register_plugin (Object.new (typeof (UPowerPlugin),
                        "data-sink", this, null) as DataPlugin);
+      register_plugin (Object.new (typeof (CommandPlugin),
+                       "data-sink", this, null) as DataPlugin);
 #if TEST_PLUGINS
       register_plugin (Object.new (typeof (TestSlowPlugin),
                        "data-sink", this, null) as DataPlugin);
@@ -256,7 +258,7 @@ namespace Sezen
       return current_result_set.get_sorted_list ();
     }
 
-    public Gee.List<Match> find_action_for_match (Match match, string? query)
+    public Gee.List<Match> find_actions_for_match (Match match, string? query)
     {
       var rs = new ResultSet ();
       var q = Query (query ?? "");

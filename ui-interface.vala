@@ -70,6 +70,7 @@ namespace Sezen
     private Gee.List<Match>? results[2];
     private QueryFlags qf;
     private string search[2];
+    private Cancellable current_cancellable;
     
     private uint tid; //for timer
     
@@ -77,6 +78,7 @@ namespace Sezen
     {
       tid = 0;
       data_sink = new DataSink();
+      current_cancellable = new Cancellable ();
       reset_search (false);
     }
     /* UI must do the following things */
@@ -152,7 +154,7 @@ namespace Sezen
         Source.remove (tid);
         tid = 0;
       }
-      data_sink.cancel_search ();
+      current_cancellable.cancel ();
       focus_index = {0, 0};
       focus = {null, null};
       results = {null, null};
@@ -202,7 +204,8 @@ namespace Sezen
         Source.remove (tid);
         tid = 0;
       }
-      data_sink.cancel_search ();
+      current_cancellable.cancel ();
+      current_cancellable = new Cancellable ();
 
       if (search[T.MATCH] == "")
       {
@@ -213,17 +216,18 @@ namespace Sezen
       focus[T.MATCH] = null;
       focus_index[T.MATCH] = 0;
 
+      var rs = new ResultSet ();
       tid = Timeout.add (PARTIAL_TIMEOUT, () => {
           tid = 0;
-          _send_partial_results ();
+          _send_partial_results (rs);
           return false;
       });
-      data_sink.search (search[T.MATCH], qf, _search_ready);
+      data_sink.search (search[T.MATCH], qf, rs, current_cancellable, _search_ready);
     }
     
-    private void _send_partial_results ()
+    private void _send_partial_results (ResultSet rs)
     {
-      results[T.MATCH] = data_sink.get_partial_results ();
+      results[T.MATCH] = rs.get_sorted_list ();
       if (results[T.MATCH].size > 0)
       {
         focus[T.MATCH] = results[T.MATCH].first();
@@ -294,7 +298,7 @@ namespace Sezen
         update_action_result_list (null, 0, null);
         return;
       }
-      results[T.ACTION] = data_sink.find_action_for_match (focus[T.MATCH], search[T.ACTION]);
+      results[T.ACTION] = data_sink.find_actions_for_match (focus[T.MATCH], search[T.ACTION]);
       if (results[T.ACTION].size > 0)
       {
         focus[T.ACTION] = results[T.ACTION].first();

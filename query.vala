@@ -75,6 +75,15 @@ namespace Sezen
         throw new SearchError.SEARCH_CANCELLED ("Cancelled");
       }
     }
+    
+    public const int MATCH_EXACT = 100;
+    public const int MATCH_PREFIX = 90;
+    public const int MATCH_WORD_PREFIX = 85;
+    public const int MATCH_MULTIPLE_WORDS = 80;
+    public const int MATCH_MULTIPLE_WORDS_REVERSED = 78;
+    public const int MATCH_SUBSTRING = 75;
+    public const int MATCH_FIRST_LETTERS = 70;
+    public const int MATCH_FUZZY = 50;
 
     public static Gee.List<Gee.Map.Entry<Regex, int>>
     get_matchers_for_query (string query,
@@ -100,7 +109,7 @@ namespace Sezen
       try
       {
         re = new Regex ("^(%s)$".printf (Regex.escape_string (query)), flags);
-        results[re] = 100;
+        results[re] = MATCH_EXACT;
       }
       catch (RegexError err)
       {
@@ -109,7 +118,7 @@ namespace Sezen
       try
       {
         re = new Regex ("^(%s)".printf (Regex.escape_string (query)), flags);
-        results[re] = 90;
+        results[re] = MATCH_PREFIX;
       }
       catch (RegexError err)
       {
@@ -118,7 +127,7 @@ namespace Sezen
       try
       {
         re = new Regex ("\\b(%s)".printf (Regex.escape_string (query)), flags);
-        results[re] = 85;
+        results[re] = MATCH_WORD_PREFIX;
       }
       catch (RegexError err)
       {
@@ -139,7 +148,7 @@ namespace Sezen
         try
         {
           re = new Regex (pattern, flags);
-          results[re] = 80;
+          results[re] = MATCH_MULTIPLE_WORDS;
         }
         catch (RegexError err)
         {
@@ -157,7 +166,7 @@ namespace Sezen
             try
             {
               re = new Regex (reversed, flags);
-              results[re] = 78;
+              results[re] = MATCH_MULTIPLE_WORDS_REVERSED;
             }
             catch (RegexError err)
             {
@@ -177,7 +186,7 @@ namespace Sezen
             try
             {
               re = new Regex (any_order, flags);
-              results[re] = 76;
+              results[re] = MATCH_MULTIPLE_WORDS_REVERSED - 1;
             }
             catch (RegexError err)
             {
@@ -191,7 +200,7 @@ namespace Sezen
         try
         {
           re = new Regex ("(%s)".printf (Regex.escape_string (query)), flags);
-          results[re] = 75;
+          results[re] = MATCH_SUBSTRING;
         }
         catch (RegexError err)
         {
@@ -214,7 +223,7 @@ namespace Sezen
         try
         {
           re = new Regex (pattern, flags);
-          results[re] = 70;
+          results[re] = MATCH_FIRST_LETTERS;
         }
         catch (RegexError err)
         {
@@ -228,7 +237,7 @@ namespace Sezen
         try
         {
           re = new Regex (pattern, flags);
-          results[re] = 50;
+          results[re] = MATCH_FUZZY;
         }
         catch (RegexError err)
         {

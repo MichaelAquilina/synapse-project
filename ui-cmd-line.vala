@@ -41,7 +41,7 @@ int main (string[] argv)
         foreach (var match in rs)
         {
           print (">> %s\n", match.title);
-          var actions = sink.find_action_for_match (match, null);
+          var actions = sink.find_actions_for_match (match, null);
           if (actions.size > 0) print ("  > %s\n", actions[0].title);
         }
       }
