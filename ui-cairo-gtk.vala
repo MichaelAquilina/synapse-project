@@ -30,19 +30,19 @@ namespace Sezen
   {
     Window window;
     /* Main UI shared components */
-    private NamedIcon match_icon = null;
-    private NamedIcon match_icon_thumb = null;
-    private Label match_label = null;
-    private Label match_label_description = null;
-    private NamedIcon action_icon = null;
-    private Label action_label = null;
-    private HSelectionContainer flag_selector = null;
-    private HBox top_hbox = null;
-    private VBox container = null;
-    private VBox container_top = null;
-    private ContainerOverlayed match_icon_container_overlayed = null;
-    private ResultBox result_box = null;
-    private Sezen.Throbber throbber = null;
+    protected NamedIcon match_icon = null;
+    protected NamedIcon match_icon_thumb = null;
+    protected Label match_label = null;
+    protected Label match_label_description = null;
+    protected NamedIcon action_icon = null;
+    protected Label action_label = null;
+    protected HSelectionContainer flag_selector = null;
+    protected HBox top_hbox = null;
+    protected VBox container = null;
+    protected VBox container_top = null;
+    protected ContainerOverlayed match_icon_container_overlayed = null;
+    protected ResultBox result_box = null;
+    protected Sezen.Throbber throbber = null;
 
     private const int UI_WIDTH = 600; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -90,7 +90,7 @@ namespace Sezen
       window.key_press_event.connect (key_press_event);
     }
 
-    private void build_ui ()
+    protected virtual void build_ui ()
     {
       container = new VBox (false, 0);
       window.add (container);
@@ -181,7 +181,7 @@ namespace Sezen
       container.show_all ();
     }
     
-    private void on_composited_changed (Widget w)
+    protected virtual void on_composited_changed (Widget w)
     {
       Gdk.Screen screen = w.get_screen ();
       bool comp = screen.is_composited ();
@@ -200,7 +200,7 @@ namespace Sezen
       this.hide_and_reset ();
     }
     
-    private void set_input_mask ()
+    protected virtual void set_input_mask ()
     {
       Requisition req = {0, 0};
       window.size_request (out req);
@@ -243,7 +243,7 @@ namespace Sezen
       window.input_shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
     }
     
-    private bool on_expose (Widget widget, Gdk.EventExpose event) {
+    protected virtual bool on_expose (Widget widget, Gdk.EventExpose event) {
       bool comp = widget.is_composited ();
       var ctx = Gdk.cairo_create (widget.window);
       ctx.set_operator (Operator.CLEAR);
@@ -401,7 +401,7 @@ namespace Sezen
       window.present_with_time (timestamp);
     }
     
-    protected bool key_press_event (Gdk.EventKey event)
+    protected virtual bool key_press_event (Gdk.EventKey event)
     {
       if (im_context.filter_keypress (event)) return true;
 
@@ -670,43 +670,6 @@ namespace Sezen
           set_list_visible (false);
       }
       focus_action (index, action);
-    }
-    
-    public static int main (string[] argv)
-    {
-      Gtk.init (ref argv);
-      var window = new SezenWindow ();
-      window.show ();
-
-      var registry = GtkHotkey.Registry.get_default ();
-      GtkHotkey.Info hotkey;
-      try
-      {
-        if (registry.has_hotkey ("sezen2", "activate"))
-        {
-          hotkey = registry.get_hotkey ("sezen2", "activate");
-        }
-        else
-        {
-          hotkey = new GtkHotkey.Info ("sezen2", "activate",
-                                       "<Control>space", null);
-          registry.store_hotkey (hotkey);
-        }
-        debug ("Binding activation to %s", hotkey.signature);
-        hotkey.bind ();
-        hotkey.activated.connect ((event_time) =>
-        {
-          window.show ();
-          window.present_with_time (event_time);
-        });
-      }
-      catch (Error err)
-      {
-        warning ("%s", err.message);
-      }
-
-      Gtk.main ();
-      return 0;
     }
   }
 }

@@ -34,11 +34,11 @@ gtk: all
 cmd: SRC_FILES += ui-cmd-line.vala
 cmd: all
 
-cairo: SRC_FILES += ui-cairo-gtk.vala ui-interface.vala ui-widgets.vala ui-utils.vala
+cairo: SRC_FILES += ui-cairo-gtk.vala ui-interface.vala ui-widgets.vala ui-utils.vala ui-cairo-gtk-launcher.vala
 cairo: all
 
 cairodebug: VALA_FLAGS += -C
-cairodebug: SRC_FILES += ui-cairo-gtk.vala ui-interface.vala ui-widgets.vala ui-utils.vala
+cairodebug: SRC_FILES += ui-cairo-gtk.vala ui-interface.vala ui-widgets.vala ui-utils.vala ui-cairo-gtk-launcher.vala
 cairodebug: all
 
 FORCE:
