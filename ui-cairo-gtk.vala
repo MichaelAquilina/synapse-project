@@ -197,19 +197,17 @@ namespace Sezen
       if (comp)
         container.border_width = SHADOW_SIZE;
       else
-        container.border_width = 0;
+        container.border_width = 2;
+      this.hide_and_reset ();
     }
     
     private void set_input_mask ()
     {
       Requisition req = {0, 0};
-      result_box.size_request (out req);
+      window.size_request (out req);
+      int w = req.width, h = req.height;
       bool composited = window.is_composited ();
-      var bitmap = new Gdk.Pixmap (null, window.allocation.width,
-                                         container_top.allocation.height + 
-                                         (int)container.border_width * 2 +
-                                         (list_visible ? req.height : 0),
-                                         1);
+      var bitmap = new Gdk.Pixmap (null, w, h, 1);
       var ctx = Gdk.cairo_create (bitmap);
       ctx.set_operator (Cairo.Operator.CLEAR);
       ctx.paint ();
@@ -228,15 +226,12 @@ namespace Sezen
         ctx.fill ();
         if (list_visible)
         {
-          debug ("%d %d %d %d", (window.allocation.width - req.width) / 2,
-                                container_top.allocation.height,
-                                req.width,
-                                req.height);
-                                  
-          ctx.rectangle ((window.allocation.width - req.width) / 2,
+          result_box.size_request (out req);
+              
+          ctx.rectangle ((w - req.width) / 2,
                          container_top.allocation.height,
                          req.width,
-                         req.height);
+                         h - container_top.allocation.height);
           ctx.fill ();
         }
       }
@@ -302,6 +297,7 @@ namespace Sezen
                                   double.max(g - 0.15, 0),
                                   double.max(b - 0.15, 0),
                                   0.95);
+
       _cairo_path_for_main (ctx, comp, x, y, w, h);
       ctx.set_source (pat);
       ctx.set_operator (Operator.SOURCE);
@@ -333,6 +329,8 @@ namespace Sezen
       {
         w = container.allocation.width;
         h = container.allocation.height;
+        x = container.allocation.x;
+        y = container.allocation.y;
         ctx.rectangle (x, y, w, h);
       }
     }
