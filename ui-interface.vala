@@ -286,6 +286,7 @@ namespace Sezen
         else
         {
           focus[T.MATCH] = null;
+          focus_index[T.MATCH] = 0;
         }
 
         update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);

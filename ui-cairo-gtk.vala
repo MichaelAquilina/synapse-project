@@ -392,6 +392,7 @@ namespace Sezen
       window.hide ();
       set_list_visible (false);
       flag_selector.select (3);
+      searching_for_matches = true;
       reset_search ();
     }
     
