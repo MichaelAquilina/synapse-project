@@ -265,10 +265,15 @@ namespace Sezen
             /* The magic is here, remove che current focus from the new list */
             /* and then reinsert it in the current focus position */
             int i = results[T.MATCH].index_of (focus[T.MATCH]);
-            if (i != focus_index[T.MATCH])
+            if (i > 0)
             {
-              results[T.MATCH].remove_at (i);
-              results[T.MATCH].insert (focus_index[T.MATCH], focus[T.MATCH]);
+              focus_index[T.MATCH] = i;
+            }
+            else
+            {
+              // cannot find the item! That's impossible! Btw, select the first item
+              focus_index[T.MATCH] = 0;
+              focus[T.MATCH] = results[T.MATCH].first ();
             }
           }
           else
