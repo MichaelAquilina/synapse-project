@@ -31,6 +31,7 @@ namespace Sezen
     Window window;
     /* Main UI shared components */
     private Image match_icon = null;
+    private string match_icon_name = "";
     private Image match_icon_thumb = null;
     private Label match_label = null;
     private Label match_label_description = null;
@@ -392,6 +393,7 @@ namespace Sezen
       window.hide ();
       set_list_visible (false);
       flag_selector.select (3);
+      searching_for_matches = true;
       reset_search ();
     }
     
@@ -596,12 +598,16 @@ namespace Sezen
           match_label_description.set_markup (
             get_description_markup (throbber.is_animating ()? "Searching..." : "Match not found.")
           );
-          match_icon.set_from_icon_name ("search", IconSize.DIALOG);
+          if (match_icon_name != "search")
+            match_icon.set_from_icon_name ("search", IconSize.DIALOG);
+          match_icon_name = "search";
           match_icon_thumb.clear ();
         }
         else
         {
-          match_icon.set_from_icon_name ("search", IconSize.DIALOG);
+          if (match_icon_name != "search")
+            match_icon.set_from_icon_name ("search", IconSize.DIALOG);
+          match_icon_name = "search";
           match_icon_thumb.clear ();
           match_label.set_markup (
             Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",
@@ -616,7 +622,9 @@ namespace Sezen
       {
         try
         {
-          match_icon.set_from_gicon (GLib.Icon.new_for_string (match.icon_name), IconSize.DIALOG);
+          if (match_icon_name != match.icon_name)
+            match_icon.set_from_gicon (GLib.Icon.new_for_string (match.icon_name), IconSize.DIALOG);
+          match_icon_name = match.icon_name;
           if (match.has_thumbnail)
             match_icon_thumb.set_from_gicon (GLib.Icon.new_for_string (match.thumbnail_path), IconSize.DIALOG);
           else
@@ -624,7 +632,9 @@ namespace Sezen
         }
         catch (Error err)
         {
-          match_icon.set_from_icon_name ("missing-image", IconSize.DIALOG);
+          if (match_icon_name != "missing-image")
+            match_icon.set_from_icon_name ("missing-image", IconSize.DIALOG);
+          match_icon_name = "missing-image";
           match_icon_thumb.clear ();
         }
         match_label.set_markup (markup_string_with_search (match.title, get_match_search (), size));

@@ -58,7 +58,7 @@ namespace Sezen
   {
     // FIXME: the partial timeout should be the shortest possible
     //        to send to the user an "instant" response
-    private const int PARTIAL_TIMEOUT = 60;
+    private const int PARTIAL_TIMEOUT = 100;
     private DataSink data_sink;
     private enum T 
     {
@@ -195,15 +195,11 @@ namespace Sezen
     protected Gee.List<Match>? get_match_results () {return results[T.MATCH];}
     protected void get_action_focus (out int index, out Match? action) {index = focus_index[T.ACTION]; action = focus[T.ACTION];}
     protected void get_match_focus (out int index, out Match? match) {index = focus_index[T.MATCH]; match = focus[T.MATCH];}
+
+    protected ResultSet last_result_set;
     
     private void search_for_matches ()
     {
-      /* STOP current search */
-      if (tid != 0)
-      {
-        Source.remove (tid);
-        tid = 0;
-      }
       current_cancellable.cancel ();
       current_cancellable = new Cancellable ();
 
@@ -216,13 +212,16 @@ namespace Sezen
       focus[T.MATCH] = null;
       focus_index[T.MATCH] = 0;
 
-      var rs = new ResultSet ();
-      tid = Timeout.add (PARTIAL_TIMEOUT, () => {
-          tid = 0;
-          _send_partial_results (rs);
-          return false;
-      });
-      data_sink.search (search[T.MATCH], qf, rs, current_cancellable, _search_ready);
+      last_result_set = new ResultSet ();
+      if (tid == 0)
+      {
+        tid = Timeout.add (PARTIAL_TIMEOUT, () => {
+            tid = 0;
+            _send_partial_results (this.last_result_set);
+            return false;
+        });
+      }
+      data_sink.search (search[T.MATCH], qf, last_result_set, current_cancellable, _search_ready);
     }
     
     private void _send_partial_results (ResultSet rs)
@@ -286,6 +285,7 @@ namespace Sezen
         else
         {
           focus[T.MATCH] = null;
+          focus_index[T.MATCH] = 0;
         }
 
         update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);
