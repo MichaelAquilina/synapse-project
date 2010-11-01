@@ -593,7 +593,9 @@ namespace Sezen
         if (get_match_search () != "")
         {
           match_label.set_markup (markup_string_with_search ("", get_match_search (), size));
-          match_label_description.set_markup (get_description_markup ("Match not found."));
+          match_label_description.set_markup (
+            get_description_markup (throbber.is_animating ()? "Searching..." : "Match not found.")
+          );
           match_icon.set_from_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
         }
@@ -1247,6 +1249,11 @@ namespace Sezen
     {
       step = 0;
       animate = false;
+    }
+    
+    public bool is_animating ()
+    {
+      return animate;
     }
 
     public void start ()
