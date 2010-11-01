@@ -24,6 +24,26 @@ namespace Sezen
   namespace Utils
   {
     private static Gdk.Pixmap transparent_pixmap = null;
+    private static string home_directory = null;
+    private static long home_directory_length = 0;
+    
+    public static string replace_home_path_with (string path, string replace)
+    {
+    	if (home_directory == null)
+    	{
+    		home_directory = Environment.get_home_dir ();
+    		home_directory_length = home_directory.length;
+    	}
+      if (path.has_prefix (home_directory))
+      {
+      	return replace + path.substring (
+      						home_directory_length + 
+      						(path.length > home_directory_length ? 1 : 0)
+      					);
+      }
+      else
+      	return path;
+    }
     
     public static void make_transparent_bg (Gtk.Widget widget)
     {

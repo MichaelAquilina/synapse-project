@@ -572,25 +572,10 @@ namespace Sezen
       }
     }
 
-    private unowned string home_directory = null;
-    private unowned long home_directory_length = 0;
-
     private string get_description_markup (string s)
     {
-      if (home_directory == null)
-      {
-        home_directory = Environment.get_home_dir ();
-        home_directory_length = home_directory.length;
-      }
-      if (s.has_prefix (home_directory))
-      {
-        long offset = home_directory_length;
-        if (s.length > home_directory_length) offset++;
-        return Markup.printf_escaped ("<span size=\"medium\">%s %s</span>", 
-                                      "Home >", // FIXME: i18n
-                                      s.substring (offset));
-      }
-      return Markup.printf_escaped ("<span size=\"medium\">%s</span>", s);
+      // FIXME: i18n
+      return Markup.printf_escaped ("<span size=\"medium\">%s</span>", Utils.replace_home_path_with (s, "Home > "));
     }
     
     /* UI INTERFACE IMPLEMENTATION */

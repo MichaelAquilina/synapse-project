@@ -152,12 +152,14 @@ namespace Sezen
         return;
       }
       no_results = false;
+      string desc;
       TreeIter iter;
       foreach (Match m in rs)
       {
         results.append (out iter);
+        desc = Utils.replace_home_path_with (m.description, "Home > "); // FIXME: i18n        
         results.set (iter, Column.IconColumn, GLib.Icon.new_for_string(m.icon_name), Column.NameColumn, 
-                     Markup.printf_escaped ("<span><b>%s</b></span>\n<span size=\"small\">%s</span>",m.title, m.description));
+                     Markup.printf_escaped ("<span><b>%s</b></span>\n<span size=\"small\">%s</span>",m.title, desc));
       }
       var sel = view.get_selection ();
       sel.select_path (new TreePath.first());
