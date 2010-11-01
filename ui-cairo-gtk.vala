@@ -111,7 +111,7 @@ namespace Sezen
       /* Top Hbox */
       top_hbox = new HBox (false, 0);
       /* Match Description */
-      match_label_description = new Label ("descrizione");
+      match_label_description = new Label (null);
       match_label_description.set_alignment (0, 0);
       match_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
       match_label_description.set_line_wrap (true);
@@ -804,13 +804,14 @@ namespace Sezen
       var status_box = new HBox (false, 0);
       status_box.set_size_request (-1, 15);
       vbox.pack_start (status_box, false);
-      status = new Label ("");
+      status = new Label (null);
       status.set_alignment (0, 0);
       status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
-      var logo = new Label ("");
+      var logo = new Label (null);
       logo.set_alignment (1, 0);
       logo.set_markup (Markup.printf_escaped ("<i>Sezen 2 </i>"));
-      status_box.pack_start (status, true, true, 10);
+      status_box.pack_start (status, false, false, 10);
+      status_box.pack_start (new Label (null), true, false);
       status_box.pack_start (logo, false, false, 10);
       
       view = new TreeView ();

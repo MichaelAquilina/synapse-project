@@ -81,7 +81,7 @@ namespace Sezen
         }
         
         var stripped = q.query_string.strip ();
-        if (stripped == null) return null;
+        if (stripped == "") return null;
         string[] args = split_regex.split (stripped);
         string? valid_cmd = Environment.find_program_in_path (args[0]);
 
