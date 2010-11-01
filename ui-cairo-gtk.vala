@@ -45,12 +45,12 @@ namespace Sezen
     private Sezen.Throbber throbber = null;
 
     private const int UI_WIDTH = 600; // height is dynamic
-    private const int PADDING = 10; // assinged to container_top's border width
+    private const int PADDING = 8; // assinged to container_top's border width
     private const int SHADOW_SIZE = 12; // assigned to containers's border width in composited
     private const int BORDER_RADIUS = 20;
     private const int ICON_SIZE = 172;
     private const int ACTION_ICON_SIZE = 64;
-    private const int TOP_SPACING = ICON_SIZE * 2 / 5;
+    private const int TOP_SPACING = ICON_SIZE * 3 / 7;
     
     private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
     private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
@@ -112,7 +112,6 @@ namespace Sezen
       /* Match Description */
       match_label_description = new Label ("descrizione");
       match_label_description.set_alignment (0, 0);
-      match_label_description.ypad = 5;
       match_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
       match_label_description.set_line_wrap (true);
       /* Packing Top Hbox with Match Desctiption into Top VBox*/
@@ -366,13 +365,7 @@ namespace Sezen
     private void search_add_char (string chr)
     {
       if (searching_for_matches)
-      {
-        string s = get_match_search() + chr;
-        match_label.set_markup (
-            markup_string_with_search (match_label.get_text(), s, "xx-large")
-          );
-        set_match_search (s);
-      }
+        set_match_search (get_match_search() + chr);
       else
         set_action_search (get_action_search() + chr);
     }
@@ -388,16 +381,12 @@ namespace Sezen
       {
         s = s.substring (0, len - 1);
         if (searching_for_matches)
-        {
-          match_label.set_markup (
-            markup_string_with_search (match_label.get_text(), s, "xx-large")
-          );
           set_match_search (s);
-        }else
+        else
           set_action_search (s);
       }
     }
-    
+
     private void hide_and_reset ()
     {
       window.hide ();
