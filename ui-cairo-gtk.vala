@@ -30,12 +30,11 @@ namespace Sezen
   {
     Window window;
     /* Main UI shared components */
-    private Image match_icon = null;
-    private string match_icon_name = "";
-    private Image match_icon_thumb = null;
+    private NamedIcon match_icon = null;
+    private NamedIcon match_icon_thumb = null;
     private Label match_label = null;
     private Label match_label_description = null;
-    private Image action_icon = null;
+    private NamedIcon action_icon = null;
     private Label action_label = null;
     private HSelectionContainer flag_selector = null;
     private HBox top_hbox = null;
@@ -121,9 +120,9 @@ namespace Sezen
       
       /* Match Icon packed into Top HBox */
       match_icon_container_overlayed = new ContainerOverlayed();
-      match_icon_thumb = new Image();
+      match_icon_thumb = new NamedIcon();
       match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
-      match_icon = new Image ();
+      match_icon = new NamedIcon ();
       match_icon.set_size_request (ICON_SIZE, ICON_SIZE);
       match_icon.set_pixel_size (ICON_SIZE);
       match_icon_container_overlayed.main = match_icon;
@@ -158,7 +157,7 @@ namespace Sezen
       
       /* Titles box and Action icon*/
       var labels_vbox = new VBox (false, 0); //FIXME: Omogeneus?
-      action_icon = new Image ();
+      action_icon = new NamedIcon ();
       action_icon.set_pixel_size (ACTION_ICON_SIZE);
       action_icon.set_alignment (0.5f, 0.5f);
       action_icon.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
@@ -598,16 +597,12 @@ namespace Sezen
           match_label_description.set_markup (
             get_description_markup (throbber.is_animating ()? "Searching..." : "Match not found.")
           );
-          if (match_icon_name != "search")
-            match_icon.set_from_icon_name ("search", IconSize.DIALOG);
-          match_icon_name = "search";
+          match_icon.set_icon_safe ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
         }
         else
         {
-          if (match_icon_name != "search")
-            match_icon.set_from_icon_name ("search", IconSize.DIALOG);
-          match_icon_name = "search";
+          match_icon.set_icon_safe ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
           match_label.set_markup (
             Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",
@@ -620,23 +615,12 @@ namespace Sezen
       }
       else
       {
-        try
-        {
-          if (match_icon_name != match.icon_name)
-            match_icon.set_from_gicon (GLib.Icon.new_for_string (match.icon_name), IconSize.DIALOG);
-          match_icon_name = match.icon_name;
-          if (match.has_thumbnail)
-            match_icon_thumb.set_from_gicon (GLib.Icon.new_for_string (match.thumbnail_path), IconSize.DIALOG);
-          else
-            match_icon_thumb.clear ();
-        }
-        catch (Error err)
-        {
-          if (match_icon_name != "missing-image")
-            match_icon.set_from_icon_name ("missing-image", IconSize.DIALOG);
-          match_icon_name = "missing-image";
+        match_icon.set_icon_safe (match.icon_name, IconSize.DIALOG);
+        if (match.has_thumbnail)
+          match_icon_thumb.set_icon_safe (match.thumbnail_path, IconSize.DIALOG);
+        else
           match_icon_thumb.clear ();
-        }
+
         match_label.set_markup (markup_string_with_search (match.title, get_match_search (), size));
         match_label_description.set_markup (get_description_markup (match.description));
         if (searching_for_matches)
@@ -651,20 +635,13 @@ namespace Sezen
       if (action == null)
       {
         action_icon.set_sensitive (false);
-        action_icon.set_from_icon_name ("system-run", IconSize.DIALOG);
+        action_icon.set_icon_safe ("system-run", IconSize.DIALOG);
         action_label.set_markup (markup_string_with_search ("", get_action_search(), size));
       }
       else
       {
         action_icon.set_sensitive (true);
-        try
-        {
-          action_icon.set_from_gicon (GLib.Icon.new_for_string (action.icon_name), IconSize.DIALOG);
-        }
-        catch (Error err)
-        {
-          action_icon.set_from_icon_name ("missing-image", IconSize.DIALOG);
-        }
+        action_icon.set_icon_safe (action.icon_name, IconSize.DIALOG);
         action_label.set_markup (markup_string_with_search (action.title,
                                  searching_for_matches ? 
                                  "" : get_action_search (), size));
@@ -1313,6 +1290,39 @@ namespace Sezen
         base.expose_event (event);
       }
       return true;
+    }
+  }
+  public class NamedIcon: Gtk.Image
+  {
+    public string not_found_name {get; set; default = "missing-image";}
+    private string current;
+    public NamedIcon ()
+    {
+      current = "";
+    }
+    public void set_icon_safe (string name, IconSize size)
+    {
+      if (name == current)
+        return;
+      else
+      {
+        try
+        {
+          this.set_from_gicon (GLib.Icon.new_for_string (name), size);
+          current = name;
+        }
+        catch (Error err)
+        {
+          if (current != not_found_name)
+          {
+            if (not_found_name == "")
+              this.clear ();
+            else
+              this.set_from_icon_name (not_found_name, IconSize.DIALOG);
+            current = not_found_name;
+          }
+        }
+      }
     }
   }
 }
