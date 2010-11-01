@@ -63,7 +63,8 @@ namespace Sezen
     public SezenWindow ()
     {
       window = new Window ();
-      window.set_default_icon_from_file ("sezen2-logo.svg");
+      window.skip_taskbar_hint = true;
+      window.skip_pager_hint = true;
       window.set_position (WindowPosition.CENTER);
       window.set_decorated (false);
       window.set_resizable (false);
