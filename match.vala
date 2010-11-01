@@ -47,5 +47,22 @@ namespace Sezen
       warning ("%s.execute () is not implemented", this.get_type ().name ());
     }
   }
+  
+  public class DefaultMatch: Object, Match
+  {
+    public string title { get; construct set; }
+    public string description { get; set; }
+    public string icon_name { get; construct set; }
+    public bool has_thumbnail { get; construct set; }
+    public string thumbnail_path { get; construct set; }
+    public string uri { get; set; }
+    public MatchType match_type { get; construct set; }
+    
+    public DefaultMatch(string query_string)
+    {
+      Object (title: query_string, description: "", has_thumbnail: false,
+              icon_name: "unknown", match_type: MatchType.UNKNOWN);
+    }
+  }
 }
 

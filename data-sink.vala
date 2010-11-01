@@ -122,6 +122,9 @@ namespace Sezen
     public unowned DataSink data_sink { get; construct; }
 
     public abstract async ResultSet? search (Query query) throws SearchError;
+
+    // weirdish kind of signal cause DataSink will be emitting it for the plugin
+    public signal void search_done (ResultSet rs);
   }
   
   public abstract class ActionPlugin : DataPlugin
@@ -191,8 +194,22 @@ namespace Sezen
       register_plugin (Object.new (typeof (CommonActions),
                        "data-sink", this, null) as DataPlugin);
     }
-
-    public signal void plugin_search_done (DataPlugin plugin, ResultSet rs);
+    
+    public unowned DataPlugin? get_plugin (string name)
+    {
+      unowned DataPlugin? result = null;
+      
+      foreach (var plugin in plugins)
+      {
+        if (plugin.get_type ().name () == name)
+        {
+          result = plugin;
+          break;
+        }
+      }
+      
+      return result;
+    }
 
     public async Gee.List<Match> search (string query,
                                          QueryFlags flags,
@@ -223,7 +240,7 @@ namespace Sezen
           try
           {
             var results = plugin.search.end (res);
-            plugin_search_done (plugin, results);
+            plugin.search_done (results); // FIXME: add a search_id param?
             current_result_set.add_all (results);
           }
           catch (SearchError err)
