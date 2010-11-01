@@ -206,6 +206,8 @@ namespace Sezen
 
       var current_result_set = dest_result_set ?? new ResultSet ();
       int search_size = plugins.size;
+      // FIXME: this is probably useless, if async method finishes immediately,
+      // it'll call complete_in_idle
       bool waiting = false;
 
       foreach (var data_plugin in plugins)
