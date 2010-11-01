@@ -35,6 +35,7 @@ namespace Sezen
 
     private IMContext im_context;
     private DataSink data_sink;
+    private Cancellable last_search_cancellable = new Cancellable ();
 
     construct
     {
@@ -58,7 +59,8 @@ namespace Sezen
           "Search > %s > %s".printf (search_type, search_string);
         head_label.set_text (label);
 
-        data_sink.cancel_search ();
+        last_search_cancellable.cancel ();
+        last_search_cancellable = new Cancellable ();
 
         if (!search_empty)
         {
@@ -70,6 +72,7 @@ namespace Sezen
             return false;
           });
           data_sink.search (this.search_string, QueryFlags.LOCAL_CONTENT,
+                            null, last_search_cancellable,
                             (obj, res) =>
           {
             if (timer_id != 0)
