@@ -597,12 +597,12 @@ namespace Sezen
           match_label_description.set_markup (
             get_description_markup (throbber.is_animating ()? "Searching..." : "Match not found.")
           );
-          match_icon.set_icon_safe ("search", IconSize.DIALOG);
+          match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
         }
         else
         {
-          match_icon.set_icon_safe ("search", IconSize.DIALOG);
+          match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
           match_label.set_markup (
             Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",
@@ -615,9 +615,9 @@ namespace Sezen
       }
       else
       {
-        match_icon.set_icon_safe (match.icon_name, IconSize.DIALOG);
+        match_icon.set_icon_name (match.icon_name, IconSize.DIALOG);
         if (match.has_thumbnail)
-          match_icon_thumb.set_icon_safe (match.thumbnail_path, IconSize.DIALOG);
+          match_icon_thumb.set_icon_name (match.thumbnail_path, IconSize.DIALOG);
         else
           match_icon_thumb.clear ();
 
@@ -635,13 +635,13 @@ namespace Sezen
       if (action == null)
       {
         action_icon.set_sensitive (false);
-        action_icon.set_icon_safe ("system-run", IconSize.DIALOG);
+        action_icon.set_icon_name ("system-run", IconSize.DIALOG);
         action_label.set_markup (markup_string_with_search ("", get_action_search(), size));
       }
       else
       {
         action_icon.set_sensitive (true);
-        action_icon.set_icon_safe (action.icon_name, IconSize.DIALOG);
+        action_icon.set_icon_name (action.icon_name, IconSize.DIALOG);
         action_label.set_markup (markup_string_with_search (action.title,
                                  searching_for_matches ? 
                                  "" : get_action_search (), size));
@@ -1300,7 +1300,7 @@ namespace Sezen
     {
       current = "";
     }
-    public void set_icon_safe (string name, IconSize size)
+    public void set_icon_name (string name, IconSize size)
     {
       if (name == current)
         return;
