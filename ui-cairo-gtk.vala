@@ -411,7 +411,6 @@ namespace Sezen
         case Gdk.KeySyms.Return:
         case Gdk.KeySyms.KP_Enter:
         case Gdk.KeySyms.ISO_Enter:
-          debug ("enter pressed");
           if (execute ())
             hide_and_reset ();
           break;
@@ -420,7 +419,6 @@ namespace Sezen
           search_delete_char ();
           break;
         case Gdk.KeySyms.Escape:
-          debug ("escape");
           if (!searching_for_matches)
           {
             set_action_search ("");
@@ -501,7 +499,7 @@ namespace Sezen
           window.queue_draw ();
           break;
         default:
-          debug ("im_context didn't filter...");
+          //debug ("im_context didn't filter...");
           break;
       }
 
