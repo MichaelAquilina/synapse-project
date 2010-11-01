@@ -40,8 +40,15 @@ namespace Sezen
       {
         bool is_sudo = command.has_prefix ("sudo ");
         AppInfoCreateFlags flags = is_sudo ? AppInfoCreateFlags.NEEDS_TERMINAL : 0;
-        var app = AppInfo.create_from_commandline (command, null, flags);
-        app.launch (null, null);
+        try
+        {
+          var app = AppInfo.create_from_commandline (command, null, flags);
+          app.launch (null, null);
+        }
+        catch (Error err)
+        {
+          warning ("%s", err.message);
+        }
       }
       
       public CommandObject (string cmd)
@@ -57,7 +64,14 @@ namespace Sezen
     construct
     {
       past_commands = new Gee.HashSet<string> ();
-      split_regex = new Regex ("\\s+", RegexCompileFlags.OPTIMIZE);
+      try
+      {
+        split_regex = new Regex ("\\s+", RegexCompileFlags.OPTIMIZE);
+      }
+      catch (RegexError err)
+      {
+        critical ("%s", err.message);
+      }
     }
 
     public override async ResultSet? search (Query q) throws SearchError

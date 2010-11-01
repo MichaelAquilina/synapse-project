@@ -130,7 +130,6 @@ namespace Sezen
     public override async ResultSet? search (Query query) throws SearchError
     {
       assert_not_reached ();
-      return null;
     }
   }
 

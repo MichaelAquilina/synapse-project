@@ -97,13 +97,20 @@ namespace Sezen
 
       public override void do_action ()
       {
-        var connection = DBus.Bus.get (DBus.BusType.SYSTEM);
-        var dbus_interface = (UPowerObject)
-          connection.get_object (UPowerObject.UNIQUE_NAME,
-                                 UPowerObject.OBJECT_PATH,
-                                 UPowerObject.INTERFACE_NAME);
+        try
+        {
+          var connection = DBus.Bus.get (DBus.BusType.SYSTEM);
+          var dbus_interface = (UPowerObject)
+            connection.get_object (UPowerObject.UNIQUE_NAME,
+                                   UPowerObject.OBJECT_PATH,
+                                   UPowerObject.INTERFACE_NAME);
 
-        dbus_interface.suspend ();
+          dbus_interface.suspend ();
+        }
+        catch (DBus.Error err)
+        {
+          warning ("%s", err.message);
+        }
       }
     }
 
@@ -148,13 +155,20 @@ namespace Sezen
 
       public override void do_action ()
       {
-        var connection = DBus.Bus.get (DBus.BusType.SYSTEM);
-        var dbus_interface = (UPowerObject)
-          connection.get_object (UPowerObject.UNIQUE_NAME,
-                                 UPowerObject.OBJECT_PATH,
-                                 UPowerObject.INTERFACE_NAME);
+        try
+        {
+          var connection = DBus.Bus.get (DBus.BusType.SYSTEM);
+          var dbus_interface = (UPowerObject)
+            connection.get_object (UPowerObject.UNIQUE_NAME,
+                                   UPowerObject.OBJECT_PATH,
+                                   UPowerObject.INTERFACE_NAME);
 
-        dbus_interface.hibernate ();
+          dbus_interface.hibernate ();
+        }
+        catch (DBus.Error err)
+        {
+          warning ("%s", err.message);
+        }
       }
     }
 

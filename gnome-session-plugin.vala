@@ -56,13 +56,20 @@ namespace Sezen
       
       public void execute (Match? match)
       {
-        var connection = DBus.Bus.get (DBus.BusType.SESSION);
-        var dbus_interface = (GnomeSessionManager)
-          connection.get_object (GnomeSessionManager.UNIQUE_NAME,
-                                 GnomeSessionManager.OBJECT_PATH,
-                                 GnomeSessionManager.INTERFACE_NAME);
+        try
+        {
+          var connection = DBus.Bus.get (DBus.BusType.SESSION);
+          var dbus_interface = (GnomeSessionManager)
+            connection.get_object (GnomeSessionManager.UNIQUE_NAME,
+                                   GnomeSessionManager.OBJECT_PATH,
+                                   GnomeSessionManager.INTERFACE_NAME);
 
-        dbus_interface.shutdown ();
+          dbus_interface.shutdown ();
+        }
+        catch (DBus.Error err)
+        {
+          warning ("%s", err.message);
+        }
       }
     }
 
@@ -86,13 +93,20 @@ namespace Sezen
       
       public void execute (Match? match)
       {
-        var connection = DBus.Bus.get (DBus.BusType.SESSION);
-        var dbus_interface = (GnomeSessionManager)
-          connection.get_object (GnomeSessionManager.UNIQUE_NAME,
-                                 GnomeSessionManager.OBJECT_PATH,
-                                 GnomeSessionManager.INTERFACE_NAME);
+        try
+        {
+          var connection = DBus.Bus.get (DBus.BusType.SESSION);
+          var dbus_interface = (GnomeSessionManager)
+            connection.get_object (GnomeSessionManager.UNIQUE_NAME,
+                                   GnomeSessionManager.OBJECT_PATH,
+                                   GnomeSessionManager.INTERFACE_NAME);
 
-        dbus_interface.request_reboot ();
+          dbus_interface.request_reboot ();
+        }
+        catch (DBus.Error err)
+        {
+          warning ("%s", err.message);
+        }
       }
     }
 
@@ -116,13 +130,20 @@ namespace Sezen
       
       public void execute (Match? match)
       {
-        var connection = DBus.Bus.get (DBus.BusType.SESSION);
-        var dbus_interface = (GnomeSessionManager)
-          connection.get_object (GnomeSessionManager.UNIQUE_NAME,
-                                 GnomeSessionManager.OBJECT_PATH,
-                                 GnomeSessionManager.INTERFACE_NAME);
+        try
+        {
+          var connection = DBus.Bus.get (DBus.BusType.SESSION);
+          var dbus_interface = (GnomeSessionManager)
+            connection.get_object (GnomeSessionManager.UNIQUE_NAME,
+                                   GnomeSessionManager.OBJECT_PATH,
+                                   GnomeSessionManager.INTERFACE_NAME);
 
-        dbus_interface.logout ();
+          dbus_interface.logout ();
+        }
+        catch (DBus.Error err)
+        {
+          warning ("%s", err.message);
+        }
       }
     }
 
@@ -144,24 +165,32 @@ namespace Sezen
     
     private bool check_name_owner ()
     {
-      connection = DBus.Bus.get (DBus.BusType.SESSION);
-      var dbus_interface = (FreeDesktopDBus)
-        connection.get_object (FreeDesktopDBus.UNIQUE_NAME,
-                               FreeDesktopDBus.OBJECT_PATH,
-                               FreeDesktopDBus.INTERFACE_NAME);
-
-      dbus_interface.name_has_owner ("org.gnome.SessionManager", (obj, res) =>
+      try
       {
-        try
+        connection = DBus.Bus.get (DBus.BusType.SESSION);
+        var dbus_interface = (FreeDesktopDBus)
+          connection.get_object (FreeDesktopDBus.UNIQUE_NAME,
+                                 FreeDesktopDBus.OBJECT_PATH,
+                                 FreeDesktopDBus.INTERFACE_NAME);
+
+        dbus_interface.name_has_owner (GnomeSessionManager.INTERFACE_NAME, 
+                                       (obj, res) =>
         {
-          session_manager_available = dbus_interface.name_has_owner.end (res);
-        }
-        catch (Error err)
-        {
-        }
-        debug ("we %s org.gnome.SessionManager", session_manager_available ? "got" : "don't have");
-        checks_done = true;
-      });
+          try
+          {
+            session_manager_available = dbus_interface.name_has_owner.end (res);
+          }
+          catch (Error err)
+          {
+          }
+          debug ("we %s org.gnome.SessionManager", session_manager_available ? "got" : "don't have");
+          checks_done = true;
+        });
+      }
+      catch (DBus.Error err)
+      {
+        warning ("%s", err.message);
+      }
 
       return false;
     }
