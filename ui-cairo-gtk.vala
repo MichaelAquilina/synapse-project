@@ -30,23 +30,23 @@ namespace Sezen
   {
     Window window;
     /* Main UI shared components */
-    private Image main_image = null;
-    private Image main_image_overlay = null;
-    private Label main_label = null;
-    private Label main_label_description = null;
-    private Image action_image = null;
+    private Image match_icon = null;
+    private Image match_icon_thumb = null;
+    private Label match_label = null;
+    private Label match_label_description = null;
+    private Image action_icon = null;
     private Label action_label = null;
-    private HSelectionContainer sts = null;
+    private HSelectionContainer flag_selector = null;
     private HBox top_hbox = null;
     private VBox container = null;
-    private VBox top_vbox = null;
-    private ContainerOverlayed gco_main = null;
+    private VBox container_top = null;
+    private ContainerOverlayed match_icon_container_overlayed = null;
     private ResultBox result_box = null;
     private Sezen.Throbber throbber = null;
-    
+
     private const int UI_WIDTH = 600; // height is dynamic
-    private const int PADDING = 10; // assinged to top_vbox's border width
-    private const int SHADOW_SIZE = 12; // assigned to window's border width in composited
+    private const int PADDING = 10; // assinged to container_top's border width
+    private const int SHADOW_SIZE = 12; // assigned to containers's border width in composited
     private const int BORDER_RADIUS = 20;
     private const int ICON_SIZE = 172;
     private const int ACTION_ICON_SIZE = 64;
@@ -92,63 +92,64 @@ namespace Sezen
 
     private void build_ui ()
     {
-      /* Constructing Main Areas*/
-      top_vbox = new VBox (false, 0);
-      top_vbox.set_size_request (UI_WIDTH, -1);
-      top_vbox.border_width = PADDING;
-      /* Container for the top area */
       container = new VBox (false, 0);
-      container.pack_start (top_vbox);
-      /* Result box */
+      window.add (container);
+
+      /* ==> Top container */
+      container_top = new VBox (false, 0);
+      container_top.set_size_request (UI_WIDTH, -1);
+      container_top.border_width = PADDING;
+      /* ==> Result box */
       result_box = new ResultBox (400, 5);
       var hbox_result_box = new HBox (true, 0);
       hbox_result_box.pack_start (result_box,false,false);
+      /* <== Pack */
+      container.pack_start (container_top);
       container.pack_start (hbox_result_box,false);
-      
-      window.add (container);
+
       /* Top Hbox */
       top_hbox = new HBox (false, 0);
       /* Match Description */
-      main_label_description = new Label ("descrizione");
-      main_label_description.set_alignment (0, 0);
-      main_label_description.ypad = 5;
-      main_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
-      main_label_description.set_line_wrap (true);
+      match_label_description = new Label ("descrizione");
+      match_label_description.set_alignment (0, 0);
+      match_label_description.ypad = 5;
+      match_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
+      match_label_description.set_line_wrap (true);
       /* Packing Top Hbox with Match Desctiption into Top VBox*/
-      top_vbox.pack_start (top_hbox);
-      top_vbox.pack_start (main_label_description, false);
+      container_top.pack_start (top_hbox);
+      container_top.pack_start (match_label_description, false);
       
       /* Match Icon packed into Top HBox */
-      gco_main = new ContainerOverlayed();
-      main_image_overlay = new Image();
-      main_image_overlay.set_pixel_size (ICON_SIZE / 2);
-      main_image = new Image ();
-      main_image.set_size_request (ICON_SIZE, ICON_SIZE);
-      main_image.set_pixel_size (ICON_SIZE);
-      gco_main.main = main_image;
-      gco_main.overlay = main_image_overlay;
-      top_hbox.pack_start (gco_main, false);
+      match_icon_container_overlayed = new ContainerOverlayed();
+      match_icon_thumb = new Image();
+      match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
+      match_icon = new Image ();
+      match_icon.set_size_request (ICON_SIZE, ICON_SIZE);
+      match_icon.set_pixel_size (ICON_SIZE);
+      match_icon_container_overlayed.main = match_icon;
+      match_icon_container_overlayed.overlay = match_icon_thumb;
+      top_hbox.pack_start (match_icon_container_overlayed, false);
       
       /* VBox to push down the right area */
       var top_right_vbox = new VBox (false, 0);
       top_hbox.pack_start (top_right_vbox);
-      /* Spacer */
+      /* Top Spacer */
       var spacer = new Label("");
       spacer.set_size_request (-1, TOP_SPACING);
-      /* STS */
-      sts = new HSelectionContainer(_hilight_label, 15);
+      /* flag_selector */
+      flag_selector = new HSelectionContainer(_hilight_label, 15);
       foreach (string s in this.categories)
-        sts.add (new Label(s));
-      sts.select (3);
+        flag_selector.add (new Label(s));
+      flag_selector.select (3);
       /* Throbber */
       throbber = new Sezen.Throbber ();
       throbber.set_size_request (20, -1);
       /* HBox for titles and action icon */
       var right_hbox = new HBox (false, 0);
-      /* HBox for throbber and sts */
+      /* HBox for throbber and flag_selector */
       var topright_hbox = new HBox (false, 0);
       
-      topright_hbox.pack_start (sts);
+      topright_hbox.pack_start (flag_selector);
       topright_hbox.pack_start (throbber, false);
 
       top_right_vbox.pack_start (spacer, false);
@@ -157,18 +158,18 @@ namespace Sezen
       
       /* Titles box and Action icon*/
       var labels_vbox = new VBox (false, 0); //FIXME: Omogeneus?
-      action_image = new Image ();
-      action_image.set_pixel_size (ACTION_ICON_SIZE);
-      action_image.set_alignment (0.5f, 0.5f);
-      action_image.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
+      action_icon = new Image ();
+      action_icon.set_pixel_size (ACTION_ICON_SIZE);
+      action_icon.set_alignment (0.5f, 0.5f);
+      action_icon.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
 
       right_hbox.pack_start (labels_vbox);
-      right_hbox.pack_start (action_image, false);
+      right_hbox.pack_start (action_icon, false);
       
-      main_label = new Label (null);
-      main_label.set_alignment (0.0f, 0.5f);
-      main_label.set_ellipsize (Pango.EllipsizeMode.END);
-      main_label.xpad = 10;
+      match_label = new Label (null);
+      match_label.set_alignment (0.0f, 0.5f);
+      match_label.set_ellipsize (Pango.EllipsizeMode.END);
+      match_label.xpad = 10;
 
       action_label = new Label (null);
       action_label.set_alignment (1.0f, 0.5f);
@@ -176,7 +177,7 @@ namespace Sezen
       action_label.xpad = 10;
       
       labels_vbox.pack_start (action_label);
-      labels_vbox.pack_start (main_label);
+      labels_vbox.pack_start (match_label);
             
       container.show_all ();
     }
@@ -208,7 +209,7 @@ namespace Sezen
       Requisition win_req = {0, 0};
       double extra = container.border_width * 2;
       window.size_request (out win_req);
-      top_vbox.size_request (out req);
+      container_top.size_request (out req);
       var bitmap = new Gdk.Pixmap (null, win_req, win_req, 1);
       var ctx = Gdk.cairo_create (bitmap);
       ctx.set_operator (Cairo.Operator.CLEAR);
@@ -232,10 +233,10 @@ namespace Sezen
       ctx.set_operator (Operator.CLEAR);
       ctx.paint ();
       ctx.set_operator (Operator.OVER);
-      double w = top_vbox.allocation.width;
-      double h = top_vbox.allocation.height;
-      double x = top_vbox.allocation.x;
-      double y = top_vbox.allocation.y;
+      double w = container_top.allocation.width;
+      double h = container_top.allocation.height;
+      double x = container_top.allocation.x;
+      double y = container_top.allocation.y;
       Gtk.Style style = widget.get_style();
       double r = 0.0, g = 0.0, b = 0.0;
       if (comp)
@@ -251,9 +252,24 @@ namespace Sezen
         _cairo_path_for_main (ctx, comp, x + 0.5, y + 0.5, w - 1, h - 1);
         ctx.set_source_rgba (r, g, b, 0.9);
         ctx.set_line_width (2.5);
-        ctx.stroke (); 
+        ctx.stroke ();
+        if (this.list_visible)
+        {
+          //draw shadow
+          Utils.cairo_make_shadow_for_rect (ctx, result_box.allocation.x,
+                                                 result_box.allocation.y,
+                                                 result_box.allocation.width,
+                                                 result_box.allocation.height,
+                                                 0, r, g, b, 0.9, SHADOW_SIZE);
+          ctx.rectangle (result_box.allocation.x,
+                         result_box.allocation.y,
+                         result_box.allocation.width,
+                         result_box.allocation.height);
+          ctx.set_source_rgba (r, g, b, 0.9);
+          ctx.set_line_width (2.5);
+          ctx.stroke ();
+        }
       }
-      
       Pattern pat = new Pattern.linear(0, y, 0, y+h);
       Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
       pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
@@ -266,7 +282,9 @@ namespace Sezen
                                   0.95);
       _cairo_path_for_main (ctx, comp, x, y, w, h);
       ctx.set_source (pat);
+      ctx.set_operator (Operator.SOURCE);
       ctx.fill ();
+      ctx.set_operator (Operator.OVER);
       if (!comp)
       {
         Utils.rgb_invert_color (out r, out g, out b);
@@ -329,8 +347,8 @@ namespace Sezen
       if (searching_for_matches)
       {
         string s = get_match_search() + chr;
-        main_label.set_markup (
-            markup_string_with_search (main_label.get_text(), s, "xx-large")
+        match_label.set_markup (
+            markup_string_with_search (match_label.get_text(), s, "xx-large")
           );
         set_match_search (s);
       }
@@ -350,8 +368,8 @@ namespace Sezen
         s = s.substring (0, len - 1);
         if (searching_for_matches)
         {
-          main_label.set_markup (
-            markup_string_with_search (main_label.get_text(), s, "xx-large")
+          match_label.set_markup (
+            markup_string_with_search (match_label.get_text(), s, "xx-large")
           );
           set_match_search (s);
         }else
@@ -363,7 +381,7 @@ namespace Sezen
     {
       window.hide ();
       set_list_visible (false);
-      sts.select (3);
+      flag_selector.select (3);
       reset_search ();
     }
     
@@ -409,22 +427,22 @@ namespace Sezen
           }
           break;
         case Gdk.KeySyms.Left:
-          sts.select_prev ();
+          flag_selector.select_prev ();
           if (!searching_for_matches)
           {
             searching_for_matches = true;
             window.queue_draw ();
           }
-          update_query_flags (this.categories_query[sts.get_selected()]);
+          update_query_flags (this.categories_query[flag_selector.get_selected()]);
           break;
         case Gdk.KeySyms.Right:
-          sts.select_next ();
+          flag_selector.select_next ();
           if (!searching_for_matches)
           {
             searching_for_matches = true;
             window.queue_draw ();
           }
-          update_query_flags (this.categories_query[sts.get_selected()]);
+          update_query_flags (this.categories_query[flag_selector.get_selected()]);
           break;
         case Gdk.KeySyms.Up:
           bool b = true;
@@ -563,19 +581,19 @@ namespace Sezen
         /* Show default stuff */
         if (get_match_search () != "")
         {
-          main_label.set_markup (markup_string_with_search ("", get_match_search (), size));
-          main_label_description.set_markup (get_description_markup ("Match not found."));
-          main_image.set_from_icon_name ("search", IconSize.DIALOG);
-          main_image_overlay.clear ();
+          match_label.set_markup (markup_string_with_search ("", get_match_search (), size));
+          match_label_description.set_markup (get_description_markup ("Match not found."));
+          match_icon.set_from_icon_name ("search", IconSize.DIALOG);
+          match_icon_thumb.clear ();
         }
         else
         {
-          main_image.set_from_icon_name ("search", IconSize.DIALOG);
-          main_image_overlay.clear ();
-          main_label.set_markup (
+          match_icon.set_from_icon_name ("search", IconSize.DIALOG);
+          match_icon_thumb.clear ();
+          match_label.set_markup (
             Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",
                                    "Type to search..."));
-          main_label_description.set_markup (
+          match_label_description.set_markup (
             Markup.printf_escaped ("<span size=\"medium\"> </span>" +
                                    "<span size=\"smaller\">%s</span>",
                                    "Powered by Zeitgeist"));
@@ -585,19 +603,19 @@ namespace Sezen
       {
         try
         {
-          main_image.set_from_gicon (GLib.Icon.new_for_string (match.icon_name), IconSize.DIALOG);
+          match_icon.set_from_gicon (GLib.Icon.new_for_string (match.icon_name), IconSize.DIALOG);
           if (match.has_thumbnail)
-            main_image_overlay.set_from_gicon (GLib.Icon.new_for_string (match.thumbnail_path), IconSize.DIALOG);
+            match_icon_thumb.set_from_gicon (GLib.Icon.new_for_string (match.thumbnail_path), IconSize.DIALOG);
           else
-            main_image_overlay.clear ();
+            match_icon_thumb.clear ();
         }
         catch (Error err)
         {
-          main_image.set_from_icon_name ("missing-image", IconSize.DIALOG);
-          main_image_overlay.clear ();
+          match_icon.set_from_icon_name ("missing-image", IconSize.DIALOG);
+          match_icon_thumb.clear ();
         }
-        main_label.set_markup (markup_string_with_search (match.title, get_match_search (), size));
-        main_label_description.set_markup (get_description_markup (match.description));
+        match_label.set_markup (markup_string_with_search (match.title, get_match_search (), size));
+        match_label_description.set_markup (get_description_markup (match.description));
         if (searching_for_matches)
         {
           result_box.move_selection_to_index (index);
@@ -609,20 +627,20 @@ namespace Sezen
       string size = !searching_for_matches ? "xx-large": "medium";
       if (action == null)
       {
-        action_image.set_sensitive (false);
-        action_image.set_from_icon_name ("system-run", IconSize.DIALOG);
+        action_icon.set_sensitive (false);
+        action_icon.set_from_icon_name ("system-run", IconSize.DIALOG);
         action_label.set_markup (markup_string_with_search ("", get_action_search(), size));
       }
       else
       {
-        action_image.set_sensitive (true);
+        action_icon.set_sensitive (true);
         try
         {
-          action_image.set_from_gicon (GLib.Icon.new_for_string (action.icon_name), IconSize.DIALOG);
+          action_icon.set_from_gicon (GLib.Icon.new_for_string (action.icon_name), IconSize.DIALOG);
         }
         catch (Error err)
         {
-          action_image.set_from_icon_name ("missing-image", IconSize.DIALOG);
+          action_icon.set_from_icon_name ("missing-image", IconSize.DIALOG);
         }
         action_label.set_markup (markup_string_with_search (action.title,
                                  searching_for_matches ? 
