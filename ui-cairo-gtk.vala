@@ -198,33 +198,55 @@ namespace Sezen
         container.border_width = SHADOW_SIZE;
       else
         container.border_width = 0;
-      set_input_mask ();
     }
     
     private void set_input_mask ()
     {
-      // TODO: set_imput mask
-      /*bool composited = window.is_composited ();
       Requisition req = {0, 0};
-      Requisition win_req = {0, 0};
-      double extra = container.border_width * 2;
-      window.size_request (out win_req);
-      container_top.size_request (out req);
-      var bitmap = new Gdk.Pixmap (null, win_req, win_req, 1);
+      result_box.size_request (out req);
+      bool composited = window.is_composited ();
+      var bitmap = new Gdk.Pixmap (null, window.allocation.width,
+                                         container_top.allocation.height + 
+                                         (int)container.border_width * 2 +
+                                         (list_visible ? req.height : 0),
+                                         1);
       var ctx = Gdk.cairo_create (bitmap);
       ctx.set_operator (Cairo.Operator.CLEAR);
       ctx.paint ();
-      ctx.set_operator (Cairo.Operator.OVER);
       ctx.set_source_rgba (0, 0, 0, 1);
+      ctx.set_operator (Cairo.Operator.SOURCE);
       if (composited)
       {
-        Utils.cairo_rounded_rect (ctx, 0, 0, ICON_SIZE + PADDING * 2 + container.border_width, ICON_SIZE, BORDER_RADIUS);
+        Utils.cairo_rounded_rect (ctx, SHADOW_SIZE, SHADOW_SIZE,
+                                       ICON_SIZE + PADDING * 2,
+                                       ICON_SIZE, BORDER_RADIUS);
         ctx.fill ();
-        Utils.cairo_rounded_rect (ctx, 0, TOP_SPACING, req.width + extra, req.height-TOP_SPACING + extra, BORDER_RADIUS);
+        Utils.cairo_rounded_rect (ctx, 0, TOP_SPACING,
+                                       container_top.allocation.width + SHADOW_SIZE * 2, 
+                                       container_top.allocation.height + SHADOW_SIZE * 2 - TOP_SPACING,
+                                       BORDER_RADIUS);
         ctx.fill ();
+        if (list_visible)
+        {
+          debug ("%d %d %d %d", (window.allocation.width - req.width) / 2,
+                                container_top.allocation.height,
+                                req.width,
+                                req.height);
+                                  
+          ctx.rectangle ((window.allocation.width - req.width) / 2,
+                         container_top.allocation.height,
+                         req.width,
+                         req.height);
+          ctx.fill ();
+        }
+      }
+      else
+      {
+        ctx.set_operator (Cairo.Operator.SOURCE);
+        ctx.paint ();
       }
       window.input_shape_combine_mask (null, 0, 0);
-      window.input_shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);*/
+      window.input_shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
     }
     
     private bool on_expose (Widget widget, Gdk.EventExpose event) {
@@ -318,6 +340,7 @@ namespace Sezen
     public void show ()
     {
       window.show ();
+      set_input_mask ();
     }
     public void hide ()
     {
@@ -510,6 +533,7 @@ namespace Sezen
         result_box.hide();
       }
       window.queue_draw ();
+      set_input_mask ();
     }   
     
     private string markup_string_with_search (string text, string pattern, string size = "xx-large")
