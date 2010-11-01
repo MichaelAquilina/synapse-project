@@ -33,7 +33,7 @@ int main (string[] argv)
     var sink = new Sezen.DataSink ();
     string query = argv[1];
     debug (@"Searching for $query");
-    sink.search (query, Sezen.QueryFlags.LOCAL_CONTENT, (obj, res) =>
+    sink.search (query, Sezen.QueryFlags.LOCAL_CONTENT, null, null, (obj, res) =>
     {
       try
       {
@@ -41,8 +41,8 @@ int main (string[] argv)
         foreach (var match in rs)
         {
           print (">> %s\n", match.title);
-          var actions = sink.find_action_for_match (match, null);
-          print ("  > %s\n", actions[0].title);
+          var actions = sink.find_actions_for_match (match, null);
+          if (actions.size > 0) print ("  > %s\n", actions[0].title);
         }
       }
       catch (Error err)

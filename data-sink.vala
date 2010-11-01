@@ -126,7 +126,6 @@ namespace Sezen
   
   public abstract class ActionPlugin : DataPlugin
   {
-    // FIXME: should this even be async?
     public abstract ResultSet find_for_match (Query query, Match match);
     public override async ResultSet? search (Query query) throws SearchError
     {
@@ -148,13 +147,11 @@ namespace Sezen
 
     private Gee.Set<DataPlugin> plugins;
     private Gee.Set<ActionPlugin> actions;
-    private Gee.List<Cancellable> cancellables;
 
     construct
     {
       plugins = new Gee.HashSet<DataPlugin> ();
       actions = new Gee.HashSet<ActionPlugin> ();
-      cancellables = new Gee.ArrayList<Cancellable> ();
 
       load_plugins ();
     }
@@ -185,6 +182,8 @@ namespace Sezen
                        "data-sink", this, null) as DataPlugin);
       register_plugin (Object.new (typeof (UPowerPlugin),
                        "data-sink", this, null) as DataPlugin);
+      register_plugin (Object.new (typeof (CommandPlugin),
+                       "data-sink", this, null) as DataPlugin);
 #if TEST_PLUGINS
       register_plugin (Object.new (typeof (TestSlowPlugin),
                        "data-sink", this, null) as DataPlugin);
@@ -196,35 +195,25 @@ namespace Sezen
 
     public signal void plugin_search_done (DataPlugin plugin, ResultSet rs);
 
-    public void cancel_search ()
-    {
-      foreach (var c in cancellables) c.cancel ();
-      cancellables.clear ();
-    }
-    
-    private ResultSet partial_result_set;
-
     public async Gee.List<Match> search (string query,
-                                         QueryFlags flags) throws SearchError
+                                         QueryFlags flags,
+                                         ResultSet? dest_result_set,
+                                         Cancellable? cancellable = null) throws SearchError
     {
       var q = Query (query, flags);
 
-      // clear current cancellables
-      cancellables.clear (); // FIXME: really?
+      var cancellables = new GLib.List<Cancellable> ();
 
-      var current_result_set = new ResultSet ();
-      partial_result_set = current_result_set;
+      var current_result_set = dest_result_set ?? new ResultSet ();
       int search_size = plugins.size;
       bool waiting = false;
-      var current_cancellable = new Cancellable ();
-      cancellables.add (current_cancellable);
 
       foreach (var data_plugin in plugins)
       {
         // we need to pass separate cancellable to each plugin, because we're
         // running them in parallel
         var c = new Cancellable ();
-        cancellables.add (c);
+        cancellables.prepend (c);
         q.cancellable = c;
         // magic comes here
         data_plugin.search.begin (q, (src_obj, res) =>
@@ -248,25 +237,28 @@ namespace Sezen
           if (--search_size == 0 && waiting) search.callback ();
         });
       }
+      cancellables.reverse ();
+      
+      if (cancellable != null)
+      {
+        CancellableFix.connect (cancellable, () =>
+        {
+          foreach (var c in cancellables) c.cancel();
+        });
+      }
 
       waiting = true;
       if (search_size > 0) yield;
 
-      if (current_cancellable.is_cancelled ())
+      if (cancellable != null && cancellable.is_cancelled ())
       {
         throw new SearchError.SEARCH_CANCELLED ("Cancelled");
       }
 
       return current_result_set.get_sorted_list ();
     }
-    
-    // this will return Matches found so far while search is running
-    public Gee.List<Match> get_partial_results ()
-    {
-      return partial_result_set.get_sorted_list ();
-    }
 
-    public Gee.List<Match> find_action_for_match (Match match, string? query)
+    public Gee.List<Match> find_actions_for_match (Match match, string? query)
     {
       var rs = new ResultSet ();
       var q = Query (query ?? "");

@@ -35,6 +35,7 @@ namespace Sezen
 
     private IMContext im_context;
     private DataSink data_sink;
+    private Cancellable last_search_cancellable = new Cancellable ();
 
     construct
     {
@@ -58,7 +59,8 @@ namespace Sezen
           "Search > %s > %s".printf (search_type, search_string);
         head_label.set_text (label);
 
-        data_sink.cancel_search ();
+        last_search_cancellable.cancel ();
+        last_search_cancellable = new Cancellable ();
 
         if (!search_empty)
         {
@@ -70,6 +72,7 @@ namespace Sezen
             return false;
           });
           data_sink.search (this.search_string, QueryFlags.LOCAL_CONTENT,
+                            null, last_search_cancellable,
                             (obj, res) =>
           {
             if (timer_id != 0)
@@ -193,12 +196,15 @@ namespace Sezen
     }
 
     private Match? current_match = null;
+    private Match? current_action = null;
 
     public void focus_match (Match? match)
     {
       current_match = match;
       if (match != null)
       {
+        var actions = data_sink.find_actions_for_match (match, null);
+        current_action = actions.size > 0 ? actions[0] : null;
         try
         {
           GLib.Icon icon = GLib.Icon.new_for_string (match.has_thumbnail ?
@@ -211,6 +217,25 @@ namespace Sezen
           main_image.set_from_icon_name ("missing-image", IconSize.DIALOG);
         }
         main_label.set_text (match.title);
+        
+        try
+        {
+          if (current_action != null)
+          {
+            action_label.set_text (current_action.title);
+            var icon = GLib.Icon.new_for_string (current_action.icon_name);
+            action_image.set_from_gicon (icon, IconSize.DIALOG);
+            icon.unref ();
+          }
+        }
+        catch (Error err)
+        {
+          action_image.set_from_icon_name ("missing-image", IconSize.DIALOG);
+        }
+      }
+      else
+      {
+        action_label.set_text ("");
       }
     }
 
@@ -236,9 +261,9 @@ namespace Sezen
         case Gdk.KeySyms.KP_Enter:
         case Gdk.KeySyms.ISO_Enter:
           debug ("enter pressed");
-          if (current_match != null)
+          if (current_match != null && current_action != null)
           {
-            current_match.execute (null);
+            current_action.execute (current_match);
             hide ();
             search_reset ();
           }
