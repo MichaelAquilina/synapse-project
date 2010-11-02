@@ -648,4 +648,41 @@ namespace Sezen
       }
     }
   }
+  public class FakeInput: Label
+  {
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      var ctx = Gdk.cairo_create (this.window);
+      ctx.translate (0.5, 0.5);
+      ctx.set_operator (Cairo.Operator.OVER);
+      ctx.set_line_width (1.25);
+      Gtk.Style style = this.get_style();
+      double r = 0.0, g = 0.0, b = 0.0;
+      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], &r, &g, &b);
+      Utils.cairo_rounded_rect (ctx,
+                                this.allocation.x,
+                                this.allocation.y,
+                                this.allocation.width - 0.5,
+                                this.allocation.height - 0.5,
+                                int.min(this.xpad, this.ypad));
+      Utils.rgb_invert_color (out r, out g, out b);
+      ctx.set_source_rgba (r, g, b, 1.0);
+      Cairo.Path path = ctx.copy_path ();
+      ctx.save ();
+      ctx.clip ();
+      ctx.paint ();
+      Utils.rgb_invert_color (out r, out g, out b);
+      var pat = new Cairo.Pattern.linear (0, this.allocation.y, 0, this.allocation.y + 2 * this.ypad);
+      pat.add_color_stop_rgba (0, r, g, b, 0.6);
+      pat.add_color_stop_rgba (0.3, r, g, b, 0.25);
+      pat.add_color_stop_rgba (1.0, r, g, b, 0);
+      ctx.set_source (pat);
+      ctx.paint ();
+      ctx.restore ();
+      ctx.append_path (path);
+      ctx.set_source_rgba (r, g, b, 0.6);
+      ctx.stroke ();
+      return base.expose_event (event);
+    }
+  }
 }

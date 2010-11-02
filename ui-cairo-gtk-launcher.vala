@@ -27,7 +27,11 @@ namespace Sezen
   public static int main (string[] argv)
   {
     Gtk.init (ref argv);
+#if UI_MINI
+    var window = new SezenWindowMini ();
+#else
     var window = new SezenWindow ();
+#endif
     window.show ();
 
     var registry = GtkHotkey.Registry.get_default ();
