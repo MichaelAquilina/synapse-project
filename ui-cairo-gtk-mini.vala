@@ -52,9 +52,9 @@ namespace Sezen
     private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
     private const int SECTION_PADDING = 10;
     private const int BORDER_RADIUS = 10;
-    private const int SELECTED_ICON_SIZE = 160;
-    private const int UNSELECTED_ICON_SIZE = SELECTED_ICON_SIZE / 3;
+    private const int ICON_SIZE = 160;
     private const int LABEL_INTERNAL_PADDING = 3;
+    private const string LABEL_TEXT_SIZE = "x-large";
     
     private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
     private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
@@ -79,10 +79,10 @@ namespace Sezen
       window.expose_event.connect (expose_event);
       on_composited_changed (window);
       window.composited_changed.connect (on_composited_changed);
-/*
+
       window.key_press_event.connect (key_press_event);
 
-      set_list_visible (false); */
+/*    set_list_visible (false); */
       
       /* SEZEN */
       focus_match (0, null);
@@ -106,21 +106,22 @@ namespace Sezen
       container_top = new HBox (false, 0);
       container_top.border_width = BORDER_RADIUS;
       container.add (container_top);
+
+      throbber = new Throbber ();
+      throbber.set_size_request (22, 22);
       
       /* Action Icon */
       action_icon = new NamedIcon ();
-      action_icon.set_pixel_size (UNSELECTED_ICON_SIZE);
+      action_icon.set_pixel_size (ICON_SIZE / 2);
       action_icon.set_alignment (0.5f, 0.5f);
-      action_icon.set_size_request (UNSELECTED_ICON_SIZE, UNSELECTED_ICON_SIZE);
       action_icon.sensitive = false;
       /* Match Icon packed into container_top */
       match_icon_container_overlayed = new ContainerOverlayed();
       match_icon_thumb = new NamedIcon();
-      match_icon_thumb.set_pixel_size (SELECTED_ICON_SIZE / 2);
-      match_icon_thumb.set_size_request (SELECTED_ICON_SIZE / 2, SELECTED_ICON_SIZE / 2);
+      match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
       match_icon = new NamedIcon ();
-      match_icon.set_size_request (SELECTED_ICON_SIZE, SELECTED_ICON_SIZE);
-      match_icon.set_pixel_size (SELECTED_ICON_SIZE);
+      match_icon.set_pixel_size (ICON_SIZE);
+      match_icon_container_overlayed.set_size_request (ICON_SIZE, ICON_SIZE);
       match_icon_container_overlayed.set_widget_in_position 
             (match_icon, ContainerOverlayed.Position.MAIN);
       match_icon_container_overlayed.set_widget_in_position 
@@ -156,7 +157,7 @@ namespace Sezen
       match_icon.set_icon_name ("pidgin", IconSize.DIALOG);
       action_icon.set_icon_name ("system-run", IconSize.DIALOG);
       action_icon.sensitive = true;
-      current_label.set_markup (Utils.markup_string_with_search ("match.title", "title", "x-large"));
+      current_label.set_markup (Utils.markup_string_with_search ("match.title", "title", LABEL_TEXT_SIZE));
       
       container.show_all ();
     }
@@ -267,7 +268,49 @@ namespace Sezen
       uint key = event.keyval;
       switch (key)
       {
-        
+        case Gdk.KeySyms.Return:
+        case Gdk.KeySyms.KP_Enter:
+        case Gdk.KeySyms.ISO_Enter:
+          if (execute ())
+            ;//hide_and_reset ();
+          break;
+        case Gdk.KeySyms.Delete:
+        case Gdk.KeySyms.BackSpace:
+          search_delete_char ();
+          break;
+        case Gdk.KeySyms.Escape:
+          
+          break;
+        case Gdk.KeySyms.Left:
+          flag_selector.select_prev ();
+          if (!searching_for_matches)
+          {
+            searching_for_matches = true;
+            window.queue_draw ();
+          }
+          update_query_flags (this.categories_query[flag_selector.get_selected()]);
+          break;
+        case Gdk.KeySyms.Right:
+          flag_selector.select_next ();
+          if (!searching_for_matches)
+          {
+            searching_for_matches = true;
+            window.queue_draw ();
+          }
+          update_query_flags (this.categories_query[flag_selector.get_selected()]);
+          break;
+        case Gdk.KeySyms.Up:
+          
+          break;
+        case Gdk.KeySyms.Down:
+          
+          break;
+        case Gdk.KeySyms.Tab:
+          
+          break;
+        default:
+          //debug ("im_context didn't filter...");
+          break;
       }
       return true;
     }
@@ -294,7 +337,38 @@ namespace Sezen
     }
     protected override void focus_match ( int index, Match? match )
     {
+      if (match == null)
+      {
+        /* Show default stuff */
+        if (get_match_search () != "")
+        {
+          if (searching_for_matches)
+           current_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), LABEL_TEXT_SIZE));
 
+          match_icon.set_icon_name ("search", IconSize.DIALOG);
+          match_icon_thumb.clear ();
+        }
+        else
+        {
+          if (searching_for_matches)
+            current_label.set_markup (
+            Markup.printf_escaped ("<span size=\"%s\">%s</span>", LABEL_TEXT_SIZE,
+                                   "Type to search..."));
+          match_icon.set_icon_name ("search", IconSize.DIALOG);
+          match_icon_thumb.clear ();
+        }
+      }
+      else
+      {
+        match_icon.set_icon_name (match.icon_name, IconSize.DIALOG);
+        if (match.has_thumbnail)
+          match_icon_thumb.set_icon_name (match.thumbnail_path, IconSize.DIALOG);
+        else
+          match_icon_thumb.clear ();
+
+        if (searching_for_matches)
+          current_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE));
+      }
     }
     protected override void focus_action ( int index, Match? action )
     {
