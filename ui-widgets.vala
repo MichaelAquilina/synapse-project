@@ -87,13 +87,13 @@ namespace Sezen
 		
     private void build_ui()
     {
+      view = new TreeView ();
+      
       var vbox = new VBox (false, 0);
       this.expose_event.connect (on_expose);
       vbox.border_width = 0;
       this.add (vbox);
-      var resultsScrolledWindow = new ScrolledWindow (null, null);
-      resultsScrolledWindow.set_policy (PolicyType.NEVER, PolicyType.NEVER);
-      vbox.pack_start (resultsScrolledWindow);
+      vbox.pack_start (view);
       var status_box = new HBox (false, 0);
       status_box.set_size_request (-1, 15);
       vbox.pack_start (status_box, false);
@@ -107,13 +107,11 @@ namespace Sezen
       status_box.pack_start (new Label (null), true, false);
       status_box.pack_start (logo, false, false, 10);
       
-      view = new TreeView ();
 			view.enable_search = false;
 			view.headers_visible = false;
 			// If this is not set the tree will call IconDataFunc for all rows to 
-			// determine the total height of the tree
+			// determine the total height of the tree (Thanks Do)
 			view.fixed_height_mode = true;
-			resultsScrolledWindow.add (view);
 			view.show();
       // Model
       view.model = results = new ListStore(2, typeof(GLib.Icon), typeof(string));
@@ -132,13 +130,17 @@ namespace Sezen
 			ctxt.set_fixed_size (mwidth - ICON_SIZE, ICON_SIZE);
 			column.pack_start (ctxt, false);
       column.add_attribute (ctxt, "markup", (int) Column.NameColumn);
+      ctxt.xpad = 5;
       
       view.append_column (column);
       
       Requisition requisition = {0, 0};
       status_box.size_request (out requisition);
+      int cellh = 4 + ICON_SIZE;
+      crp.set_fixed_size (-1, cellh);
+
       requisition.width = mwidth;
-      requisition.height += nrows * (ICON_SIZE + 4) + 2;
+      requisition.height += nrows * (cellh + 2);
       vbox.set_size_request (requisition.width, requisition.height); 
     }
 
