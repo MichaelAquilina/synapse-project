@@ -221,8 +221,8 @@ namespace Sezen
 
   public class ContainerOverlayed: Gtk.Container
   {
-    public float scale {get; set; default = 0.25f;}
     private Widget widgets[5];
+    private float scale[5];
 
     public enum Position
     {
@@ -235,9 +235,18 @@ namespace Sezen
 
     public ContainerOverlayed ()
     {
+      scale = {0, 0.5f, 0.5f, 0.5f, 0.5f};
       widgets = {null, null, null, null, null};
       set_has_window(false);
       set_redraw_on_allocate(false);
+    }
+    public void set_scale_for_pos (float s, Position pos)
+    {
+      if (s != scale[pos])
+      {
+        scale[pos] = float.max (0.0f, float.min (0.5f, s));
+        this.queue_resize ();
+      }
     }
     public override void size_request (out Requisition requisition)
     {
@@ -265,27 +274,33 @@ namespace Sezen
       {
         widgets[Position.MAIN].size_allocate (allocation);
       }
-      allocation.width = alloc.width / 2;
-      allocation.height = alloc.height / 2;
       if (widgets[Position.TOP_LEFT] != null)
       {
+        allocation.width = (int)(alloc.width * scale[Position.TOP_LEFT]);
+        allocation.height = (int)(alloc.height * scale[Position.TOP_LEFT]);
         widgets[Position.TOP_LEFT].size_allocate (allocation);
       }
       if (widgets[Position.TOP_RIGHT] != null)
       {
-        allocation.x = alloc.x + allocation.width;
+        allocation.width = (int)(alloc.width * scale[Position.TOP_RIGHT]);
+        allocation.height = (int)(alloc.height * scale[Position.TOP_RIGHT]);
+        allocation.x = alloc.x + alloc.width - allocation.width;
         widgets[Position.TOP_RIGHT].size_allocate (allocation);
       }
       if (widgets[Position.BOTTOM_RIGHT] != null)
       {
-        allocation.x = alloc.x + allocation.width;
-        allocation.y = alloc.y + allocation.height;
+        allocation.width = (int)(alloc.width * scale[Position.BOTTOM_RIGHT]);
+        allocation.height = (int)(alloc.height * scale[Position.BOTTOM_RIGHT]);
+        allocation.x = alloc.x + alloc.width - allocation.width;
+        allocation.y = alloc.y + alloc.height - allocation.height;
         widgets[Position.BOTTOM_RIGHT].size_allocate (allocation);
       }
       if (widgets[Position.BOTTOM_LEFT] != null)
       {
+        allocation.width = (int)(alloc.width * scale[Position.BOTTOM_LEFT]);
+        allocation.height = (int)(alloc.height * scale[Position.BOTTOM_LEFT]);
         allocation.x = alloc.x;
-        allocation.y = alloc.y + allocation.height;
+        allocation.y = alloc.y + alloc.height - allocation.height;
         widgets[Position.BOTTOM_LEFT].size_allocate (allocation);
       }
     }

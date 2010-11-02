@@ -52,7 +52,7 @@ namespace Sezen
     private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
     private const int SECTION_PADDING = 10;
     private const int BORDER_RADIUS = 10;
-    private const int ICON_SIZE = 160;
+    private const int ICON_SIZE = 192;
     private const int LABEL_INTERNAL_PADDING = 3;
     private const string LABEL_TEXT_SIZE = "x-large";
     
@@ -112,7 +112,7 @@ namespace Sezen
       
       /* Action Icon */
       action_icon = new NamedIcon ();
-      action_icon.set_pixel_size (ICON_SIZE / 2);
+      action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
       action_icon.set_alignment (0.5f, 0.5f);
       action_icon.sensitive = false;
       /* Match Icon packed into container_top */
@@ -122,6 +122,7 @@ namespace Sezen
       match_icon = new NamedIcon ();
       match_icon.set_pixel_size (ICON_SIZE);
       match_icon_container_overlayed.set_size_request (ICON_SIZE, ICON_SIZE);
+      match_icon_container_overlayed.set_scale_for_pos (0.3f, ContainerOverlayed.Position.BOTTOM_RIGHT);
       match_icon_container_overlayed.set_widget_in_position 
             (match_icon, ContainerOverlayed.Position.MAIN);
       match_icon_container_overlayed.set_widget_in_position 
@@ -376,7 +377,7 @@ namespace Sezen
     }
     protected override void update_match_result_list (Gee.List<Match>? matches, int index, Match? match)
     {
-
+      focus_match ( index, match );
     }
     protected override void update_action_result_list (Gee.List<Match>? actions, int index, Match? action)
     {
