@@ -30,7 +30,7 @@ namespace Sezen
   public class ResultBox: EventBox
   {
     private const int VISIBLE_RESULTS = 5;
-    private const int ICON_SIZE = 35;
+    private const int ICON_SIZE = 36;
     private int mwidth;
     private int nrows;
     private bool no_results;
@@ -120,14 +120,12 @@ namespace Sezen
 			column.sizing = Gtk.TreeViewColumnSizing.FIXED;
 
 			var crp = new CellRendererPixbuf ();
-      crp.set_fixed_size (ICON_SIZE, ICON_SIZE);
       crp.stock_size = IconSize.DND;
 			column.pack_start (crp, false);
 			column.add_attribute (crp, "gicon", (int) Column.IconColumn);
 			
 			var ctxt = new CellRendererText ();
 			ctxt.ellipsize = Pango.EllipsizeMode.END;
-			ctxt.set_fixed_size (mwidth - ICON_SIZE, ICON_SIZE);
 			column.pack_start (ctxt, false);
       column.add_attribute (ctxt, "markup", (int) Column.NameColumn);
       ctxt.xpad = 5;
@@ -136,11 +134,12 @@ namespace Sezen
       
       Requisition requisition = {0, 0};
       status_box.size_request (out requisition);
-      int cellh = 4 + ICON_SIZE;
-      crp.set_fixed_size (-1, cellh);
+      int cellh = ICON_SIZE;
+      crp.set_fixed_size (ICON_SIZE, cellh);
+      ctxt.set_fixed_size (mwidth - ICON_SIZE, cellh);
 
       requisition.width = mwidth;
-      requisition.height += nrows * (cellh + 2);
+      requisition.height += nrows * (cellh + 2 * int.max((int)crp.ypad, (int)ctxt.ypad) );
       vbox.set_size_request (requisition.width, requisition.height); 
     }
 
