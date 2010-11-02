@@ -107,6 +107,12 @@ namespace Sezen
       container_top.border_width = BORDER_RADIUS;
       container.add (container_top);
       
+      /* Action Icon */
+      action_icon = new NamedIcon ();
+      action_icon.set_pixel_size (UNSELECTED_ICON_SIZE);
+      action_icon.set_alignment (0.5f, 0.5f);
+      action_icon.set_size_request (UNSELECTED_ICON_SIZE, UNSELECTED_ICON_SIZE);
+      action_icon.sensitive = false;
       /* Match Icon packed into container_top */
       match_icon_container_overlayed = new ContainerOverlayed();
       match_icon_thumb = new NamedIcon();
@@ -115,17 +121,16 @@ namespace Sezen
       match_icon = new NamedIcon ();
       match_icon.set_size_request (SELECTED_ICON_SIZE, SELECTED_ICON_SIZE);
       match_icon.set_pixel_size (SELECTED_ICON_SIZE);
-      match_icon_container_overlayed.main = match_icon;
-      match_icon_container_overlayed.overlay = match_icon_thumb;
+      match_icon_container_overlayed.set_widget_in_position 
+            (match_icon, ContainerOverlayed.Position.MAIN);
+      match_icon_container_overlayed.set_widget_in_position 
+            (match_icon_thumb, ContainerOverlayed.Position.BOTTOM_LEFT);
+      match_icon_container_overlayed.set_widget_in_position 
+            (action_icon, ContainerOverlayed.Position.BOTTOM_RIGHT);
       container_top.pack_start (match_icon_container_overlayed, false, true, SECTION_PADDING);
       
-      /* Action Icon packed into container_top */
-      action_icon = new NamedIcon ();
-      action_icon.set_pixel_size (UNSELECTED_ICON_SIZE);
-      action_icon.set_alignment (0.5f, 0.5f);
-      action_icon.set_size_request (UNSELECTED_ICON_SIZE, UNSELECTED_ICON_SIZE);
-      action_icon.sensitive = false;
-      container_top.pack_start (action_icon, false, true, SECTION_PADDING);
+      
+      //container_top.pack_start (action_icon, false, true, SECTION_PADDING);
       
       /* Match or Action Label */
       current_label = new FakeInput ();
@@ -148,8 +153,9 @@ namespace Sezen
       
       //DEBUG
       container.border_width = SHADOW_SIZE;
-      match_icon.set_icon_name ("search", IconSize.DIALOG);
+      match_icon.set_icon_name ("pidgin", IconSize.DIALOG);
       action_icon.set_icon_name ("system-run", IconSize.DIALOG);
+      action_icon.sensitive = true;
       current_label.set_markup (Utils.markup_string_with_search ("match.title", "title", "x-large"));
       
       container.show_all ();

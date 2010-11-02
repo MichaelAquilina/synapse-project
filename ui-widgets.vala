@@ -222,103 +222,103 @@ namespace Sezen
   public class ContainerOverlayed: Gtk.Container
   {
     public float scale {get; set; default = 0.25f;}
-    private Widget _main = null;
-    private Widget _overlay = null;
-    public Widget main { get {return _main;}
-                         set {
-                               if(_main!=null)
-                               {
-                                 _main.unparent();
-                                 _main = null;
-                               }
-                               if(value!=null)
-                               {
-                                 _main = value;
-                                 _main.set_parent(this);
-                               }
-                             }
-                       }
-    public Widget overlay  { get {return _overlay;}
-                             set {
-                                   if(_overlay!=null)
-                                   {
-                                     _overlay.unparent();
-                                     _overlay = null;
-                                   }
-                                   if(value!=null)
-                                   {
-                                     _overlay = value;
-                                     _overlay.set_parent(this);
-                                   }
-                                 }
-                           }
+    private Widget widgets[5];
+
+    public enum Position
+    {
+      MAIN,
+      TOP_LEFT,
+      TOP_RIGHT,
+      BOTTOM_RIGHT,
+      BOTTOM_LEFT
+    }
+
     public ContainerOverlayed ()
     {
+      widgets = {null, null, null, null, null};
       set_has_window(false);
       set_redraw_on_allocate(false);
     }
     public override void size_request (out Requisition requisition)
     {
-      Requisition req = {0, 0};
-      requisition.width = 1;
-      requisition.height = 1;
-      if (main != null)
+      if (widgets[Position.MAIN] != null)
       {
-        main.size_request (out req);
-        requisition.width = int.max(req.width, requisition.width);
-        requisition.height = int.max(req.height, requisition.height);
+        widgets[Position.MAIN].size_request (out requisition);
+        return;
       }
-      if (overlay != null)
+      Requisition req = {0, 0};
+      for (int i = 1; i < 5; ++i)
       {
-        overlay.size_request (out req);
-        requisition.width = int.max(req.width, requisition.width);
-        requisition.height = int.max(req.height, requisition.height);
+        if (widgets[i] != null)
+        {
+          widgets[i].size_request (out req);
+          requisition.width = int.max (requisition.width, req.width);
+          requisition.height = int.max (requisition.height, req.height);
+        }
       }
     }
     public override void size_allocate (Gdk.Rectangle allocation)
     {
-      Gdk.Rectangle aoverlay = {allocation.x,
-                                allocation.y + allocation.height / 2,
-                                allocation.width / 2,
-                                allocation.height / 2
-                                };
       Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
       set_allocation (alloc);    
-      main.size_allocate (allocation);
-      overlay.size_allocate (aoverlay);
+      if (widgets[Position.MAIN] != null)
+      {
+        widgets[Position.MAIN].size_allocate (allocation);
+      }
+      allocation.width = alloc.width / 2;
+      allocation.height = alloc.height / 2;
+      if (widgets[Position.TOP_LEFT] != null)
+      {
+        widgets[Position.TOP_LEFT].size_allocate (allocation);
+      }
+      if (widgets[Position.TOP_RIGHT] != null)
+      {
+        allocation.x = alloc.x + allocation.width;
+        widgets[Position.TOP_RIGHT].size_allocate (allocation);
+      }
+      if (widgets[Position.BOTTOM_RIGHT] != null)
+      {
+        allocation.x = alloc.x + allocation.width;
+        allocation.y = alloc.y + allocation.height;
+        widgets[Position.BOTTOM_RIGHT].size_allocate (allocation);
+      }
+      if (widgets[Position.BOTTOM_LEFT] != null)
+      {
+        allocation.x = alloc.x;
+        allocation.y = alloc.y + allocation.height;
+        widgets[Position.BOTTOM_LEFT].size_allocate (allocation);
+      }
     }
     public override void forall_internal (bool b, Gtk.Callback callback)
     {
-      if (main != null)
-        callback (main);
-      if (overlay != null)
-        callback (overlay);
+      for (int i = 0; i < 5; ++i)
+      {
+        if (widgets[i] != null)
+          callback (widgets[i]);
+      }
+    }
+    public void set_widget_in_position (Widget widget, Position pos)
+    {
+      if (widgets[pos] != null)
+        widgets[pos].unparent ();
+      widgets[pos] = widget;
+      if (widget != null)
+        widget.set_parent (this);
+    }
+    public void swap (Position pos1, Position pos2)
+    {
+      Widget t = widgets[pos1];
+      widgets[pos1] = widgets[pos2];
+      widgets[pos2] = t;
     }
 
     public override void add (Widget widget)
     {
-      if (main == null)
-      {
-        main = widget;
-      }
-      else if (overlay == null)
-      {
-        overlay = widget;
-      }
+      //TODO
     }
     public override void remove (Widget widget)
     {
-      if (overlay == widget)
-      {
-        widget.unparent ();
-        overlay = null;
-        return;
-      }
-      if (main == widget)
-      {
-        widget.unparent ();
-        main = null;
-      }
+      //TODO
     }
   }
   
@@ -623,12 +623,22 @@ namespace Sezen
     {
       current = "";
     }
+    public new void clear ()
+    {
+      current = "";
+      base.clear ();
+    }
     public void set_icon_name (string name, IconSize size)
     {
       if (name == current)
         return;
       else
       {
+        if (name == "")
+        {
+          this.clear ();
+          return;
+        }
         try
         {
           this.set_from_gicon (GLib.Icon.new_for_string (name), size);

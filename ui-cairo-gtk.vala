@@ -127,8 +127,10 @@ namespace Sezen
       match_icon = new NamedIcon ();
       match_icon.set_size_request (ICON_SIZE, ICON_SIZE);
       match_icon.set_pixel_size (ICON_SIZE);
-      match_icon_container_overlayed.main = match_icon;
-      match_icon_container_overlayed.overlay = match_icon_thumb;
+      match_icon_container_overlayed.set_widget_in_position 
+            (match_icon, ContainerOverlayed.Position.MAIN);
+      match_icon_container_overlayed.set_widget_in_position 
+            (match_icon_thumb, ContainerOverlayed.Position.BOTTOM_LEFT);
       top_hbox.pack_start (match_icon_container_overlayed, false);
       
       /* VBox to push down the right area */
