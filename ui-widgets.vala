@@ -89,7 +89,7 @@ namespace Sezen
     {
       var vbox = new VBox (false, 0);
       this.expose_event.connect (on_expose);
-      vbox.border_width = 1;
+      vbox.border_width = 0;
       this.add (vbox);
       var resultsScrolledWindow = new ScrolledWindow (null, null);
       resultsScrolledWindow.set_policy (PolicyType.NEVER, PolicyType.NEVER);
@@ -444,9 +444,8 @@ namespace Sezen
         requisition.width = int.max(req.width, requisition.width);
         requisition.height = int.max(req.height, requisition.height);
       }
-      requisition.height += 1;
       if (sep.visible)
-        requisition.height += 3;
+        requisition.height += 4;
     }
 
     public override void size_allocate (Gdk.Rectangle allocation)
@@ -484,7 +483,7 @@ namespace Sezen
       // update widget allocations and visibility
       i = 0;
       int pos = 0;
-      int sep_space = sep.visible ? 4 : 1;
+      int sep_space = sep.visible ? 4 : 0;
       foreach (Widget w in childs)
       {
         w.size_request (out req);

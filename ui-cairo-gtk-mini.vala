@@ -217,8 +217,9 @@ namespace Sezen
       {
         double ly = y + h - BORDER_RADIUS;
         double lh = results_container.allocation.y - ly + results_container.allocation.height;
+        Utils.gdk_color_to_rgb (style.base[Gtk.StateType.NORMAL], &r, &g, &b);
         ctx.rectangle (x, ly, w, lh);
-        ctx.set_source_rgba (1, 1, 1, 1);
+        ctx.set_source_rgba (r, g, b, 1);
         ctx.fill ();
         Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         Utils.rgb_invert_color (out r, out g, out b);
