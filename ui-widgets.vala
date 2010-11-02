@@ -692,7 +692,7 @@ namespace Sezen
     }
   }
 
-  public class FakeInput: Label
+  public class FakeInput: ShrinkingLabel
   {
     public override bool expose_event (Gdk.EventExpose event)
     {

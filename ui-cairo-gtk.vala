@@ -32,10 +32,10 @@ namespace Sezen
     /* Main UI shared components */
     protected NamedIcon match_icon = null;
     protected NamedIcon match_icon_thumb = null;
-    protected Label match_label = null;
+    protected ShrinkingLabel match_label = null;
     protected Label match_label_description = null;
     protected NamedIcon action_icon = null;
-    protected Label action_label = null;
+    protected ShrinkingLabel action_label = null;
     protected HSelectionContainer flag_selector = null;
     protected HBox top_hbox = null;
     protected VBox container = null;
@@ -169,12 +169,12 @@ namespace Sezen
       right_hbox.pack_start (labels_vbox);
       right_hbox.pack_start (action_icon, false);
       
-      match_label = new Label (null);
+      match_label = new ShrinkingLabel ();
       match_label.set_alignment (0.0f, 0.5f);
       match_label.set_ellipsize (Pango.EllipsizeMode.END);
       match_label.xpad = 10;
 
-      action_label = new Label (null);
+      action_label = new ShrinkingLabel ();
       action_label.set_alignment (1.0f, 0.5f);
       action_label.set_ellipsize (Pango.EllipsizeMode.START);
       action_label.xpad = 10;
