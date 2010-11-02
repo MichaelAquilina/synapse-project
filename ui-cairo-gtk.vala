@@ -443,13 +443,13 @@ namespace Sezen
           }
           update_query_flags (this.categories_query[flag_selector.get_selected()]);
           break;
-        case Gdk.KeySyms.Page_Up:
+        case Gdk.KeySyms.Home:
           if (searching_for_matches)
             select_first_last_match (true);
           else
             select_first_last_action (true);
           break;
-        case Gdk.KeySyms.Page_Down:
+        case Gdk.KeySyms.End:
           if (!list_visible)
           {
             set_list_visible (true);
