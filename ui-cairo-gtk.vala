@@ -335,16 +335,7 @@ namespace Sezen
         ctx.rectangle (x, y, w, h);
       }
     }
-    
-    public void show ()
-    {
-      window.show ();
-      set_input_mask ();
-    }
-    public void hide ()
-    {
-      window.hide ();
-    }
+
     private static void _hilight_label (Widget w, bool b)
     {
       Label l = (Label) w;
@@ -396,11 +387,6 @@ namespace Sezen
       flag_selector.select (3);
       searching_for_matches = true;
       reset_search ();
-    }
-    
-    public void present_with_time (uint32 timestamp)
-    {
-      window.present_with_time (timestamp);
     }
     
     protected virtual bool key_press_event (Gdk.EventKey event)
@@ -524,61 +510,6 @@ namespace Sezen
       set_input_mask ();
     }   
     
-    private string markup_string_with_search (string text, string pattern, string size = "xx-large")
-    {
-      if (pattern == "")
-      {
-        return Markup.printf_escaped ("<span size=\"%s\">%s</span>", size, text);
-      }
-      // if no text found, use pattern
-      if (text == "")
-      {
-        return Markup.printf_escaped ("<span size=\"%s\">%s<b> </b></span>", size, pattern);
-      }
-
-      var matchers = Query.get_matchers_for_query (
-                        Markup.escape_text (pattern), 0,
-                        RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
-      string? highlighted = null;
-      string escaped_text = Markup.escape_text (text);
-      foreach (var matcher in matchers)
-      {
-        if (matcher.key.match (escaped_text))
-        {
-          try
-          {
-            highlighted = matcher.key.replace_eval (escaped_text, -1, 0, 0, (mi, res) =>
-            {
-              int start_pos;
-              int end_pos;
-              int last_pos = 0;
-              int cnt = mi.get_match_count ();
-              for (int i = 1; i < cnt; i++)
-              {
-                mi.fetch_pos (i, out start_pos, out end_pos);
-                if (i > 1) res.append (escaped_text.substring (last_pos, start_pos - last_pos));
-                last_pos = end_pos;
-                res.append ("<u><b>%s</b></u>".printf (mi.fetch (i)));
-              }
-            });
-            break;
-          }
-          catch (RegexError err)
-          {
-            warn_if_reached ();
-          }
-        }
-      }
-      if (highlighted != null)
-      {
-        return "<span size=\"%s\">%s</span>".printf (size,highlighted);
-      }
-      else
-      {
-        return Markup.printf_escaped ("<span size=\"%s\">%s</span>", size, text);
-      }
-    }
-
     private string get_description_markup (string s)
     {
       // FIXME: i18n
@@ -586,6 +517,19 @@ namespace Sezen
     }
     
     /* UI INTERFACE IMPLEMENTATION */
+    public override void show ()
+    {
+      window.show ();
+      set_input_mask ();
+    }
+    public override void hide ()
+    {
+      window.hide ();
+    }
+    public override void present_with_time (uint32 timestamp)
+    {
+      window.present_with_time (timestamp);
+    }    
     protected override void set_throbber_visible (bool visible)
     {
       if (visible)
@@ -601,7 +545,7 @@ namespace Sezen
         /* Show default stuff */
         if (get_match_search () != "")
         {
-          match_label.set_markup (markup_string_with_search ("", get_match_search (), size));
+          match_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), size));
           match_label_description.set_markup (
             get_description_markup (throbber.is_animating ()? "Searching..." : "Match not found.")
           );
@@ -629,7 +573,7 @@ namespace Sezen
         else
           match_icon_thumb.clear ();
 
-        match_label.set_markup (markup_string_with_search (match.title, get_match_search (), size));
+        match_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), size));
         match_label_description.set_markup (get_description_markup (match.description));
         if (searching_for_matches)
         {
@@ -644,13 +588,13 @@ namespace Sezen
       {
         action_icon.set_sensitive (false);
         action_icon.set_icon_name ("system-run", IconSize.DIALOG);
-        action_label.set_markup (markup_string_with_search ("", get_action_search(), size));
+        action_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), size));
       }
       else
       {
         action_icon.set_sensitive (true);
         action_icon.set_icon_name (action.icon_name, IconSize.DIALOG);
-        action_label.set_markup (markup_string_with_search (action.title,
+        action_label.set_markup (Utils.markup_string_with_search (action.title,
                                  searching_for_matches ? 
                                  "" : get_action_search (), size));
         if (!searching_for_matches)

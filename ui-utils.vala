@@ -27,6 +27,61 @@ namespace Sezen
     private static string home_directory = null;
     private static long home_directory_length = 0;
     
+    public static string markup_string_with_search (string text, string pattern, string size = "xx-large")
+    {
+      if (pattern == "")
+      {
+        return Markup.printf_escaped ("<span size=\"%s\">%s</span>", size, text);
+      }
+      // if no text found, use pattern
+      if (text == "")
+      {
+        return Markup.printf_escaped ("<span size=\"%s\">%s<b> </b></span>", size, pattern);
+      }
+
+      var matchers = Query.get_matchers_for_query (
+                        Markup.escape_text (pattern), 0,
+                        RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
+      string? highlighted = null;
+      string escaped_text = Markup.escape_text (text);
+      foreach (var matcher in matchers)
+      {
+        if (matcher.key.match (escaped_text))
+        {
+          try
+          {
+            highlighted = matcher.key.replace_eval (escaped_text, -1, 0, 0, (mi, res) =>
+            {
+              int start_pos;
+              int end_pos;
+              int last_pos = 0;
+              int cnt = mi.get_match_count ();
+              for (int i = 1; i < cnt; i++)
+              {
+                mi.fetch_pos (i, out start_pos, out end_pos);
+                if (i > 1) res.append (escaped_text.substring (last_pos, start_pos - last_pos));
+                last_pos = end_pos;
+                res.append ("<u><b>%s</b></u>".printf (mi.fetch (i)));
+              }
+            });
+            break;
+          }
+          catch (RegexError err)
+          {
+            warn_if_reached ();
+          }
+        }
+      }
+      if (highlighted != null)
+      {
+        return "<span size=\"%s\">%s</span>".printf (size,highlighted);
+      }
+      else
+      {
+        return Markup.printf_escaped ("<span size=\"%s\">%s</span>", size, text);
+      }
+    }
+    
     public static string replace_home_path_with (string path, string replace)
     {
     	if (home_directory == null)
