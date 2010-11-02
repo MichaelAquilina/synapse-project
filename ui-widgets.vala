@@ -445,8 +445,9 @@ namespace Sezen
         requisition.width = int.max(req.width, requisition.width);
         requisition.height = int.max(req.height, requisition.height);
       }
+      sep.size_request (out req);
       if (sep.visible)
-        requisition.height += 4;
+        requisition.height += req.height * 2;
     }
 
     public override void size_allocate (Gdk.Rectangle allocation)
@@ -484,7 +485,8 @@ namespace Sezen
       // update widget allocations and visibility
       i = 0;
       int pos = 0;
-      int sep_space = sep.visible ? 4 : 0;
+      sep.size_request (out req);
+      int sep_space = sep.visible ? req.height * 2 : 0;
       foreach (Widget w in childs)
       {
         w.size_request (out req);
@@ -507,8 +509,8 @@ namespace Sezen
         ++i;
       }
       allocation.x = alloc.x;
-      allocation.y = alloc.y + alloc.height - 3;
-      allocation.height = 2;
+      allocation.y = alloc.y + alloc.height - sep_space * 3 / 2;
+      allocation.height = sep_space;
       allocation.width = alloc.width;
       sep.size_allocate (allocation);
     }
@@ -762,7 +764,6 @@ namespace Sezen
       ctx.rel_line_to (this.allocation.width - SIZE * 2, this.allocation.height - SIZE * 2);
       ctx.rel_line_to (0, - this.allocation.height + SIZE * 2);
       ctx.close_path ();
-      var path = ctx.copy_path ();
       ctx.fill ();
       return true;
     }
