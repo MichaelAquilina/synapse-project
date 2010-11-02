@@ -120,7 +120,11 @@ namespace Sezen
     
     private static void on_style_set (Gtk.Widget widget, Gtk.Style? prev_style)
     {
-      if (widget.get_realized ()) make_transparent_bg (widget);
+      if (widget.get_realized ()) 
+      {
+        make_transparent_bg (widget);
+        widget.queue_draw ();
+      }
     }
     
     private static void on_composited_change (Gtk.Widget widget)
