@@ -748,21 +748,21 @@ namespace Sezen
     public override bool expose_event (Gdk.EventExpose event)
     {
       var ctx = Gdk.cairo_create (this.window);
-      ctx.translate (0.5, 0.5);
+      double SIZE = 0.5;
+      ctx.translate (SIZE, SIZE);
       ctx.set_operator (Cairo.Operator.OVER);
       
       Gtk.Style style = this.get_style();
       double r = 0.0, g = 0.0, b = 0.0;
-      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-      Utils.rgb_invert_color (out r, out g, out b);
+      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.INSENSITIVE], &r, &g, &b);
       ctx.set_source_rgba (r, g, b, 1.0);
       
       ctx.new_path ();
       ctx.move_to (this.allocation.x, this.allocation.y);
-      ctx.rel_line_to (this.allocation.width, this.allocation.height);
-      ctx.rel_line_to (0, - this.allocation.height);
+      ctx.rel_line_to (this.allocation.width - SIZE * 2, this.allocation.height - SIZE * 2);
+      ctx.rel_line_to (0, - this.allocation.height + SIZE * 2);
       ctx.close_path ();
-      
+      var path = ctx.copy_path ();
       ctx.fill ();
       return true;
     }
