@@ -373,7 +373,20 @@ namespace Sezen
     }
     protected override void focus_action ( int index, Match? action )
     {
-      
+      if (action == null)
+      {
+        action_icon.set_sensitive (false);
+        action_icon.set_icon_name ("system-run", IconSize.DIALOG);
+        if (!searching_for_matches)
+          current_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), LABEL_TEXT_SIZE));
+      }
+      else
+      {
+        action_icon.set_sensitive (true);
+        action_icon.set_icon_name (action.icon_name, IconSize.DIALOG);
+        if (!searching_for_matches)
+          current_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search (), LABEL_TEXT_SIZE));
+      }
     }
     protected override void update_match_result_list (Gee.List<Match>? matches, int index, Match? match)
     {
@@ -381,7 +394,7 @@ namespace Sezen
     }
     protected override void update_action_result_list (Gee.List<Match>? actions, int index, Match? action)
     {
-
+      focus_action ( index, action );
     }
   }
 }

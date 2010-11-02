@@ -242,6 +242,8 @@ namespace Sezen
     }
     public void set_scale_for_pos (float s, Position pos)
     {
+      if (pos == Position.MAIN)
+        return;
       if (s != scale[pos])
       {
         scale[pos] = float.max (0.0f, float.min (0.5f, s));
