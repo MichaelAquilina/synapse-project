@@ -262,6 +262,25 @@ namespace Sezen
           set_action_search (s);
       }
     }
+    private void visual_update_search_for ()
+    {
+      if (searching_for_matches)
+      {
+        action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
+        match_icon.set_pixel_size (ICON_SIZE);
+        match_icon_container_overlayed.swapif (action_icon,
+                                               ContainerOverlayed.Position.MAIN,
+                                               ContainerOverlayed.Position.BOTTOM_RIGHT);
+      }
+      else
+      {
+        match_icon.set_pixel_size (ICON_SIZE * 29 / 100);
+        action_icon.set_pixel_size (ICON_SIZE);
+        match_icon_container_overlayed.swapif (match_icon,
+                                               ContainerOverlayed.Position.MAIN,
+                                               ContainerOverlayed.Position.BOTTOM_RIGHT);
+      }
+    }
     protected virtual bool key_press_event (Gdk.EventKey event)
     {
       if (im_context.filter_keypress (event)) return true;
@@ -287,6 +306,7 @@ namespace Sezen
           if (!searching_for_matches)
           {
             searching_for_matches = true;
+            visual_update_search_for ();
             window.queue_draw ();
           }
           update_query_flags (this.categories_query[flag_selector.get_selected()]);
@@ -296,6 +316,7 @@ namespace Sezen
           if (!searching_for_matches)
           {
             searching_for_matches = true;
+            visual_update_search_for ();
             window.queue_draw ();
           }
           update_query_flags (this.categories_query[flag_selector.get_selected()]);
@@ -307,7 +328,28 @@ namespace Sezen
           
           break;
         case Gdk.KeySyms.Tab:
-          
+          if (searching_for_matches && 
+              (get_match_results () == null || get_match_results ().size == 0 ||
+               get_action_results () == null || get_action_results ().size == 0))
+            return true;
+          searching_for_matches = !searching_for_matches;
+          Match m = null;
+          int i = 0;
+          if (searching_for_matches)
+          {
+            get_match_focus (out i, out m);
+            update_match_result_list (get_match_results (), i, m);
+            get_action_focus (out i, out m);
+            focus_action (i, m);
+          }
+          else
+          {
+            get_match_focus (out i, out m);
+            focus_match (i, m); 
+            get_action_focus (out i, out m);
+            update_action_result_list (get_action_results (), i, m);
+          }
+          visual_update_search_for ();
           break;
         default:
           //debug ("im_context didn't filter...");
@@ -375,14 +417,14 @@ namespace Sezen
     {
       if (action == null)
       {
-        action_icon.set_sensitive (false);
+        action_icon.hide ();
         action_icon.set_icon_name ("system-run", IconSize.DIALOG);
         if (!searching_for_matches)
           current_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), LABEL_TEXT_SIZE));
       }
       else
       {
-        action_icon.set_sensitive (true);
+        action_icon.show ();
         action_icon.set_icon_name (action.icon_name, IconSize.DIALOG);
         if (!searching_for_matches)
           current_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search (), LABEL_TEXT_SIZE));

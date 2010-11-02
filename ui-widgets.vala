@@ -322,6 +322,11 @@ namespace Sezen
       if (widget != null)
         widget.set_parent (this);
     }
+    public void swapif (Widget w, Position pos1, Position pos2)
+    {
+      if (widgets[pos1] == w)
+        swap (pos1, pos2);
+    }
     public void swap (Position pos1, Position pos2)
     {
       Widget t = widgets[pos1];
