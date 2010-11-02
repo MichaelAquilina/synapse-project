@@ -168,18 +168,26 @@ namespace Sezen
         flag_selector.add (new Label(s));
       flag_selector.select (3);
       
+      /* Pref item */
+      var pref = new NamedIcon ();
+      pref.set_from_stock (Gtk.STOCK_PREFERENCES, IconSize.MENU);
+      pref.set_pixel_size (22);
+      pref.set_size_request (22, 22);
       {
+        var hbox = new HBox (false, 0);
+        hbox.pack_start (flag_selector);
+        hbox.pack_start (pref, false);
         var vbox = new VBox (false, 0);
         var spacer = new Label (null);
         spacer.set_size_request (-1, TOP_SPACING);
         vbox.pack_start (spacer);
         vbox.pack_start (new Label(null));
-        vbox.pack_start (flag_selector, false);
+        vbox.pack_start (hbox, false);
         vbox.pack_start (current_label, false);
         vbox.pack_start (new Label(null));
         container_top.pack_start (vbox, true, true, SECTION_PADDING);
       }
-      
+
       container.show_all ();
     }
     
