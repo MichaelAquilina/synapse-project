@@ -149,10 +149,9 @@ namespace Sezen
         var spacer = new Label (null);
         spacer.set_size_request (-1, TOP_SPACING);
         vbox.pack_start (spacer, false);
-        vbox.pack_start (new Label(null));
         vbox.pack_start (throbber, false);
         vbox.pack_start (new Label(null));
-        container_top.pack_start (vbox, false);
+        container_top.pack_start (vbox, false, true, 3);
       }
       
       /* Match or Action Label */
@@ -170,7 +169,7 @@ namespace Sezen
       
       /* Pref item */
       var pref = new MenuButton ();
-      pref.set_size_request (10, 7);
+      pref.set_size_request (10, 10);
       {
         var vbox = new VBox (false, 0);
         var spacer = new Label (null);

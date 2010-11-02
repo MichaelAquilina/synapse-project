@@ -742,7 +742,7 @@ namespace Sezen
     public override void size_request (out Requisition requisition)
     {
       requisition.width = 5;
-      requisition.height = 4;
+      requisition.height = 5;
     }
     
     public override bool expose_event (Gdk.EventExpose event)
@@ -759,8 +759,8 @@ namespace Sezen
       
       ctx.new_path ();
       ctx.move_to (this.allocation.x, this.allocation.y);
-      ctx.rel_line_to (this.allocation.width, 0);
-      ctx.rel_line_to (- this.allocation.width / 2, this.allocation.height);
+      ctx.rel_line_to (this.allocation.width, this.allocation.height);
+      ctx.rel_line_to (0, - this.allocation.height);
       ctx.close_path ();
       
       ctx.fill ();
