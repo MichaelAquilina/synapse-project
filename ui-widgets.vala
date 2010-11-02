@@ -691,6 +691,7 @@ namespace Sezen
       }
     }
   }
+
   public class FakeInput: Label
   {
     public override bool expose_event (Gdk.EventExpose event)
@@ -726,6 +727,78 @@ namespace Sezen
       ctx.set_source_rgba (r, g, b, 0.6);
       ctx.stroke ();
       return base.expose_event (event);
+    }
+  }
+
+  public class ShrinkingLabel: Gtk.Label
+  {
+    private const double STEP = 1.0466351393921056; // (1.2)^1/4
+    public string default_size { get; set; default = "x-large"; }
+    public string min_size { get; set; default = "medium"; }
+    
+    private Gtk.Requisition base_req;
+    protected override void size_request (out Gtk.Requisition req)
+    {
+      req.width = base_req.width;
+      req.height = base_req.height;
+    }
+    
+    public new void set_markup (string markup)
+    {
+      base.set_markup ("<span size=\"%s\">%s</span>".printf (default_size,
+                                                             markup));
+      base.size_request (out base_req);
+    }
+    
+    private bool downscale ()
+    {
+      bool changed = false;
+      var context = this.get_layout ();
+      var attrs = context.get_attributes ();
+      unowned Pango.AttrIterator iter = attrs.get_iterator (); // FIXME: leaks
+      do
+      {
+        unowned Pango.Attribute? attr = iter.get (Pango.AttrType.SCALE);
+        if (attr != null)
+        {
+          unowned Pango.AttrFloat a = (Pango.AttrFloat) attr;
+          if (a.value > 1) // FIXME: value based on min_size
+          {
+            a.value /= STEP;
+            changed = true;
+          }
+        }
+      } while (iter.next ());
+      
+      if (changed) context.context_changed (); // force recomputation
+      return changed;
+    }
+    
+    protected override void size_allocate (Gdk.Rectangle alloc)
+    {
+      base.size_allocate (alloc);
+      
+      var layout = this.get_layout ();
+      if (this.get_ellipsize () != Pango.EllipsizeMode.NONE)
+      {
+        int width = (int) ((alloc.width - this.xpad * 2) * Pango.SCALE);
+        Pango.Rectangle logical;
+        
+        layout.set_width (-1);
+        layout.get_extents (null, out logical);
+
+        while (logical.width > width && downscale ())
+        {
+          layout.get_extents (null, out logical);
+        }
+        
+        if (logical.width > width) layout.set_width (width);
+      }
+    }
+    
+    public ShrinkingLabel ()
+    {
+      GLib.Object (label: null);
     }
   }
 }
