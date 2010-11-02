@@ -734,47 +734,57 @@ namespace Sezen
   public class ShrinkingLabel: Gtk.Label
   {
     private const double STEP = 1.0466351393921056; // (1.2)^1/4
+    
     public string default_size { get; set; default = "x-large"; }
     public string min_size { get; set; default = "medium"; }
+    private double min_scale = 1.0;
+
+    construct
+    {
+      this.notify["min-size"].connect (this.min_size_changed);
+    }
+    
+    private void min_size_changed ()
+    {
+      switch (min_size)
+      {
+        case "xx-small":
+          min_scale = Pango.Scale.XX_SMALL;
+          break;
+        case "x-small":
+          min_scale = Pango.Scale.X_SMALL;
+          break;
+        case "small":
+          min_scale = Pango.Scale.SMALL;
+          break;
+        case "medium":
+          min_scale = Pango.Scale.MEDIUM;
+          break;
+        case "large":
+          min_scale = Pango.Scale.LARGE;
+          break;
+        case "x-large":
+          min_scale = Pango.Scale.X_LARGE;
+          break;
+        case "xx-large":
+          min_scale = Pango.Scale.XX_LARGE;
+          break;
+        default:
+          warning ("\"%s\" is not valid for min-size property", min_size);
+          min_scale = 1.0;
+          break;
+      }
+    }
     
     private Gtk.Requisition base_req;
+    private Gtk.Requisition small_req;
+    
     protected override void size_request (out Gtk.Requisition req)
     {
       req.width = base_req.width;
       req.height = base_req.height;
     }
-    
-    public new void set_markup (string markup)
-    {
-      base.set_markup ("<span size=\"%s\">%s</span>".printf (default_size,
-                                                             markup));
-      base.size_request (out base_req);
-    }
-    
-    private bool downscale ()
-    {
-      bool changed = false;
-      var context = this.get_layout ();
-      var attrs = context.get_attributes ();
-      unowned Pango.AttrIterator iter = attrs.get_iterator (); // FIXME: leaks
-      do
-      {
-        unowned Pango.Attribute? attr = iter.get (Pango.AttrType.SCALE);
-        if (attr != null)
-        {
-          unowned Pango.AttrFloat a = (Pango.AttrFloat) attr;
-          if (a.value > 1) // FIXME: value based on min_size
-          {
-            a.value /= STEP;
-            changed = true;
-          }
-        }
-      } while (iter.next ());
-      
-      if (changed) context.context_changed (); // force recomputation
-      return changed;
-    }
-    
+
     protected override void size_allocate (Gdk.Rectangle alloc)
     {
       base.size_allocate (alloc);
@@ -792,9 +802,58 @@ namespace Sezen
         {
           layout.get_extents (null, out logical);
         }
+
+        // careful this seems to call layout.set_width
+        base.size_request (out small_req);
         
         if (logical.width > width) layout.set_width (width);
       }
+    }
+
+    protected override bool expose_event (Gdk.EventExpose event)
+    {
+      // fool our base class to keep correct align
+      this.requisition.width = small_req.width;
+      this.requisition.height = small_req.height;
+
+      bool ret = base.expose_event (event);
+
+      this.requisition.width = base_req.width;
+      this.requisition.height = base_req.height;
+
+      return ret;
+    }
+    
+    public new void set_markup (string markup)
+    {
+      base.set_markup ("<span size=\"%s\">%s</span>".printf (default_size,
+                                                             markup));
+      base.size_request (out base_req);
+      small_req = base_req;
+    }
+    
+    private bool downscale ()
+    {
+      bool changed = false;
+      var context = this.get_layout ();
+      var attrs = context.get_attributes ();
+      unowned Pango.AttrIterator iter = attrs.get_iterator (); // FIXME: leaks
+      do
+      {
+        unowned Pango.Attribute? attr = iter.get (Pango.AttrType.SCALE);
+        if (attr != null)
+        {
+          unowned Pango.AttrFloat a = (Pango.AttrFloat) attr;
+          if (a.value > min_scale)
+          {
+            a.value /= STEP;
+            changed = true;
+          }
+        }
+      } while (iter.next ());
+      
+      if (changed) context.context_changed (); // force recomputation
+      return changed;
     }
     
     public ShrinkingLabel ()
