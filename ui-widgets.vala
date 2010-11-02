@@ -778,6 +778,7 @@ namespace Sezen
     }
     
     private Gtk.Requisition base_req;
+    private Gtk.Requisition small_req;
     
     protected override void size_request (out Gtk.Requisition req)
     {
@@ -802,9 +803,26 @@ namespace Sezen
         {
           layout.get_extents (null, out logical);
         }
+
+        // careful this seems to call layout.set_width
+        base.size_request (out small_req);
         
         if (logical.width > width) layout.set_width (width);
       }
+    }
+
+    protected override bool expose_event (Gdk.EventExpose event)
+    {
+      // fool our base class to keep correct align
+      this.requisition.width = small_req.width;
+      this.requisition.height = small_req.height;
+
+      bool ret = base.expose_event (event);
+
+      this.requisition.width = base_req.width;
+      this.requisition.height = base_req.height;
+
+      return ret;
     }
     
     public new void set_markup (string markup)
@@ -812,6 +830,7 @@ namespace Sezen
       base.set_markup ("<span size=\"%s\">%s</span>".printf (default_size,
                                                              markup));
       base.size_request (out base_req);
+      small_req = base_req;
     }
     
     private bool downscale ()
