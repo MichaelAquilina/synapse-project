@@ -82,6 +82,10 @@ namespace Sezen
       reset_search (false);
     }
     /* UI must do the following things */
+    public abstract void show ();
+    public abstract void hide ();
+    public abstract void present_with_time (uint32 timestamp);
+
     protected abstract void focus_match ( int index, Match? match );
     protected abstract void focus_action ( int index, Match? action );
     protected abstract void update_match_result_list (Gee.List<Match>? matches, int index, Match? match);
@@ -286,6 +290,7 @@ namespace Sezen
         {
           focus[T.MATCH] = null;
           focus_index[T.MATCH] = 0;
+          search_for_actions ();
         }
 
         update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);

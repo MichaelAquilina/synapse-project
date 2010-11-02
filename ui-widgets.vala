@@ -154,11 +154,15 @@ namespace Sezen
       no_results = false;
       string desc;
       TreeIter iter;
+      GLib.Icon icon = null;
       foreach (Match m in rs)
       {
         results.append (out iter);
-        desc = Utils.replace_home_path_with (m.description, "Home > "); // FIXME: i18n        
-        results.set (iter, Column.IconColumn, GLib.Icon.new_for_string(m.icon_name), Column.NameColumn, 
+        desc = Utils.replace_home_path_with (m.description, "Home > "); // FIXME: i18n
+        try {
+          icon = GLib.Icon.new_for_string(m.icon_name);
+        } catch (GLib.Error err) { icon = null; }
+        results.set (iter, Column.IconColumn, icon, Column.NameColumn, 
                      Markup.printf_escaped ("<span><b>%s</b></span>\n<span size=\"small\">%s</span>",m.title, desc));
       }
       var sel = view.get_selection ();
@@ -217,104 +221,126 @@ namespace Sezen
 
   public class ContainerOverlayed: Gtk.Container
   {
-    public float scale {get; set; default = 0.25f;}
-    private Widget _main = null;
-    private Widget _overlay = null;
-    public Widget main { get {return _main;}
-                         set {
-                               if(_main!=null)
-                               {
-                                 _main.unparent();
-                                 _main = null;
-                               }
-                               if(value!=null)
-                               {
-                                 _main = value;
-                                 _main.set_parent(this);
-                               }
-                             }
-                       }
-    public Widget overlay  { get {return _overlay;}
-                             set {
-                                   if(_overlay!=null)
-                                   {
-                                     _overlay.unparent();
-                                     _overlay = null;
-                                   }
-                                   if(value!=null)
-                                   {
-                                     _overlay = value;
-                                     _overlay.set_parent(this);
-                                   }
-                                 }
-                           }
+    private Widget widgets[5];
+    private float scale[5];
+
+    public enum Position
+    {
+      MAIN,
+      TOP_LEFT,
+      TOP_RIGHT,
+      BOTTOM_RIGHT,
+      BOTTOM_LEFT
+    }
+
     public ContainerOverlayed ()
     {
+      scale = {0, 0.5f, 0.5f, 0.5f, 0.5f};
+      widgets = {null, null, null, null, null};
       set_has_window(false);
       set_redraw_on_allocate(false);
     }
+    public void set_scale_for_pos (float s, Position pos)
+    {
+      if (pos == Position.MAIN)
+        return;
+      if (s != scale[pos])
+      {
+        scale[pos] = float.max (0.0f, float.min (0.5f, s));
+        this.queue_resize ();
+      }
+    }
     public override void size_request (out Requisition requisition)
     {
-      Requisition req = {0, 0};
-      requisition.width = 1;
-      requisition.height = 1;
-      if (main != null)
+      if (widgets[Position.MAIN] != null)
       {
-        main.size_request (out req);
-        requisition.width = int.max(req.width, requisition.width);
-        requisition.height = int.max(req.height, requisition.height);
+        widgets[Position.MAIN].size_request (out requisition);
+        return;
       }
-      if (overlay != null)
+      Requisition req = {0, 0};
+      for (int i = 1; i < 5; ++i)
       {
-        overlay.size_request (out req);
-        requisition.width = int.max(req.width, requisition.width);
-        requisition.height = int.max(req.height, requisition.height);
+        if (widgets[i] != null)
+        {
+          widgets[i].size_request (out req);
+          requisition.width = int.max (requisition.width, req.width);
+          requisition.height = int.max (requisition.height, req.height);
+        }
       }
     }
     public override void size_allocate (Gdk.Rectangle allocation)
     {
-      Gdk.Rectangle aoverlay = {allocation.x,
-                                allocation.y + allocation.height / 2,
-                                allocation.width / 2,
-                                allocation.height / 2
-                                };
       Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
       set_allocation (alloc);    
-      main.size_allocate (allocation);
-      overlay.size_allocate (aoverlay);
+      if (widgets[Position.MAIN] != null)
+      {
+        widgets[Position.MAIN].size_allocate (allocation);
+      }
+      if (widgets[Position.TOP_LEFT] != null)
+      {
+        allocation.width = (int)(alloc.width * scale[Position.TOP_LEFT]);
+        allocation.height = (int)(alloc.height * scale[Position.TOP_LEFT]);
+        widgets[Position.TOP_LEFT].size_allocate (allocation);
+      }
+      if (widgets[Position.TOP_RIGHT] != null)
+      {
+        allocation.width = (int)(alloc.width * scale[Position.TOP_RIGHT]);
+        allocation.height = (int)(alloc.height * scale[Position.TOP_RIGHT]);
+        allocation.x = alloc.x + alloc.width - allocation.width;
+        widgets[Position.TOP_RIGHT].size_allocate (allocation);
+      }
+      if (widgets[Position.BOTTOM_RIGHT] != null)
+      {
+        allocation.width = (int)(alloc.width * scale[Position.BOTTOM_RIGHT]);
+        allocation.height = (int)(alloc.height * scale[Position.BOTTOM_RIGHT]);
+        allocation.x = alloc.x + alloc.width - allocation.width;
+        allocation.y = alloc.y + alloc.height - allocation.height;
+        widgets[Position.BOTTOM_RIGHT].size_allocate (allocation);
+      }
+      if (widgets[Position.BOTTOM_LEFT] != null)
+      {
+        allocation.width = (int)(alloc.width * scale[Position.BOTTOM_LEFT]);
+        allocation.height = (int)(alloc.height * scale[Position.BOTTOM_LEFT]);
+        allocation.x = alloc.x;
+        allocation.y = alloc.y + alloc.height - allocation.height;
+        widgets[Position.BOTTOM_LEFT].size_allocate (allocation);
+      }
     }
     public override void forall_internal (bool b, Gtk.Callback callback)
     {
-      if (main != null)
-        callback (main);
-      if (overlay != null)
-        callback (overlay);
+      for (int i = 0; i < 5; ++i)
+      {
+        if (widgets[i] != null)
+          callback (widgets[i]);
+      }
+    }
+    public void set_widget_in_position (Widget widget, Position pos)
+    {
+      if (widgets[pos] != null)
+        widgets[pos].unparent ();
+      widgets[pos] = widget;
+      if (widget != null)
+        widget.set_parent (this);
+    }
+    public void swapif (Widget w, Position pos1, Position pos2)
+    {
+      if (widgets[pos1] == w)
+        swap (pos1, pos2);
+    }
+    public void swap (Position pos1, Position pos2)
+    {
+      Widget t = widgets[pos1];
+      widgets[pos1] = widgets[pos2];
+      widgets[pos2] = t;
     }
 
     public override void add (Widget widget)
     {
-      if (main == null)
-      {
-        main = widget;
-      }
-      else if (overlay == null)
-      {
-        overlay = widget;
-      }
+      //TODO
     }
     public override void remove (Widget widget)
     {
-      if (overlay == widget)
-      {
-        widget.unparent ();
-        overlay = null;
-        return;
-      }
-      if (main == widget)
-      {
-        widget.unparent ();
-        main = null;
-      }
+      //TODO
     }
   }
   
@@ -352,6 +378,12 @@ namespace Sezen
       sep = new HSeparator();
       sep.set_parent (this);
       sep.show ();
+    }
+    
+    public void set_separator_visible (bool b)
+    {
+      sep.set_visible (b);
+      this.queue_resize ();
     }
     
     public void set_selection_align (SelectionAlign align)
@@ -410,7 +442,9 @@ namespace Sezen
         requisition.width = int.max(req.width, requisition.width);
         requisition.height = int.max(req.height, requisition.height);
       }
-      requisition.height += 4;
+      requisition.height += 1;
+      if (sep.visible)
+        requisition.height += 3;
     }
 
     public override void size_allocate (Gdk.Rectangle allocation)
@@ -448,6 +482,7 @@ namespace Sezen
       // update widget allocations and visibility
       i = 0;
       int pos = 0;
+      int sep_space = sep.visible ? 4 : 1;
       foreach (Widget w in childs)
       {
         w.size_request (out req);
@@ -463,7 +498,7 @@ namespace Sezen
           allocation.x = alloc.x + pos;
           allocation.width = req.width;
           allocation.height = req.height;
-          allocation.y = alloc.y + (alloc.height - 4 - req.height) / 2;
+          allocation.y = alloc.y + (alloc.height - sep_space - req.height) / 2;
           w.size_allocate (allocation);
           w.show_all ();
         }
@@ -482,6 +517,8 @@ namespace Sezen
       {
         callback (sep);
       }
+      if (childs.size == 0)
+        return;
       if (this.align == SelectionAlign.LEFT)
       {
         for (i = childs.size - 1; i >= 0; ++i)
@@ -619,12 +656,22 @@ namespace Sezen
     {
       current = "";
     }
+    public new void clear ()
+    {
+      current = "";
+      base.clear ();
+    }
     public void set_icon_name (string name, IconSize size)
     {
       if (name == current)
         return;
       else
       {
+        if (name == "")
+        {
+          this.clear ();
+          return;
+        }
         try
         {
           this.set_from_gicon (GLib.Icon.new_for_string (name), size);
@@ -642,6 +689,43 @@ namespace Sezen
           }
         }
       }
+    }
+  }
+  public class FakeInput: Label
+  {
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      var ctx = Gdk.cairo_create (this.window);
+      ctx.translate (0.5, 0.5);
+      ctx.set_operator (Cairo.Operator.OVER);
+      ctx.set_line_width (1.25);
+      Gtk.Style style = this.get_style();
+      double r = 0.0, g = 0.0, b = 0.0;
+      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], &r, &g, &b);
+      Utils.cairo_rounded_rect (ctx,
+                                this.allocation.x,
+                                this.allocation.y,
+                                this.allocation.width - 0.5,
+                                this.allocation.height - 0.5,
+                                int.min(this.xpad, this.ypad));
+      Utils.rgb_invert_color (out r, out g, out b);
+      ctx.set_source_rgba (r, g, b, 1.0);
+      Cairo.Path path = ctx.copy_path ();
+      ctx.save ();
+      ctx.clip ();
+      ctx.paint ();
+      Utils.rgb_invert_color (out r, out g, out b);
+      var pat = new Cairo.Pattern.linear (0, this.allocation.y, 0, this.allocation.y + 2 * this.ypad);
+      pat.add_color_stop_rgba (0, r, g, b, 0.6);
+      pat.add_color_stop_rgba (0.3, r, g, b, 0.25);
+      pat.add_color_stop_rgba (1.0, r, g, b, 0);
+      ctx.set_source (pat);
+      ctx.paint ();
+      ctx.restore ();
+      ctx.append_path (path);
+      ctx.set_source_rgba (r, g, b, 0.6);
+      ctx.stroke ();
+      return base.expose_event (event);
     }
   }
 }
