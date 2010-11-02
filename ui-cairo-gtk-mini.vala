@@ -57,7 +57,7 @@ namespace Sezen
     private const int SECTION_PADDING = 10;
     private const int BORDER_RADIUS = 10;
     private const int ICON_SIZE = 160;
-    private const int TOP_SPACING = ICON_SIZE / 4;
+    private const int TOP_SPACING = ICON_SIZE / 2;
     private const int LABEL_INTERNAL_PADDING = 3;
     private const string LABEL_TEXT_SIZE = "x-large";
     
@@ -122,9 +122,6 @@ namespace Sezen
       results_container.add (results_match);
       results_container.add (results_action);
 
-      throbber = new Throbber ();
-      throbber.set_size_request (22, 22);
-      
       /* Action Icon */
       action_icon = new NamedIcon ();
       action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
@@ -143,10 +140,19 @@ namespace Sezen
             (match_icon_thumb, ContainerOverlayed.Position.BOTTOM_LEFT);
       match_icon_container_overlayed.set_widget_in_position 
             (action_icon, ContainerOverlayed.Position.BOTTOM_RIGHT);
-      container_top.pack_start (match_icon_container_overlayed, false, true, SECTION_PADDING);
+      container_top.pack_start (match_icon_container_overlayed, false);
       
-      
-      //container_top.pack_start (action_icon, false, true, SECTION_PADDING);
+      throbber = new Throbber ();
+      throbber.set_size_request (22, 22);
+      {
+        var vbox = new VBox (false, 0);
+        var spacer = new Label (null);
+        spacer.set_size_request (-1, TOP_SPACING);
+        vbox.pack_start (spacer, false);
+        vbox.pack_start (throbber, false);
+        vbox.pack_start (new Label(null));
+        container_top.pack_start (vbox, false, true, 3);
+      }
       
       /* Match or Action Label */
       current_label = new FakeInput ();
@@ -161,16 +167,27 @@ namespace Sezen
         flag_selector.add (new Label(s));
       flag_selector.select (3);
       
-      var vbox = new VBox (false, 0);
-      var spacer = new Label (null);
-      spacer.set_size_request (-1, TOP_SPACING);
-      vbox.pack_start (spacer);
-      vbox.pack_start (new Label(null));
-      vbox.pack_start (flag_selector, false);
-      vbox.pack_start (current_label, false);
-      vbox.pack_start (new Label(null));
-      container_top.pack_start (vbox, true, true, SECTION_PADDING);
-      
+      /* Pref item */
+      var pref = new MenuButton ();
+      pref.set_size_request (7, 7);
+      {
+        var vbox = new VBox (false, 0);
+        var spacer = new Label (null);
+        spacer.set_size_request (-1, TOP_SPACING);
+        vbox.pack_start (spacer, false);
+        vbox.pack_start (flag_selector, false);
+        vbox.pack_start (current_label, false);
+        vbox.pack_start (new Label(null));
+        container_top.pack_start (vbox);
+      }
+      {
+        var vbox = new VBox (false, 0);
+        var spacer = new Label (null);
+        spacer.set_size_request (-1, TOP_SPACING);
+        vbox.pack_start (spacer, false);
+        vbox.pack_start (pref, false, false);
+        container_top.pack_start (vbox, false);
+      }
       container.show_all ();
     }
     
@@ -217,8 +234,9 @@ namespace Sezen
       {
         double ly = y + h - BORDER_RADIUS;
         double lh = results_container.allocation.y - ly + results_container.allocation.height;
+        Utils.gdk_color_to_rgb (style.base[Gtk.StateType.NORMAL], &r, &g, &b);
         ctx.rectangle (x, ly, w, lh);
-        ctx.set_source_rgba (1, 1, 1, 1);
+        ctx.set_source_rgba (r, g, b, 1);
         ctx.fill ();
         Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         Utils.rgb_invert_color (out r, out g, out b);
@@ -448,7 +466,7 @@ namespace Sezen
     }
     public override void hide ()
     {
-      window.hide ();
+      hide_and_reset ();
     }
     public override void present_with_time (uint32 timestamp)
     {

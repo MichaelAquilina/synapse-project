@@ -30,7 +30,7 @@ namespace Sezen
   public class ResultBox: EventBox
   {
     private const int VISIBLE_RESULTS = 5;
-    private const int ICON_SIZE = 35;
+    private const int ICON_SIZE = 36;
     private int mwidth;
     private int nrows;
     private bool no_results;
@@ -87,13 +87,13 @@ namespace Sezen
 		
     private void build_ui()
     {
+      view = new TreeView ();
+      
       var vbox = new VBox (false, 0);
       this.expose_event.connect (on_expose);
-      vbox.border_width = 1;
+      vbox.border_width = 0;
       this.add (vbox);
-      var resultsScrolledWindow = new ScrolledWindow (null, null);
-      resultsScrolledWindow.set_policy (PolicyType.NEVER, PolicyType.NEVER);
-      vbox.pack_start (resultsScrolledWindow);
+      vbox.pack_start (view);
       var status_box = new HBox (false, 0);
       status_box.set_size_request (-1, 15);
       vbox.pack_start (status_box, false);
@@ -107,13 +107,11 @@ namespace Sezen
       status_box.pack_start (new Label (null), true, false);
       status_box.pack_start (logo, false, false, 10);
       
-      view = new TreeView ();
 			view.enable_search = false;
 			view.headers_visible = false;
 			// If this is not set the tree will call IconDataFunc for all rows to 
-			// determine the total height of the tree
+			// determine the total height of the tree (Thanks Do)
 			view.fixed_height_mode = true;
-			resultsScrolledWindow.add (view);
 			view.show();
       // Model
       view.model = results = new ListStore(2, typeof(GLib.Icon), typeof(string));
@@ -122,30 +120,33 @@ namespace Sezen
 			column.sizing = Gtk.TreeViewColumnSizing.FIXED;
 
 			var crp = new CellRendererPixbuf ();
-      crp.set_fixed_size (ICON_SIZE, ICON_SIZE);
       crp.stock_size = IconSize.DND;
 			column.pack_start (crp, false);
 			column.add_attribute (crp, "gicon", (int) Column.IconColumn);
 			
 			var ctxt = new CellRendererText ();
 			ctxt.ellipsize = Pango.EllipsizeMode.END;
-			ctxt.set_fixed_size (mwidth - ICON_SIZE, ICON_SIZE);
 			column.pack_start (ctxt, false);
       column.add_attribute (ctxt, "markup", (int) Column.NameColumn);
+      ctxt.xpad = 5;
       
       view.append_column (column);
       
       Requisition requisition = {0, 0};
       status_box.size_request (out requisition);
+      int cellh = ICON_SIZE;
+      crp.set_fixed_size (ICON_SIZE, cellh);
+      ctxt.set_fixed_size (mwidth - ICON_SIZE, cellh);
+
       requisition.width = mwidth;
-      requisition.height += nrows * (ICON_SIZE + 4) + 2;
+      requisition.height += nrows * (cellh + 2 * int.max((int)crp.ypad, (int)ctxt.ypad) );
       vbox.set_size_request (requisition.width, requisition.height); 
     }
 
     public void update_matches (Gee.List<Sezen.Match>? rs)
     {
       results.clear();
-      if (rs==null)
+      if (rs==null || rs.size == 0)
       {
         no_results = true;
         status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
@@ -444,9 +445,9 @@ namespace Sezen
         requisition.width = int.max(req.width, requisition.width);
         requisition.height = int.max(req.height, requisition.height);
       }
-      requisition.height += 1;
+      sep.size_request (out req);
       if (sep.visible)
-        requisition.height += 3;
+        requisition.height += req.height * 2;
     }
 
     public override void size_allocate (Gdk.Rectangle allocation)
@@ -484,7 +485,8 @@ namespace Sezen
       // update widget allocations and visibility
       i = 0;
       int pos = 0;
-      int sep_space = sep.visible ? 4 : 1;
+      sep.size_request (out req);
+      int sep_space = sep.visible ? req.height * 2 : 0;
       foreach (Widget w in childs)
       {
         w.size_request (out req);
@@ -507,8 +509,8 @@ namespace Sezen
         ++i;
       }
       allocation.x = alloc.x;
-      allocation.y = alloc.y + alloc.height - 3;
-      allocation.height = 2;
+      allocation.y = alloc.y + alloc.height - sep_space * 3 / 2;
+      allocation.height = sep_space;
       allocation.width = alloc.width;
       sep.size_allocate (allocation);
     }
@@ -729,6 +731,41 @@ namespace Sezen
       ctx.set_source_rgba (r, g, b, 0.6);
       ctx.stroke ();
       return base.expose_event (event);
+    }
+  }
+  
+  public class MenuButton: Button
+  {
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
+      set_allocation (alloc);
+    }
+    public override void size_request (out Requisition requisition)
+    {
+      requisition.width = 5;
+      requisition.height = 5;
+    }
+    
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      var ctx = Gdk.cairo_create (this.window);
+      double SIZE = 0.5;
+      ctx.translate (SIZE, SIZE);
+      ctx.set_operator (Cairo.Operator.OVER);
+      
+      Gtk.Style style = this.get_style();
+      double r = 0.0, g = 0.0, b = 0.0;
+      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.INSENSITIVE], &r, &g, &b);
+      ctx.set_source_rgba (r, g, b, 1.0);
+      
+      ctx.new_path ();
+      ctx.move_to (this.allocation.x, this.allocation.y);
+      ctx.rel_line_to (this.allocation.width - SIZE * 2, this.allocation.height - SIZE * 2);
+      ctx.rel_line_to (0, - this.allocation.height + SIZE * 2);
+      ctx.close_path ();
+      ctx.fill ();
+      return true;
     }
   }
 
