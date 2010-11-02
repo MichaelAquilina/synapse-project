@@ -154,6 +154,7 @@ namespace Sezen
       current_label.xpad = LABEL_INTERNAL_PADDING * 2;
       current_label.ypad = LABEL_INTERNAL_PADDING;
       current_label.set_alignment (0.0f, 0.5f);
+      current_label.set_ellipsize (Pango.EllipsizeMode.END);
       
       /* Query flag selector  */
       flag_selector = new HSelectionContainer(_hilight_label, 15);

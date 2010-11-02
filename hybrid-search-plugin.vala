@@ -161,7 +161,11 @@ namespace Sezen
     protected override void constructed ()
     {
       // FIXME: if zeitgeist-plugin available
-      data_sink.plugin_search_done.connect (this.zg_plugin_search_done);
+      unowned DataPlugin? zg_plugin;
+      zg_plugin = data_sink.get_plugin ("SezenZeitgeistPlugin");
+      return_if_fail (zg_plugin != null);
+      
+      zg_plugin.search_done.connect (this.zg_plugin_search_done);
     }
 
     private const string RECENT_XML_NAME = ".recently-used.xbel";
@@ -243,27 +247,24 @@ namespace Sezen
       }
     }
 
-    private void zg_plugin_search_done (DataPlugin plugin, ResultSet? rs)
+    private void zg_plugin_search_done (ResultSet? rs)
     {
-      if (plugin.get_type ().name ().has_prefix ("SezenZeitgeistPlugin"))
+      // let's mine directories ZG is aware of
+      Gee.Set<string> uris = new Gee.HashSet<string> ();
+      foreach (var match in rs) uris.add (match.key.uri);
+
+      int current_hit_level = hit_level;
+
+      process_uris.begin (uris, (obj, res) =>
       {
-        // let's mine directories ZG is aware of
-        Gee.Set<string> uris = new Gee.HashSet<string> ();
-        foreach (var match in rs) uris.add (match.key.uri);
+        process_uris.end (res);
 
-        int current_hit_level = hit_level;
+        current_level_uris = uris.size;
+        hit_level = current_hit_level+1;
+        //debug ("Hit_level: %d - %d uris", hit_level, current_level_uris);
 
-        process_uris.begin (uris, (obj, res) =>
-        {
-          process_uris.end (res);
-
-          current_level_uris = uris.size;
-          hit_level = current_hit_level+1;
-          //debug ("Hit_level: %d - %d uris", hit_level, current_level_uris);
-
-          hits_updated (rs);
-        });
-      }
+        hits_updated (rs);
+      });
     }
 
     public signal void hits_updated (ResultSet original_rs);
