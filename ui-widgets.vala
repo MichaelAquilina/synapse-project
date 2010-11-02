@@ -733,14 +733,76 @@ namespace Sezen
   public class ShrinkingLabel: Gtk.Label
   {
     private const double STEP = 1.0466351393921056; // (1.2)^1/4
+    
     public string default_size { get; set; default = "x-large"; }
     public string min_size { get; set; default = "medium"; }
+    private double min_scale = 1.0;
+
+    construct
+    {
+      this.notify["min-size"].connect (this.min_size_changed);
+    }
+    
+    private void min_size_changed ()
+    {
+      switch (min_size)
+      {
+        case "xx-small":
+          min_scale = Pango.Scale.XX_SMALL;
+          break;
+        case "x-small":
+          min_scale = Pango.Scale.X_SMALL;
+          break;
+        case "small":
+          min_scale = Pango.Scale.SMALL;
+          break;
+        case "medium":
+          min_scale = Pango.Scale.MEDIUM;
+          break;
+        case "large":
+          min_scale = Pango.Scale.LARGE;
+          break;
+        case "x-large":
+          min_scale = Pango.Scale.X_LARGE;
+          break;
+        case "xx-large":
+          min_scale = Pango.Scale.XX_LARGE;
+          break;
+        default:
+          warning ("\"%s\" is not valid for min-size property", min_size);
+          min_scale = 1.0;
+          break;
+      }
+    }
     
     private Gtk.Requisition base_req;
+    
     protected override void size_request (out Gtk.Requisition req)
     {
       req.width = base_req.width;
       req.height = base_req.height;
+    }
+
+    protected override void size_allocate (Gdk.Rectangle alloc)
+    {
+      base.size_allocate (alloc);
+      
+      var layout = this.get_layout ();
+      if (this.get_ellipsize () != Pango.EllipsizeMode.NONE)
+      {
+        int width = (int) ((alloc.width - this.xpad * 2) * Pango.SCALE);
+        Pango.Rectangle logical;
+        
+        layout.set_width (-1);
+        layout.get_extents (null, out logical);
+
+        while (logical.width > width && downscale ())
+        {
+          layout.get_extents (null, out logical);
+        }
+        
+        if (logical.width > width) layout.set_width (width);
+      }
     }
     
     public new void set_markup (string markup)
@@ -762,7 +824,7 @@ namespace Sezen
         if (attr != null)
         {
           unowned Pango.AttrFloat a = (Pango.AttrFloat) attr;
-          if (a.value > 1) // FIXME: value based on min_size
+          if (a.value > min_scale)
           {
             a.value /= STEP;
             changed = true;
@@ -772,28 +834,6 @@ namespace Sezen
       
       if (changed) context.context_changed (); // force recomputation
       return changed;
-    }
-    
-    protected override void size_allocate (Gdk.Rectangle alloc)
-    {
-      base.size_allocate (alloc);
-      
-      var layout = this.get_layout ();
-      if (this.get_ellipsize () != Pango.EllipsizeMode.NONE)
-      {
-        int width = (int) ((alloc.width - this.xpad * 2) * Pango.SCALE);
-        Pango.Rectangle logical;
-        
-        layout.set_width (-1);
-        layout.get_extents (null, out logical);
-
-        while (logical.width > width && downscale ())
-        {
-          layout.get_extents (null, out logical);
-        }
-        
-        if (logical.width > width) layout.set_width (width);
-      }
     }
     
     public ShrinkingLabel ()
