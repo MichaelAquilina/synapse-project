@@ -98,6 +98,7 @@ namespace Sezen
         unowned string uri = subject.get_uri ();
         if (!(uri in uris))
         {
+          int relevancy_penalty = Match.URI_PENALTY;
           string? thumbnail_path = null;
           string? icon = null;
           uris.add (uri);
@@ -130,6 +131,7 @@ namespace Sezen
           }
           else
           {
+            relevancy_penalty += 5;
             if (f.get_uri_scheme () == "data") continue;
             unowned string mimetype = subject.get_mimetype ();
             if (mimetype != null && mimetype != "")
@@ -145,7 +147,7 @@ namespace Sezen
           {
             if (matcher.key.match (match_obj.title))
             {
-              results.add (match_obj, matcher.value - Match.URI_PENALTY);
+              results.add (match_obj, matcher.value - relevancy_penalty);
               match_found = true;
               break;
             }
