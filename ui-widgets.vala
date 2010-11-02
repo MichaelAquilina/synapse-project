@@ -731,6 +731,42 @@ namespace Sezen
       return base.expose_event (event);
     }
   }
+  
+  public class MenuButton: Button
+  {
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
+      set_allocation (alloc);
+    }
+    public override void size_request (out Requisition requisition)
+    {
+      requisition.width = 5;
+      requisition.height = 4;
+    }
+    
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      var ctx = Gdk.cairo_create (this.window);
+      ctx.translate (0.5, 0.5);
+      ctx.set_operator (Cairo.Operator.OVER);
+      
+      Gtk.Style style = this.get_style();
+      double r = 0.0, g = 0.0, b = 0.0;
+      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+      Utils.rgb_invert_color (out r, out g, out b);
+      ctx.set_source_rgba (r, g, b, 1.0);
+      
+      ctx.new_path ();
+      ctx.move_to (this.allocation.x, this.allocation.y);
+      ctx.rel_line_to (this.allocation.width, 0);
+      ctx.rel_line_to (- this.allocation.width / 2, this.allocation.height);
+      ctx.close_path ();
+      
+      ctx.fill ();
+      return true;
+    }
+  }
 
   public class ShrinkingLabel: Gtk.Label
   {

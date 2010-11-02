@@ -57,7 +57,7 @@ namespace Sezen
     private const int SECTION_PADDING = 10;
     private const int BORDER_RADIUS = 10;
     private const int ICON_SIZE = 160;
-    private const int TOP_SPACING = ICON_SIZE / 4;
+    private const int TOP_SPACING = ICON_SIZE / 2;
     private const int LABEL_INTERNAL_PADDING = 3;
     private const string LABEL_TEXT_SIZE = "x-large";
     
@@ -148,7 +148,7 @@ namespace Sezen
         var vbox = new VBox (false, 0);
         var spacer = new Label (null);
         spacer.set_size_request (-1, TOP_SPACING);
-        vbox.pack_start (spacer);
+        vbox.pack_start (spacer, false);
         vbox.pack_start (new Label(null));
         vbox.pack_start (throbber, false);
         vbox.pack_start (new Label(null));
@@ -169,25 +169,26 @@ namespace Sezen
       flag_selector.select (3);
       
       /* Pref item */
-      var pref = new NamedIcon ();
-      pref.set_from_stock (Gtk.STOCK_PREFERENCES, IconSize.MENU);
-      pref.set_pixel_size (22);
-      pref.set_size_request (22, 22);
+      var pref = new MenuButton ();
+      pref.set_size_request (10, 7);
       {
-        var hbox = new HBox (false, 0);
-        hbox.pack_start (flag_selector);
-        hbox.pack_start (pref, false);
         var vbox = new VBox (false, 0);
         var spacer = new Label (null);
         spacer.set_size_request (-1, TOP_SPACING);
-        vbox.pack_start (spacer);
-        vbox.pack_start (new Label(null));
-        vbox.pack_start (hbox, false);
+        vbox.pack_start (spacer, false);
+        vbox.pack_start (flag_selector, false);
         vbox.pack_start (current_label, false);
         vbox.pack_start (new Label(null));
-        container_top.pack_start (vbox, true, true, SECTION_PADDING);
+        container_top.pack_start (vbox);
       }
-
+      {
+        var vbox = new VBox (false, 0);
+        var spacer = new Label (null);
+        spacer.set_size_request (-1, TOP_SPACING);
+        vbox.pack_start (spacer, false);
+        vbox.pack_start (pref, false, false);
+        container_top.pack_start (vbox, false);
+      }
       container.show_all ();
     }
     
