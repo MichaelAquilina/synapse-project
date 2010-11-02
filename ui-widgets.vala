@@ -172,6 +172,8 @@ namespace Sezen
     public void move_selection_to_index (int i)
     {
       var sel = view.get_selection ();
+      if (no_results)
+        return;
       Gtk.TreePath path = new TreePath.from_string( i.to_string() );
       /* Scroll to path */
       Timeout.add(1, () => {

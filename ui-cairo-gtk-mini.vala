@@ -87,7 +87,7 @@ namespace Sezen
 
       window.key_press_event.connect (key_press_event);
 
-/*    set_list_visible (false); */
+      set_list_visible (false);
       
       /* SEZEN */
       focus_match (0, null);
@@ -129,7 +129,6 @@ namespace Sezen
       action_icon = new NamedIcon ();
       action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
       action_icon.set_alignment (0.5f, 0.5f);
-      action_icon.sensitive = false;
       /* Match Icon packed into container_top */
       match_icon_container_overlayed = new ContainerOverlayed();
       match_icon_thumb = new NamedIcon();
@@ -153,7 +152,7 @@ namespace Sezen
       current_label = new FakeInput ();
       current_label.xpad = LABEL_INTERNAL_PADDING * 2;
       current_label.ypad = LABEL_INTERNAL_PADDING;
-      current_label.set_alignment (0.0f, 0.5f);
+      current_label.set_alignment (0.0f, 1.0f);
       current_label.set_ellipsize (Pango.EllipsizeMode.END);
       
       /* Query flag selector  */
@@ -172,14 +171,18 @@ namespace Sezen
       vbox.pack_start (new Label(null));
       container_top.pack_start (vbox, true, true, SECTION_PADDING);
       
-      //DEBUG
-      match_icon.set_icon_name ("pidgin", IconSize.DIALOG);
-      action_icon.set_icon_name ("system-run", IconSize.DIALOG);
-      action_icon.sensitive = true;
-      current_label.set_markup (Utils.markup_string_with_search ("match.title", "title", LABEL_TEXT_SIZE));
-      
       container.show_all ();
     }
+    
+    private void set_list_visible (bool b)
+    {
+      if (b == list_visible)
+        return;
+      list_visible = b;
+      results_container.visible = b;
+      window.queue_draw ();
+    }
+    
     protected virtual void on_composited_changed (Widget w)
     {
       Gdk.Screen screen = w.get_screen ();
@@ -292,7 +295,11 @@ namespace Sezen
       {
         s = s.substring (0, len - 1);
         if (searching_for_matches)
+        {
           set_match_search (s);
+          if (s == "")
+            set_list_visible (false);
+        }
         else
           set_action_search (s);
       }
@@ -318,6 +325,15 @@ namespace Sezen
         results_container.select (1);
       }
     }
+    private void hide_and_reset ()
+    {
+      window.hide ();
+      set_list_visible (false);
+      flag_selector.select (3);
+      searching_for_matches = true;
+      visual_update_search_for ();
+      reset_search ();
+    }
     protected virtual bool key_press_event (Gdk.EventKey event)
     {
       if (im_context.filter_keypress (event)) return true;
@@ -329,14 +345,29 @@ namespace Sezen
         case Gdk.KeySyms.KP_Enter:
         case Gdk.KeySyms.ISO_Enter:
           if (execute ())
-            ;//hide_and_reset ();
+            hide_and_reset ();
           break;
         case Gdk.KeySyms.Delete:
         case Gdk.KeySyms.BackSpace:
           search_delete_char ();
           break;
         case Gdk.KeySyms.Escape:
-          
+          if (!searching_for_matches)
+          {
+            set_action_search ("");
+            searching_for_matches = true;
+            visual_update_search_for ();
+            window.queue_draw ();
+          }
+          else if (get_match_search() != "")
+          {
+            set_match_search("");
+            set_list_visible (false);
+          }
+          else
+          {
+            hide_and_reset ();
+          }
           break;
         case Gdk.KeySyms.Left:
           flag_selector.select_prev ();
@@ -359,10 +390,25 @@ namespace Sezen
           update_query_flags (this.categories_query[flag_selector.get_selected()]);
           break;
         case Gdk.KeySyms.Up:
-          
+          bool b = true;
+          if (searching_for_matches)
+            b = select_prev_match ();
+          else
+            b = select_prev_action ();
+          if (!b)
+            set_list_visible (false);
           break;
         case Gdk.KeySyms.Down:
-          
+          if (!list_visible)
+          {
+            set_list_visible (true);
+            return true;
+          }
+          if (searching_for_matches)
+            select_next_match ();
+          else
+            select_next_action ();
+          set_list_visible (true);
           break;
         case Gdk.KeySyms.Tab:
           if (searching_for_matches && 
@@ -449,6 +495,7 @@ namespace Sezen
         if (searching_for_matches)
           current_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE));
       }
+      results_match.move_selection_to_index (index);
     }
     protected override void focus_action ( int index, Match? action )
     {
@@ -466,6 +513,7 @@ namespace Sezen
         if (!searching_for_matches)
           current_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search (), LABEL_TEXT_SIZE));
       }
+      results_action.move_selection_to_index (index);
     }
     protected override void update_match_result_list (Gee.List<Match>? matches, int index, Match? match)
     {
