@@ -145,7 +145,7 @@ namespace Sezen
     public void update_matches (Gee.List<Sezen.Match>? rs)
     {
       results.clear();
-      if (rs==null)
+      if (rs==null || rs.size == 0)
       {
         no_results = true;
         status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
