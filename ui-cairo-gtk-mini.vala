@@ -43,8 +43,12 @@ namespace Sezen
     protected HSelectionContainer flag_selector = null;
     protected HBox container_top = null;
     protected VBox container = null;
+    
+    protected HSelectionContainer results_container = null;
 
-    protected ResultBox result_box = null;
+    protected ResultBox results_match = null;
+    protected ResultBox results_action = null;
+    
     protected Sezen.Throbber throbber = null;
 
     private const int UI_WIDTH = 600; // height is dynamic
@@ -52,7 +56,8 @@ namespace Sezen
     private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
     private const int SECTION_PADDING = 10;
     private const int BORDER_RADIUS = 10;
-    private const int ICON_SIZE = 192;
+    private const int ICON_SIZE = 160;
+    private const int TOP_SPACING = ICON_SIZE / 4;
     private const int LABEL_INTERNAL_PADDING = 3;
     private const string LABEL_TEXT_SIZE = "x-large";
     
@@ -101,11 +106,21 @@ namespace Sezen
       /* containers holds top hbox and result list */
       container = new VBox (false, 0);
       container.set_size_request (UI_WIDTH, -1);
+      container.border_width = SHADOW_SIZE;
       window.add (container);
       
       container_top = new HBox (false, 0);
       container_top.border_width = BORDER_RADIUS;
-      container.add (container_top);
+      container.pack_start (container_top, false);
+      
+      results_container = new HSelectionContainer (null, 0);
+      results_container.set_separator_visible (false);
+      container.pack_start (results_container, false);
+      
+      results_match = new ResultBox (UI_WIDTH - SHADOW_SIZE * 2 - 2);
+      results_action = new ResultBox (UI_WIDTH - SHADOW_SIZE * 2 - 2);
+      results_container.add (results_match);
+      results_container.add (results_action);
 
       throbber = new Throbber ();
       throbber.set_size_request (22, 22);
@@ -147,6 +162,9 @@ namespace Sezen
       flag_selector.select (3);
       
       var vbox = new VBox (false, 0);
+      var spacer = new Label (null);
+      spacer.set_size_request (-1, TOP_SPACING);
+      vbox.pack_start (spacer);
       vbox.pack_start (new Label(null));
       vbox.pack_start (flag_selector, false);
       vbox.pack_start (current_label, false);
@@ -154,7 +172,6 @@ namespace Sezen
       container_top.pack_start (vbox, true, true, SECTION_PADDING);
       
       //DEBUG
-      container.border_width = SHADOW_SIZE;
       match_icon.set_icon_name ("pidgin", IconSize.DIALOG);
       action_icon.set_icon_name ("system-run", IconSize.DIALOG);
       action_icon.sensitive = true;
@@ -185,13 +202,29 @@ namespace Sezen
       var ctx = Gdk.cairo_create (widget.get_window ());
       ctx.set_operator (Operator.CLEAR);
       ctx.paint ();
-      ctx.set_operator (Operator.OVER);
       Gtk.Style style = widget.get_style();
       double r = 0.0, g = 0.0, b = 0.0;
       double x = this.container.border_width,
              y = flag_selector.allocation.y - BORDER_RADIUS;
       double w = UI_WIDTH - this.container.border_width * 2,
              h = current_label.allocation.y - y + current_label.allocation.height + BORDER_RADIUS;
+      ctx.set_operator (Operator.OVER);
+      if (list_visible)
+      {
+        double ly = y + h - BORDER_RADIUS;
+        double lh = results_container.allocation.y - ly + results_container.allocation.height;
+        ctx.rectangle (x, ly, w, lh);
+        ctx.set_source_rgba (1, 1, 1, 1);
+        ctx.fill ();
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.rgb_invert_color (out r, out g, out b);
+        if (comp)
+        {
+          //draw shadow
+          Utils.cairo_make_shadow_for_rect (ctx, x, ly, w, lh, 0,
+                                            r, g, b, 0.9, SHADOW_SIZE);
+        }
+      }
       if (comp)
       {
         //draw shadow
@@ -200,6 +233,7 @@ namespace Sezen
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
                                           r, g, b, 0.9, SHADOW_SIZE);
       }
+      ctx.set_operator (Operator.OVER);
       Pattern pat = new Pattern.linear(0, flag_selector.allocation.y - BORDER_RADIUS, 0,
                                           current_label.allocation.y + BORDER_RADIUS);
       Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
@@ -210,7 +244,7 @@ namespace Sezen
       pat.add_color_stop_rgba (1, double.max(r - 0.15, 0),
                                   double.max(g - 0.15, 0),
                                   double.max(b - 0.15, 0),
-                                  0.98);
+                                  1.0);
       Utils.cairo_rounded_rect (ctx, x, y, w, h, BORDER_RADIUS);
       ctx.set_source (pat);
       ctx.fill ();
@@ -271,6 +305,7 @@ namespace Sezen
         match_icon_container_overlayed.swapif (action_icon,
                                                ContainerOverlayed.Position.MAIN,
                                                ContainerOverlayed.Position.BOTTOM_RIGHT);
+        results_container.select (0);
       }
       else
       {
@@ -279,6 +314,7 @@ namespace Sezen
         match_icon_container_overlayed.swapif (match_icon,
                                                ContainerOverlayed.Position.MAIN,
                                                ContainerOverlayed.Position.BOTTOM_RIGHT);
+        results_container.select (1);
       }
     }
     protected virtual bool key_press_event (Gdk.EventKey event)
@@ -432,10 +468,12 @@ namespace Sezen
     }
     protected override void update_match_result_list (Gee.List<Match>? matches, int index, Match? match)
     {
+      results_match.update_matches (matches);
       focus_match ( index, match );
     }
     protected override void update_action_result_list (Gee.List<Match>? actions, int index, Match? action)
     {
+      results_action.update_matches (actions);
       focus_action ( index, action );
     }
   }

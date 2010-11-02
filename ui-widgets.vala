@@ -380,6 +380,12 @@ namespace Sezen
       sep.show ();
     }
     
+    public void set_separator_visible (bool b)
+    {
+      sep.set_visible (b);
+      this.queue_resize ();
+    }
+    
     public void set_selection_align (SelectionAlign align)
     {
       this.align = align;
@@ -436,7 +442,9 @@ namespace Sezen
         requisition.width = int.max(req.width, requisition.width);
         requisition.height = int.max(req.height, requisition.height);
       }
-      requisition.height += 4;
+      requisition.height += 1;
+      if (sep.visible)
+        requisition.height += 3;
     }
 
     public override void size_allocate (Gdk.Rectangle allocation)
@@ -474,6 +482,7 @@ namespace Sezen
       // update widget allocations and visibility
       i = 0;
       int pos = 0;
+      int sep_space = sep.visible ? 4 : 1;
       foreach (Widget w in childs)
       {
         w.size_request (out req);
@@ -489,7 +498,7 @@ namespace Sezen
           allocation.x = alloc.x + pos;
           allocation.width = req.width;
           allocation.height = req.height;
-          allocation.y = alloc.y + (alloc.height - 4 - req.height) / 2;
+          allocation.y = alloc.y + (alloc.height - sep_space - req.height) / 2;
           w.size_allocate (allocation);
           w.show_all ();
         }
@@ -508,6 +517,8 @@ namespace Sezen
       {
         callback (sep);
       }
+      if (childs.size == 0)
+        return;
       if (this.align == SelectionAlign.LEFT)
       {
         for (i = childs.size - 1; i >= 0; ++i)
