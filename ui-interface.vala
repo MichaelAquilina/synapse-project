@@ -104,6 +104,25 @@ namespace Sezen
       search[T.ACTION] = "";
       search_for_matches ();
     }
+    protected void select_first_last_match (bool first)
+    {
+      util_select_first_last (first, T.MATCH);
+    }
+    protected void select_first_last_action (bool first)
+    {
+      util_select_first_last (first, T.ACTION);
+    }
+    private void util_select_first_last (bool first, T t)
+    {
+      if (results[t] == null || results[t].size == 0)
+        return;
+      focus_index[t] = first ? 0 : results[t].size - 1;
+      focus[t] = results[t].get (focus_index[t]);
+      if (t == T.MATCH)
+        focus_match (focus_index[t], focus[t]);
+      else
+        focus_action (focus_index[t], focus[t]);
+    }
     protected bool select_next_match ()
     {
       return select_match_next_prev (true);
