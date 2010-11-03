@@ -868,6 +868,7 @@ namespace Sezen
                                                              markup));
       base.size_request (out base_req);
       small_req = base_req;
+      this.size_allocate ((Gdk.Rectangle) this.allocation);
     }
     
     private bool downscale ()
