@@ -36,8 +36,8 @@ namespace Sezen
     private int mwidth;
     private int nrows;
     private bool no_results;
+    private int items;
 
-    private int cellh;
     private VBox vbox;
     private HBox status_box;
     
@@ -45,7 +45,7 @@ namespace Sezen
     {
       this.mwidth = width;
       this.nrows = nrows;
-      cellh = 0;
+      items = 0;
       no_results = true;
       build_ui();
     }
@@ -115,6 +115,7 @@ namespace Sezen
       status_box.pack_start (logo, false, false, 10);
       
 			view.enable_search = false;
+			view.show_expanders = false;
 			view.headers_visible = false;
 			view.fixed_height_mode = true; // speedup but use Gtk.TreeViewColumnSizing.FIXED
 			view.show();
@@ -131,10 +132,9 @@ namespace Sezen
 			ctxt.ellipsize = Pango.EllipsizeMode.END;
 			ctxt.xpad = 5;
 
-			int pad = 1;
       crp.ypad = 0;
       ctxt.ypad = 0;
-      cellh = ICON_SIZE + pad * 2;
+      int cellh = ICON_SIZE;
       crp.set_fixed_size (ICON_SIZE, cellh);
       ctxt.set_fixed_size (mwidth - ICON_SIZE, cellh);
 
@@ -147,17 +147,22 @@ namespace Sezen
       on_view_style_set (view, null);
       view.style_set.connect (on_view_style_set);
     }
-
     private void on_view_style_set (Gtk.Widget widget, Gtk.Style? prev_style)
     {
-      int vspacing = 0;
-      view.style.get (typeof (TreeView), "vertical-separator", out vspacing);
+      /* WORKAROUND FOR ROW HEIGHT */
       Requisition requisition = {0, 0};
+      TreeIter iter;
+      results.append (out iter);
+      results.set (iter, Column.ICON_COLUMN, null, Column.NAME_COLUMN, "");
+      view.size_request (out requisition);
+      results.remove (iter);
+      int cellh = requisition.height / (items + 1);
       status_box.size_request (out requisition);
       requisition.width = mwidth;
-      requisition.height += nrows * (cellh + vspacing * 2);
+      requisition.height += nrows * cellh;
       vbox.set_size_request (requisition.width, requisition.height);
-      vbox.queue_draw ();
+      this.queue_resize ();
+      this.queue_draw ();
     }
 
     public void update_matches (Gee.List<Sezen.Match>? rs)
@@ -166,9 +171,11 @@ namespace Sezen
       if (rs==null || rs.size == 0)
       {
         no_results = true;
+        items = 0;
         status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
         return;
       }
+      items = rs.size;
       no_results = false;
       string desc;
       TreeIter iter;
