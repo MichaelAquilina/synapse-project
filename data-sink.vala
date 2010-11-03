@@ -124,7 +124,7 @@ namespace Sezen
     public abstract async ResultSet? search (Query query) throws SearchError;
 
     // weirdish kind of signal cause DataSink will be emitting it for the plugin
-    public signal void search_done (ResultSet rs);
+    public signal void search_done (ResultSet rs, uint query_id);
   }
   
   public abstract class ActionPlugin : DataPlugin
@@ -149,11 +149,13 @@ namespace Sezen
 
     private Gee.Set<DataPlugin> plugins;
     private Gee.Set<ActionPlugin> actions;
+    private uint query_id;
 
     construct
     {
       plugins = new Gee.HashSet<DataPlugin> ();
       actions = new Gee.HashSet<ActionPlugin> ();
+      query_id = 0;
 
       load_plugins ();
     }
@@ -216,7 +218,7 @@ namespace Sezen
                                          ResultSet? dest_result_set,
                                          Cancellable? cancellable = null) throws SearchError
     {
-      var q = Query (query, flags);
+      var q = Query (query_id++, query, flags);
 
       var cancellables = new GLib.List<Cancellable> ();
 
@@ -240,7 +242,7 @@ namespace Sezen
           try
           {
             var results = plugin.search.end (res);
-            plugin.search_done (results); // FIXME: add a search_id param?
+            plugin.search_done (results, q.query_id);
             current_result_set.add_all (results);
           }
           catch (SearchError err)
@@ -279,7 +281,7 @@ namespace Sezen
     public Gee.List<Match> find_actions_for_match (Match match, string? query)
     {
       var rs = new ResultSet ();
-      var q = Query (query ?? "");
+      var q = Query (0, query ?? "");
       foreach (var action_plugin in actions)
       {
         rs.add_all (action_plugin.find_for_match (q, match));

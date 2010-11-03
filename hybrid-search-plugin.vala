@@ -247,7 +247,7 @@ namespace Sezen
       }
     }
 
-    private void zg_plugin_search_done (ResultSet? rs)
+    private void zg_plugin_search_done (ResultSet? rs, uint query_id)
     {
       // let's mine directories ZG is aware of
       Gee.Set<string> uris = new Gee.HashSet<string> ();

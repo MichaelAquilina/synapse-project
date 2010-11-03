@@ -276,7 +276,7 @@ namespace Sezen
                                         new Zeitgeist.TimeRange (int64.MIN, int64.MAX),
                                         (owned) templates,
                                         0,
-                                        96,
+                                        q.max_results,
                                         Zeitgeist.ResultType.MOST_RECENT_SUBJECTS,
                                         q.cancellable);
 
