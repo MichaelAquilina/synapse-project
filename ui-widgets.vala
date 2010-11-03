@@ -707,12 +707,13 @@ namespace Sezen
       Gtk.Style style = this.get_style();
       double r = 0.0, g = 0.0, b = 0.0;
       Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], &r, &g, &b);
+      int rad = int.max (1, int.min(this.xpad, this.ypad));
       Utils.cairo_rounded_rect (ctx,
                                 this.allocation.x,
                                 this.allocation.y,
-                                this.allocation.width,
-                                this.allocation.height,
-                                int.min(this.xpad, this.ypad));
+                                this.allocation.width - 1.0,
+                                this.allocation.height - 1.0,
+                                rad);
       Utils.rgb_invert_color (out r, out g, out b);
       ctx.set_source_rgba (r, g, b, 1.0);
       Cairo.Path path = ctx.copy_path ();
@@ -720,7 +721,8 @@ namespace Sezen
       ctx.clip ();
       ctx.paint ();
       Utils.rgb_invert_color (out r, out g, out b);
-      var pat = new Cairo.Pattern.linear (0, this.allocation.y, 0, this.allocation.y + 2 * this.ypad);
+      int shadow_size = int.min(this.allocation.height / 5, 2 * this.ypad);
+      var pat = new Cairo.Pattern.linear (0, this.allocation.y, 0, this.allocation.y + shadow_size);
       pat.add_color_stop_rgba (0, r, g, b, 0.6);
       pat.add_color_stop_rgba (0.3, r, g, b, 0.25);
       pat.add_color_stop_rgba (1.0, r, g, b, 0);
