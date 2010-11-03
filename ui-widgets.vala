@@ -24,6 +24,8 @@ using Gtk;
 using Cairo;
 using Gee;
 
+public static extern void gtk_style_get_style_property (Style style, Type widget_type, string property_name, out Value val);
+
 namespace Sezen
 {
   /* Result List stuff */
@@ -34,18 +36,23 @@ namespace Sezen
     private int mwidth;
     private int nrows;
     private bool no_results;
+
+    private int cellh;
+    private VBox vbox;
+    private HBox status_box;
     
     public ResultBox (int width, int nrows = 5)
     {
       this.mwidth = width;
       this.nrows = nrows;
+      cellh = 0;
       no_results = true;
       build_ui();
     }
     
     private enum Column {
-			IconColumn = 0,
-			NameColumn = 1,
+			ICON_COLUMN = 0,
+			NAME_COLUMN = 1,
 		}
 		
 		private TreeView view;
@@ -84,17 +91,17 @@ namespace Sezen
         
         return true;
     }
-		
+
     private void build_ui()
     {
       view = new TreeView ();
       
-      var vbox = new VBox (false, 0);
+      vbox = new VBox (false, 0);
       this.expose_event.connect (on_expose);
       vbox.border_width = 0;
       this.add (vbox);
       vbox.pack_start (view);
-      var status_box = new HBox (false, 0);
+      status_box = new HBox (false, 0);
       status_box.set_size_request (-1, 15);
       vbox.pack_start (status_box, false);
       status = new Label (null);
@@ -109,38 +116,48 @@ namespace Sezen
       
 			view.enable_search = false;
 			view.headers_visible = false;
-			// If this is not set the tree will call IconDataFunc for all rows to 
-			// determine the total height of the tree (Thanks Do)
-			view.fixed_height_mode = true;
+			view.fixed_height_mode = true; // speedup but use Gtk.TreeViewColumnSizing.FIXED
 			view.show();
-      // Model
+
       view.model = results = new ListStore(2, typeof(GLib.Icon), typeof(string));
 
       var column = new TreeViewColumn ();
-			column.sizing = Gtk.TreeViewColumnSizing.FIXED;
+			column.sizing = Gtk.TreeViewColumnSizing.FIXED; // needed for speedup
+			column.spacing = 0;
 
 			var crp = new CellRendererPixbuf ();
       crp.stock_size = IconSize.DND;
-			column.pack_start (crp, false);
-			column.add_attribute (crp, "gicon", (int) Column.IconColumn);
-			
 			var ctxt = new CellRendererText ();
 			ctxt.ellipsize = Pango.EllipsizeMode.END;
-			column.pack_start (ctxt, false);
-      column.add_attribute (ctxt, "markup", (int) Column.NameColumn);
-      ctxt.xpad = 5;
-      
-      view.append_column (column);
-      
-      Requisition requisition = {0, 0};
-      status_box.size_request (out requisition);
-      int cellh = ICON_SIZE;
+			ctxt.xpad = 5;
+
+			int pad = 1;
+      crp.ypad = 0;
+      ctxt.ypad = 0;
+      cellh = ICON_SIZE + pad * 2;
       crp.set_fixed_size (ICON_SIZE, cellh);
       ctxt.set_fixed_size (mwidth - ICON_SIZE, cellh);
 
+			column.pack_start (crp, false);
+			column.add_attribute (crp, "gicon", (int) Column.ICON_COLUMN);
+			column.pack_start (ctxt, false);
+      column.add_attribute (ctxt, "markup", (int) Column.NAME_COLUMN);
+
+      view.append_column (column);
+      on_view_style_set (view, null);
+      view.style_set.connect (on_view_style_set);
+    }
+
+    private void on_view_style_set (Gtk.Widget widget, Gtk.Style? prev_style)
+    {
+      int vspacing = 0;
+      view.style.get (typeof (TreeView), "vertical-separator", out vspacing);
+      Requisition requisition = {0, 0};
+      status_box.size_request (out requisition);
       requisition.width = mwidth;
-      requisition.height += nrows * (cellh + 2 * int.max((int)crp.ypad, (int)ctxt.ypad) );
-      vbox.set_size_request (requisition.width, requisition.height); 
+      requisition.height += nrows * (cellh + vspacing * 2);
+      vbox.set_size_request (requisition.width, requisition.height);
+      vbox.queue_draw ();
     }
 
     public void update_matches (Gee.List<Sezen.Match>? rs)
@@ -163,8 +180,8 @@ namespace Sezen
         try {
           icon = GLib.Icon.new_for_string(m.icon_name);
         } catch (GLib.Error err) { icon = null; }
-        results.set (iter, Column.IconColumn, icon, Column.NameColumn, 
-                     Markup.printf_escaped ("<span><b>%s</b></span>\n<span size=\"small\">%s</span>",m.title, desc));
+        results.set (iter, Column.ICON_COLUMN, icon, Column.NAME_COLUMN, 
+                     Markup.printf_escaped ("<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>",m.title, desc));
       }
       var sel = view.get_selection ();
       sel.select_path (new TreePath.first());
