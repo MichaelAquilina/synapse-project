@@ -1,0 +1,26 @@
+Source: sezen2
+Section: utils
+Priority: optional
+Maintainer: Siegfried-Angel Gevatter Pujals <rainct@ubuntu.com>
+Build-Depends: debhelper (>= 7.0.50~),
+ intltool,
+ valac (>= 0.9.4~),
+ libzeitgeist-dev,
+ libdbus-glib-1-dev,
+ libgtk2.0-dev,
+ libgee-dev (>= 0.5.2),
+ libgtkhotkey-dev
+Vcs-Bzr: bzr+ssh://bazaar.launchpad.net/~zeitgeist-packagers/sezen/debian-sezen2
+Vcs-Browser: https://code.launchpad.net/~zeitgeist-packagers/sezen/debian-sezen2
+Homepage: https://launchpad.net/sezen
+Standards-Version: 3.9.1
+
+Package: sezen2
+Architecture: any
+Depends: ${shlibs:Depends},
+ ${misc:Depends},
+ zeitgeist (>= 0.5.0~) | zeitgeist-core (>= 0.5.0~),
+Description: semantic file launcher
+ Sezen 2 is a graphical launcher enabling you to start applications and also
+ to quickly find and access relevant documents and files (by making use of the
+ Zeitgeist engine).

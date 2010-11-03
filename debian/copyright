@@ -1,0 +1,15 @@
+Format-Specification: http://dep.debian.net/deps/dep5/#index4h1
+Name: Sezen
+Maintainer: Michal Hruby <michal.mhr@gmail.com>
+Source: https://code.launchpad.net/sezen
+
+Files: *
+Copyright: © 2010, Michal Hruby <michal.mhr@gmail.com>
+License: GPL-2+
+
+Files: debian/*
+Copyright: © 2010, Siegfried-Angel Gevatter Pujals <rainct@ubuntu.com>
+License: GPL-2+
+
+License: GPL-2+
+ See `/usr/share/common-licenses/GPL'.
