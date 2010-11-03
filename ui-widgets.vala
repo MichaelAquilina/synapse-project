@@ -721,7 +721,7 @@ namespace Sezen
       ctx.clip ();
       ctx.paint ();
       Utils.rgb_invert_color (out r, out g, out b);
-      int shadow_size = int.min(this.allocation.height / 5, 2 * this.ypad);
+      int shadow_size = int.max(this.allocation.height / 5, 2 * this.ypad);
       var pat = new Cairo.Pattern.linear (0, this.allocation.y, 0, this.allocation.y + shadow_size);
       pat.add_color_stop_rgba (0, r, g, b, 0.6);
       pat.add_color_stop_rgba (0.3, r, g, b, 0.25);
