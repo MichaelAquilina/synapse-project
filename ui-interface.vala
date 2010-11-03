@@ -123,53 +123,37 @@ namespace Sezen
       else
         focus_action (focus_index[t], focus[t]);
     }
-    protected bool select_next_match ()
+    protected bool move_selection_action (int delta)
     {
-      return select_match_next_prev (true);
+      return move_selection (T.ACTION, delta);
     }
-    protected bool select_prev_match ()
+    protected bool move_selection_match (int delta)
     {
-      return select_match_next_prev (false);
+      return move_selection (T.MATCH, delta);
     }
-    private bool select_match_next_prev (bool next)
+    private bool move_selection (T t, int delta)
     {
-      if (!util_select_prev_next (T.MATCH, next))
+      if (results[t] == null || results[t].size == 0)
         return false;
-      focus_match (focus_index[T.MATCH], focus[T.MATCH]);
-      search_for_actions ();
-      return true;
-    }
-    protected bool select_next_action ()
-    {
-      if (!util_select_prev_next (T.ACTION, true))
-        return false;
-      focus_action (focus_index[T.ACTION], focus[T.ACTION]);
-      return true;
-    }
-    protected bool select_prev_action ()
-    {
-      if (!util_select_prev_next (T.ACTION, false))
-        return false;
-      focus_action (focus_index[T.ACTION], focus[T.ACTION]);
-      return true;
-    }
-    private bool util_select_prev_next (T t, bool next)
-    {
-      if (next)
+      if (delta > 0)
       {
-        if (results[t] == null || (focus_index[t] + 1) >= results[t].size)
+        if (focus_index[t] == results[t].size - 1)
           return false;
-        focus_index[t] += 1;
+        focus_index[t] = int.min (focus_index[t] + delta, results[t].size - 1);
       }
       else
       {
-        if (results[t] == null || focus_index[t] == 0 || results[t].size == 0)
+        if (focus_index[t] == 0)
           return false;
-        focus_index[t] -= 1;
+        focus_index[t] = int.max (focus_index[t] + delta, 0);
       }
       focus[t] = results[t].get (focus_index[t]);
-      return true;      
-    }    
+      if (t == T.MATCH)
+        focus_match (focus_index[t], focus[t]);
+      else
+        focus_action (focus_index[t], focus[t]);
+      return true;
+    }
     protected void reset_search (bool notify = true, bool reset_flags = true)
     {
       if (tid != 0)

@@ -166,6 +166,7 @@ namespace Sezen
       foreach (string s in this.categories)
         flag_selector.add (new Label(s));
       flag_selector.select (3);
+      flag_selector.set_arrows_visible (true);
       
       /* Pref item */
       var pref = new MenuButton ();
@@ -480,9 +481,18 @@ namespace Sezen
         case Gdk.KeySyms.Up:
           bool b = true;
           if (searching_for_matches)
-            b = select_prev_match ();
+            b = move_selection_match (-1);
           else
-            b = select_prev_action ();
+            b = move_selection_action (-1);
+          if (!b)
+            set_list_visible (false);
+          break;
+        case Gdk.KeySyms.Page_Up:
+          bool b = true;
+          if (searching_for_matches)
+            b = move_selection_match (-5);
+          else
+            b = move_selection_action (-5);
           if (!b)
             set_list_visible (false);
           break;
@@ -493,9 +503,21 @@ namespace Sezen
             return true;
           }
           if (searching_for_matches)
-            select_next_match ();
+            move_selection_match (1);
           else
-            select_next_action ();
+            move_selection_action (1);
+          set_list_visible (true);
+          break;
+        case Gdk.KeySyms.Page_Down:
+          if (!list_visible)
+          {
+            set_list_visible (true);
+            return true;
+          }
+          if (searching_for_matches)
+            move_selection_match (5);
+          else
+            move_selection_action (5);
           set_list_visible (true);
           break;
         case Gdk.KeySyms.Tab:
