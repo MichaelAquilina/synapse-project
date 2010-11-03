@@ -710,8 +710,8 @@ namespace Sezen
       Utils.cairo_rounded_rect (ctx,
                                 this.allocation.x,
                                 this.allocation.y,
-                                this.allocation.width - 0.5,
-                                this.allocation.height - 0.5,
+                                this.allocation.width,
+                                this.allocation.height,
                                 int.min(this.xpad, this.ypad));
       Utils.rgb_invert_color (out r, out g, out b);
       ctx.set_source_rgba (r, g, b, 1.0);
@@ -868,7 +868,10 @@ namespace Sezen
                                                              markup));
       base.size_request (out base_req);
       small_req = base_req;
-      this.size_allocate ((Gdk.Rectangle) this.allocation);
+      if (this.allocation.width > 1 && this.allocation.height > 1)
+      {
+        this.size_allocate ((Gdk.Rectangle) this.allocation);
+      }
     }
     
     private bool downscale ()
