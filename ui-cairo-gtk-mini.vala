@@ -197,6 +197,7 @@ namespace Sezen
         return;
       list_visible = b;
       results_container.visible = b;
+      set_input_mask ();
       window.queue_draw ();
     }
     
@@ -216,6 +217,7 @@ namespace Sezen
         container.border_width = SHADOW_SIZE;
       else
         container.border_width = 2;
+      this.hide_and_reset ();
     }
     public bool expose_event (Widget widget, Gdk.EventExpose event)
     {
@@ -275,6 +277,51 @@ namespace Sezen
       if (c != null)
         c.propagate_expose (c.get_child(), event);
       return true;
+    }
+    
+    protected virtual void set_input_mask ()
+    {
+      Requisition req = {0, 0};
+      window.size_request (out req);
+      bool composited = window.is_composited ();
+      var bitmap = new Gdk.Pixmap (null, req.width, req.height, 1);
+      var ctx = Gdk.cairo_create (bitmap);
+      ctx.set_operator (Cairo.Operator.CLEAR);
+      ctx.paint ();
+      ctx.set_source_rgba (0, 0, 0, 1);
+      ctx.set_operator (Cairo.Operator.SOURCE);
+      if (composited)
+      {
+        Utils.cairo_rounded_rect (ctx, match_icon_container_overlayed.allocation.x,
+                                       match_icon_container_overlayed.allocation.y,
+                                       match_icon_container_overlayed.allocation.width,
+                                       match_icon_container_overlayed.allocation.height, 0);
+        ctx.fill ();
+        double x = this.container.border_width,
+               y = flag_selector.allocation.y - BORDER_RADIUS;
+        double w = UI_WIDTH - this.container.border_width * 2,
+               h = current_label.allocation.y - y + current_label.allocation.height + BORDER_RADIUS;
+        Utils.cairo_rounded_rect (ctx, x - SHADOW_SIZE, y - SHADOW_SIZE,
+                                       w + SHADOW_SIZE * 2, 
+                                       h + SHADOW_SIZE * 2,
+                                       SHADOW_SIZE);
+        ctx.fill ();
+        if (list_visible)
+        {
+          ctx.rectangle (0,
+                         y + h,
+                         req.width,
+                         req.height - (y + h));
+          ctx.fill ();
+        }
+      }
+      else
+      {
+        ctx.set_operator (Cairo.Operator.SOURCE);
+        ctx.paint ();
+      }
+      window.input_shape_combine_mask (null, 0, 0);
+      window.input_shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
     }
 
     private static void _hilight_label (Widget w, bool b)
@@ -480,6 +527,7 @@ namespace Sezen
     public override void show ()
     {
       window.show ();
+      set_input_mask ();
     }
     public override void hide ()
     {
