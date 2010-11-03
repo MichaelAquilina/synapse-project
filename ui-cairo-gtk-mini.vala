@@ -105,20 +105,20 @@ namespace Sezen
     {
       /* containers holds top hbox and result list */
       container = new VBox (false, 0);
-      container.set_size_request (UI_WIDTH, -1);
       container.border_width = SHADOW_SIZE;
       window.add (container);
       
       container_top = new HBox (false, 0);
       container_top.border_width = BORDER_RADIUS;
+      container_top.set_size_request (UI_WIDTH, -1);
       container.pack_start (container_top, false);
       
       results_container = new HSelectionContainer (null, 0);
       results_container.set_separator_visible (false);
       container.pack_start (results_container, false);
       
-      results_match = new ResultBox (UI_WIDTH - SHADOW_SIZE * 2 - 2);
-      results_action = new ResultBox (UI_WIDTH - SHADOW_SIZE * 2 - 2);
+      results_match = new ResultBox (UI_WIDTH - 2);
+      results_action = new ResultBox (UI_WIDTH - 2);
       results_container.add (results_match);
       results_container.add (results_action);
 
@@ -205,6 +205,7 @@ namespace Sezen
     {
       Gdk.Screen screen = w.get_screen ();
       bool comp = screen.is_composited ();
+      this.hide_and_reset ();
       Gdk.Colormap? cm = screen.get_rgba_colormap();
       if (cm == null)
       {
@@ -216,8 +217,7 @@ namespace Sezen
       if (comp)
         container.border_width = SHADOW_SIZE;
       else
-        container.border_width = 2;
-      this.hide_and_reset ();
+        container.border_width = 1;
     }
     public bool expose_event (Widget widget, Gdk.EventExpose event)
     {
@@ -225,16 +225,23 @@ namespace Sezen
       var ctx = Gdk.cairo_create (widget.get_window ());
       ctx.set_operator (Operator.CLEAR);
       ctx.paint ();
+      ctx.translate (0.5, 0.5);
       Gtk.Style style = widget.get_style();
+      double border_radius = comp ? BORDER_RADIUS : 0;
       double r = 0.0, g = 0.0, b = 0.0;
       double x = this.container.border_width,
-             y = flag_selector.allocation.y - BORDER_RADIUS;
-      double w = UI_WIDTH - this.container.border_width * 2,
-             h = current_label.allocation.y - y + current_label.allocation.height + BORDER_RADIUS;
+             y = flag_selector.allocation.y - border_radius;
+      double w = UI_WIDTH - 1.0,
+             h = current_label.allocation.y - y + current_label.allocation.height + border_radius - 1.0;
+      if (!comp)
+      {
+        y = this.container.border_width;
+        h = container_top.allocation.height;
+      }
       ctx.set_operator (Operator.OVER);
       if (list_visible)
       {
-        double ly = y + h - BORDER_RADIUS;
+        double ly = y + h - border_radius;
         double lh = results_container.allocation.y - ly + results_container.allocation.height;
         Utils.gdk_color_to_rgb (style.base[Gtk.StateType.NORMAL], &r, &g, &b);
         ctx.rectangle (x, ly, w, lh);
@@ -254,12 +261,11 @@ namespace Sezen
         //draw shadow
         Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         Utils.rgb_invert_color (out r, out g, out b);
-        Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
+        Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
                                           r, g, b, 0.9, SHADOW_SIZE);
       }
       ctx.set_operator (Operator.OVER);
-      Pattern pat = new Pattern.linear(0, flag_selector.allocation.y - BORDER_RADIUS, 0,
-                                          current_label.allocation.y + BORDER_RADIUS);
+      Pattern pat = new Pattern.linear(0, y, 0, y + h);
       Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
       pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                   double.min(g + 0.15, 1),
@@ -269,7 +275,7 @@ namespace Sezen
                                   double.max(g - 0.15, 0),
                                   double.max(b - 0.15, 0),
                                   1.0);
-      Utils.cairo_rounded_rect (ctx, x, y, w, h, BORDER_RADIUS);
+      Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
       ctx.set_source (pat);
       ctx.fill ();
 
@@ -299,7 +305,7 @@ namespace Sezen
         ctx.fill ();
         double x = this.container.border_width,
                y = flag_selector.allocation.y - BORDER_RADIUS;
-        double w = UI_WIDTH - this.container.border_width * 2,
+        double w = UI_WIDTH,
                h = current_label.allocation.y - y + current_label.allocation.height + BORDER_RADIUS;
         Utils.cairo_rounded_rect (ctx, x - SHADOW_SIZE, y - SHADOW_SIZE,
                                        w + SHADOW_SIZE * 2, 
