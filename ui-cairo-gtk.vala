@@ -35,9 +35,10 @@ namespace Sezen
     protected ShrinkingLabel match_label = null;
     protected Label match_label_description = null;
     protected NamedIcon action_icon = null;
-    protected ShrinkingLabel action_label = null;
+    protected Label action_label = null;
     protected HSelectionContainer flag_selector = null;
     protected HBox top_hbox = null;
+    protected Label top_spacer = null;
     protected VBox container = null;
     protected VBox container_top = null;
     protected ContainerOverlayed match_icon_container_overlayed = null;
@@ -49,8 +50,7 @@ namespace Sezen
     private const int SHADOW_SIZE = 12; // assigned to containers's border width in composited
     private const int BORDER_RADIUS = 20;
     private const int ICON_SIZE = 172;
-    private const int ACTION_ICON_SIZE = 64;
-    private const int TOP_SPACING = ICON_SIZE * 3 / 7;
+    private const int ACTION_ICON_SIZE = 48;
     
     private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
     private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
@@ -137,8 +137,7 @@ namespace Sezen
       var top_right_vbox = new VBox (false, 0);
       top_hbox.pack_start (top_right_vbox);
       /* Top Spacer */
-      var spacer = new Label("");
-      spacer.set_size_request (-1, TOP_SPACING);
+      top_spacer = new Label(null);
       /* flag_selector */
       flag_selector = new HSelectionContainer(_hilight_label, 15);
       foreach (string s in this.categories)
@@ -155,18 +154,18 @@ namespace Sezen
       topright_hbox.pack_start (flag_selector);
       topright_hbox.pack_start (throbber, false);
 
-      top_right_vbox.pack_start (spacer, false);
+      top_right_vbox.pack_start (top_spacer, true);
       top_right_vbox.pack_start (topright_hbox, false);
-      top_right_vbox.pack_start (right_hbox);
+      top_right_vbox.pack_start (right_hbox, false);
       
       /* Titles box and Action icon*/
-      var labels_vbox = new VBox (false, 0); //FIXME: Omogeneus?
+      var labels_hbox = new HBox (false, 0);
       action_icon = new NamedIcon ();
       action_icon.set_pixel_size (ACTION_ICON_SIZE);
       action_icon.set_alignment (0.5f, 0.5f);
       action_icon.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
 
-      right_hbox.pack_start (labels_vbox);
+      right_hbox.pack_start (labels_hbox);
       right_hbox.pack_start (action_icon, false);
       
       match_label = new ShrinkingLabel ();
@@ -174,14 +173,14 @@ namespace Sezen
       match_label.set_ellipsize (Pango.EllipsizeMode.END);
       match_label.xpad = 10;
 
-      action_label = new ShrinkingLabel ();
+      action_label = new Label (null);
       action_label.set_alignment (1.0f, 0.5f);
-      action_label.set_ellipsize (Pango.EllipsizeMode.START);
+      //action_label.set_ellipsize (Pango.EllipsizeMode.START);
       action_label.xpad = 10;
       
-      labels_vbox.pack_start (action_label);
-      labels_vbox.pack_start (match_label);
-            
+      labels_hbox.pack_start (match_label);
+      labels_hbox.pack_start (action_label, false);
+
       container.show_all ();
     }
     
@@ -218,13 +217,14 @@ namespace Sezen
       ctx.set_operator (Cairo.Operator.SOURCE);
       if (composited)
       {
+        int spacing = top_spacer.allocation.height;
         Utils.cairo_rounded_rect (ctx, SHADOW_SIZE, SHADOW_SIZE,
                                        ICON_SIZE + PADDING * 2,
                                        ICON_SIZE, BORDER_RADIUS);
         ctx.fill ();
-        Utils.cairo_rounded_rect (ctx, 0, TOP_SPACING,
+        Utils.cairo_rounded_rect (ctx, 0, spacing,
                                        container_top.allocation.width + SHADOW_SIZE * 2, 
-                                       container_top.allocation.height + SHADOW_SIZE * 2 - TOP_SPACING,
+                                       container_top.allocation.height + SHADOW_SIZE * 2 - spacing,
                                        BORDER_RADIUS);
         ctx.fill ();
         if (list_visible)
@@ -261,8 +261,9 @@ namespace Sezen
       double r = 0.0, g = 0.0, b = 0.0;
       if (comp)
       {
-        y += TOP_SPACING;
-        h -= TOP_SPACING;
+        int spacing = top_spacer.allocation.height;
+        y += spacing;
+        h -= spacing;
         //draw shadow
         Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
         Utils.rgb_invert_color (out r, out g, out b);
