@@ -289,25 +289,6 @@ namespace Sezen
       
       ctx.restore ();
     }
-    public static Cairo.Surface cairo_prepare_widget_expose (Cairo.Context ctx, Gtk.Widget widget)
-    {
-      Cairo.Surface sr = new Cairo.ImageSurface (Cairo.Format.ARGB32, widget.allocation.width, widget.allocation.height);
-      Cairo.Context c = new Cairo.Context (sr);
-      c.set_source_surface (ctx.get_target (), 0, 0);
-      c.translate (- widget.allocation.x, - widget.allocation.y);
-      c.paint ();
-      return sr;
-    }
-    public static void cairo_finish_widget_expose (Cairo.Context ctx, Gtk.Widget widget, Cairo.Surface prepare)
-    {
-      ctx.save ();
-      ctx.set_operator (Cairo.Operator.DEST_OVER);
-      ctx.set_source_surface (prepare, widget.allocation.x, widget.allocation.y);
-      ctx.rectangle (widget.allocation.x, widget.allocation.y, widget.allocation.width, widget.allocation.height);
-      ctx.clip ();
-      ctx.paint ();
-      ctx.restore ();
-    }
   }
 }
 
