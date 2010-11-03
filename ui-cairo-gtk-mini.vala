@@ -166,6 +166,7 @@ namespace Sezen
       foreach (string s in this.categories)
         flag_selector.add (new Label(s));
       flag_selector.select (3);
+      flag_selector.set_arrows_visible (true);
       
       /* Pref item */
       var pref = new MenuButton ();

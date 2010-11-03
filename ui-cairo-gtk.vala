@@ -144,6 +144,7 @@ namespace Sezen
       foreach (string s in this.categories)
         flag_selector.add (new Label(s));
       flag_selector.select (3);
+      flag_selector.set_arrows_visible (true);
       /* Throbber */
       throbber = new Sezen.Throbber ();
       throbber.set_size_request (20, -1);

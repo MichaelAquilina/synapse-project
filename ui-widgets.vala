@@ -360,6 +360,9 @@ namespace Sezen
     private bool[] visibles = {};
     private bool direction = true;
     private HSeparator sep;
+    private Label left;
+    private Label right;
+    private bool show_arrows;
     
     public enum SelectionAlign
     {
@@ -381,6 +384,21 @@ namespace Sezen
       sep = new HSeparator();
       sep.set_parent (this);
       sep.show ();
+      show_arrows = false;
+      left = new Label (null);
+      left.set_markup ("<span size=\"medium\">&lt;&lt;</span>");
+      left.set_parent (this);
+      left.sensitive = false;
+      right = new Label (null);
+      right.set_markup ("<span size=\"medium\">&gt;&gt;</span>");
+      right.set_parent (this);
+      right.sensitive = false;
+    }
+    
+    public void set_arrows_visible (bool b)
+    {
+      show_arrows = b;
+      this.queue_resize ();
     }
     
     public void set_separator_visible (bool b)
@@ -445,6 +463,12 @@ namespace Sezen
         requisition.width = int.max(req.width, requisition.width);
         requisition.height = int.max(req.height, requisition.height);
       }
+      left.size_request (out req);
+      if (show_arrows)
+      {
+        requisition.width += req.width * 2;
+        requisition.height = int.max (req.height, requisition.height);
+      }
       sep.size_request (out req);
       if (sep.visible)
         requisition.height += req.height * 2;
@@ -455,7 +479,29 @@ namespace Sezen
       Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
       set_allocation (alloc);
       int lastx = 0;
+      int min_x = 0;
+      int max_x = allocation.width;
       Requisition req = {0, 0};
+      sep.size_request (out req);
+      int sep_space = sep.visible ? req.height * 2 : 0;
+      if (show_arrows)
+      {
+        left.size_request (out req);
+        lastx = req.width;
+        max_x -= req.width;
+        min_x += req.width;
+        allocation.x = alloc.x;
+        allocation.y = alloc.y + (alloc.height - sep_space - req.height) / 2;
+        allocation.height = req.height;
+        allocation.width = req.width;
+        left.size_allocate (allocation);
+        right.size_request (out req);
+        allocation.x = alloc.x + max_x;
+        allocation.y = alloc.y + (alloc.height - sep_space - req.height) / 2;
+        allocation.height = req.height;
+        allocation.width = req.width;
+        right.size_allocate (allocation);
+      }
       int i = 0;
       // update relative coords
       foreach (Widget w in childs)
@@ -472,12 +518,12 @@ namespace Sezen
           offset = - allocations[selection];
           break;
         case SelectionAlign.RIGHT:
-          offset = allocation.width - allocations[selection];
+          offset = max_x - allocations[selection];
           childs.get (selection).size_request (out req);
           offset -= req.width;
           break;
         default:
-          offset = allocation.width / 2 - allocations[selection];
+          offset = alloc.width / 2 - allocations[selection];
           childs.get (selection).size_request (out req);
           offset -= req.width / 2;
           break;
@@ -485,13 +531,11 @@ namespace Sezen
       // update widget allocations and visibility
       i = 0;
       int pos = 0;
-      sep.size_request (out req);
-      int sep_space = sep.visible ? req.height * 2 : 0;
       foreach (Widget w in childs)
       {
         w.size_request (out req);
         pos = offset + allocations[i];
-        if (pos < 0 || pos + req.width > alloc.width)
+        if (pos < min_x || pos + req.width > max_x)
         {
           visibles[i] = false;
           w.hide ();
@@ -508,6 +552,8 @@ namespace Sezen
         }
         ++i;
       }
+      left.visible = show_arrows && (!visibles[0]);
+      right.visible = show_arrows && (!visibles[childs.size - 1]);
       allocation.x = alloc.x;
       allocation.y = alloc.y + alloc.height - sep_space * 3 / 2;
       allocation.height = sep_space;
@@ -520,6 +566,8 @@ namespace Sezen
       if (b)
       {
         callback (sep);
+        callback (left);
+        callback (right);
       }
       if (childs.size == 0)
         return;
