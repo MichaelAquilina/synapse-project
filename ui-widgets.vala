@@ -144,18 +144,11 @@ namespace Sezen
       column.add_attribute (ctxt, "markup", (int) Column.NAME_COLUMN);
 
       view.append_column (column);
-      on_view_style_set (view, null);
-      view.style_set.connect (on_view_style_set);
-    }
 
-    private void on_view_style_set (Gtk.Widget widget, Gtk.Style? prev_style)
-    {
-      int vspacing = 0;
-      view.style.get (typeof (TreeView), "vertical-separator", out vspacing);
       Requisition requisition = {0, 0};
       status_box.size_request (out requisition);
       requisition.width = mwidth;
-      requisition.height += nrows * (cellh + vspacing * 2);
+      requisition.height += nrows * (cellh);
       vbox.set_size_request (requisition.width, requisition.height);
       vbox.queue_draw ();
     }
