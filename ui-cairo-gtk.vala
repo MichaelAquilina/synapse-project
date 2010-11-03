@@ -116,6 +116,7 @@ namespace Sezen
       match_label_description.set_alignment (0, 0);
       match_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
       match_label_description.set_line_wrap (true);
+      match_label_description.xpad = 6;
       /* Packing Top Hbox with Match Desctiption into Top VBox*/
       container_top.pack_start (top_hbox);
       container_top.pack_start (match_label_description, false);
