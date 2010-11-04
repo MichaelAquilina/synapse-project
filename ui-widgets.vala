@@ -119,6 +119,13 @@ namespace Sezen
 			view.headers_visible = false;
 			view.fixed_height_mode = true; // speedup but use Gtk.TreeViewColumnSizing.FIXED
 			view.show();
+			view.realize.connect (()=>{
+			  /* Block clicks on list */
+			  Gdk.EventMask mask = view.get_bin_window ().get_events ();
+			  mask = mask & (~Gdk.EventMask.BUTTON_PRESS_MASK);
+			  mask = mask & (~Gdk.EventMask.BUTTON_RELEASE_MASK);
+			  view.get_bin_window ().set_events (mask);
+			});
 
       view.model = results = new ListStore(2, typeof(GLib.Icon), typeof(string));
 
