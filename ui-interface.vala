@@ -119,7 +119,10 @@ namespace Sezen
       focus_index[t] = first ? 0 : results[t].size - 1;
       focus[t] = results[t].get (focus_index[t]);
       if (t == T.MATCH)
+      {
         focus_match (focus_index[t], focus[t]);
+        search_for_actions ();
+      }
       else
         focus_action (focus_index[t], focus[t]);
     }
@@ -149,7 +152,10 @@ namespace Sezen
       }
       focus[t] = results[t].get (focus_index[t]);
       if (t == T.MATCH)
+      {
         focus_match (focus_index[t], focus[t]);
+        search_for_actions ();
+      }
       else
         focus_action (focus_index[t], focus[t]);
       return true;
