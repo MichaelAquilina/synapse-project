@@ -735,12 +735,23 @@ namespace Sezen
   {
     public string not_found_name {get; set; default = "missing-image";}
     private string current;
+    private IconSize current_size;
+    private uint tid; //for timer
+    public int update_timeout {get; set; default = -1;}
+    public bool stop_prev_timeout {get; set; default = false;}
     public NamedIcon ()
     {
       current = "";
+      current_size = IconSize.DIALOG;
+      tid = 0;
     }
     public new void clear ()
     {
+      if (tid != 0)
+      {
+        Source.remove (tid);
+        tid = 0;
+      }
       current = "";
       base.clear ();
     }
@@ -753,23 +764,47 @@ namespace Sezen
         if (name == "")
         {
           this.clear ();
+          current = "";
           return;
         }
-        try
+        current = name;
+        current_size = size;
+        if (update_timeout <= 0)
         {
-          this.set_from_gicon (GLib.Icon.new_for_string (name), size);
-          current = name;
+          real_update_image ();
         }
-        catch (Error err)
+        else
         {
-          if (current != not_found_name)
+          if (tid != 0 && stop_prev_timeout)
           {
-            if (not_found_name == "")
-              this.clear ();
-            else
-              this.set_from_icon_name (not_found_name, IconSize.DIALOG);
-            current = not_found_name;
+            Source.remove (tid);
+            tid = 0;
           }
+          if (tid == 0)
+          {
+            base.clear ();
+            tid = Timeout.add (update_timeout,
+              () => {tid = 0; real_update_image (); return false;}
+            );
+          }
+        }
+      }
+    }
+    private void real_update_image ()
+    {
+      try
+      {
+        this.set_from_gicon (GLib.Icon.new_for_string (current), current_size);
+      }
+      catch (Error err)
+      {
+        if (current != not_found_name)
+        {
+          if (not_found_name == "")
+            this.clear ();
+          else
+            this.set_from_icon_name (not_found_name, current_size);
+          current = not_found_name;
         }
       }
     }
