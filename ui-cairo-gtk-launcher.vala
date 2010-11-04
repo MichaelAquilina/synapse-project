@@ -24,6 +24,11 @@ using Gtk;
 
 namespace Sezen
 {
+  public static void show_config ()
+  {
+    var sett = new SettingsWindow ();
+    sett.show ();
+  }
   public static int main (string[] argv)
   {
     Gtk.init (ref argv);
@@ -34,7 +39,7 @@ namespace Sezen
 #endif
     window.show ();
 
-    //TODO: window.show_settings_clicked.connect (/* SHOW SETTINGS WINDOW */);
+    window.show_settings_clicked.connect (show_config);
 
     var registry = GtkHotkey.Registry.get_default ();
     GtkHotkey.Info hotkey;

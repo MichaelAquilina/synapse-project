@@ -40,17 +40,18 @@ namespace Sezen
       Gee.Map<string, PluginSetting?> plugins;
       bool autostart;
     }
-
+    SezenSettings sett;
     public SettingsWindow ()
     {
       this.title = "Sezen 2 - Settings"; //TODO: i18n
       this.set_size_request (500, 450);
+      this.resizable = false;
       init_settings ();
       build_ui ();
     }
     private void init_settings ()
     {
-      SezenSettings sett = SezenSettings ()
+      sett = SezenSettings ()
       {
         selected_theme = typeof (SezenWindowMini),
         themes = new Gee.HashMap<string, Type>(),
@@ -77,7 +78,22 @@ namespace Sezen
     }
     private void build_ui ()
     {
+      var tabs = new Gtk.Notebook ();
+      var general_tab = new VBox (false, 4);
+      var plugin_tab = new VBox (false, 4);
+      this.add (tabs);
+      tabs.append_page (general_tab, new Label ("General"));
+      tabs.append_page (plugin_tab, new Label ("Plugins"));
       
+      /* General Tab */
+      ComboBox cb_themes = new ComboBox.text ();
+      foreach (Gee.Map.Entry<string,GLib.Type> e in sett.themes)
+        cb_themes.append_text (e.key);
+      cb_themes.set_active (0);
+      general_tab.pack_start (cb_themes, false, false);
+      
+            
+      tabs.show_all ();
     }
   }
 }
