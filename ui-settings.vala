@@ -80,17 +80,23 @@ namespace Sezen
     {
       var tabs = new Gtk.Notebook ();
       var general_tab = new VBox (false, 4);
+      general_tab.border_width = 5;
       var plugin_tab = new VBox (false, 4);
+      plugin_tab.border_width = 5;
       this.add (tabs);
       tabs.append_page (general_tab, new Label ("General"));
       tabs.append_page (plugin_tab, new Label ("Plugins"));
       
+      HBox row;
       /* General Tab */
+      row = new HBox (false, 5);
       ComboBox cb_themes = new ComboBox.text ();
       foreach (Gee.Map.Entry<string,GLib.Type> e in sett.themes)
         cb_themes.append_text (e.key);
       cb_themes.set_active (0);
-      general_tab.pack_start (cb_themes, false, false);
+      row.pack_start (new Label ("Select Theme:"), false, false);
+      row.pack_start (cb_themes, false, false);
+      general_tab.pack_start (row, false, false);
       
             
       tabs.show_all ();
