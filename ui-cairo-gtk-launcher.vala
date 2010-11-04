@@ -34,6 +34,8 @@ namespace Sezen
 #endif
     window.show ();
 
+    //TODO: window.show_settings_clicked.connect (/* SHOW SETTINGS WINDOW */);
+
     var registry = GtkHotkey.Registry.get_default ();
     GtkHotkey.Info hotkey;
     try

@@ -152,6 +152,7 @@ namespace Sezen
       /* Menu Button */
       menubtn = new MenuButton ();
       menubtn.set_size_request (8, 8);
+      menubtn.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       /* HBox for titles and action icon */
       var right_hbox = new HBox (false, 0);
       /* HBox for throbber and flag_selector */

@@ -852,6 +852,27 @@ namespace Sezen
   
   public class MenuButton: Button
   {
+    private Gtk.Menu menu;
+    public MenuButton ()
+    {
+      menu = new Gtk.Menu ();
+      Gtk.MenuItem item = null;
+      
+      item = new Gtk.MenuItem.with_label ("Settings"); //TODO: i18n
+      item.activate.connect (()=> {settings_clicked ();});
+      menu.append (item);
+      
+      item = new Gtk.MenuItem.with_label ("Quit"); //TODO: i18n
+      item.activate.connect (Gtk.main_quit);
+      menu.append (item);
+      
+      menu.show_all ();
+    }
+    public override void released ()
+    {
+      menu.popup (null, null, null, 1, 0);
+    }
+    public signal void settings_clicked ();
     public override void size_allocate (Gdk.Rectangle allocation)
     {
       Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};

@@ -171,6 +171,7 @@ namespace Sezen
       
       /* Pref item */
       var pref = new MenuButton ();
+      pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       pref.set_size_request (7, 7);
       {
         var vbox = new VBox (false, 0);
