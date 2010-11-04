@@ -83,6 +83,9 @@ namespace Sezen
       }
     }
     
+    // FIXME: turn into 0.0 - 1.0 floats
+    public const int MATCH_SCORE_MAX = 100;
+    
     public const int MATCH_EXACT = 100;
     public const int MATCH_PREFIX = 90;
     public const int MATCH_WORD_PREFIX = 85;

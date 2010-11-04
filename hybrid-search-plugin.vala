@@ -425,8 +425,12 @@ namespace Sezen
                                                Gee.Collection<string>? dirs)
       throws SearchError
     {
+      uint num_results = 0;
+      bool enough_results = false;
       var results = new ResultSet ();
 
+      // FIXME: casefold the parse_names, so we don't need CASELESS regexes
+      //   but first find out if it really saves some time
       var flags = RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS;
       var matchers = Query.get_matchers_for_query (q.query_string,
                                                    MatcherFlags.NO_FUZZY | MatcherFlags.NO_PARTIAL,
@@ -458,14 +462,21 @@ namespace Sezen
                 if (fi.match_obj != null && fi.file_type in q.query_type)
                 {
                   results.add (fi.match_obj, matcher.value - Match.URI_PENALTY);
+                  num_results++;
                 }
               }
               break;
             }
           }
+          if (num_results >= q.max_results)
+          {
+            enough_results = true;
+            break;
+          }
         }
 
         q.check_cancellable ();
+        if (enough_results) break;
       }
 
       if (directories.size == 0) q.check_cancellable ();
