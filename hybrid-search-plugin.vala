@@ -19,6 +19,11 @@
  *
  */
 
+/* 
+ * This plugin keeps a cache of file names for directories that are commonly
+ * used. 
+ */
+
 namespace Sezen
 {
   public class HybridSearchPlugin: DataPlugin
@@ -124,6 +129,7 @@ namespace Sezen
             {
               file_type = QueryFlags.DOCUMENTS;
             }
+            // FIXME: this isn't right
             else if (g_content_type_is_a (mime_type, "application/*"))
             {
               file_type = QueryFlags.DOCUMENTS;
@@ -134,6 +140,24 @@ namespace Sezen
         {
           warning ("%s", err.message);
         }
+      }
+      
+      public async bool exists ()
+      {
+        bool result = true;
+        var f = File.new_for_uri (uri);
+        try
+        {
+          // will throw error if the file doesn't exist
+          var fi = yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_TYPE,
+                                             0, 0, null);
+        }
+        catch (Error err)
+        {
+          result = false;
+        }
+        
+        return result;
       }
     }
 
@@ -164,7 +188,7 @@ namespace Sezen
       unowned DataPlugin? zg_plugin;
       zg_plugin = data_sink.get_plugin ("SezenZeitgeistPlugin");
       return_if_fail (zg_plugin != null);
-      
+
       zg_plugin.search_done.connect (this.zg_plugin_search_done);
     }
 
@@ -238,7 +262,8 @@ namespace Sezen
           {
             z += x.value.files.size;
           }
-          debug ("we now have %d file names", z);
+          print ("%s keeps in cache now %d file names\n",
+                 this.get_type ().name (), z);
         }
       }
       catch (Error err)
@@ -247,27 +272,12 @@ namespace Sezen
       }
     }
 
+    public signal void zeitgeist_search_complete (ResultSet? rs, uint query_id);
+    
     private void zg_plugin_search_done (ResultSet? rs, uint query_id)
     {
-      // let's mine directories ZG is aware of
-      Gee.Set<string> uris = new Gee.HashSet<string> ();
-      foreach (var match in rs) uris.add (match.key.uri);
-
-      int current_hit_level = hit_level;
-
-      process_uris.begin (uris, (obj, res) =>
-      {
-        process_uris.end (res);
-
-        current_level_uris = uris.size;
-        hit_level = current_hit_level+1;
-        //debug ("Hit_level: %d - %d uris", hit_level, current_level_uris);
-
-        hits_updated (rs);
-      });
+      zeitgeist_search_complete (rs, query_id);
     }
-
-    public signal void hits_updated (ResultSet original_rs);
 
     Gee.Map<string, int> directory_hits;
     int hit_level = 0;
@@ -438,7 +448,13 @@ namespace Sezen
                 {
                   yield fi.initialize ();
                 }
-                // FIXME: check if it matches query_type
+                else if (fi.match_obj != null && fi.file_type in q.query_type)
+                {
+                  // make sure the file still exists (could be deleted by now)
+                  bool exists = yield fi.exists ();
+                  if (!exists) break;
+                }
+                // file info is now initialized
                 if (fi.match_obj != null && fi.file_type in q.query_type)
                 {
                   results.add (fi.match_obj, matcher.value - Match.URI_PENALTY);
@@ -479,13 +495,19 @@ namespace Sezen
         current_level_uris = 0;
         directory_hits.clear ();
       }
+      
+      uint query_id = q.query_id;
       current_query = q.query_string;
       int last_level_uris = current_level_uris;
       ResultSet? original_rs = null;
+      Gee.Set<unowned string> uris = new Gee.HashSet<unowned string> ();
 
       // wait for our signal or cancellable
-      ulong sig_id = this.hits_updated.connect ((rs) =>
+      ulong sig_id = this.zeitgeist_search_complete.connect ((rs, q_id) =>
       {
+        if (q_id != query_id) return;
+        // let's mine directories ZG is aware of
+        foreach (var match in rs) uris.add (match.key.uri);
         original_rs = rs;
         search.callback ();
       });
@@ -500,6 +522,15 @@ namespace Sezen
       q.cancellable.disconnect (canc_sig_id);
 
       q.check_cancellable ();
+
+      // process results from the zeitgeist plugin
+      current_level_uris = uris.size;
+      if (current_level_uris > 0)
+      {
+        yield process_uris (uris);
+        q.check_cancellable ();
+      }
+      hit_level++;
 
       // we weren't cancelled and we should have some directories and hits
       if (hit_level > 1 && q.query_string.length >= 3)
@@ -521,8 +552,10 @@ namespace Sezen
       // directory contents are updated now, we can take a look if any
       // files match our query
       var t = new Timer ();
+
       // FIXME: run this sooner, it doesn't need to wait for the signal
       var result = yield get_extra_results (q, original_rs, null);
+
       debug ("%s ran matching %d ms (total %d ms)",
              this.get_type ().name (),
              (int) (t.elapsed ()*1000),
