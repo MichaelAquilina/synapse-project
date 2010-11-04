@@ -61,7 +61,7 @@ namespace Sezen
     private bool list_visible = true;
     private IMContext im_context;
     
-    public SezenWindow ()
+    construct
     {
       window = new Window ();
       window.skip_taskbar_hint = true;

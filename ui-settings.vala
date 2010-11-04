@@ -53,7 +53,7 @@ namespace Sezen
     {
       sett = SezenSettings ()
       {
-        selected_theme = typeof (SezenWindowMini),
+        selected_theme = typeof (SezenWindow),
         themes = new Gee.HashMap<string, Type>(),
         plugins = new Gee.HashMap<string, PluginSetting?>(),
         autostart = false
@@ -76,6 +76,7 @@ namespace Sezen
         plugin_class = typeof (HybridSearchPlugin)
       });
     }
+    ComboBox cb_themes;
     private void build_ui ()
     {
       var tabs = new Gtk.Notebook ();
@@ -90,10 +91,21 @@ namespace Sezen
       HBox row;
       /* General Tab */
       row = new HBox (false, 5);
-      ComboBox cb_themes = new ComboBox.text ();
+      cb_themes = new ComboBox.text ();
       foreach (Gee.Map.Entry<string,GLib.Type> e in sett.themes)
         cb_themes.append_text (e.key);
+#if UI_MINI
+      cb_themes.set_active (1);
+      sett.selected_theme = typeof (SezenWindowMini);
+#else
       cb_themes.set_active (0);
+      sett.selected_theme = typeof (SezenWindow);
+#endif
+      cb_themes.changed.connect (() => {
+        string themeid = cb_themes.get_active_text ();
+        sett.selected_theme = sett.themes.get (themeid);
+        theme_selected (sett.selected_theme);
+      });
       row.pack_start (new Label ("Select Theme:"), false, false);
       row.pack_start (cb_themes, false, false);
       general_tab.pack_start (row, false, false);
@@ -101,5 +113,11 @@ namespace Sezen
             
       tabs.show_all ();
     }
+    public Type get_current_theme ()
+    {
+      return sett.selected_theme;
+    }
+
+    public signal void theme_selected (Type theme);
   }
 }
