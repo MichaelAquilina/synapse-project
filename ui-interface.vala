@@ -75,10 +75,11 @@ namespace Sezen
     construct
     {
       tid = 0;
-      data_sink = new DataSink();
+      data_sink = null;
       current_cancellable = new Cancellable ();
       reset_search (false);
     }
+    public void set_data_sink (DataSink ds) {this.data_sink = ds;}
     /* UI must do the following things */
     public abstract void show ();
     public abstract void hide ();

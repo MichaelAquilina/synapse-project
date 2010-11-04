@@ -24,56 +24,74 @@ using Gtk;
 
 namespace Sezen
 {
-  public static UIInterface ui;
-  public static SettingsWindow sett;
-
-  public static void init_ui (Type t)
+  public class UILauncher
   {
-    if (ui != null)
-      ui.hide(); //TODO: destroy?
-    ui = (UIInterface)GLib.Object.new (t);
-    ui.show_settings_clicked.connect (()=>{
-      sett.show ();
-    });
-    ui.show ();
+    private UIInterface ui;
+    private SettingsWindow sett;
+    private DataSink global_data_sink;
+    public UILauncher ()
+    {
+      ui = null;
+      global_data_sink = new DataSink ();
+      sett = new SettingsWindow ();
+      
+      bind_keyboard_shortcut ();
+      
+      init_ui (sett.get_current_theme ());
+      
+      sett.theme_selected.connect (init_ui);
+    }
+    private void init_ui (Type t)
+    {
+      if (ui != null)
+        ui.hide(); //TODO: destroy?
+      ui = (UIInterface)GLib.Object.new (t);
+      // Data Sink MUST be initialized after constructor
+      ui.set_data_sink (global_data_sink);
+      ui.show_settings_clicked.connect (()=>{
+        sett.show_all ();
+      });
+      ui.show ();
+    }
+    private void bind_keyboard_shortcut ()
+    {
+      var registry = GtkHotkey.Registry.get_default ();
+      GtkHotkey.Info hotkey;
+      try
+      {
+        if (registry.has_hotkey ("sezen2", "activate"))
+        {
+          hotkey = registry.get_hotkey ("sezen2", "activate");
+        }
+        else
+        {
+          hotkey = new GtkHotkey.Info ("sezen2", "activate",
+                                       "<Control>space", null);
+          registry.store_hotkey (hotkey);
+        }
+        debug ("Binding activation to %s", hotkey.signature);
+        hotkey.bind ();
+        hotkey.activated.connect ((event_time) =>
+        {
+          if (this.ui == null)
+            return;
+          this.ui.show ();
+          this.ui.present_with_time (event_time);
+        });
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }/* */
+    }
   }
+  
+
+  
   public static int main (string[] argv)
   {
-    ui = null;
     Gtk.init (ref argv);
-    sett = new SettingsWindow ();
-    
-    init_ui (sett.get_current_theme ());
-    
-    sett.theme_selected.connect (init_ui);
- 
-    var registry = GtkHotkey.Registry.get_default ();
-    GtkHotkey.Info hotkey;
-    try
-    {
-      if (registry.has_hotkey ("sezen2", "activate"))
-      {
-        hotkey = registry.get_hotkey ("sezen2", "activate");
-      }
-      else
-      {
-        hotkey = new GtkHotkey.Info ("sezen2", "activate",
-                                     "<Control>space", null);
-        registry.store_hotkey (hotkey);
-      }
-      debug ("Binding activation to %s", hotkey.signature);
-      hotkey.bind ();
-      hotkey.activated.connect ((event_time) =>
-      {
-        ui.show ();
-        ui.present_with_time (event_time);
-      });
-    }
-    catch (Error err)
-    {
-      warning ("%s", err.message);
-    }/* */
-
+    var launcher = new UILauncher ();
     Gtk.main ();
     return 0;
   }
