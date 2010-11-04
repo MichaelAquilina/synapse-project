@@ -37,6 +37,7 @@ namespace Sezen
     protected NamedIcon action_icon = null;
     protected Label action_label = null;
     protected HSelectionContainer flag_selector = null;
+    protected MenuButton menubtn = null;
     protected HBox top_hbox = null;
     protected Label top_spacer = null;
     protected VBox container = null;
@@ -148,6 +149,9 @@ namespace Sezen
       /* Throbber */
       throbber = new Sezen.Throbber ();
       throbber.set_size_request (20, -1);
+      /* Menu Button */
+      menubtn = new MenuButton ();
+      menubtn.set_size_request (8, 8);
       /* HBox for titles and action icon */
       var right_hbox = new HBox (false, 0);
       /* HBox for throbber and flag_selector */
@@ -155,6 +159,7 @@ namespace Sezen
       
       topright_hbox.pack_start (flag_selector);
       topright_hbox.pack_start (throbber, false);
+      topright_hbox.pack_start (menubtn, false, false);
 
       top_right_vbox.pack_start (top_spacer, true);
       top_right_vbox.pack_start (topright_hbox, false);

@@ -841,9 +841,10 @@ namespace Sezen
       ctx.set_source_rgba (r, g, b, 1.0);
       
       ctx.new_path ();
+      double size = int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
       ctx.move_to (this.allocation.x, this.allocation.y);
-      ctx.rel_line_to (this.allocation.width - SIZE * 2, this.allocation.height - SIZE * 2);
-      ctx.rel_line_to (0, - this.allocation.height + SIZE * 2);
+      ctx.rel_line_to (size, size);
+      ctx.rel_line_to (0, - size);
       ctx.close_path ();
       ctx.fill ();
       return true;
