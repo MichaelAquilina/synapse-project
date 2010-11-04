@@ -93,6 +93,11 @@ namespace Sezen
       window.key_press_event.connect (key_press_event);
     }
 
+    ~SezenWindow ()
+    {
+      window.destroy ();
+    }
+
     protected virtual void build_ui ()
     {
       container = new VBox (false, 0);
@@ -359,7 +364,7 @@ namespace Sezen
       {
         string s = l.get_text();
         l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
-        l.sensitive = false;
+        //l.sensitive = false;
       }
     }
     bool searching_for_matches = true;
@@ -561,7 +566,8 @@ namespace Sezen
     private string get_description_markup (string s)
     {
       // FIXME: i18n
-      return Markup.printf_escaped ("<span size=\"medium\">%s</span>", Utils.replace_home_path_with (s, "Home > "));
+      return Markup.printf_escaped ("<span size=\"medium\">%s</span>",
+        Utils.replace_home_path_with (s, "Home", " > "));
     }
     
     /* UI INTERFACE IMPLEMENTATION */

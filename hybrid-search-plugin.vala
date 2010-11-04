@@ -481,7 +481,7 @@ namespace Sezen
 
       if (directories.size == 0) q.check_cancellable ();
 
-      debug ("%s found %d extra uris (ZG returned %d)",
+      print ("%s found %d extra uris (ZG returned %d)\n",
         this.get_type ().name (), results.size, original_rs.size);
 
       return results;
@@ -497,8 +497,6 @@ namespace Sezen
       // ignore short searches
       if (common_flags == 0 || q.query_string.length <= 1) return null;
       
-      var start_time = new Timer ();
-
       // FIXME: what about deleting one character?
       if (current_query != null && !q.query_string.has_prefix (current_query))
       {
@@ -562,15 +560,9 @@ namespace Sezen
 
       // directory contents are updated now, we can take a look if any
       // files match our query
-      var t = new Timer ();
 
       // FIXME: run this sooner, it doesn't need to wait for the signal
       var result = yield get_extra_results (q, original_rs, null);
-
-      debug ("%s ran matching %d ms (total %d ms)",
-             this.get_type ().name (),
-             (int) (t.elapsed ()*1000),
-             (int) (start_time.elapsed ()*1000));
 
       return result;
     }

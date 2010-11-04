@@ -82,7 +82,8 @@ namespace Sezen
       }
     }
     
-    public static string replace_home_path_with (string path, string replace)
+    public static string replace_home_path_with (string path, string replace,
+                                                 string delimiter)
     {
     	if (home_directory == null)
     	{
@@ -91,10 +92,9 @@ namespace Sezen
     	}
       if (path.has_prefix (home_directory))
       {
-      	return replace + path.substring (
-      						home_directory_length + 
-      						(path.length > home_directory_length ? 1 : 0)
-      					);
+        string rem = path.substring (home_directory_length);
+        string[] parts = Regex.split_simple ("/", rem);
+        return replace + string.joinv (delimiter, parts);
       }
       else
       	return path;

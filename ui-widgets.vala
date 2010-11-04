@@ -190,7 +190,7 @@ namespace Sezen
       foreach (Match m in rs)
       {
         results.append (out iter);
-        desc = Utils.replace_home_path_with (m.description, "Home > "); // FIXME: i18n
+        desc = Utils.replace_home_path_with (m.description, "Home", " > "); // FIXME: i18n
         try {
           icon = GLib.Icon.new_for_string(m.icon_name);
         } catch (GLib.Error err) { icon = null; }
@@ -417,13 +417,13 @@ namespace Sezen
       sep.show ();
       show_arrows = false;
       left = new Label (null);
-      left.set_markup ("<span size=\"medium\">&lt;&lt;</span>");
+      left.set_markup ("<span size=\"small\">&lt;&lt;</span>");
       left.set_parent (this);
-      left.sensitive = false;
+      //left.sensitive = false;
       right = new Label (null);
-      right.set_markup ("<span size=\"medium\">&gt;&gt;</span>");
+      right.set_markup ("<span size=\"small\">&gt;&gt;</span>");
       right.set_parent (this);
-      right.sensitive = false;
+      //right.sensitive = false;
     }
     
     public void set_arrows_visible (bool b)

@@ -251,7 +251,6 @@ namespace Sezen
               int relevancy = matcher.value - relevancy_penalty;
               if (uri in popularity_map)
               {
-                int old_relevancy = relevancy;
                 float pr = popularity_map[uri] / 65535f;
                 float mr = (float) relevancy / Query.MATCH_SCORE_MAX;
                 relevancy = (int) (float.min(pr + mr, 1.0f) * Query.MATCH_SCORE_MAX);

@@ -101,6 +101,11 @@ namespace Sezen
       window.key_press_event.connect (key_press_event);
     }
 
+    ~SezenWindowMini ()
+    {
+      window.destroy ();
+    }
+
     protected virtual void build_ui ()
     {
       /* containers holds top hbox and result list */
