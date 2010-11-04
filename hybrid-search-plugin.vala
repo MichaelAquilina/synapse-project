@@ -149,8 +149,8 @@ namespace Sezen
         try
         {
           // will throw error if the file doesn't exist
-          var fi = yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_TYPE,
-                                             0, 0, null);
+          yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_TYPE,
+                                    0, 0, null);
         }
         catch (Error err)
         {
@@ -500,7 +500,7 @@ namespace Sezen
       current_query = q.query_string;
       int last_level_uris = current_level_uris;
       ResultSet? original_rs = null;
-      Gee.Set<unowned string> uris = new Gee.HashSet<unowned string> ();
+      Gee.Set<string> uris = new Gee.HashSet<string> ();
 
       // wait for our signal or cancellable
       ulong sig_id = this.zeitgeist_search_complete.connect ((rs, q_id) =>
