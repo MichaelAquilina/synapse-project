@@ -20,8 +20,6 @@
  *
  */
 
-using Gtk;
-using Cairo;
 using Gee;
 
 namespace Sezen
@@ -54,7 +52,7 @@ namespace Sezen
     This one is to notify the user that search is not yet completed
   */
   
-  public abstract class UIInterface : GLib.Object
+  public abstract class UIInterface : Object
   {
     // FIXME: the partial timeout should be the shortest possible
     //        to send to the user an "instant" response
