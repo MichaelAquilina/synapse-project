@@ -46,6 +46,7 @@ namespace Sezen
       this.title = "Sezen 2 - Settings"; //TODO: i18n
       this.set_size_request (500, 450);
       this.resizable = false;
+      this.delete_event.connect (this.hide_on_delete);
       init_settings ();
       build_ui ();
     }

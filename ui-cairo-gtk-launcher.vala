@@ -26,14 +26,17 @@ namespace Sezen
 {
   public static UIInterface ui;
   public static SettingsWindow sett;
+  public static DataSink global_data_sink;
 
   public static void init_ui (Type t)
   {
     if (ui != null)
       ui.hide(); //TODO: destroy?
     ui = (UIInterface)GLib.Object.new (t);
+    // Data Sink MUST be initialized after constructor
+    ui.set_data_sink (global_data_sink);
     ui.show_settings_clicked.connect (()=>{
-      sett.show ();
+      sett.show_all ();
     });
     ui.show ();
   }
@@ -41,6 +44,8 @@ namespace Sezen
   {
     ui = null;
     Gtk.init (ref argv);
+    global_data_sink = new DataSink ();
+    
     sett = new SettingsWindow ();
     
     init_ui (sett.get_current_theme ());
