@@ -151,7 +151,6 @@ namespace Sezen
       throbber.set_size_request (20, -1);
       /* Menu Button */
       menubtn = new MenuButton ();
-      menubtn.set_size_request (8, 8);
       menubtn.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       /* HBox for titles and action icon */
       var right_hbox = new HBox (false, 0);

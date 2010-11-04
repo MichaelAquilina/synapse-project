@@ -51,7 +51,7 @@ namespace Sezen
     
     protected Sezen.Throbber throbber = null;
 
-    private const int UI_WIDTH = 600; // height is dynamic
+    private const int UI_WIDTH = 620; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
     private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
     private const int SECTION_PADDING = 10;
@@ -172,7 +172,6 @@ namespace Sezen
       /* Pref item */
       var pref = new MenuButton ();
       pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
-      pref.set_size_request (7, 7);
       {
         var vbox = new VBox (false, 0);
         var spacer = new Label (null);
