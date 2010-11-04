@@ -44,6 +44,7 @@ namespace Sezen
     public SettingsWindow ()
     {
       this.title = "Sezen 2 - Settings"; //TODO: i18n
+      this.set_position (WindowPosition.CENTER);
       this.set_size_request (500, 450);
       this.resizable = false;
       this.delete_event.connect (this.hide_on_delete);
