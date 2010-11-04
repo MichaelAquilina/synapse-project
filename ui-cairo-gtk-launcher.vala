@@ -28,11 +28,11 @@ namespace Sezen
   {
     private UIInterface ui;
     private SettingsWindow sett;
-    private DataSink global_data_sink;
+    private DataSink data_sink;
     public UILauncher ()
     {
       ui = null;
-      global_data_sink = new DataSink ();
+      data_sink = new DataSink ();
       sett = new SettingsWindow ();
       
       bind_keyboard_shortcut ();
@@ -43,11 +43,7 @@ namespace Sezen
     }
     private void init_ui (Type t)
     {
-      if (ui != null)
-        ui.hide(); //TODO: destroy?
-      ui = (UIInterface)GLib.Object.new (t);
-      // Data Sink MUST be initialized after constructor
-      ui.set_data_sink (global_data_sink);
+      ui = GLib.Object.new (t, "data-sink", data_sink) as UIInterface;
       ui.show_settings_clicked.connect (()=>{
         sett.show_all ();
       });
@@ -84,6 +80,11 @@ namespace Sezen
         warning ("%s", err.message);
       }/* */
     }
+
+    public void run ()
+    {
+      Gtk.main ();
+    }
   }
   
 
@@ -92,7 +93,7 @@ namespace Sezen
   {
     Gtk.init (ref argv);
     var launcher = new UILauncher ();
-    Gtk.main ();
+    launcher.run ();
     return 0;
   }
 }

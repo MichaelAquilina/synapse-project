@@ -124,12 +124,13 @@ namespace Sezen
     public abstract async ResultSet? search (Query query) throws SearchError;
 
     // weirdish kind of signal cause DataSink will be emitting it for the plugin
-    public signal void search_done (ResultSet rs);
+    public signal void search_done (ResultSet rs, uint query_id);
   }
   
   public abstract class ActionPlugin : DataPlugin
   {
-    public abstract ResultSet find_for_match (Query query, Match match);
+    public abstract bool handles_unknown ();
+    public abstract ResultSet? find_for_match (Query query, Match match);
     public override async ResultSet? search (Query query) throws SearchError
     {
       assert_not_reached ();
@@ -149,50 +150,54 @@ namespace Sezen
 
     private Gee.Set<DataPlugin> plugins;
     private Gee.Set<ActionPlugin> actions;
+    private uint query_id;
 
     construct
     {
       plugins = new Gee.HashSet<DataPlugin> ();
       actions = new Gee.HashSet<ActionPlugin> ();
+      query_id = 0;
 
       load_plugins ();
     }
+
+    private bool has_unknown_handlers = false;
 
     // FIXME: public? really?
     public void register_plugin (DataPlugin plugin)
     {
       if (plugin is ActionPlugin)
       {
-        actions.add (plugin as ActionPlugin);
+        ActionPlugin? action_plugin = plugin as ActionPlugin;
+        actions.add (action_plugin);
+        has_unknown_handlers |= action_plugin.handles_unknown ();
       }
       else
       {
         plugins.add (plugin);
       }
     }
+    
+    private DataPlugin? create_plugin (Type t)
+    {
+      return Object.new (t, "data-sink", this, null) as DataPlugin;
+    }
 
     private void load_plugins ()
     {
       // FIXME: turn into proper modules
-      register_plugin (Object.new (typeof (DesktopFilePlugin),
-                       "data-sink", this, null) as DataPlugin);
-      register_plugin (Object.new (typeof (ZeitgeistPlugin),
-                       "data-sink", this, null) as DataPlugin);
-      register_plugin (Object.new (typeof (HybridSearchPlugin),
-                       "data-sink", this, null) as DataPlugin);
-      register_plugin (Object.new (typeof (GnomeSessionPlugin),
-                       "data-sink", this, null) as DataPlugin);
-      register_plugin (Object.new (typeof (UPowerPlugin),
-                       "data-sink", this, null) as DataPlugin);
-      register_plugin (Object.new (typeof (CommandPlugin),
-                       "data-sink", this, null) as DataPlugin);
+      register_plugin (create_plugin (typeof (DesktopFilePlugin)));
+      register_plugin (create_plugin (typeof (ZeitgeistPlugin)));
+      register_plugin (create_plugin (typeof (HybridSearchPlugin)));
+      register_plugin (create_plugin (typeof (GnomeSessionPlugin)));
+      register_plugin (create_plugin (typeof (UPowerPlugin)));
+      register_plugin (create_plugin (typeof (CommandPlugin)));
 #if TEST_PLUGINS
-      register_plugin (Object.new (typeof (TestSlowPlugin),
-                       "data-sink", this, null) as DataPlugin);
+      register_plugin (create_plugin (typeof (TestSlowPlugin)));
 #endif
 
-      register_plugin (Object.new (typeof (CommonActions),
-                       "data-sink", this, null) as DataPlugin);
+      register_plugin (create_plugin (typeof (CommonActions)));
+      register_plugin (create_plugin (typeof (DictionaryPlugin)));
     }
     
     public unowned DataPlugin? get_plugin (string name)
@@ -216,7 +221,7 @@ namespace Sezen
                                          ResultSet? dest_result_set,
                                          Cancellable? cancellable = null) throws SearchError
     {
-      var q = Query (query, flags);
+      var q = Query (query_id++, query, flags);
 
       var cancellables = new GLib.List<Cancellable> ();
 
@@ -240,7 +245,7 @@ namespace Sezen
           try
           {
             var results = plugin.search.end (res);
-            plugin.search_done (results); // FIXME: add a search_id param?
+            plugin.search_done (results, q.query_id);
             current_result_set.add_all (results);
           }
           catch (SearchError err)
@@ -272,6 +277,12 @@ namespace Sezen
       {
         throw new SearchError.SEARCH_CANCELLED ("Cancelled");
       }
+      
+      if (has_unknown_handlers && 
+        (QueryFlags.UNCATEGORIZED in flags || QueryFlags.ACTIONS in flags))
+      {
+        current_result_set.add (new DefaultMatch (query), 0);
+      }
 
       return current_result_set.get_sorted_list ();
     }
@@ -279,7 +290,7 @@ namespace Sezen
     public Gee.List<Match> find_actions_for_match (Match match, string? query)
     {
       var rs = new ResultSet ();
-      var q = Query (query ?? "");
+      var q = Query (0, query ?? "");
       foreach (var action_plugin in actions)
       {
         rs.add_all (action_plugin.find_for_match (q, match));

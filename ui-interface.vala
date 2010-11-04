@@ -57,7 +57,7 @@ namespace Sezen
     // FIXME: the partial timeout should be the shortest possible
     //        to send to the user an "instant" response
     private const int PARTIAL_TIMEOUT = 100;
-    private DataSink data_sink;
+    public DataSink data_sink { get; construct; }
     private enum T 
     {
       MATCH,
@@ -75,11 +75,9 @@ namespace Sezen
     construct
     {
       tid = 0;
-      data_sink = null;
       current_cancellable = new Cancellable ();
       reset_search (false);
     }
-    public void set_data_sink (DataSink ds) {this.data_sink = ds;}
     /* UI must do the following things */
     public abstract void show ();
     public abstract void hide ();

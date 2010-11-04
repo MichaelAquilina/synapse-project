@@ -101,8 +101,12 @@ namespace Sezen
 
         if (valid_cmd != null)
         {
-          // TODO: add result
-          result.add (new CommandObject (stripped), Query.MATCH_FUZZY);
+          // don't allow dangerous commands
+          if (args[0] != "rm")
+          {
+            // TODO: add result
+            result.add (new CommandObject (stripped), Query.MATCH_FUZZY);
+          }
         }
       }
       else

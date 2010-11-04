@@ -244,7 +244,7 @@ namespace Sezen
         // we'll do this so other plugins can send their DBus requests etc.
         // and they don't have to wait for our blocking (though fast) search
         // to finish
-        Idle.add (search.callback);
+        Idle.add_full (Priority.HIGH_IDLE, search.callback);
         yield;
       }
 

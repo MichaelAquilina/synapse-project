@@ -55,12 +55,19 @@ namespace Sezen
     string query_string_folded;
     Cancellable cancellable;
     QueryFlags query_type;
+    uint max_results;
+    uint query_id;
 
-    public Query (string query, QueryFlags flags = QueryFlags.LOCAL_CONTENT)
+    public Query (uint query_id,
+                  string query,
+                  QueryFlags flags = QueryFlags.LOCAL_CONTENT,
+                  uint num_results = 96)
     {
+      this.query_id = query_id;
       this.query_string = query;
       this.query_string_folded = query.casefold ();
       this.query_type = flags;
+      this.max_results = num_results;
     }
 
     public bool is_cancelled ()
@@ -75,6 +82,9 @@ namespace Sezen
         throw new SearchError.SEARCH_CANCELLED ("Cancelled");
       }
     }
+    
+    // FIXME: turn into 0.0 - 1.0 floats
+    public const int MATCH_SCORE_MAX = 100;
     
     public const int MATCH_EXACT = 100;
     public const int MATCH_PREFIX = 90;
