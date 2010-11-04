@@ -58,7 +58,7 @@ namespace Sezen
     public string uri { get; set; }
     public MatchType match_type { get; construct set; }
     
-    public DefaultMatch(string query_string)
+    public DefaultMatch (string query_string)
     {
       Object (title: query_string, description: "", has_thumbnail: false,
               icon_name: "unknown", match_type: MatchType.UNKNOWN);

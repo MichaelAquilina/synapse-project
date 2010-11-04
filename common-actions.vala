@@ -175,8 +175,13 @@ namespace Sezen
       actions.add (new Opener ());
       actions.add (new OpenFolder ());
     }
+    
+    public override bool handles_unknown ()
+    {
+      return false;
+    }
 
-    public override ResultSet find_for_match (Query query, Match match)
+    public override ResultSet? find_for_match (Query query, Match match)
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
