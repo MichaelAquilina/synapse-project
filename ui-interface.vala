@@ -20,8 +20,6 @@
  *
  */
 
-using Gtk;
-using Cairo;
 using Gee;
 
 namespace Sezen
@@ -54,7 +52,7 @@ namespace Sezen
     This one is to notify the user that search is not yet completed
   */
   
-  public abstract class UIInterface : GLib.Object
+  public abstract class UIInterface : Object
   {
     // FIXME: the partial timeout should be the shortest possible
     //        to send to the user an "instant" response
@@ -85,6 +83,7 @@ namespace Sezen
     public abstract void show ();
     public abstract void hide ();
     public abstract void present_with_time (uint32 timestamp);
+    public signal void show_settings_clicked ();
 
     protected abstract void focus_match ( int index, Match? match );
     protected abstract void focus_action ( int index, Match? action );
@@ -119,7 +118,10 @@ namespace Sezen
       focus_index[t] = first ? 0 : results[t].size - 1;
       focus[t] = results[t].get (focus_index[t]);
       if (t == T.MATCH)
+      {
         focus_match (focus_index[t], focus[t]);
+        search_for_actions ();
+      }
       else
         focus_action (focus_index[t], focus[t]);
     }
@@ -149,7 +151,10 @@ namespace Sezen
       }
       focus[t] = results[t].get (focus_index[t]);
       if (t == T.MATCH)
+      {
         focus_match (focus_index[t], focus[t]);
+        search_for_actions ();
+      }
       else
         focus_action (focus_index[t], focus[t]);
       return true;

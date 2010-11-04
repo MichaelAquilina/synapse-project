@@ -24,16 +24,29 @@ using Gtk;
 
 namespace Sezen
 {
+  public static UIInterface ui;
+  public static SettingsWindow sett;
+
+  public static void init_ui (Type t)
+  {
+    if (ui != null)
+      ui.hide(); //TODO: destroy?
+    ui = (UIInterface)GLib.Object.new (t);
+    ui.show_settings_clicked.connect (()=>{
+      sett.show ();
+    });
+    ui.show ();
+  }
   public static int main (string[] argv)
   {
+    ui = null;
     Gtk.init (ref argv);
-#if UI_MINI
-    var window = new SezenWindowMini ();
-#else
-    var window = new SezenWindow ();
-#endif
-    window.show ();
-
+    sett = new SettingsWindow ();
+    
+    init_ui (sett.get_current_theme ());
+    
+    sett.theme_selected.connect (init_ui);
+ 
     var registry = GtkHotkey.Registry.get_default ();
     GtkHotkey.Info hotkey;
     try
@@ -52,14 +65,14 @@ namespace Sezen
       hotkey.bind ();
       hotkey.activated.connect ((event_time) =>
       {
-        window.show ();
-        window.present_with_time (event_time);
+        ui.show ();
+        ui.present_with_time (event_time);
       });
     }
     catch (Error err)
     {
       warning ("%s", err.message);
-    }
+    }/* */
 
     Gtk.main ();
     return 0;

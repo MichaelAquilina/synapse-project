@@ -51,7 +51,7 @@ namespace Sezen
     
     protected Sezen.Throbber throbber = null;
 
-    private const int UI_WIDTH = 600; // height is dynamic
+    private const int UI_WIDTH = 620; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
     private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
     private const int SECTION_PADDING = 10;
@@ -69,7 +69,7 @@ namespace Sezen
     private bool list_visible = true;
     private IMContext im_context;
     
-    public SezenWindowMini ()
+    construct
     {
       window = new Window ();
       window.skip_taskbar_hint = true;
@@ -130,6 +130,7 @@ namespace Sezen
       match_icon_container_overlayed = new ContainerOverlayed();
       match_icon_thumb = new NamedIcon();
       match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
+      match_icon_thumb.update_timeout = 100;
       match_icon = new NamedIcon ();
       match_icon.set_pixel_size (ICON_SIZE);
       match_icon_container_overlayed.set_size_request (ICON_SIZE, ICON_SIZE);
@@ -170,7 +171,7 @@ namespace Sezen
       
       /* Pref item */
       var pref = new MenuButton ();
-      pref.set_size_request (7, 7);
+      pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       {
         var vbox = new VBox (false, 0);
         var spacer = new Label (null);
