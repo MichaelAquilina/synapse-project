@@ -32,13 +32,14 @@ namespace Sezen
     /* Main UI shared components */
     protected NamedIcon match_icon = null;
     protected NamedIcon match_icon_thumb = null;
-    protected FakeInput match_label = null;
+    protected ShrinkingLabel match_label = null;
     protected Label match_label_description = null;
     protected NamedIcon action_icon = null;
-    protected FakeInput action_label = null;
+    protected Label action_label = null;
     protected HSelectionContainer flag_selector = null;
     protected MenuButton menubtn = null;
     protected HBox top_hbox = null;
+    protected FakeInput fake_input = null;
     protected Label top_spacer = null;
     protected VBox container = null;
     protected VBox container_top = null;
@@ -125,7 +126,7 @@ namespace Sezen
       match_label_description.xpad = 6;
       /* Packing Top Hbox with Match Desctiption into Top VBox*/
       container_top.pack_start (top_hbox);
-      container_top.pack_start (match_label_description, false);
+      //container_top.pack_start (match_label_description, false);
       
       /* Match Icon packed into Top HBox */
       match_icon_container_overlayed = new ContainerOverlayed();
@@ -169,6 +170,7 @@ namespace Sezen
       top_right_vbox.pack_start (top_spacer, true);
       top_right_vbox.pack_start (topright_hbox, false);
       top_right_vbox.pack_start (right_hbox, false);
+      top_right_vbox.pack_start (match_label_description, false);
       
       /* Titles box and Action icon*/
       var labels_hbox = new HBox (false, 0);
@@ -177,19 +179,22 @@ namespace Sezen
       action_icon.set_alignment (0.5f, 0.5f);
       action_icon.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
 
-      right_hbox.pack_start (labels_hbox);
+      fake_input = new FakeInput ();
+      fake_input.add (labels_hbox);
+      fake_input.top_padding = 8;
+      fake_input.bottom_padding = 9;
+      fake_input.yalign = 0.5f;
+      fake_input.focus_height = 8;
+      right_hbox.pack_start (fake_input);
       right_hbox.pack_start (action_icon, false);
       
-      match_label = new FakeInput ();
-      match_label.enable_fake_input = true;
+      match_label = new ShrinkingLabel ();
       match_label.set_alignment (0.0f, 0.5f);
       match_label.set_ellipsize (Pango.EllipsizeMode.END);
       match_label.xpad = 10;
 
-      action_label = new FakeInput ();
-      action_label.enable_fake_input = false;
+      action_label = new Label (null);
       action_label.set_alignment (1.0f, 0.5f);
-      //action_label.set_ellipsize (Pango.EllipsizeMode.START);
       action_label.xpad = 10;
       
       labels_hbox.pack_start (match_label);
@@ -197,7 +202,13 @@ namespace Sezen
 
       container.show_all ();
     }
-    
+    private void visual_update_search_for ()
+    {
+      if (searching_for_matches)
+        fake_input.focus_widget = match_label;
+      else
+        fake_input.focus_widget = action_label;
+    }
     protected virtual void on_composited_changed (Widget w)
     {
       Gdk.Screen screen = w.get_screen ();
@@ -375,7 +386,10 @@ namespace Sezen
     private void search_add_char (string chr)
     {
       if (searching_for_matches)
+      {
         set_match_search (get_match_search() + chr);
+        set_action_search ("");
+      }
       else
         set_action_search (get_action_search() + chr);
     }
@@ -391,7 +405,10 @@ namespace Sezen
       {
         s = s.substring (0, len - 1);
         if (searching_for_matches)
+        {
           set_match_search (s);
+          set_action_search ("");
+        }
         else
           set_action_search (s);
       }
@@ -405,11 +422,6 @@ namespace Sezen
       searching_for_matches = true;
       reset_search ();
       visual_update_search_for ();
-    }
-    private void visual_update_search_for ()
-    {
-      match_label.enable_fake_input = searching_for_matches;
-      action_label.enable_fake_input = !searching_for_matches;
     }
     
     protected virtual bool key_press_event (Gdk.EventKey event)
@@ -434,6 +446,7 @@ namespace Sezen
           {
             set_action_search ("");
             searching_for_matches = true;
+            visual_update_search_for ();
             window.queue_draw ();
           }
           else if (get_match_search() != "")
@@ -526,9 +539,12 @@ namespace Sezen
           set_list_visible (true);
           break;
         case Gdk.KeySyms.Tab:
-          if (searching_for_matches && 
-              (get_match_results () == null || get_match_results ().size == 0 ||
-               get_action_results () == null || get_action_results ().size == 0))
+          if  (searching_for_matches && 
+                (
+                  get_match_results () == null || get_match_results ().size == 0 ||
+                  (get_action_search () == "" && (get_action_results () == null || get_action_results ().size == 0))
+                )
+              )
             return true;
           searching_for_matches = !searching_for_matches;
           Match m = null;
@@ -604,7 +620,7 @@ namespace Sezen
     }
     protected override void focus_match ( int index, Match? match )
     {
-      string size = searching_for_matches ? "xx-large": "medium";
+      string size = "x-large"; //searching_for_matches ? "xx-large": "medium";
       if (match == null)
       {
         /* Show default stuff */
@@ -622,7 +638,7 @@ namespace Sezen
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
           match_label.set_markup (
-            Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",
+            Markup.printf_escaped ("<span size=\"x-large\">%s</span>",
                                    "Type to search..."));
           match_label_description.set_markup (
             Markup.printf_escaped ("<span size=\"medium\"> </span>" +
@@ -648,7 +664,7 @@ namespace Sezen
     }
     protected override void focus_action ( int index, Match? action )
     {
-      string size = !searching_for_matches ? "xx-large": "medium";
+      string size = "x-large"; //!searching_for_matches ? "xx-large": "medium";
       if (action == null)
       {
         action_icon.set_sensitive (false);
