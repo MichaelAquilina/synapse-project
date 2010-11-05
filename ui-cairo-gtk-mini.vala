@@ -58,7 +58,7 @@ namespace Sezen
     private const int BORDER_RADIUS = 10;
     private const int ICON_SIZE = 160;
     private const int TOP_SPACING = ICON_SIZE / 2;
-    private const int LABEL_INTERNAL_PADDING = 3;
+    private const int LABEL_INTERNAL_PADDING = 4;
     private const string LABEL_TEXT_SIZE = "x-large";
     
     private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
