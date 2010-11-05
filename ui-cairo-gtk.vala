@@ -182,9 +182,9 @@ namespace Sezen
       fake_input = new FakeInput ();
       fake_input.add (labels_hbox);
       fake_input.top_padding = 8;
-      fake_input.bottom_padding = 8;
+      fake_input.bottom_padding = 9;
       fake_input.yalign = 0.5f;
-      fake_input.focus_height = 4;
+      fake_input.focus_height = 8;
       right_hbox.pack_start (fake_input);
       right_hbox.pack_start (action_icon, false);
       
@@ -195,7 +195,6 @@ namespace Sezen
 
       action_label = new Label (null);
       action_label.set_alignment (1.0f, 0.5f);
-      //action_label.set_ellipsize (Pango.EllipsizeMode.START);
       action_label.xpad = 10;
       
       labels_hbox.pack_start (match_label);
@@ -611,7 +610,7 @@ namespace Sezen
     }
     protected override void focus_match ( int index, Match? match )
     {
-      string size = searching_for_matches ? "xx-large": "medium";
+      string size = "x-large"; //searching_for_matches ? "xx-large": "medium";
       if (match == null)
       {
         /* Show default stuff */
@@ -629,7 +628,7 @@ namespace Sezen
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
           match_label.set_markup (
-            Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",
+            Markup.printf_escaped ("<span size=\"x-large\">%s</span>",
                                    "Type to search..."));
           match_label_description.set_markup (
             Markup.printf_escaped ("<span size=\"medium\"> </span>" +
@@ -655,7 +654,7 @@ namespace Sezen
     }
     protected override void focus_action ( int index, Match? action )
     {
-      string size = !searching_for_matches ? "xx-large": "medium";
+      string size = "x-large"; //!searching_for_matches ? "xx-large": "medium";
       if (action == null)
       {
         action_icon.set_sensitive (false);
