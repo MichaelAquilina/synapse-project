@@ -886,6 +886,7 @@ namespace Sezen
         }
         ctx.restore ();
         ctx.append_path (path);
+        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], &r, &g, &b);
         ctx.set_source_rgba (r, g, b, 0.6);
         ctx.stroke ();
       }
