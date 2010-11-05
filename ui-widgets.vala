@@ -873,8 +873,24 @@ namespace Sezen
           double y1 = y + h - focus_height;
           ctx.new_path ();
           ctx.move_to (x1, y2);
-          ctx.curve_to (x1, y2, x1, y1, x2, y1);
-          ctx.curve_to (x3, y1, x3, y2, x3, y2);
+          if (x1 < x + 1)
+          {
+            ctx.line_to (x1, y1);
+            ctx.line_to (x2, y1);
+          }
+          else
+          {
+            ctx.curve_to (x1, y2, x1, y1, x2, y1);
+          }
+          if (x3 > x + w - 1)
+          {
+            ctx.line_to (x3, y1);
+            ctx.line_to (x3, y2);
+          }
+          else
+          {
+            ctx.curve_to (x3, y1, x3, y2, x3, y2);
+          }
           ctx.close_path ();
           ctx.clip ();
           Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
