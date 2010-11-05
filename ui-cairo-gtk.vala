@@ -386,7 +386,10 @@ namespace Sezen
     private void search_add_char (string chr)
     {
       if (searching_for_matches)
+      {
         set_match_search (get_match_search() + chr);
+        set_action_search ("");
+      }
       else
         set_action_search (get_action_search() + chr);
     }
@@ -402,7 +405,10 @@ namespace Sezen
       {
         s = s.substring (0, len - 1);
         if (searching_for_matches)
+        {
           set_match_search (s);
+          set_action_search ("");
+        }
         else
           set_action_search (s);
       }
@@ -532,9 +538,12 @@ namespace Sezen
           set_list_visible (true);
           break;
         case Gdk.KeySyms.Tab:
-          if (searching_for_matches && 
-              (get_match_results () == null || get_match_results ().size == 0 ||
-               get_action_results () == null || get_action_results ().size == 0))
+          if  (searching_for_matches && 
+                (
+                  get_match_results () == null || get_match_results ().size == 0 ||
+                  (get_action_search () == "" && (get_action_results () == null || get_action_results ().size == 0))
+                )
+              )
             return true;
           searching_for_matches = !searching_for_matches;
           Match m = null;

@@ -814,16 +814,30 @@ namespace Sezen
   {
     public bool draw_input {get; set; default = true;}
     public double border_radius {get; set; default = 3.0;}
-    public double shadow_pct {get; set; default = 0.2;}
+    public double shadow_height {get; set; default = 3;}
     public double focus_height {get; set; default = 3;}
-    public Widget? focus_widget {get; set; default = null;}
+    public Widget? focus_widget 
+    {
+      get {return _focus_widget;}
+      set {
+        if (value == _focus_widget)
+          return;
+        this.queue_draw ();
+        if (_focus_widget != null)
+          _focus_widget.queue_draw ();
+        _focus_widget = value;
+        if (_focus_widget != null)
+          _focus_widget.queue_draw ();
+      }
+    }
+    private Widget? _focus_widget;
     construct
     {
+      _focus_widget = null;
       this.notify["draw-input"].connect (this.queue_draw);
       this.notify["border-radius"].connect (this.queue_draw);
       this.notify["shadow-pct"].connect (this.queue_draw);
       this.notify["focus-height"].connect (this.queue_draw);
-      this.notify["focus-widget"].connect (this.queue_draw);
     }
 
     public override bool expose_event (Gdk.EventExpose event)
@@ -849,14 +863,13 @@ namespace Sezen
         ctx.clip ();
         ctx.paint ();
         Utils.rgb_invert_color (out r, out g, out b);
-        double shadow_size = double.min(1.0, shadow_pct) * (h);
-        var pat = new Cairo.Pattern.linear (0, y, 0, y + shadow_size);
+        var pat = new Cairo.Pattern.linear (0, y, 0, y + shadow_height);
         pat.add_color_stop_rgba (0, r, g, b, 0.6);
         pat.add_color_stop_rgba (0.3, r, g, b, 0.25);
         pat.add_color_stop_rgba (1.0, r, g, b, 0);
         ctx.set_source (pat);
         ctx.paint ();
-        if (focus_widget != null)
+        if (_focus_widget != null)
         {
           /*
                      ____            y1
@@ -865,8 +878,8 @@ namespace Sezen
             .-'                '-.
            x1         x2         x3  y2
           */
-          double x1 = double.max (focus_widget.allocation.x, x),
-                 x3 = double.min (focus_widget.allocation.x + focus_widget.allocation.width,
+          double x1 = double.max (_focus_widget.allocation.x, x),
+                 x3 = double.min (_focus_widget.allocation.x + _focus_widget.allocation.width,
                            x + w);
           double x2 = (x1 + x3) / 2.0;
           double y2 = y + h;
