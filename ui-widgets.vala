@@ -815,14 +815,14 @@ namespace Sezen
     public bool draw_input {get; set; default = true;}
     public double border_radius {get; set; default = 3.0;}
     public double shadow_pct {get; set; default = 0.2;}
-    public double focus_pct {get; set; default = 0.30;}
+    public double focus_height {get; set; default = 3;}
     public Widget? focus_widget {get; set; default = null;}
     construct
     {
       this.notify["draw-input"].connect (this.queue_draw);
       this.notify["border-radius"].connect (this.queue_draw);
       this.notify["shadow-pct"].connect (this.queue_draw);
-      this.notify["focus-pct"].connect (this.queue_draw);
+      this.notify["focus-height"].connect (this.queue_draw);
       this.notify["focus-widget"].connect (this.queue_draw);
     }
 
@@ -870,7 +870,7 @@ namespace Sezen
                            x + w);
           double x2 = (x1 + x3) / 2.0;
           double y2 = y + h;
-          double y1 = y + h * (1.0 - double.min (1.0, focus_pct));
+          double y1 = y + h - focus_height;
           ctx.new_path ();
           ctx.move_to (x1, y2);
           ctx.curve_to (x1, y2, x1, y1, x2, y1);
@@ -879,8 +879,8 @@ namespace Sezen
           ctx.clip ();
           Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
           pat = new Cairo.Pattern.linear (0, y2, 0, y1);
-          pat.add_color_stop_rgba (0, r, g, b, 0.6);
-          pat.add_color_stop_rgba (1.0, r, g, b, 0.0);
+          pat.add_color_stop_rgba (0, r, g, b, 1.0);
+          pat.add_color_stop_rgba (1, r, g, b, 0.0);
           ctx.set_source (pat);
           ctx.paint ();
         }

@@ -183,7 +183,7 @@ namespace Sezen
       fake_input.top_padding = 8;
       fake_input.bottom_padding = 8;
       fake_input.yalign = 0.5f;
-      fake_input.focus_pct = 0.25;
+      fake_input.focus_height = 4;
       right_hbox.pack_start (fake_input);
       right_hbox.pack_start (action_icon, false);
       
