@@ -24,7 +24,7 @@ namespace Sezen
   public enum MatchType
   {
     UNKNOWN = 0,
-    DESKTOP_ENTRY,
+    APPLICATION,
     GENERIC_URI,
     ACTION
   }
@@ -46,6 +46,19 @@ namespace Sezen
     {
       warning ("%s.execute () is not implemented", this.get_type ().name ());
     }
+  }
+  
+  public interface ApplicationMatch: Match
+  {
+    public abstract AppInfo? app_info { get; set; }
+    public abstract bool needs_terminal { get; set; }
+    public abstract string? filename { get; construct set; }
+  }
+
+  public interface UriMatch: Match
+  {
+    public abstract QueryFlags file_type { get; set; }
+    public abstract string mime_type { get; set; }
   }
   
   public class DefaultMatch: Object, Match

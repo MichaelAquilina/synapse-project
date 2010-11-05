@@ -28,7 +28,7 @@ namespace Sezen
 {
   public class HybridSearchPlugin: DataPlugin
   {
-    private class MatchObject: Object, Match
+    private class MatchObject: Object, Match, UriMatch
     {
       // for Match interface
       public string title { get; construct set; }
@@ -38,6 +38,10 @@ namespace Sezen
       public string thumbnail_path { get; construct set; }
       public string uri { get; set; }
       public MatchType match_type { get; construct set; }
+
+      // for FileMatch
+      public QueryFlags file_type { get; set; }
+      public string mime_type { get; set; }
 
       public MatchObject (string? thumbnail_path, string? icon)
       {
@@ -134,6 +138,9 @@ namespace Sezen
             {
               file_type = QueryFlags.DOCUMENTS;
             }
+            
+            match_obj.file_type = file_type;
+            match_obj.mime_type = mime_type;
           }
         }
         catch (Error err)
@@ -379,8 +386,19 @@ namespace Sezen
         var child = directory.get_child (name);
         var file_info = new FileInfo (child.get_uri ());
         di.files[file_info.uri] = file_info;
-        //di.files[child.get_uri ()] = null;
       }
+    }
+
+    private async void update_directory_contents (GLib.File directory,
+                                                  DirectoryInfo di)
+    {
+      debug ("Scanning %s...", directory.get_path ());
+      var enumerator = yield directory.enumerate_children_async (
+        FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
+      var files = yield enumerator.next_files_async (1024, 0);
+
+      di.files.clear ();
+      process_directory_contents (di, directory, files);
     }
 
     private async void process_directories (Gee.Collection<string> directories)
@@ -407,12 +425,7 @@ namespace Sezen
             directory_contents[dir_path] = di;
           }
 
-          debug ("Scanning %s...", dir_path);
-          var enumerator = yield directory.enumerate_children_async (
-            FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
-          var files = yield enumerator.next_files_async (1024, 0);
-
-          process_directory_contents (di, directory, files);
+          yield update_directory_contents (directory, di);
         }
         catch (Error err)
         {
@@ -438,8 +451,27 @@ namespace Sezen
       Gee.Collection<string> directories = dirs ?? directory_contents.keys;
       foreach (var directory in directories)
       {
+        var di = directory_contents[directory];
+        // check if we have fresh directory listing
+        var dir = File.new_for_path (directory);
+        try
+        {
+          var dir_info = yield dir.query_info_async ("time::*", 0, 0, null);
+          var t = TimeVal ();
+          dir_info.get_modification_time (out t);
+          if (t.tv_sec > di.last_update.tv_sec)
+          {
+            // the directory was changed, let's update
+            yield update_directory_contents (dir, di);
+          }
+        }
+        catch (Error err)
+        {
+          warning ("%s", err.message);
+        }
+
         // only add the uri if it matches our query
-        foreach (var entry in directory_contents[directory].files)
+        foreach (var entry in di.files)
         {
           foreach (var matcher in matchers)
           {

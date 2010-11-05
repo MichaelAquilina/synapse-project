@@ -24,20 +24,20 @@ namespace Sezen
   [Flags]
   public enum QueryFlags
   {
-    LOCAL_ONLY    = 1 << 0,
+    INCLUDE_REMOTE  = 1 << 0,
 
-    APPLICATIONS  = 1 << 1,
-    ACTIONS       = 1 << 2,
-    AUDIO         = 1 << 3,
-    VIDEO         = 1 << 4,
-    DOCUMENTS     = 1 << 5,
-    IMAGES        = 1 << 6,
-    INTERNET      = 1 << 7,
+    APPLICATIONS    = 1 << 1,
+    ACTIONS         = 1 << 2,
+    AUDIO           = 1 << 3,
+    VIDEO           = 1 << 4,
+    DOCUMENTS       = 1 << 5,
+    IMAGES          = 1 << 6,
+    INTERNET        = 1 << 7,
 
-    UNCATEGORIZED = 1 << 15,
+    UNCATEGORIZED   = 1 << 15,
 
-    LOCAL_CONTENT = 0xFF | QueryFlags.UNCATEGORIZED,
-    ALL           = 0xFE | QueryFlags.UNCATEGORIZED
+    ALL           = 0xFF | QueryFlags.UNCATEGORIZED,
+    LOCAL_CONTENT = ALL ^ QueryFlags.INCLUDE_REMOTE
   }
   
   [Flags]
