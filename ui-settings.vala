@@ -28,19 +28,25 @@ namespace Sezen
 {
   public class SettingsWindow : Gtk.Window
   {
-    public struct PluginSetting
+    private struct Plugin
     {
+      string name;
+      string description;
       bool enabled;
-      Type plugin_class;
+      Type tclass;
     }
-    public struct SezenSettings
+    private struct Theme
     {
-      Type selected_theme;
-      Gee.Map<string, Type> themes;
-      Gee.Map<string, PluginSetting?> plugins;
-      bool autostart;
+      string name;
+      string description;
+      Type tclass;
     }
-    SezenSettings sett;
+
+    string selected_theme;
+    Gee.Map<string, Theme?> themes;
+    Gee.Map<string, Plugin?> plugins;
+    bool autostart;
+
     public SettingsWindow ()
     {
       this.title = "Sezen 2 - Settings"; //TODO: i18n
@@ -51,34 +57,104 @@ namespace Sezen
       init_settings ();
       build_ui ();
     }
+
+    private void init_plugins ()
+    {
+      plugins = new Gee.HashMap<string, Plugin?>();
+      plugins.set ("DesktopFilePlugin",
+                   Plugin(){
+                     name = "Desktop File", //i18n
+                     description = "", //i18n
+                     tclass = typeof (DesktopFilePlugin),
+                     enabled = true
+                   });
+      plugins.set ("ZeitgeistPlugin",
+                   Plugin(){
+                     name = "Zeitgeist", //i18n
+                     description = "", //i18n
+                     tclass = typeof (ZeitgeistPlugin),
+                     enabled = true
+                   });
+      plugins.set ("HybridSearchPlugin",
+                   Plugin(){
+                     name = "Hybrid Search", //i18n
+                     description = "", //i18n
+                     tclass = typeof (HybridSearchPlugin),
+                     enabled = true
+                   });
+      plugins.set ("GnomeSessionPlugin",
+                   Plugin(){
+                     name = "Gnome Session", //i18n
+                     description = "", //i18n
+                     tclass = typeof (GnomeSessionPlugin),
+                     enabled = true
+                   });
+      plugins.set ("UPowerPlugin",
+                   Plugin(){
+                     name = "Power Management", //i18n
+                     description = "", //i18n
+                     tclass = typeof (UPowerPlugin),
+                     enabled = true
+                   });
+      plugins.set ("TestSlowPlugin",
+                   Plugin(){
+                     name = "Test Slow Search", //i18n
+                     description = "", //i18n
+                     tclass = typeof (TestSlowPlugin),
+                     enabled = false
+                   });
+      plugins.set ("CommonActions",
+                   Plugin(){
+                     name = "Common Actions", //i18n
+                     description = "", //i18n
+                     tclass = typeof (CommonActions),
+                     enabled = true
+                   });
+      plugins.set ("DictionaryPlugin",
+                   Plugin(){
+                     name = "Dictionary Plugin", //i18n
+                     description = "", //i18n
+                     tclass = typeof (DictionaryPlugin),
+                     enabled = true
+                   });
+      // TODO: read from gconf if enabled or not
+    }
+    private void init_themes ()
+    {
+      themes = new Gee.HashMap<string, Theme?>();
+      themes.set ("Default",
+                   Theme(){
+                     name = "Default", //i18n
+                     description = "", //i18n
+                     tclass = typeof (SezenWindow)
+                   });
+      themes.set ("Mini",
+                   Theme(){
+                     name = "Mini", //i18n
+                     description = "", //i18n
+                     tclass = typeof (SezenWindowMini)
+                   });
+
+      // TODO: read from gconf the selected one
+#if UI_MINI
+      selected_theme = "Mini";
+#else
+      selected_theme = "Default";
+#endif
+    }
+    
+    private void init_general_options ()
+    {
+      autostart = false;
+    }
+
     private void init_settings ()
     {
-      sett = SezenSettings ()
-      {
-        selected_theme = typeof (SezenWindow),
-        themes = new Gee.HashMap<string, Type>(),
-        plugins = new Gee.HashMap<string, PluginSetting?>(),
-        autostart = false
-      };
-      //GLOBAL TODO: i18n
-      sett.themes.set ("Default", typeof(SezenWindow));
-      sett.themes.set ("Mini", typeof(SezenWindowMini));
-      
-      //TODO: Make a new Interface to be implemented in Plugins to get name and description
-      sett.plugins.set ("Launchers", PluginSetting (){
-        enabled = true,
-        plugin_class = typeof (DesktopFilePlugin)
-      });
-      sett.plugins.set ("Zeitgeist", PluginSetting (){
-        enabled = true,
-        plugin_class = typeof (ZeitgeistPlugin)
-      });
-      sett.plugins.set ("Hybrid", PluginSetting (){
-        enabled = true,
-        plugin_class = typeof (HybridSearchPlugin)
-      });
+      init_themes ();
+      init_plugins ();
+      init_general_options ();
     }
-    ComboBox cb_themes;
+
     private void build_ui ()
     {
       var tabs = new Gtk.Notebook ();
@@ -91,33 +167,50 @@ namespace Sezen
       tabs.append_page (plugin_tab, new Label ("Plugins"));
       
       HBox row;
+
       /* General Tab */
       row = new HBox (false, 5);
-      cb_themes = new ComboBox.text ();
-      foreach (Gee.Map.Entry<string,GLib.Type> e in sett.themes)
-        cb_themes.append_text (e.key);
-#if UI_MINI
-      cb_themes.set_active (1);
-      sett.selected_theme = typeof (SezenWindowMini);
-#else
-      cb_themes.set_active (0);
-      sett.selected_theme = typeof (SezenWindow);
-#endif
-      cb_themes.changed.connect (() => {
-        string themeid = cb_themes.get_active_text ();
-        sett.selected_theme = sett.themes.get (themeid);
-        theme_selected (sett.selected_theme);
-      });
+
       row.pack_start (new Label ("Select Theme:"), false, false);
-      row.pack_start (cb_themes, false, false);
+      row.pack_start (build_theme_combo (), false, false);
       general_tab.pack_start (row, false, false);
-      
             
       tabs.show_all ();
     }
+
+    private ComboBox build_theme_combo ()
+    {
+      var cb_themes = new ComboBox.text ();
+      /* Set the model */                  /* key */      /* Label */
+      var theme_list = new ListStore (2, typeof(string), typeof(string));
+      cb_themes.clear ();
+      cb_themes.set_model (theme_list);
+      /* Set the renderer only for the Label */
+      var ctxt = new CellRendererText();
+      cb_themes.pack_start (ctxt, true);
+      cb_themes.set_attributes (ctxt, "text", 1);
+      /* Pack data into the model and select current theme */
+      TreeIter iter;
+      foreach (Gee.Map.Entry<string,Theme?> e in themes)
+      {
+        theme_list.append (out iter);
+        theme_list.set (iter, 0, e.key, 1, e.value.name);
+        if (e.key == selected_theme)
+          cb_themes.set_active_iter (iter);
+      }
+      /* Listen on value changed */
+      cb_themes.changed.connect (() => {
+        TreeIter active_iter;
+        cb_themes.get_active_iter (out active_iter);
+        theme_list.get (active_iter, 0, out selected_theme);
+        theme_selected (get_current_theme ());
+      });
+      
+      return cb_themes;
+    }
     public Type get_current_theme ()
     {
-      return sett.selected_theme;
+      return themes.get(selected_theme).tclass;
     }
 
     public signal void theme_selected (Type theme);
