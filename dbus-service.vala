@@ -39,5 +39,89 @@ namespace Sezen
                                                uint32 flags) throws DBus.Error;
     public abstract async string get_name_owner (string name) throws DBus.Error;
   }
+  
+  public class DBusNameCache : Object
+  {
+    private DBus.Connection connection;
+    private FreeDesktopDBus proxy;
+    private Gee.Set<string> owned_names;
+    
+    public bool initialized { get; private set; default = false; }
+
+    // singleton that can be easily destroyed
+    public static DBusNameCache get_default ()
+    {
+      return instance ?? new DBusNameCache ();
+    }
+
+    private DBusNameCache ()
+    {
+    }
+    
+    private static unowned DBusNameCache? instance;
+    construct
+    {
+      instance = this;
+      owned_names = new Gee.HashSet<string> ();
+      
+      initialize ();
+    }
+    
+    ~DBusNameCache ()
+    {
+      instance = null;
+    }
+    
+    private void name_owner_changed (FreeDesktopDBus sender,
+                                     string name,
+                                     string old_owner,
+                                     string new_owner)
+    {
+      if (name.has_prefix (":")) return;
+      
+      if (old_owner == "")
+      {
+        owned_names.add (name);
+      }
+      else if (new_owner == "")
+      {
+        owned_names.remove (name);
+      }
+    }
+    
+    public bool name_has_owner (string name)
+    {
+      return name in owned_names;
+    }
+    
+    public signal void initialization_done ();
+    
+    private async void initialize ()
+    {
+      try
+      {
+        connection = DBus.Bus.get (DBus.BusType.SESSION);
+        proxy = (FreeDesktopDBus)
+          connection.get_object (FreeDesktopDBus.UNIQUE_NAME,
+                                 FreeDesktopDBus.OBJECT_PATH,
+                                 FreeDesktopDBus.INTERFACE_NAME);
+
+        proxy.name_owner_changed.connect (this.name_owner_changed);
+        string[] names = yield proxy.list_names ();
+        foreach (unowned string name in names)
+        {
+          if (name.has_prefix (":")) continue;
+          owned_names.add (name);
+        }
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
+      
+      initialized = true;
+      initialization_done ();
+    }
+  }
 }
 

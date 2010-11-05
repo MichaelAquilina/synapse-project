@@ -7,6 +7,7 @@ SRC_FILES = \
 	command-plugin.vala \
 	desktop-file-plugin.vala \
 	dictionary.vala \
+	devhelp-search.vala \
 	hybrid-search-plugin.vala \
 	gnome-session-plugin.vala \
 	upower-plugin.vala \
