@@ -168,6 +168,8 @@ namespace Sezen
       current_label.set_ellipsize (Pango.EllipsizeMode.END);
       var fakeinput = new FakeInput ();
       fakeinput.add (current_label);
+      fakeinput.border_radius = 4.5;
+      fakeinput.focus_widget = current_label;
       
       /* Query flag selector  */
       flag_selector = new HSelectionContainer(_hilight_label, 15);

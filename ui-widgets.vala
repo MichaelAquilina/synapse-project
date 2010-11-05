@@ -815,6 +815,16 @@ namespace Sezen
     public bool draw_input {get; set; default = true;}
     public double border_radius {get; set; default = 3.0;}
     public double shadow_pct {get; set; default = 0.2;}
+    public double focus_pct {get; set; default = 0.30;}
+    public Widget? focus_widget {get; set; default = null;}
+    construct
+    {
+      this.notify["draw-input"].connect (this.queue_draw);
+      this.notify["border-radius"].connect (this.queue_draw);
+      this.notify["shadow-pct"].connect (this.queue_draw);
+      this.notify["focus-pct"].connect (this.queue_draw);
+      this.notify["focus-widget"].connect (this.queue_draw);
+    }
 
     public override bool expose_event (Gdk.EventExpose event)
     {
@@ -827,12 +837,11 @@ namespace Sezen
         Gtk.Style style = this.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
         Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], &r, &g, &b);
-        Utils.cairo_rounded_rect (ctx,
-                                  this.allocation.x,
-                                  this.allocation.y,
-                                  this.allocation.width - 3.0,
-                                  this.allocation.height - 3.0,
-                                  border_radius);
+        double x = this.allocation.x + this.left_padding,
+               y = this.allocation.y + this.top_padding,
+               w = this.allocation.width - this.left_padding - this.right_padding - 3.0,
+               h = this.allocation.height - this.top_padding - this.bottom_padding - 3.0;
+        Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
         Utils.rgb_invert_color (out r, out g, out b);
         ctx.set_source_rgba (r, g, b, 1.0);
         Cairo.Path path = ctx.copy_path ();
@@ -840,13 +849,41 @@ namespace Sezen
         ctx.clip ();
         ctx.paint ();
         Utils.rgb_invert_color (out r, out g, out b);
-        double shadow_size = double.min(1.0, shadow_pct) * (this.allocation.height - 3.0);
-        var pat = new Cairo.Pattern.linear (0, this.allocation.y, 0, this.allocation.y + shadow_size);
+        double shadow_size = double.min(1.0, shadow_pct) * (h);
+        var pat = new Cairo.Pattern.linear (0, y, 0, y + shadow_size);
         pat.add_color_stop_rgba (0, r, g, b, 0.6);
         pat.add_color_stop_rgba (0.3, r, g, b, 0.25);
         pat.add_color_stop_rgba (1.0, r, g, b, 0);
         ctx.set_source (pat);
         ctx.paint ();
+        if (focus_widget != null)
+        {
+          /*
+                     ____            y1
+                  .-'    '-.
+               .-'          '-.
+            .-'                '-.
+           x1         x2         x3  y2
+          */
+          double x1 = double.max (focus_widget.allocation.x, x),
+                 x3 = double.min (focus_widget.allocation.x + focus_widget.allocation.width,
+                           x + w);
+          double x2 = (x1 + x3) / 2.0;
+          double y2 = y + h;
+          double y1 = y + h * (1.0 - double.min (1.0, focus_pct));
+          ctx.new_path ();
+          ctx.move_to (x1, y2);
+          ctx.curve_to (x1, y2, x1, y1, x2, y1);
+          ctx.curve_to (x3, y1, x3, y2, x3, y2);
+          ctx.close_path ();
+          ctx.clip ();
+          Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
+          pat = new Cairo.Pattern.linear (0, y2, 0, y1);
+          pat.add_color_stop_rgba (0, r, g, b, 0.6);
+          pat.add_color_stop_rgba (1.0, r, g, b, 0.0);
+          ctx.set_source (pat);
+          ctx.paint ();
+        }
         ctx.restore ();
         ctx.append_path (path);
         ctx.set_source_rgba (r, g, b, 0.6);

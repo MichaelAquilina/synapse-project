@@ -35,10 +35,11 @@ namespace Sezen
     protected ShrinkingLabel match_label = null;
     protected Label match_label_description = null;
     protected NamedIcon action_icon = null;
-    protected ShrinkingLabel action_label = null;
+    protected Label action_label = null;
     protected HSelectionContainer flag_selector = null;
     protected MenuButton menubtn = null;
     protected HBox top_hbox = null;
+    protected FakeInput fake_input = null;
     protected Label top_spacer = null;
     protected VBox container = null;
     protected VBox container_top = null;
@@ -51,7 +52,7 @@ namespace Sezen
     private const int SHADOW_SIZE = 12; // assigned to containers's border width in composited
     private const int BORDER_RADIUS = 20;
     private const int ICON_SIZE = 172;
-    private const int ACTION_ICON_SIZE = 64;
+    private const int ACTION_ICON_SIZE = 48;
     
     private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
     private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
@@ -119,14 +120,13 @@ namespace Sezen
       top_hbox = new HBox (false, 0);
       /* Match Description */
       match_label_description = new Label (null);
-      match_label_description.set_alignment (0, 1.0f);
+      match_label_description.set_alignment (0, 0);
       match_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
       match_label_description.set_line_wrap (true);
-      match_label_description.xpad = 10;
-      match_label_description.ypad = 1;
+      match_label_description.xpad = 6;
       /* Packing Top Hbox with Match Desctiption into Top VBox*/
       container_top.pack_start (top_hbox);
-      //container_top.pack_start (match_label_description, false);
+      container_top.pack_start (match_label_description, false);
       
       /* Match Icon packed into Top HBox */
       match_icon_container_overlayed = new ContainerOverlayed();
@@ -170,16 +170,21 @@ namespace Sezen
       top_right_vbox.pack_start (top_spacer, true);
       top_right_vbox.pack_start (topright_hbox, false);
       top_right_vbox.pack_start (right_hbox, false);
-      top_right_vbox.pack_start (match_label_description, false);
       
       /* Titles box and Action icon*/
-      var labels_hbox = new VBox (true, 0);
+      var labels_hbox = new HBox (false, 0);
       action_icon = new NamedIcon ();
       action_icon.set_pixel_size (ACTION_ICON_SIZE);
       action_icon.set_alignment (0.5f, 0.5f);
       action_icon.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
 
-      right_hbox.pack_start (labels_hbox);
+      fake_input = new FakeInput ();
+      fake_input.add (labels_hbox);
+      fake_input.top_padding = 8;
+      fake_input.bottom_padding = 8;
+      fake_input.yalign = 0.5f;
+      fake_input.focus_pct = 0.25;
+      right_hbox.pack_start (fake_input);
       right_hbox.pack_start (action_icon, false);
       
       match_label = new ShrinkingLabel ();
@@ -187,17 +192,23 @@ namespace Sezen
       match_label.set_ellipsize (Pango.EllipsizeMode.END);
       match_label.xpad = 10;
 
-      action_label = new ShrinkingLabel ();
+      action_label = new Label (null);
       action_label.set_alignment (1.0f, 0.5f);
       //action_label.set_ellipsize (Pango.EllipsizeMode.START);
       action_label.xpad = 10;
       
-      labels_hbox.pack_end (match_label);
-      labels_hbox.pack_end (action_label);
+      labels_hbox.pack_start (match_label);
+      labels_hbox.pack_start (action_label, false);
 
       container.show_all ();
     }
-    
+    private void visual_update_search_for ()
+    {
+      if (searching_for_matches)
+        fake_input.focus_widget = match_label;
+      else
+        fake_input.focus_widget = action_label;
+    }
     protected virtual void on_composited_changed (Widget w)
     {
       Gdk.Screen screen = w.get_screen ();
@@ -406,11 +417,6 @@ namespace Sezen
       reset_search ();
       visual_update_search_for ();
     }
-    private void visual_update_search_for ()
-    {
-      //match_label.enable_fake_input = searching_for_matches;
-      //action_label.enable_fake_input = !searching_for_matches;
-    }
     
     protected virtual bool key_press_event (Gdk.EventKey event)
     {
@@ -604,7 +610,7 @@ namespace Sezen
     }
     protected override void focus_match ( int index, Match? match )
     {
-      string size = true ? "xx-large": "medium";
+      string size = searching_for_matches ? "xx-large": "medium";
       if (match == null)
       {
         /* Show default stuff */
@@ -648,7 +654,7 @@ namespace Sezen
     }
     protected override void focus_action ( int index, Match? action )
     {
-      string size = true ? "xx-large": "medium";
+      string size = !searching_for_matches ? "xx-large": "medium";
       if (action == null)
       {
         action_icon.set_sensitive (false);
