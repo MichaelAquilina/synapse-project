@@ -126,7 +126,7 @@ namespace Sezen
       match_label_description.xpad = 6;
       /* Packing Top Hbox with Match Desctiption into Top VBox*/
       container_top.pack_start (top_hbox);
-      container_top.pack_start (match_label_description, false);
+      //container_top.pack_start (match_label_description, false);
       
       /* Match Icon packed into Top HBox */
       match_icon_container_overlayed = new ContainerOverlayed();
@@ -170,6 +170,7 @@ namespace Sezen
       top_right_vbox.pack_start (top_spacer, true);
       top_right_vbox.pack_start (topright_hbox, false);
       top_right_vbox.pack_start (right_hbox, false);
+      top_right_vbox.pack_start (match_label_description, false);
       
       /* Titles box and Action icon*/
       var labels_hbox = new HBox (false, 0);
