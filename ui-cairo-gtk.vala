@@ -446,6 +446,7 @@ namespace Sezen
           {
             set_action_search ("");
             searching_for_matches = true;
+            visual_update_search_for ();
             window.queue_draw ();
           }
           else if (get_match_search() != "")
