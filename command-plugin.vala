@@ -23,7 +23,7 @@ namespace Sezen
 {
   public class CommandPlugin: DataPlugin
   {
-    private class CommandObject: Object, Match
+    private class CommandObject: Object, Match, ApplicationMatch
     {
       // for Match interface
       public string title { get; construct set; }
@@ -33,28 +33,19 @@ namespace Sezen
       public string thumbnail_path { get; construct set; }
       public string uri { get; set; }
       public MatchType match_type { get; construct set; }
-      
-      public string command { get; construct; }
 
-      public void execute (Match? match)
-      {
-        bool is_sudo = command.has_prefix ("sudo ");
-        AppInfoCreateFlags flags = is_sudo ? AppInfoCreateFlags.NEEDS_TERMINAL : 0;
-        try
-        {
-          var app = AppInfo.create_from_commandline (command, null, flags);
-          app.launch (null, null);
-        }
-        catch (Error err)
-        {
-          warning ("%s", err.message);
-        }
-      }
+      // for ApplicationMatch
+      public AppInfo? app_info { get; set; default = null; }
+      public bool needs_terminal { get; set; default = false; }
+      public string? filename { get; construct set; default = null; }
       
       public CommandObject (string cmd)
       {
         Object (title: cmd, description: "Run command", icon_name: "unknown",
-                match_type: MatchType.ACTION, command: cmd);
+                match_type: MatchType.APPLICATION,
+                needs_terminal: cmd.has_prefix ("sudo "));
+
+        app_info = AppInfo.create_from_commandline (cmd, null, 0);
       }
     }
 

@@ -55,7 +55,7 @@ namespace Sezen
     public abstract string? filename { get; construct set; }
   }
 
-  public interface FileMatch: Match
+  public interface UriMatch: Match
   {
     public abstract QueryFlags file_type { get; set; }
     public abstract string mime_type { get; set; }

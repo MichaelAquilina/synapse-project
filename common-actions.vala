@@ -86,8 +86,58 @@ namespace Sezen
         switch (match.match_type)
         {
           case MatchType.ACTION:
-          case MatchType.APPLICATION:
             return true;
+          case MatchType.APPLICATION:
+            ApplicationMatch? am = match as ApplicationMatch;
+            return am == null || !am.needs_terminal;
+          default:
+            return false;
+        }
+      }
+    }
+
+    private class TerminalRunner: Action
+    {
+      public TerminalRunner ()
+      {
+        Object (title: "Run in Terminal", // FIXME: i18n
+                description: "Run application or command in terminal",
+                icon_name: "terminal", has_thumbnail: false,
+                match_type: MatchType.ACTION,
+                default_relevancy: 60);
+      }
+
+      public override void execute_internal (Match? match)
+      {
+        if (match.match_type == MatchType.APPLICATION)
+        {
+          ApplicationMatch? app_match = match as ApplicationMatch;
+          return_if_fail (app_match != null);
+
+          AppInfo original = app_match.app_info ??
+            new DesktopAppInfo.from_filename (app_match.filename);
+          AppInfo app = AppInfo.create_from_commandline (
+            original.get_commandline (), original.get_name (),
+            AppInfoCreateFlags.NEEDS_TERMINAL);
+
+          try
+          {
+            app.launch (null, new Gdk.AppLaunchContext ());
+          }
+          catch (Error err)
+          {
+            warning ("%s", err.message);
+          }
+        }
+      }
+
+      public override bool valid_for_match (Match match)
+      {
+        switch (match.match_type)
+        {
+          case MatchType.APPLICATION:
+            ApplicationMatch? am = match as ApplicationMatch;
+            return am != null;
           default:
             return false;
         }
@@ -177,6 +227,7 @@ namespace Sezen
       actions = new Gee.ArrayList<Action> ();
       
       actions.add (new Runner ());
+      actions.add (new TerminalRunner ());
       actions.add (new Opener ());
       actions.add (new OpenFolder ());
     }

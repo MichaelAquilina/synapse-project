@@ -28,7 +28,7 @@ namespace Sezen
 {
   public class HybridSearchPlugin: DataPlugin
   {
-    private class MatchObject: Object, Match, FileMatch
+    private class MatchObject: Object, Match, UriMatch
     {
       // for Match interface
       public string title { get; construct set; }
