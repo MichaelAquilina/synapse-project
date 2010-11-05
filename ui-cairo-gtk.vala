@@ -51,7 +51,7 @@ namespace Sezen
     private const int SHADOW_SIZE = 12; // assigned to containers's border width in composited
     private const int BORDER_RADIUS = 20;
     private const int ICON_SIZE = 172;
-    private const int ACTION_ICON_SIZE = 48;
+    private const int ACTION_ICON_SIZE = 64;
     
     private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
     private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
@@ -119,13 +119,14 @@ namespace Sezen
       top_hbox = new HBox (false, 0);
       /* Match Description */
       match_label_description = new Label (null);
-      match_label_description.set_alignment (0, 0);
+      match_label_description.set_alignment (0, 1.0f);
       match_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
       match_label_description.set_line_wrap (true);
-      match_label_description.xpad = 6;
+      match_label_description.xpad = 10;
+      match_label_description.ypad = 1;
       /* Packing Top Hbox with Match Desctiption into Top VBox*/
       container_top.pack_start (top_hbox);
-      container_top.pack_start (match_label_description, false);
+      //container_top.pack_start (match_label_description, false);
       
       /* Match Icon packed into Top HBox */
       match_icon_container_overlayed = new ContainerOverlayed();
@@ -169,9 +170,10 @@ namespace Sezen
       top_right_vbox.pack_start (top_spacer, true);
       top_right_vbox.pack_start (topright_hbox, false);
       top_right_vbox.pack_start (right_hbox, false);
+      top_right_vbox.pack_start (match_label_description, false);
       
       /* Titles box and Action icon*/
-      var labels_hbox = new HBox (false, 0);
+      var labels_hbox = new VBox (true, 0);
       action_icon = new NamedIcon ();
       action_icon.set_pixel_size (ACTION_ICON_SIZE);
       action_icon.set_alignment (0.5f, 0.5f);
@@ -192,8 +194,8 @@ namespace Sezen
       //action_label.set_ellipsize (Pango.EllipsizeMode.START);
       action_label.xpad = 10;
       
-      labels_hbox.pack_start (match_label);
-      labels_hbox.pack_start (action_label, false);
+      labels_hbox.pack_end (match_label);
+      labels_hbox.pack_end (action_label);
 
       container.show_all ();
     }
@@ -604,7 +606,7 @@ namespace Sezen
     }
     protected override void focus_match ( int index, Match? match )
     {
-      string size = searching_for_matches ? "xx-large": "medium";
+      string size = true ? "xx-large": "medium";
       if (match == null)
       {
         /* Show default stuff */
@@ -648,7 +650,7 @@ namespace Sezen
     }
     protected override void focus_action ( int index, Match? action )
     {
-      string size = !searching_for_matches ? "xx-large": "medium";
+      string size = true ? "xx-large": "medium";
       if (action == null)
       {
         action_icon.set_sensitive (false);
