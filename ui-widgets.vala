@@ -810,20 +810,12 @@ namespace Sezen
     }
   }
 
-  public class FakeInput: ShrinkingLabel
+  public class FakeInput: Gtk.Alignment
   {
-    private bool draw_input = true;
-    public bool enable_fake_input {
-      set {
-        if (draw_input == value)
-          return;
-        draw_input = value;
-        this.queue_draw ();
-      }
-      get {
-        return draw_input;
-      }
-    }
+    public bool draw_input {get; set; default = true;}
+    public double border_radius {get; set; default = 3.0;}
+    public double shadow_pct {get; set; default = 0.2;}
+
     public override bool expose_event (Gdk.EventExpose event)
     {
       if (draw_input)
@@ -835,13 +827,12 @@ namespace Sezen
         Gtk.Style style = this.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
         Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], &r, &g, &b);
-        int rad = int.max (1, int.min(this.xpad, this.ypad));
         Utils.cairo_rounded_rect (ctx,
                                   this.allocation.x,
                                   this.allocation.y,
                                   this.allocation.width - 3.0,
                                   this.allocation.height - 3.0,
-                                  rad);
+                                  border_radius);
         Utils.rgb_invert_color (out r, out g, out b);
         ctx.set_source_rgba (r, g, b, 1.0);
         Cairo.Path path = ctx.copy_path ();
@@ -849,7 +840,7 @@ namespace Sezen
         ctx.clip ();
         ctx.paint ();
         Utils.rgb_invert_color (out r, out g, out b);
-        int shadow_size = int.max(this.allocation.height / 5, 2 * this.ypad);
+        double shadow_size = double.min(1.0, shadow_pct) * (this.allocation.height - 3.0);
         var pat = new Cairo.Pattern.linear (0, this.allocation.y, 0, this.allocation.y + shadow_size);
         pat.add_color_stop_rgba (0, r, g, b, 0.6);
         pat.add_color_stop_rgba (0.3, r, g, b, 0.25);

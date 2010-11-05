@@ -38,7 +38,7 @@ namespace Sezen
     protected ContainerOverlayed match_icon_container_overlayed = null;
     
     protected Label match_label_description = null;
-    protected FakeInput current_label = null;
+    protected ShrinkingLabel current_label = null;
 
     protected HSelectionContainer flag_selector = null;
     protected HBox container_top = null;
@@ -161,11 +161,13 @@ namespace Sezen
       }
       
       /* Match or Action Label */
-      current_label = new FakeInput ();
+      current_label = new ShrinkingLabel ();
       current_label.xpad = LABEL_INTERNAL_PADDING * 2;
       current_label.ypad = LABEL_INTERNAL_PADDING;
       current_label.set_alignment (0.0f, 1.0f);
       current_label.set_ellipsize (Pango.EllipsizeMode.END);
+      var fakeinput = new FakeInput ();
+      fakeinput.add (current_label);
       
       /* Query flag selector  */
       flag_selector = new HSelectionContainer(_hilight_label, 15);
@@ -183,7 +185,7 @@ namespace Sezen
         spacer.set_size_request (-1, TOP_SPACING);
         vbox.pack_start (spacer, false);
         vbox.pack_start (flag_selector, false);
-        vbox.pack_start (current_label, false);
+        vbox.pack_start (fakeinput, false);
         vbox.pack_start (new Label(null));
         container_top.pack_start (vbox);
       }

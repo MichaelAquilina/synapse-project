@@ -32,10 +32,10 @@ namespace Sezen
     /* Main UI shared components */
     protected NamedIcon match_icon = null;
     protected NamedIcon match_icon_thumb = null;
-    protected FakeInput match_label = null;
+    protected ShrinkingLabel match_label = null;
     protected Label match_label_description = null;
     protected NamedIcon action_icon = null;
-    protected FakeInput action_label = null;
+    protected ShrinkingLabel action_label = null;
     protected HSelectionContainer flag_selector = null;
     protected MenuButton menubtn = null;
     protected HBox top_hbox = null;
@@ -182,14 +182,12 @@ namespace Sezen
       right_hbox.pack_start (labels_hbox);
       right_hbox.pack_start (action_icon, false);
       
-      match_label = new FakeInput ();
-      match_label.enable_fake_input = true;
+      match_label = new ShrinkingLabel ();
       match_label.set_alignment (0.0f, 0.5f);
       match_label.set_ellipsize (Pango.EllipsizeMode.END);
       match_label.xpad = 10;
 
-      action_label = new FakeInput ();
-      action_label.enable_fake_input = false;
+      action_label = new ShrinkingLabel ();
       action_label.set_alignment (1.0f, 0.5f);
       //action_label.set_ellipsize (Pango.EllipsizeMode.START);
       action_label.xpad = 10;
@@ -410,8 +408,8 @@ namespace Sezen
     }
     private void visual_update_search_for ()
     {
-      match_label.enable_fake_input = searching_for_matches;
-      action_label.enable_fake_input = !searching_for_matches;
+      //match_label.enable_fake_input = searching_for_matches;
+      //action_label.enable_fake_input = !searching_for_matches;
     }
     
     protected virtual bool key_press_event (Gdk.EventKey event)
