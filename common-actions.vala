@@ -58,12 +58,17 @@ namespace Sezen
 
       public override void execute_internal (Match? match)
       {
-        if (match.match_type == MatchType.DESKTOP_ENTRY)
+        if (match.match_type == MatchType.APPLICATION)
         {
-          var de = new DesktopAppInfo.from_filename (match.uri);
+          ApplicationMatch? app_match = match as ApplicationMatch;
+          return_if_fail (app_match != null);
+
+          AppInfo app = app_match.app_info ??
+            new DesktopAppInfo.from_filename (app_match.filename);
+
           try
           {
-            de.launch (null, new Gdk.AppLaunchContext ());
+            app.launch (null, new Gdk.AppLaunchContext ());
           }
           catch (Error err)
           {
@@ -81,7 +86,7 @@ namespace Sezen
         switch (match.match_type)
         {
           case MatchType.ACTION:
-          case MatchType.DESKTOP_ENTRY:
+          case MatchType.APPLICATION:
             return true;
           default:
             return false;

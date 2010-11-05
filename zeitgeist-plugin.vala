@@ -23,7 +23,7 @@ namespace Sezen
 {
   public class ZeitgeistPlugin: DataPlugin
   {
-    private class MatchObject: Object, Match
+    private class MatchObject: Object, Match, FileMatch
     {
       // for Match interface
       public string title { get; construct set; }
@@ -33,6 +33,10 @@ namespace Sezen
       public string thumbnail_path { get; construct set; }
       public string uri { get; set; }
       public MatchType match_type { get; construct set; }
+      
+      // for FileMatch
+      public QueryFlags file_type { get; set; }
+      public string mime_type { get; set; }
 
       public MatchObject (Zeitgeist.Event event,
                           string? thumbnail_path,
@@ -61,6 +65,34 @@ namespace Sezen
         else
         {
           this.title = text;
+        }
+        
+        this.mime_type = subject.get_mimetype ();
+
+        unowned string interpretation = subject.get_interpretation ();
+        if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_AUDIO))
+        {
+          this.file_type = QueryFlags.AUDIO;
+        }
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_VIDEO))
+        {
+          this.file_type = QueryFlags.VIDEO;
+        }
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_IMAGE))
+        {
+          this.file_type = QueryFlags.IMAGES;
+        }
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_DOCUMENT))
+        {
+          this.file_type = QueryFlags.DOCUMENTS;
+        }
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_WEBSITE))
+        {
+          this.file_type = QueryFlags.INTERNET;
+        }
+        else
+        {
+          this.file_type = QueryFlags.UNCATEGORIZED;
         }
       }
     }
@@ -268,8 +300,8 @@ namespace Sezen
     private GenericArray<Zeitgeist.Event> create_templates (QueryFlags flags)
     {
       var templates = new GenericArray<Zeitgeist.Event> ();
-      var manifestation = QueryFlags.LOCAL_ONLY in flags ?
-        "!" + Zeitgeist.NFO_REMOTE_DATA_OBJECT : "";
+      var manifestation = QueryFlags.INCLUDE_REMOTE in flags ?
+        "" : "!" + Zeitgeist.NFO_REMOTE_DATA_OBJECT;
 
       Zeitgeist.Event event;
       Zeitgeist.Subject subject;
@@ -349,7 +381,7 @@ namespace Sezen
         event.add_subject (subject);
 
         // and one more subject to say that we might not want remote stuff
-        if (QueryFlags.LOCAL_ONLY in flags)
+        if (!(QueryFlags.INCLUDE_REMOTE in flags))
         {
           subject = new Zeitgeist.Subject ();
           subject.set_manifestation (manifestation);
@@ -391,12 +423,16 @@ namespace Sezen
         if (!q.is_cancelled ())
         {
           yield process_results (q.query_string, rs, q.cancellable, result,
-                                 QueryFlags.LOCAL_ONLY in q.query_type);
+                                 !(QueryFlags.INCLUDE_REMOTE in q.query_type));
         }
       }
       catch (Error err)
       {
-        warning ("Search in Zeitgeist's index failed: %s", err.message);
+        if (!q.is_cancelled ())
+        {
+          // we don't care about message about being cancelled
+          warning ("Search in Zeitgeist's index failed: %s", err.message);
+        }
       }
 
       q.check_cancellable ();

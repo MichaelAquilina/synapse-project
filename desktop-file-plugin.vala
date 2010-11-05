@@ -26,7 +26,7 @@ namespace Sezen
     UNINTERESTING_ENTRY
   }
 
-  public class DesktopFileInfo: Object, Match
+  public class DesktopFileInfo: Object, Match, ApplicationMatch
   {
     // for Match interface
     public string title { get; construct set; }
@@ -36,6 +36,11 @@ namespace Sezen
     public string thumbnail_path { get; construct set; }
     public string uri { get; set; }
     public MatchType match_type { get; construct set; }
+
+    // for ApplicationMatch
+    public AppInfo? app_info { get; set; default = null; }
+    public bool needs_terminal { get; set; default = false; }
+    public string? filename { get; construct set; }
 
     private string? title_folded = null;
     public unowned string get_title_folded ()
@@ -52,7 +57,7 @@ namespace Sezen
 
     public DesktopFileInfo.for_keyfile (string path, KeyFile keyfile)
     {
-      Object (uri: path, match_type: MatchType.DESKTOP_ENTRY);
+      Object (filename: path, match_type: MatchType.APPLICATION);
 
       init_from_keyfile (keyfile);
     }
@@ -96,6 +101,10 @@ namespace Sezen
           {
             icon_name = icon_name.ndup (icon_name.size () - 4);
           }
+        }
+        if (keyfile.has_key (GROUP, "Terminal"))
+        {
+          needs_terminal = keyfile.get_boolean (GROUP, "Terminal");
         }
       }
       catch (Error err)
