@@ -151,6 +151,9 @@ namespace Sezen
     private Gee.Set<DataPlugin> plugins;
     private Gee.Set<ActionPlugin> actions;
     private uint query_id;
+    // data sink will keep reference to the name cache, so others will get this
+    // instance on call to get_default()
+    private DBusNameCache dbus_name_cache;
 
     construct
     {
@@ -158,13 +161,15 @@ namespace Sezen
       actions = new Gee.HashSet<ActionPlugin> ();
       query_id = 0;
 
-      load_plugins ();
+      dbus_name_cache = DBusNameCache.get_default ();
+      dbus_name_cache.initialization_done.connect (load_plugins);
     }
 
     private bool has_unknown_handlers = false;
+    private bool plugins_loaded = false;
 
     // FIXME: public? really?
-    public void register_plugin (DataPlugin plugin)
+    protected void register_plugin (DataPlugin plugin)
     {
       if (plugin is ActionPlugin)
       {
@@ -198,6 +203,9 @@ namespace Sezen
 
       register_plugin (create_plugin (typeof (CommonActions)));
       register_plugin (create_plugin (typeof (DictionaryPlugin)));
+      register_plugin (create_plugin (typeof (DevhelpPlugin)));
+      
+      plugins_loaded = true;
     }
     
     public unowned DataPlugin? get_plugin (string name)
@@ -221,6 +229,12 @@ namespace Sezen
                                          ResultSet? dest_result_set,
                                          Cancellable? cancellable = null) throws SearchError
     {
+      // wait for our initialization
+      while (!plugins_loaded)
+      {
+        Timeout.add (50, search.callback);
+        yield;
+      }
       var q = Query (query_id++, query, flags);
 
       var cancellables = new GLib.List<Cancellable> ();
