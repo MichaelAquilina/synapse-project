@@ -45,7 +45,7 @@ cairomini: SRC_FILES += ui-cairo-gtk.vala ui-cairo-gtk-mini.vala ui-interface.va
 cairomini: all
 
 cairodebug: VALA_FLAGS += -C
-cairodebug: SRC_FILES += ui-cairo-gtk.vala ui-interface.vala ui-widgets.vala ui-utils.vala ui-cairo-gtk-launcher.vala
+cairodebug: SRC_FILES += ui-cairo-gtk.vala ui-cairo-gtk-mini.vala ui-interface.vala ui-widgets.vala ui-utils.vala ui-cairo-gtk-launcher.vala ui-settings.vala
 cairodebug: all
 
 FORCE:
