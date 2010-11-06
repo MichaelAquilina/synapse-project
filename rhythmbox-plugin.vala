@@ -32,8 +32,10 @@ namespace Sezen
   interface RhythmboxPlayer : Object {
       [DBus (name = "getPlaying")]
       public abstract bool get_playing () throws DBus.Error;
-      [DBus (name = "next")] /* Fix to Vala naming conversion error */
+      [DBus (name = "next")]
       public abstract void next () throws DBus.Error;
+      [DBus (name = "previous")]
+      public abstract void previous () throws DBus.Error;
       [DBus (name = "playPause")]
       public abstract void play_pause (bool b) throws DBus.Error;
   }
@@ -61,6 +63,130 @@ namespace Sezen
       }
     }
 
+    private class PlayPause: Action
+    {
+      public PlayPause ()
+      {
+        Object (title: "Play / Pause", //fixme i18n
+                description: "Control Rhythmbox playing status",
+                icon_name: "media-playback-start", has_thumbnail: false,
+                match_type: MatchType.ACTION,
+                default_relevancy: 92);
+      }
+
+      public override void execute_internal (Match? match)
+      {
+        try {
+          var conn = DBus.Bus.get(DBus.BusType.SESSION);
+          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
+                                                      "/org/gnome/Rhythmbox/Player");
+          player.play_pause (true);
+        } catch (DBus.Error e) {
+          stderr.printf ("Rythmbox is not available.\n%s", e.message);
+        }
+      }
+
+      public override bool valid_for_match (Match match)
+      {
+        switch (match.match_type)
+        {
+          case MatchType.APPLICATION:
+            if (match is DesktopFileInfo)
+            {
+              var info = (DesktopFileInfo) match;
+              return ("rhythmbox" in info.exec);
+            }
+            else
+                return false;
+            return false;
+          default:
+            return false;
+        }
+      }
+    }
+    private class Next: Action
+    {
+      public Next ()
+      {
+        Object (title: "Next", //fixme i18n
+                description: "Plays the next song in playlist",
+                icon_name: "media-skip-forward", has_thumbnail: false,
+                match_type: MatchType.ACTION,
+                default_relevancy: 91);
+      }
+
+      public override void execute_internal (Match? match)
+      {
+        try {
+          var conn = DBus.Bus.get(DBus.BusType.SESSION);
+          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
+                                                      "/org/gnome/Rhythmbox/Player");
+          player.next ();
+        } catch (DBus.Error e) {
+          stderr.printf ("Rythmbox is not available.\n%s", e.message);
+        }
+      }
+
+      public override bool valid_for_match (Match match)
+      {
+        switch (match.match_type)
+        {
+          case MatchType.APPLICATION:
+            if (match is DesktopFileInfo)
+            {
+              var info = (DesktopFileInfo) match;
+              return ("rhythmbox" in info.exec);
+            }
+            else
+                return false;
+            return false;
+          default:
+            return false;
+        }
+      }
+    }
+    private class Previous: Action
+    {
+      public Previous ()
+      {
+        Object (title: "Previous", //fixme i18n
+                description: "Plays the previous song in playlist",
+                icon_name: "media-skip-backward", has_thumbnail: false,
+                match_type: MatchType.ACTION,
+                default_relevancy: 90);
+      }
+
+      public override void execute_internal (Match? match)
+      {
+        try {
+          var conn = DBus.Bus.get(DBus.BusType.SESSION);
+          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
+                                                      "/org/gnome/Rhythmbox/Player");
+          player.previous ();
+          player.previous ();
+        } catch (DBus.Error e) {
+          stderr.printf ("Rythmbox is not available.\n%s", e.message);
+        }
+      }
+
+      public override bool valid_for_match (Match match)
+      {
+        switch (match.match_type)
+        {
+          case MatchType.APPLICATION:
+            if (match is DesktopFileInfo)
+            {
+              var info = (DesktopFileInfo) match;
+              return ("rhythmbox" in info.exec);
+            }
+            else
+                return false;
+            return false;
+          default:
+            return false;
+        }
+      }
+    }
     private class AddToPlaylist: Action
     {
       public AddToPlaylist ()
@@ -160,7 +286,10 @@ namespace Sezen
       actions = new Gee.ArrayList<Action> ();
       
       actions.add (new PlayNow());
-      actions.add (new AddToPlaylist());      
+      actions.add (new AddToPlaylist());    
+      actions.add (new PlayPause());
+      actions.add (new Previous());
+      actions.add (new Next());
     }
     
     public override bool handles_unknown ()
