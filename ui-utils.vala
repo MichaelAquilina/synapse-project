@@ -74,6 +74,7 @@ namespace Sezen
       }
       if (highlighted != null)
       {
+        highlighted.replace ("'", "&amp;");
         return "<span size=\"%s\">%s</span>".printf (size,highlighted);
       }
       else
