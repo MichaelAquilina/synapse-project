@@ -181,6 +181,17 @@ namespace Synapse
       }
     }
 
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (HybridSearchPlugin),
+        "Hybrid search",
+        "Tries to improve results returned by Zeitgeist plugin by looking" +
+        "for similar files on the filesystem.",
+        "search"
+      );
+    }
+
     construct
     {
       directory_hits = new Gee.HashMap<string, int> ();

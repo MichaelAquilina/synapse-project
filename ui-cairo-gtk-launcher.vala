@@ -58,7 +58,7 @@ namespace Synapse
     {
       ui = GLib.Object.new (t, "data-sink", data_sink) as UIInterface;
       ui.show_settings_clicked.connect (()=>{
-        sett.show_all ();
+        sett.show ();
       });
     }
     private void bind_keyboard_shortcut ()

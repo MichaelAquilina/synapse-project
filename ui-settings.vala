@@ -30,11 +30,13 @@ namespace Synapse
   {
     class PluginTileObject: UI.Widgets.AbstractTileObject
     {
+      public DataSink.PluginRegistry.PluginInfo pi { get; construct set; }
       public PluginTileObject (DataSink.PluginRegistry.PluginInfo info)
       {
         GLib.Object (name: info.title,
                      description: info.description,
-                     icon: info.icon_name);
+                     icon: info.icon_name,
+                     pi: info);
       }
 
       construct
@@ -113,12 +115,8 @@ namespace Synapse
     private void init_plugin_tiles ()
     {
       tile_view.clear ();
-      var plugins = DataSink.PluginRegistry.get_default ().get_plugins ();
       var arr = new Gee.ArrayList<DataSink.PluginRegistry.PluginInfo> ();
-      foreach (var entry in plugins)
-      {
-        arr.add (entry.value);
-      }
+      arr.add_all (DataSink.PluginRegistry.get_default ().get_plugins ());
       arr.sort ((a, b) => 
       {
         unowned DataSink.PluginRegistry.PluginInfo p1 =
@@ -132,7 +130,14 @@ namespace Synapse
       {
         var tile = new PluginTileObject (pi);
         tile_view.append_tile (tile);
-        tile.update_state (true);
+        tile.update_state (data_sink.is_plugin_enabled (pi.plugin_type));
+        
+        tile.active_changed.connect ((tile_obj) =>
+        {
+          PluginTileObject pto = tile_obj as PluginTileObject;
+          pto.update_state (!tile_obj.enabled);
+          data_sink.set_plugin_enabled (pto.pi.plugin_type, tile_obj.enabled);
+        });
       }
     }
     

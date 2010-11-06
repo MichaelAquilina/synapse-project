@@ -148,11 +148,13 @@ namespace Synapse
     {
       public class PluginInfo
       {
+        public Type plugin_type;
         public string title;
         public string description;
         public string icon_name;
-        public PluginInfo (string title, string desc, string icon_name)
+        public PluginInfo (Type type, string title, string desc, string icon_name)
         {
+          this.plugin_type = type;
           this.title = title;
           this.description = desc;
           this.icon_name = icon_name;
@@ -160,11 +162,13 @@ namespace Synapse
       }
 
       public static unowned PluginRegistry instance = null;
+
+      private Gee.List<PluginInfo> plugins;
       
       construct
       {
         instance = this;
-        plugins = new Gee.HashMap<Type, PluginInfo> ();
+        plugins = new Gee.ArrayList<PluginInfo> ();
       }
       
       ~PluginRegistry ()
@@ -177,19 +181,18 @@ namespace Synapse
         return instance ?? new PluginRegistry ();
       }
       
-      private Gee.Map<Type, PluginInfo> plugins;
       public void register_plugin (Type plugin_type,
                                    string title,
                                    string description,
                                    string icon_name)
       {
-        var p = new PluginInfo (title, description, icon_name);
-        plugins[plugin_type] = p;
+        var p = new PluginInfo (plugin_type, title, description, icon_name);
+        plugins.add (p);
       }
       
-      public Gee.Set<Gee.Map.Entry<Type, PluginInfo> > get_plugins ()
+      public Gee.List<PluginInfo> get_plugins ()
       {
-        return plugins.entries;
+        return plugins.read_only_view;
       }
     }
     
@@ -282,6 +285,44 @@ namespace Synapse
       }
       
       return result;
+    }
+    
+    public bool is_plugin_enabled (Type plugin_type)
+    {
+      foreach (var plugin in plugins)
+      {
+        if (plugin.get_type () == plugin_type) return plugin.enabled;
+      }
+      
+      foreach (var action in actions)
+      {
+        if (action.get_type () == plugin_type) return action.enabled;
+      }
+      
+      return false;
+    }
+    
+    public void set_plugin_enabled (Type plugin_type, bool enabled)
+    {
+      foreach (var plugin in plugins)
+      {
+        if (plugin.get_type () == plugin_type)
+        {
+          plugin.enabled = enabled;
+          return;
+        }
+      }
+
+      foreach (var action in actions)
+      {
+        if (action.get_type () == plugin_type)
+        {
+          action.enabled = enabled;
+          return;
+        }
+      }
+
+      warn_if_reached ();
     }
 
     public async Gee.List<Match> search (string query,
