@@ -26,6 +26,18 @@ namespace Synapse
 {
   public class UILauncher
   {
+    private static bool is_startup = false;
+    const OptionEntry[] options =
+    {
+      {
+        "startup", 's', 0, OptionArg.NONE,
+        out is_startup, "Startup mode (don't show the UI immediately)", ""
+      },
+      {
+        null
+      }
+    };
+    
     private UIInterface ui;
     private SettingsWindow sett;
     private DataSink data_sink;
@@ -38,6 +50,7 @@ namespace Synapse
       bind_keyboard_shortcut ();
       
       init_ui (sett.get_current_theme ());
+      if (!is_startup) ui.show ();
       
       sett.theme_selected.connect (init_ui);
     }
@@ -47,7 +60,6 @@ namespace Synapse
       ui.show_settings_clicked.connect (()=>{
         sett.show_all ();
       });
-      ui.show ();
     }
     private void bind_keyboard_shortcut ()
     {
@@ -69,8 +81,7 @@ namespace Synapse
         hotkey.bind ();
         hotkey.activated.connect ((event_time) =>
         {
-          if (this.ui == null)
-            return;
+          if (this.ui == null) return;
           this.ui.show ();
           this.ui.present_with_time (event_time);
         });
@@ -83,17 +94,21 @@ namespace Synapse
 
     public void run ()
     {
+      Environment.unset_variable ("DESKTOP_AUTOSTART_ID");
       Gtk.main ();
     }
-  }
-  
 
-  
-  public static int main (string[] argv)
-  {
-    Gtk.init (ref argv);
-    var launcher = new UILauncher ();
-    launcher.run ();
-    return 0;
+    public static int main (string[] argv)
+    {
+      var context = new OptionContext (" - Awn Applet Activation Options");
+      context.add_main_entries (options, null);
+      context.add_group (Gtk.get_option_group (false));
+      context.parse (ref argv);
+
+      Gtk.init (ref argv);
+      var launcher = new UILauncher ();
+      launcher.run ();
+      return 0;
+    }
   }
 }
