@@ -29,6 +29,7 @@ namespace Sezen
   [DBus (name = "org.gnome.Rhythmbox.Player")]
   interface RhythmboxPlayer : Object {
       public abstract bool getPlaying () throws DBus.Error;
+      [DBus (name = "next")] /* Fix to Vala naming conversion error */
       public abstract void next () throws DBus.Error;
       public abstract void playPause (bool b) throws DBus.Error;
   }
@@ -64,7 +65,7 @@ namespace Sezen
                 description: "Add the song to Rhythmbox playlist",
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 90);
+                default_relevancy: 101);
       }
 
       public override void execute_internal (Match? match)
@@ -109,7 +110,7 @@ namespace Sezen
                 description: "Clears the current playlist and plays the song",
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 95);
+                default_relevancy: 102);
       }
 
       public override void execute_internal (Match? match)
