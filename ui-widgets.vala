@@ -665,68 +665,18 @@ namespace Synapse
       }
     }
   }
-  public class Throbber: Label
+  public class Throbber: Spinner
   {
-    private int step;
-    private bool animate;
-    private const int TIMEOUT = 1000 / 30;
-    private const int MAX_STEP = 30;
     construct
     {
-      step = 0;
-      animate = false;
-    }
-    
-    public bool is_animating ()
-    {
-      return animate;
+      this.notify["active"].connect (this.queue_draw);
     }
 
-    public void start ()
-    {
-      if (animate)
-        return;
-      animate = true;
-      Timeout.add (TIMEOUT, () => {
-        step = (step + 1) % MAX_STEP;
-        this.queue_draw ();
-        return animate;
-      } );
-    }
-    
-    public void stop ()
-    {
-      if (!animate)
-        return;
-      animate = false;
-    }
     public override bool expose_event (Gdk.EventExpose event)
     {
-      if (animate)
+      if (this.active)
       {
-        var ctx = Gdk.cairo_create (this.window);
-        ctx.translate (0.5, 0.5);
-        ctx.set_operator (Cairo.Operator.OVER);
-        Gtk.Style style = this.get_style();
-        double r = 0.0, g = 0.0, b = 0.0;
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
-        double xc = this.allocation.x + this.allocation.width / 2;
-        double yc = this.allocation.y + this.allocation.height / 2;
-        double rad = int.min (this.allocation.width, this.allocation.height) / 2 - 0.5;
-        var pat = new Cairo.Pattern.radial (xc, yc, 0, xc, yc, rad);
-        pat.add_color_stop_rgba (0.5, r, g, b, 0);
-        pat.add_color_stop_rgba (0.7, r, g, b, 1.0);
-        Utils.rgb_invert_color (out r, out g, out b);
-        pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
-        double gamma = Math.PI * 2.0 * step / MAX_STEP;
-        ctx.new_path ();
-        ctx.arc (xc, yc, rad, gamma, gamma + Math.PI * 2 / 3);
-        ctx.line_to (xc, yc);
-        ctx.close_path ();
-        ctx.clip ();
-        ctx.set_source (pat);
-        ctx.paint ();
-        base.expose_event (event);
+        return base.expose_event (event);
       }
       return true;
     }

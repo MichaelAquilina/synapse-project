@@ -632,7 +632,7 @@ namespace Synapse
         {
           match_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), size));
           match_label_description.set_markup (
-            get_description_markup (throbber.is_animating ()? "Searching..." : "Match not found.")
+            get_description_markup (throbber.active ? "Searching..." : "Match not found.")
           );
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
