@@ -40,42 +40,46 @@ namespace Sezen
       }
 
       var matchers = Query.get_matchers_for_query (
-                        Markup.escape_text (pattern), 0,
+                        pattern, 0,
                         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
       string? highlighted = null;
-      string escaped_text = Markup.escape_text (text);
       foreach (var matcher in matchers)
       {
-        if (matcher.key.match (escaped_text))
+        MatchInfo mi;
+        if (matcher.key.match (text, 0, out mi))
         {
-          try
+          int start_pos;
+          int end_pos;
+          int last_pos = 0;
+          int cnt = mi.get_match_count ();
+          StringBuilder res = new StringBuilder ();
+          for (int i = 1; i < cnt; i++)
           {
-            highlighted = matcher.key.replace_eval (escaped_text, -1, 0, 0, (mi, res) =>
+            // fetch_pos doesn't return utf8 offsets, so we can't use 
+            // string.substring ()
+            mi.fetch_pos (i, out start_pos, out end_pos);
+            warn_if_fail (start_pos >= 0 && end_pos >= 0);
+            char* str_ptr = text;
+            str_ptr += last_pos;
+            unowned string non_matched = (string) str_ptr;
+            res.append (Markup.escape_text (non_matched.ndup (start_pos - last_pos)));
+            last_pos = end_pos;
+            res.append (Markup.printf_escaped ("<u><b>%s</b></u>", mi.fetch (i)));
+            if (i == cnt - 1)
             {
-              int start_pos;
-              int end_pos;
-              int last_pos = 0;
-              int cnt = mi.get_match_count ();
-              for (int i = 1; i < cnt; i++)
-              {
-                mi.fetch_pos (i, out start_pos, out end_pos);
-                if (i > 1) res.append (escaped_text.substring (last_pos, start_pos - last_pos));
-                last_pos = end_pos;
-                res.append ("<u><b>%s</b></u>".printf (mi.fetch (i)));
-              }
-            });
-            break;
+              str_ptr = text;
+              str_ptr += last_pos;
+              non_matched = (string) str_ptr;
+              res.append (Markup.escape_text (non_matched));
+            }
           }
-          catch (RegexError err)
-          {
-            warn_if_reached ();
-          }
+          highlighted = res.str;
+          break;
         }
       }
       if (highlighted != null)
       {
-        highlighted.replace ("'", "&amp;");
-        return "<span size=\"%s\">%s</span>".printf (size,highlighted);
+        return "<span size=\"%s\">%s</span>".printf (size, highlighted);
       }
       else
       {
