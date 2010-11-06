@@ -390,7 +390,7 @@ namespace Synapse
     }
 
     private async void update_directory_contents (GLib.File directory,
-                                                  DirectoryInfo di)
+                                                  DirectoryInfo di) throws Error
     {
       debug ("Scanning %s...", directory.get_path ());
       var enumerator = yield directory.enumerate_children_async (
