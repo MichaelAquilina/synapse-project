@@ -97,6 +97,16 @@ namespace Synapse
       }
     }
 
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (ZeitgeistPlugin),
+        "Zeitgeist",
+        "Search various items logged by Zeitgeist.",
+        "zeitgeist"
+      );
+    }
+
     private Zeitgeist.Index zg_index;
     private Zeitgeist.Log zg_log;
     private Gee.Map<string, int> popularity_map;

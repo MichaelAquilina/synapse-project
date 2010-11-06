@@ -45,7 +45,7 @@ namespace Synapse
     {
       ui = null;
       data_sink = new DataSink ();
-      sett = new SettingsWindow ();
+      sett = new SettingsWindow (data_sink);
       
       bind_keyboard_shortcut ();
       

@@ -147,6 +147,16 @@ namespace Synapse
       }
     }
 
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (GnomeSessionPlugin),
+        "Gnome session plugin",
+        "Allows you to log out from your session, restart and shutdown your computer.",
+        "gnome-session-logout"
+      );
+    }
+
     private bool session_manager_available = false;
     private Gee.List<Match> actions;
 

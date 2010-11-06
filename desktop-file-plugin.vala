@@ -122,7 +122,7 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (DesktopFilePlugin),
         "Applications",
-        "Search applications on your computer",
+        "Search applications on your computer.",
         "system-run"
       );
     }

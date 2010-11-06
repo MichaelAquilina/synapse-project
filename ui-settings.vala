@@ -28,13 +28,38 @@ namespace Synapse
 {
   public class SettingsWindow : Gtk.Window
   {
-    private struct Plugin
+    class PluginTileObject: UI.Widgets.AbstractTileObject
     {
-      string name;
-      string description;
-      bool enabled;
-      Type tclass;
+      public PluginTileObject (DataSink.PluginRegistry.PluginInfo info)
+      {
+        GLib.Object (name: info.title,
+                     description: info.description,
+                     icon: info.icon_name);
+      }
+
+      construct
+      {
+        sub_description_title = "Status"; // FIXME: i18n
+
+        add_button_tooltip = "Enable this plugin"; // FIXME: i18n
+        remove_button_tooltip = "Disable this plugin"; // FIXME: i18n
+      }
+
+      public void update_state (bool enabled)
+      {
+        this.enabled = enabled;
+
+        if (!enabled)
+        {
+          sub_description_text = "Disabled"; // i18n!
+        }
+        else
+        {
+          sub_description_text = "Enabled"; // i18n!
+        }
+      }
     }
+    
     private struct Theme
     {
       string name;
@@ -44,81 +69,23 @@ namespace Synapse
 
     string selected_theme;
     Gee.Map<string, Theme?> themes;
-    Gee.Map<string, Plugin?> plugins;
     bool autostart;
+    private unowned DataSink data_sink;
 
-    public SettingsWindow ()
+    public SettingsWindow (DataSink data_sink)
     {
       this.title = "Synapse - Settings"; //TODO: i18n
+      this.data_sink = data_sink;
       this.set_position (WindowPosition.CENTER);
       this.set_size_request (500, 450);
       this.resizable = false;
       this.delete_event.connect (this.hide_on_delete);
       init_settings ();
       build_ui ();
+      
+      this.tile_view.map.connect (this.init_plugin_tiles);
     }
 
-    private void init_plugins ()
-    {
-      plugins = new Gee.HashMap<string, Plugin?>();
-      plugins.set ("DesktopFilePlugin",
-                   Plugin(){
-                     name = "Desktop File", //i18n
-                     description = "", //i18n
-                     tclass = typeof (DesktopFilePlugin),
-                     enabled = true
-                   });
-      plugins.set ("ZeitgeistPlugin",
-                   Plugin(){
-                     name = "Zeitgeist", //i18n
-                     description = "", //i18n
-                     tclass = typeof (ZeitgeistPlugin),
-                     enabled = true
-                   });
-      plugins.set ("HybridSearchPlugin",
-                   Plugin(){
-                     name = "Hybrid Search", //i18n
-                     description = "", //i18n
-                     tclass = typeof (HybridSearchPlugin),
-                     enabled = true
-                   });
-      plugins.set ("GnomeSessionPlugin",
-                   Plugin(){
-                     name = "Gnome Session", //i18n
-                     description = "", //i18n
-                     tclass = typeof (GnomeSessionPlugin),
-                     enabled = true
-                   });
-      plugins.set ("UPowerPlugin",
-                   Plugin(){
-                     name = "Power Management", //i18n
-                     description = "", //i18n
-                     tclass = typeof (UPowerPlugin),
-                     enabled = true
-                   });
-      plugins.set ("TestSlowPlugin",
-                   Plugin(){
-                     name = "Test Slow Search", //i18n
-                     description = "", //i18n
-                     tclass = typeof (TestSlowPlugin),
-                     enabled = false
-                   });
-      plugins.set ("CommonActions",
-                   Plugin(){
-                     name = "Common Actions", //i18n
-                     description = "", //i18n
-                     tclass = typeof (CommonActions),
-                     enabled = true
-                   });
-      plugins.set ("DictionaryPlugin",
-                   Plugin(){
-                     name = "Dictionary Plugin", //i18n
-                     description = "", //i18n
-                     tclass = typeof (DictionaryPlugin),
-                     enabled = true
-                   });
-      // TODO: read from gconf if enabled or not
-    }
     private void init_themes ()
     {
       themes = new Gee.HashMap<string, Theme?>();
@@ -143,6 +110,32 @@ namespace Synapse
 #endif
     }
     
+    private void init_plugin_tiles ()
+    {
+      tile_view.clear ();
+      var plugins = DataSink.PluginRegistry.get_default ().get_plugins ();
+      var arr = new Gee.ArrayList<DataSink.PluginRegistry.PluginInfo> ();
+      foreach (var entry in plugins)
+      {
+        arr.add (entry.value);
+      }
+      arr.sort ((a, b) => 
+      {
+        unowned DataSink.PluginRegistry.PluginInfo p1 =
+          (DataSink.PluginRegistry.PluginInfo) a;
+        unowned DataSink.PluginRegistry.PluginInfo p2 =
+          (DataSink.PluginRegistry.PluginInfo) b;
+        return strcmp (p1.title, p2.title);
+      });
+      
+      foreach (var pi in arr)
+      {
+        var tile = new PluginTileObject (pi);
+        tile_view.append_tile (tile);
+        tile.update_state (true);
+      }
+    }
+    
     private void init_general_options ()
     {
       autostart = false;
@@ -151,9 +144,10 @@ namespace Synapse
     private void init_settings ()
     {
       init_themes ();
-      init_plugins ();
       init_general_options ();
     }
+    
+    private UI.Widgets.TileView tile_view;
 
     private void build_ui ()
     {
@@ -166,15 +160,24 @@ namespace Synapse
       tabs.append_page (general_tab, new Label ("General"));
       tabs.append_page (plugin_tab, new Label ("Plugins"));
       
-      HBox row;
-
       /* General Tab */
+      HBox row;
       row = new HBox (false, 5);
 
       row.pack_start (new Label ("Select Theme:"), false, false);
       row.pack_start (build_theme_combo (), false, false);
       general_tab.pack_start (row, false, false);
-            
+      
+      /* Plugin Tab */
+      var scroll = new Gtk.ScrolledWindow (null, null);
+      scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+      tile_view = new UI.Widgets.TileView ();
+      tile_view.show_all ();
+      scroll.add_with_viewport (tile_view);
+      scroll.show ();
+
+      plugin_tab.pack_start (scroll);
+
       tabs.show_all ();
     }
 

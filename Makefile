@@ -14,6 +14,10 @@ SRC_FILES = \
 	zeitgeist-plugin.vala \
 	rhythmbox-plugin.vala \
 	test-slow-plugin.vala \
+	abstract-tile-object.vala \
+	tile.vala \
+	tile-view.vala \
+	wrap-label.vala \
 	$(NULL)
 
 VALAC = valac

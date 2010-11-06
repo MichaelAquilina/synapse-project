@@ -48,6 +48,16 @@ namespace Synapse
         app_info = AppInfo.create_from_commandline (cmd, null, 0);
       }
     }
+    
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (CommandPlugin),
+        "Commands",
+        "Allow execution of arbitrary commands.",
+        "system-run"
+      );
+    }
 
     private Gee.Set<string> past_commands;
     private Regex split_regex;
