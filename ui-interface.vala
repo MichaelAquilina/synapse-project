@@ -332,8 +332,12 @@ namespace Sezen
     {
       if (focus[T.MATCH] == null || focus[T.ACTION] == null)
         return false;
-      focus[T.ACTION].execute (focus[T.MATCH]);
+      _execute (focus[T.MATCH], focus[T.ACTION]);
       return true;
+    }
+    private async void _execute (Match match, Match action)
+    {
+      action.execute (match);
     }
   }
 }

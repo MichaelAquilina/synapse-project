@@ -442,6 +442,10 @@ namespace Sezen
             set_action_search ("");
             searching_for_matches = true;
             visual_update_search_for ();
+            Match m = null;
+            int i = 0;
+            get_match_focus (out i, out m);
+            focus_match (i, m);
             window.queue_draw ();
           }
           else if (get_match_search() != "")
@@ -547,16 +551,12 @@ namespace Sezen
           if (searching_for_matches)
           {
             get_match_focus (out i, out m);
-            update_match_result_list (get_match_results (), i, m);
-            get_action_focus (out i, out m);
-            focus_action (i, m);
+            focus_match (i, m);
           }
           else
           {
-            get_match_focus (out i, out m);
-            focus_match (i, m); 
             get_action_focus (out i, out m);
-            update_action_result_list (get_action_results (), i, m);
+            focus_action (i, m);
           }
           visual_update_search_for ();
           break;

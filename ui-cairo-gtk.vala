@@ -447,6 +447,10 @@ namespace Sezen
             set_action_search ("");
             searching_for_matches = true;
             visual_update_search_for ();
+            Match m = null;
+            int i = 0;
+            get_match_focus (out i, out m);
+            update_match_result_list (get_match_results (), i, m);
             window.queue_draw ();
           }
           else if (get_match_search() != "")
