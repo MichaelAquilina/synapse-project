@@ -117,6 +117,16 @@ namespace Synapse
 
   public class DesktopFilePlugin: DataPlugin
   {
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (DesktopFilePlugin),
+        "Applications",
+        "Search applications on your computer",
+        "system-run"
+      );
+    }
+    
     private Gee.List<DesktopFileInfo> desktop_files;
 
     construct
