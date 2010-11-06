@@ -41,7 +41,7 @@ namespace Sezen
   }
   public class RhythmboxActions: ActionPlugin
   {
-    private abstract class Action: Object, Match
+    private abstract class RhythmboxAction: Object, Match
     {
       // from Match interface
       public string title { get; construct set; }
@@ -62,21 +62,38 @@ namespace Sezen
         execute_internal (match);
       }
     }
+    
+    private abstract class RhythmboxControlMatch: Object, Match
+    {
+      // for Match interface
+      public string title { get; construct set; }
+      public string description { get; set; default = ""; }
+      public string icon_name { get; construct set; default = ""; }
+      public bool has_thumbnail { get; construct set; default = false; }
+      public string thumbnail_path { get; construct set; }
+      public string uri { get; set; }
+      public MatchType match_type { get; construct set; }
 
-    /*
-    WRONG IMPLEMENTATION
-    private class PlayPause: Action
+      public void execute (Match? match)
+      {
+        this.do_action ();
+      }
+
+      public abstract void do_action ();
+    }
+
+    /* MATCHES of Type.ACTION */
+    private class PlayPause: RhythmboxControlMatch
     {
       public PlayPause ()
       {
         Object (title: "Play / Pause", //fixme i18n
                 description: "Control Rhythmbox playing status",
                 icon_name: "media-playback-start", has_thumbnail: false,
-                match_type: MatchType.ACTION,
-                default_relevancy: 103);
+                match_type: MatchType.ACTION);
       }
 
-      public override void execute_internal (Match? match)
+      public override void do_action ()
       {
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
@@ -87,37 +104,18 @@ namespace Sezen
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
       }
-
-      public override bool valid_for_match (Match match)
-      {
-        switch (match.match_type)
-        {
-          case MatchType.APPLICATION:
-            if (match is DesktopFileInfo)
-            {
-              var info = (DesktopFileInfo) match;
-              return ("rhythmbox" in info.exec);
-            }
-            else
-                return false;
-            return false;
-          default:
-            return false;
-        }
-      }
     }
-    private class Next: Action
+    private class Next: RhythmboxControlMatch
     {
       public Next ()
       {
         Object (title: "Next", //fixme i18n
-                description: "Plays the next song in playlist",
+                description: "Plays the next song in Rhythmbox's playlist",
                 icon_name: "media-skip-forward", has_thumbnail: false,
-                match_type: MatchType.ACTION,
-                default_relevancy: 102);
+                match_type: MatchType.ACTION);
       }
 
-      public override void execute_internal (Match? match)
+      public override void do_action ()
       {
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
@@ -128,37 +126,18 @@ namespace Sezen
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
       }
-
-      public override bool valid_for_match (Match match)
-      {
-        switch (match.match_type)
-        {
-          case MatchType.APPLICATION:
-            if (match is DesktopFileInfo)
-            {
-              var info = (DesktopFileInfo) match;
-              return ("rhythmbox" in info.exec);
-            }
-            else
-                return false;
-            return false;
-          default:
-            return false;
-        }
-      }
     }
-    private class Previous: Action
+    private class Previous: RhythmboxControlMatch
     {
       public Previous ()
       {
         Object (title: "Previous", //fixme i18n
-                description: "Plays the previous song in playlist",
+                description: "Plays the previous song in Rhythmbox's playlist",
                 icon_name: "media-skip-backward", has_thumbnail: false,
-                match_type: MatchType.ACTION,
-                default_relevancy: 101);
+                match_type: MatchType.ACTION);
       }
 
-      public override void execute_internal (Match? match)
+      public override void do_action ()
       {
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
@@ -170,27 +149,9 @@ namespace Sezen
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
       }
-
-      public override bool valid_for_match (Match match)
-      {
-        switch (match.match_type)
-        {
-          case MatchType.APPLICATION:
-            if (match is DesktopFileInfo)
-            {
-              var info = (DesktopFileInfo) match;
-              return ("rhythmbox" in info.exec);
-            }
-            else
-                return false;
-            return false;
-          default:
-            return false;
-        }
-      }
     }
-    */
-    private class AddToPlaylist: Action
+    /* ACTIONS FOR MP3s */
+    private class AddToPlaylist: RhythmboxAction
     {
       public AddToPlaylist ()
       {
@@ -235,7 +196,7 @@ namespace Sezen
         }
       }
     }
-    private class PlayNow: Action
+    private class PlayNow: RhythmboxAction
     {
       public PlayNow ()
       {
@@ -282,17 +243,51 @@ namespace Sezen
         }
       }
     }
-    private Gee.List<Action> actions;
+    private Gee.List<RhythmboxAction> actions;
+    private Gee.List<RhythmboxControlMatch> matches;
 
     construct
     {
-      actions = new Gee.ArrayList<Action> ();
+      actions = new Gee.ArrayList<RhythmboxAction> ();
+      matches = new Gee.ArrayList<RhythmboxControlMatch> ();
       
       actions.add (new PlayNow());
-      actions.add (new AddToPlaylist());    
-      actions.add (new PlayPause());
-      actions.add (new Previous());
-      actions.add (new Next());
+      actions.add (new AddToPlaylist());
+      
+      matches.add (new PlayPause());
+      matches.add (new Previous ());
+      matches.add (new Next ());
+    }
+    
+    public override bool provides_data ()
+    {
+      return true;
+    }
+    public override async ResultSet? search (Query q) throws SearchError
+    {
+      // we only search for actions
+      if (!(QueryFlags.ACTIONS in q.query_type)) return null;
+
+      var result = new ResultSet ();
+      
+      var matchers = Query.get_matchers_for_query (q.query_string, 0,
+        RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
+
+      foreach (var action in matches)
+      {
+        foreach (var matcher in matchers)
+        {
+          if (matcher.key.match (action.title))
+          {
+            result.add (action, matcher.value - 5);
+            break;
+          }
+        }
+      }
+
+      q.check_cancellable ();
+
+      return result;
     }
     
     public override bool handles_unknown ()
