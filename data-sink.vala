@@ -111,7 +111,7 @@ namespace Synapse
     }
   }
 
-  errordomain SearchError
+  public errordomain SearchError
   {
     SEARCH_CANCELLED,
     UNKNOWN_ERROR

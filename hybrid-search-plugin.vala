@@ -265,7 +265,7 @@ namespace Synapse
           yield process_directories (directories);
 
           int z = 0;
-          foreach (var x in directory_contents)
+          foreach (var x in directory_contents.entries)
           {
             z += x.value.files.size;
           }
@@ -471,7 +471,7 @@ namespace Synapse
         }
 
         // only add the uri if it matches our query
-        foreach (var entry in di.files)
+        foreach (var entry in di.files.entries)
         {
           foreach (var matcher in matchers)
           {

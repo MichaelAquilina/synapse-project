@@ -191,7 +191,7 @@ namespace Synapse
       cb_themes.set_attributes (ctxt, "text", 1);
       /* Pack data into the model and select current theme */
       TreeIter iter;
-      foreach (Gee.Map.Entry<string,Theme?> e in themes)
+      foreach (Gee.Map.Entry<string,Theme?> e in themes.entries)
       {
         theme_list.append (out iter);
         theme_list.set (iter, 0, e.key, 1, e.value.name);
