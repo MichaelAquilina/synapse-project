@@ -12,6 +12,7 @@ SRC_FILES = \
 	gnome-session-plugin.vala \
 	upower-plugin.vala \
 	zeitgeist-plugin.vala \
+	rhythmbox-plugin.vala \
 	test-slow-plugin.vala \
 	$(NULL)
 
