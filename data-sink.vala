@@ -131,6 +131,10 @@ namespace Sezen
   {
     public abstract bool handles_unknown ();
     public abstract ResultSet? find_for_match (Query query, Match match);
+    public virtual bool provides_data ()
+    {
+      return false;
+    }
     public override async ResultSet? search (Query query) throws SearchError
     {
       assert_not_reached ();
@@ -168,7 +172,6 @@ namespace Sezen
     private bool has_unknown_handlers = false;
     private bool plugins_loaded = false;
 
-    // FIXME: public? really?
     protected void register_plugin (DataPlugin plugin)
     {
       if (plugin is ActionPlugin)
@@ -176,6 +179,8 @@ namespace Sezen
         ActionPlugin? action_plugin = plugin as ActionPlugin;
         actions.add (action_plugin);
         has_unknown_handlers |= action_plugin.handles_unknown ();
+        
+        if (action_plugin.provides_data ()) plugins.add (action_plugin);
       }
       else
       {
