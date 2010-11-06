@@ -103,11 +103,18 @@ namespace Synapse
       var context = new OptionContext (" - Awn Applet Activation Options");
       context.add_main_entries (options, null);
       context.add_group (Gtk.get_option_group (false));
-      context.parse (ref argv);
+      try
+      {
+        context.parse (ref argv);
 
-      Gtk.init (ref argv);
-      var launcher = new UILauncher ();
-      launcher.run ();
+        Gtk.init (ref argv);
+        var launcher = new UILauncher ();
+        launcher.run ();
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
       return 0;
     }
   }

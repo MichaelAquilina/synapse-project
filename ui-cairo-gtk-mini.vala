@@ -253,12 +253,12 @@ namespace Synapse
       {
         double ly = y + h - border_radius;
         double lh = results_container.allocation.y - ly + results_container.allocation.height;
-        Utils.gdk_color_to_rgb (style.base[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.base[Gtk.StateType.NORMAL], out r, out g, out b);
         ctx.rectangle (x, ly, w, lh);
         ctx.set_source_rgba (r, g, b, 1);
         ctx.fill ();
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         if (comp)
         {
           //draw shadow
@@ -269,14 +269,14 @@ namespace Synapse
       if (comp)
       {
         //draw shadow
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
                                           r, g, b, 0.9, SHADOW_SIZE);
       }
       ctx.set_operator (Operator.OVER);
       Pattern pat = new Pattern.linear(0, y, 0, y + h);
-      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
       pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                   double.min(g + 0.15, 1),
                                   double.min(b + 0.15, 1),

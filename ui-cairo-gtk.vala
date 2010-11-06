@@ -290,8 +290,8 @@ namespace Synapse
         y += spacing;
         h -= spacing;
         //draw shadow
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
                                           r, g, b, 0.9, SHADOW_SIZE);
         // border
@@ -317,7 +317,7 @@ namespace Synapse
         }
       }
       Pattern pat = new Pattern.linear(0, y, 0, y+h);
-      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
       pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                   double.min(g + 0.15, 1),
                                   double.min(b + 0.15, 1),
@@ -334,7 +334,7 @@ namespace Synapse
       ctx.set_operator (Operator.OVER);
       if (!comp)
       {
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         _cairo_path_for_main (ctx, comp, x, y, w, h);
         ctx.set_source_rgba (r, g, b, 1.0);
         ctx.set_line_width (3.5);

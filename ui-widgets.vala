@@ -70,7 +70,7 @@ namespace Synapse
         Gtk.Style style = w.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
         Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
         pat.add_color_stop_rgba (1.0 - 15.0 / w.allocation.height, double.min(r + 0.15, 1),
                                     double.min(g + 0.15, 1),
                                     double.min(b + 0.15, 1),
@@ -800,19 +800,19 @@ namespace Synapse
         ctx.set_line_width (1.25);
         Gtk.Style style = this.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
-        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
         double x = this.allocation.x + this.left_padding,
                y = this.allocation.y + this.top_padding,
                w = this.allocation.width - this.left_padding - this.right_padding - 3.0,
                h = this.allocation.height - this.top_padding - this.bottom_padding - 3.0;
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         ctx.set_source_rgba (r, g, b, 1.0);
         Cairo.Path path = ctx.copy_path ();
         ctx.save ();
         ctx.clip ();
         ctx.paint ();
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         var pat = new Cairo.Pattern.linear (0, y, 0, y + shadow_height);
         pat.add_color_stop_rgba (0, r, g, b, 0.6);
         pat.add_color_stop_rgba (0.3, r, g, b, 0.25);
@@ -856,7 +856,7 @@ namespace Synapse
           }
           ctx.close_path ();
           ctx.clip ();
-          Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
+          Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], out r, out g, out b);
           pat = new Cairo.Pattern.linear (0, y2, 0, y1);
           pat.add_color_stop_rgba (0, r, g, b, 1.0);
           pat.add_color_stop_rgba (1, r, g, b, 0.0);
@@ -865,7 +865,7 @@ namespace Synapse
         }
         ctx.restore ();
         ctx.append_path (path);
-        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
         ctx.set_source_rgba (r, g, b, 0.6);
         ctx.stroke ();
       }
@@ -916,7 +916,7 @@ namespace Synapse
       
       Gtk.Style style = this.get_style();
       double r = 0.0, g = 0.0, b = 0.0;
-      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.INSENSITIVE], &r, &g, &b);
+      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.INSENSITIVE], out r, out g, out b);
       ctx.set_source_rgba (r, g, b, 1.0);
       
       ctx.new_path ();
@@ -1040,7 +1040,11 @@ namespace Synapse
       bool changed = false;
       var context = this.get_layout ();
       var attrs = context.get_attributes ();
+#if VALA_0_12
+      Pango.AttrIterator iter = attrs.get_iterator ();
+#else
       unowned Pango.AttrIterator iter = attrs.get_iterator (); // FIXME: leaks
+#endif
       do
       {
         unowned Pango.Attribute? attr = iter.get (Pango.AttrType.SCALE);
