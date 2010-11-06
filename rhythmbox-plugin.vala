@@ -71,7 +71,7 @@ namespace Sezen
                 description: "Control Rhythmbox playing status",
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 92);
+                default_relevancy: 103);
       }
 
       public override void execute_internal (Match? match)
@@ -112,7 +112,7 @@ namespace Sezen
                 description: "Plays the next song in playlist",
                 icon_name: "media-skip-forward", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 91);
+                default_relevancy: 102);
       }
 
       public override void execute_internal (Match? match)
@@ -153,7 +153,7 @@ namespace Sezen
                 description: "Plays the previous song in playlist",
                 icon_name: "media-skip-backward", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 90);
+                default_relevancy: 101);
       }
 
       public override void execute_internal (Match? match)
