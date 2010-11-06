@@ -23,15 +23,19 @@ namespace Sezen
 {
   [DBus (name = "org.gnome.Rhythmbox.Shell")]
   interface RhythmboxShell : Object {
-      public abstract void addToQueue (string uri) throws DBus.Error;
-      public abstract void clearQueue () throws DBus.Error;
+      [DBus (name = "addToQueue")]
+      public abstract void add_to_queue (string uri) throws DBus.Error;
+      [DBus (name = "clearQueue")]
+      public abstract void clear_queue () throws DBus.Error;
   }
   [DBus (name = "org.gnome.Rhythmbox.Player")]
   interface RhythmboxPlayer : Object {
-      public abstract bool getPlaying () throws DBus.Error;
+      [DBus (name = "getPlaying")]
+      public abstract bool get_playing () throws DBus.Error;
       [DBus (name = "next")] /* Fix to Vala naming conversion error */
       public abstract void next () throws DBus.Error;
-      public abstract void playPause (bool b) throws DBus.Error;
+      [DBus (name = "playPause")]
+      public abstract void play_pause (bool b) throws DBus.Error;
   }
   public class RhythmboxActions: ActionPlugin
   {
@@ -79,9 +83,9 @@ namespace Sezen
                                                       "/org/gnome/Rhythmbox/Shell");
           var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
                                                       "/org/gnome/Rhythmbox/Player");
-          shell.addToQueue (uri.uri);
-          if (!player.getPlaying())
-            player.playPause (true);
+          shell.add_to_queue (uri.uri);
+          if (!player.get_playing())
+            player.play_pause (true);
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
@@ -124,11 +128,11 @@ namespace Sezen
                                                       "/org/gnome/Rhythmbox/Shell");
           var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
                                                       "/org/gnome/Rhythmbox/Player");
-          shell.clearQueue ();
-          shell.addToQueue (uri.uri);
-          player.next (); //FIXME: Vala error!? why not found?
-          if (!player.getPlaying())
-            player.playPause (true);
+          shell.clear_queue ();
+          shell.add_to_queue (uri.uri);
+          player.next ();
+          if (!player.get_playing())
+            player.play_pause (true);
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
