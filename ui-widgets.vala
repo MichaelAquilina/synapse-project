@@ -26,7 +26,7 @@ using Gee;
 
 public static extern void gtk_style_get_style_property (Style style, Type widget_type, string property_name, out Value val);
 
-namespace Sezen
+namespace Synapse
 {
   /* Result List stuff */
   public class ResultBox: EventBox
@@ -109,7 +109,7 @@ namespace Sezen
       status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
       var logo = new Label (null);
       logo.set_alignment (1, 0);
-      logo.set_markup (Markup.printf_escaped ("<i>Sezen 2 </i>"));
+      logo.set_markup (Markup.printf_escaped ("<i>Synapse</i>"));
       status_box.pack_start (status, false, false, 10);
       status_box.pack_start (new Label (null), true, false);
       status_box.pack_start (logo, false, false, 10);
@@ -172,7 +172,7 @@ namespace Sezen
       this.queue_draw ();
     }
 
-    public void update_matches (Gee.List<Sezen.Match>? rs)
+    public void update_matches (Gee.List<Synapse.Match>? rs)
     {
       results.clear();
       if (rs==null || rs.size == 0)

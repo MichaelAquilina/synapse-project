@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   [DBus (name = "org.gnome.SessionManager")]
   public interface GnomeSessionManager: Object

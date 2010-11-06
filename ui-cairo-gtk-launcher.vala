@@ -22,7 +22,7 @@
 
 using Gtk;
 
-namespace Sezen
+namespace Synapse
 {
   public class UILauncher
   {

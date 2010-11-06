@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   [DBus (name = "org.freedesktop.UPower")]
   public interface UPowerObject: Object

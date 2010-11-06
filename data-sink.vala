@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   public class ResultSet : Object, Gee.Iterable <Gee.Map.Entry <Match, int>>
   {

@@ -24,7 +24,7 @@ using Gtk;
 using Cairo;
 using Gee;
 
-namespace Sezen
+namespace Synapse
 {
   public class SettingsWindow : Gtk.Window
   {
@@ -49,7 +49,7 @@ namespace Sezen
 
     public SettingsWindow ()
     {
-      this.title = "Sezen 2 - Settings"; //TODO: i18n
+      this.title = "Synapse - Settings"; //TODO: i18n
       this.set_position (WindowPosition.CENTER);
       this.set_size_request (500, 450);
       this.resizable = false;
@@ -126,13 +126,13 @@ namespace Sezen
                    Theme(){
                      name = "Default", //i18n
                      description = "", //i18n
-                     tclass = typeof (SezenWindow)
+                     tclass = typeof (SynapseWindow)
                    });
       themes.set ("Mini",
                    Theme(){
                      name = "Mini", //i18n
                      description = "", //i18n
-                     tclass = typeof (SezenWindowMini)
+                     tclass = typeof (SynapseWindowMini)
                    });
 
       // TODO: read from gconf the selected one

@@ -24,7 +24,7 @@
  * used. 
  */
 
-namespace Sezen
+namespace Synapse
 {
   public class HybridSearchPlugin: DataPlugin
   {
@@ -193,7 +193,7 @@ namespace Sezen
     {
       // FIXME: if zeitgeist-plugin available
       unowned DataPlugin? zg_plugin;
-      zg_plugin = data_sink.get_plugin ("SezenZeitgeistPlugin");
+      zg_plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin");
       return_if_fail (zg_plugin != null);
 
       zg_plugin.search_done.connect (this.zg_plugin_search_done);

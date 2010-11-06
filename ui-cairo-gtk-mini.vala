@@ -24,9 +24,9 @@ using Gtk;
 using Cairo;
 using Gee;
 
-namespace Sezen
+namespace Synapse
 {
-  public class SezenWindowMini : UIInterface
+  public class SynapseWindowMini : UIInterface
   {
     Window window;
     bool searching_for_matches = true;
@@ -49,7 +49,7 @@ namespace Sezen
     protected ResultBox results_match = null;
     protected ResultBox results_action = null;
     
-    protected Sezen.Throbber throbber = null;
+    protected Synapse.Throbber throbber = null;
 
     private const int UI_WIDTH = 620; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -101,7 +101,7 @@ namespace Sezen
       window.key_press_event.connect (key_press_event);
     }
 
-    ~SezenWindowMini ()
+    ~SynapseWindowMini ()
     {
       window.destroy ();
     }

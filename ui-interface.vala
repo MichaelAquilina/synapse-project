@@ -22,7 +22,7 @@
 
 using Gee;
 
-namespace Sezen
+namespace Synapse
 {
   /* The target of this abstract class, is to separate model/control from view. */
   /* Each IU must implement this abstract class by translating user input into actions for this class. */
@@ -32,7 +32,7 @@ namespace Sezen
      - select_prev_match : when user wants to select the prev match in the list
      - select_next_action : when user wants to select the next action in the list
      - select_prev_action : when user wants to select the prev action in the list
-     - reset_search : when user hits the "Esc" button to hide Sezen2
+     - reset_search : when user hits the "Esc" button to hide Synapse2
      - set_match_search : when user writes a new string for searching matches
      - set_action_search : when user writes a new string for searching actions
      - execute : when user wants to execute the match

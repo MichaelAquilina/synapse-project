@@ -24,9 +24,9 @@ using Gtk;
 using Cairo;
 using Gee;
 
-namespace Sezen
+namespace Synapse
 {
-  public class SezenWindow : UIInterface
+  public class SynapseWindow : UIInterface
   {
     Window window;
     /* Main UI shared components */
@@ -45,7 +45,7 @@ namespace Sezen
     protected VBox container_top = null;
     protected ContainerOverlayed match_icon_container_overlayed = null;
     protected ResultBox result_box = null;
-    protected Sezen.Throbber throbber = null;
+    protected Synapse.Throbber throbber = null;
 
     private const int UI_WIDTH = 600; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -94,7 +94,7 @@ namespace Sezen
       window.key_press_event.connect (key_press_event);
     }
 
-    ~SezenWindow ()
+    ~SynapseWindow ()
     {
       window.destroy ();
     }
@@ -153,7 +153,7 @@ namespace Sezen
       flag_selector.select (3);
       flag_selector.set_arrows_visible (true);
       /* Throbber */
-      throbber = new Sezen.Throbber ();
+      throbber = new Synapse.Throbber ();
       throbber.set_size_request (20, -1);
       /* Menu Button */
       menubtn = new MenuButton ();
