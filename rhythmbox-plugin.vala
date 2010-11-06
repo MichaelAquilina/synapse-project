@@ -63,6 +63,8 @@ namespace Sezen
       }
     }
 
+    /*
+    WRONG IMPLEMENTATION
     private class PlayPause: Action
     {
       public PlayPause ()
@@ -187,6 +189,7 @@ namespace Sezen
         }
       }
     }
+    */
     private class AddToPlaylist: Action
     {
       public AddToPlaylist ()
