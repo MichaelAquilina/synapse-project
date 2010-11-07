@@ -968,24 +968,59 @@ namespace Synapse
       ctx.translate (SIZE, SIZE);
       ctx.set_operator (Cairo.Operator.OVER);
       
-      Gtk.Style style = this.get_style();
+      Gtk.Style style = this.get_parent ().get_style();
       double r = 0.0, g = 0.0, b = 0.0;
-      double size = 0.4 * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
+      double size = 0.5 * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
+
+      
+      Pattern pat;
+      pat = new Pattern.linear (this.allocation.x,
+                                this.allocation.y,
+                                this.allocation.x,
+                                this.allocation.y + this.allocation.height);
       if (entered)
       {
-        size = 1.5 * size;
         Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], out r, out g, out b);
       }
       else
       {
-        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.INSENSITIVE], out r, out g, out b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
       }
-      ctx.set_source_rgba (r, g, b, 1.0);
-      size /= 2.0;
+      pat.add_color_stop_rgb (0.0,
+                              double.max(r - 0.15, 0),
+                              double.max(g - 0.15, 0),
+                              double.max(b - 0.15, 0));
+      if (entered)
+      {
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+      }
+      pat.add_color_stop_rgb (1.0,
+                              double.min(r + 0.15, 1),
+                              double.min(g + 0.15, 1),
+                              double.min(b + 0.15, 1));
+      
+      size *= 0.5;
+      ctx.set_source (pat);
       ctx.arc (this.allocation.x + this.allocation.width - SIZE * 2 - size,
                this.allocation.y + size,
                size, 0, Math.PI * 2);
       ctx.fill ();
+
+      if (entered)
+      {
+        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
+      }
+      else
+      {
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+      }
+      
+      ctx.set_source_rgb (r, g, b);
+      ctx.arc (this.allocation.x + this.allocation.width - SIZE * 2 - size,
+               this.allocation.y + size,
+               size * 0.5, 0, Math.PI * 2);
+      ctx.fill ();
+      
       return true;
     }
   }
