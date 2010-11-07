@@ -929,6 +929,18 @@ namespace Synapse
       item.activate.connect (()=> {settings_clicked ();});
       menu.append (item);
       
+      item = new Gtk.MenuItem.with_label ("About"); //TODO: i18n
+      item.activate.connect (()=> 
+      {
+        var about = new SynapseAboutDialog ();
+        about.run ();
+        about.destroy ();
+      });
+      menu.append (item);
+      
+      item = new Gtk.SeparatorMenuItem ();
+      menu.append (item);
+      
       item = new Gtk.MenuItem.with_label ("Quit"); //TODO: i18n
       item.activate.connect (Gtk.main_quit);
       menu.append (item);
@@ -1161,6 +1173,20 @@ namespace Synapse
     public ShrinkingLabel ()
     {
       GLib.Object (label: null);
+    }
+  }
+  
+  public class SynapseAboutDialog: Gtk.AboutDialog
+  {
+    public SynapseAboutDialog ()
+    {
+      string[] devs = {"Michal Hruby <michal.mhr@gmail.com>", "Alberto Aldegheri <albyrock87+dev@gmail.com>"};
+      GLib.Object (artists : devs,
+                   authors : devs,
+                   copyright : "Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>",
+                   program_name: "Synapse",
+                   logo_icon_name : "synapse",
+                   version: "0.1.0");
     }
   }
 }
