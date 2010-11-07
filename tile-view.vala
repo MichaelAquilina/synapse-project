@@ -154,9 +154,8 @@ namespace UI.Widgets
       va.height = this.get_parent ().allocation.height;
 
       var va_region = Gdk.Region.rectangle (va);
-      Gdk.Rectangle* rect_ptr = (Gdk.Rectangle*) (&alloc);
 
-      if (va_region.rect_in (*rect_ptr) == Gdk.OverlapType.OUT)
+      if (va_region.rect_in (alloc) != Gdk.OverlapType.IN)
       {
         double delta = 0.0;
         if (alloc.y + alloc.height > va.y + va.height)

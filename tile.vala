@@ -16,7 +16,7 @@ namespace UI.Widgets
 
     private int icon_size;
 
-    public TileView owner { get; set; }
+    public unowned TileView owner { get; set; }
     public AbstractTileObject owned_object { get; private set; }
     public bool last { get; private set; }
 
@@ -27,8 +27,8 @@ namespace UI.Widgets
       GLib.Object (n_rows: 3, n_columns: 3, homogeneous: false);
 
       IconSize isz = IconSize.SMALL_TOOLBAR;
-      add_image = new Image.from_stock (STOCK_ADD, isz);
-      remove_image = new Image.from_stock (STOCK_REMOVE, isz);
+      add_image = new Image.from_stock (obj.add_button_stock, isz);
+      remove_image = new Image.from_stock (obj.remove_button_stock, isz);
       
       owned_object = obj;
       owned_object.icon_updated.connect (this.set_image);
@@ -39,7 +39,6 @@ namespace UI.Widgets
       this.icon_size = icon_size;
 
       build_tile ();
-      this.expose_event.connect (this.on_expose_event);
     }
 
     private void build_tile ()
@@ -97,8 +96,15 @@ namespace UI.Widgets
       this.show ();
       update_state ();
     }
+    
+    protected override void realize ()
+    {
+      this.set_flags (WidgetFlags.NO_WINDOW);
+      this.set_window (this.parent.get_window ());
+      base.realize ();
+    }
 
-    protected bool on_expose_event (Gdk.EventExpose event)
+    protected override bool expose_event (Gdk.EventExpose event)
     {
       if (this.get_state () == StateType.SELECTED)
       {
@@ -119,7 +125,7 @@ namespace UI.Widgets
                          this.allocation.y + this.allocation.height - 1);
       }
 
-      return false;
+      return base.expose_event (event);
     }
 
     public void update_state ()
@@ -133,8 +139,8 @@ namespace UI.Widgets
       title.set_sensitive (sensitive);
       description.set_sensitive (sensitive);
       description.wrap = is_selected;
-
       sub_description.set_visible (is_selected);
+
       add_remove_button.set_image (enabled ? remove_image : add_image);
       add_remove_button.set_tooltip_markup (enabled ?
         owned_object.remove_button_tooltip : owned_object.add_button_tooltip);
@@ -206,15 +212,14 @@ namespace UI.Widgets
 
     private void set_text ()
     {
-      // FIXME: escape!
-      title.set_markup ("<b>%s</b>".printf (owned_object.name));
+      title.set_markup (Markup.printf_escaped ("<b>%s</b>", owned_object.name));
       description.set_text (owned_object.description);
 
       if (owned_object.sub_description_title != "" &&
           owned_object.sub_description_text != "")
       {
-        sub_description.set_markup (
-          "<small><b>%s</b> <i>%s</i></small>".printf (
+        sub_description.set_markup (Markup.printf_escaped (
+          "<small><b>%s</b> <i>%s</i></small>",
             owned_object.sub_description_title,
             owned_object.sub_description_text
           )
