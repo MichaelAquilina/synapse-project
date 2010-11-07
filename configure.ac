@@ -68,11 +68,11 @@ AC_DEFINE_UNQUOTED(PKGDATADIR, "$PKGDATADIR", [Package base directory])
 
 AC_CONFIG_FILES([
 Makefile
+data/Makefile
 src/Makefile
 po/Makefile.in
 ])
 
-dnl data/Makefile
 
 AC_OUTPUT
 
