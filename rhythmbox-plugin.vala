@@ -131,8 +131,8 @@ namespace Synapse
       {
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Player");
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH);
           player.play_pause (true);
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
@@ -141,7 +141,18 @@ namespace Synapse
 
       public override bool action_available ()
       {
-        return true;
+        if (!DBusNameCache.get_default ().name_has_owner (
+            RhythmboxPlayer.UNIQUE_NAME))
+          return false;
+        try {
+          var conn = DBus.Bus.get(DBus.BusType.SESSION);
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH);
+          return !player.get_playing ();
+        } catch (DBus.Error e) {
+          stderr.printf ("Rythmbox is not available.\n%s", e.message);
+        }
+        return false;
       }
     }
     private class Pause: Play
@@ -156,8 +167,18 @@ namespace Synapse
 
       public override bool action_available ()
       {
-        return DBusNameCache.get_default ().name_has_owner (
-          RhythmboxPlayer.UNIQUE_NAME);
+        if (!DBusNameCache.get_default ().name_has_owner (
+            RhythmboxPlayer.UNIQUE_NAME))
+          return false;
+        try {
+          var conn = DBus.Bus.get(DBus.BusType.SESSION);
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH);
+          return player.get_playing ();
+        } catch (DBus.Error e) {
+          stderr.printf ("Rythmbox is not available.\n%s", e.message);
+        }
+        return false;
       }
     }
     private class Next: RhythmboxControlMatch
