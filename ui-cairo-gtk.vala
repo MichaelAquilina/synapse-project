@@ -620,7 +620,7 @@ namespace Synapse
     }
     protected override void focus_match ( int index, Match? match )
     {
-      string size = "x-large"; //searching_for_matches ? "xx-large": "medium";
+      string size = searching_for_matches ? "x-large": "medium";
       if (match == null)
       {
         /* Show default stuff */
@@ -664,7 +664,7 @@ namespace Synapse
     }
     protected override void focus_action ( int index, Match? action )
     {
-      string size = "x-large"; //!searching_for_matches ? "xx-large": "medium";
+      string size = !searching_for_matches ? "x-large": "medium";
       if (action == null)
       {
         action_icon.set_sensitive (false);
