@@ -21,7 +21,6 @@
  */
 
 using Gtk;
-using Cairo;
 using Gee;
 
 namespace Synapse
@@ -184,25 +183,57 @@ namespace Synapse
       this.add (main_vbox);
       
       var tabs = new Gtk.Notebook ();
-      var general_tab = new VBox (false, 4);
+      var general_tab = new VBox (false, 6);
       general_tab.border_width = 5;
-      var plugin_tab = new VBox (false, 4);
+      var plugin_tab = new VBox (false, 6);
       plugin_tab.border_width = 5;
       main_vbox.pack_start (tabs);
       tabs.append_page (general_tab, new Label ("General"));
       tabs.append_page (plugin_tab, new Label ("Plugins"));
       
       /* General Tab */
-      HBox row;
-      row = new HBox (false, 5);
+      var theme_frame = new Frame (null);
+      var theme_frame_label = new Label (null);
+      theme_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", "Behavior & Look"));
+      theme_frame.set_label_widget (theme_frame_label);
 
-      row.pack_start (new Label ("Select Theme:"), false, false);
+      var behavior_vbox = new VBox (false, 4);
+      var align = new Alignment (0.5f, 0.5f, 1.0f, 1.0f);
+      align.set_padding (0, 0, 10, 0);
+      align.add (behavior_vbox);
+      theme_frame.add (align);
+      
+      /* Select theme combobox row */
+      var row = new HBox (false, 5);
+      behavior_vbox.pack_start (row, false);
+      var select_theme_label = new Label ("Select Theme:");
+      select_theme_label.xalign = 0.0f;
+      row.pack_start (select_theme_label, true, true);
       row.pack_start (build_theme_combo (), false, false);
-      general_tab.pack_start (row, false, false);
 
-      // keybinding treeview
+      /* Autostart checkbox */
+      var autostart = new CheckButton.with_label ("Startup on login");
+      autostart.active = autostart_exists ();
+      autostart.toggled.connect (this.autostart_toggled);
+      behavior_vbox.pack_start (autostart, false);
+
+      general_tab.pack_start (theme_frame, false);
+
+      /* keybinding treeview */
+      var shortcut_frame = new Frame (null);
+      var shortcut_frame_label = new Label (null);
+      shortcut_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", "Shortcuts"));
+      shortcut_frame.set_label_widget (shortcut_frame_label);
+      align = new Alignment (0.5f, 0.5f, 1.0f, 1.0f);
+      align.set_padding (0, 0, 10, 0);
+      
+      var tree_vbox = new VBox (false, 4);
       Gtk.TreeView treeview = new Gtk.TreeView ();
-      general_tab.pack_start (treeview, false, false, 0);
+      tree_vbox.pack_start (treeview, false);
+      align.add (tree_vbox);
+      shortcut_frame.add (align);
+      general_tab.pack_start (shortcut_frame, false, false);
+      
       model = new Gtk.ListStore (2, typeof (string), typeof (string));
       treeview.set_model (model);
 
@@ -233,6 +264,17 @@ namespace Synapse
       Gtk.TreeIter iter;
       model.append (out iter);
       model.set (iter, 0, "Activate");
+      
+      /* Add info */
+      
+      var info_box = new HBox (false, 12);
+      var info_image = new Image.from_stock (STOCK_INFO, IconSize.DND);
+      info_box.pack_start (info_image, false, true);
+      var info_label = new Label ("To edit a shortcut, double click it and press a new one.");
+      info_box.pack_start (info_label);
+      info_box.show_all ();
+
+      tree_vbox.pack_start (info_box, false);
 
       /* Plugin Tab */
       var scroll = new Gtk.ScrolledWindow (null, null);
@@ -307,5 +349,57 @@ namespace Synapse
     }
 
     public signal void theme_selected (Type theme);
+
+    private string autostart_file = 
+      Path.build_filename (Environment.get_user_config_dir (), "autostart",
+                           "synapse.desktop", null);
+
+    private bool autostart_exists ()
+    {
+      return FileUtils.test (autostart_file, FileTest.EXISTS);
+    }
+
+    private void autostart_toggled (Widget w)
+    {
+      CheckButton check = w as CheckButton;
+      bool active = check.active;
+      if (!active && autostart_exists ())
+      {
+        // delete the autostart file
+        FileUtils.remove (autostart_file);
+      }
+      else if (active && !autostart_exists ())
+      {
+        string autostart_entry = 
+          "[Desktop Entry]\n" +
+          "Name=Synapse\n" +
+          "Exec=synapse --startup\n" +
+          "Encoding=UTF-8\n" +
+          "Type=Application\n" +
+          "X-GNOME-Autostart-enabled=true\n" +
+          "Icon=synapse\n";
+
+        // create the autostart file
+        string autostart_dir = 
+          Path.build_filename (Environment.get_user_config_dir (),
+                               "autostart", null);
+        if (!FileUtils.test (autostart_dir, FileTest.EXISTS | FileTest.IS_DIR))
+        {
+          DirUtils.create_with_parents (autostart_dir, 0755);
+        }
+        try
+        {
+          FileUtils.set_contents (autostart_file, autostart_entry);
+        }
+        catch (Error err)
+        {
+          var d = new MessageDialog (this, 0, MessageType.ERROR, 
+                                     ButtonsType.CLOSE,
+                                     "%s", err.message);
+          d.run ();
+          d.destroy ();
+        }
+      }
+    }
   }
 }

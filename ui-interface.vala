@@ -251,7 +251,6 @@ namespace Synapse
           if (matcher.key.match (focus[T.MATCH].title))
           {
             focus_match (focus_index[T.MATCH], focus[T.MATCH]);
-            debug ("jump partial results");
             return;
           }
         }

@@ -23,13 +23,22 @@ namespace Synapse
 {
   [DBus (name = "org.gnome.Rhythmbox.Shell")]
   interface RhythmboxShell : Object {
+      public const string UNIQUE_NAME = "org.gnome.Rhythmbox";
+      public const string OBJECT_PATH = "/org/gnome/Rhythmbox/Shell";
+      public const string INTERFACE_NAME = "org.gnome.Rhythmbox.Shell";
+      
       [DBus (name = "addToQueue")]
       public abstract void add_to_queue (string uri) throws DBus.Error;
       [DBus (name = "clearQueue")]
       public abstract void clear_queue () throws DBus.Error;
   }
+  
   [DBus (name = "org.gnome.Rhythmbox.Player")]
   interface RhythmboxPlayer : Object {
+      public const string UNIQUE_NAME = "org.gnome.Rhythmbox";
+      public const string OBJECT_PATH = "/org/gnome/Rhythmbox/Player";
+      public const string INTERFACE_NAME = "org.gnome.Rhythmbox.Shell";
+      
       [DBus (name = "getPlaying")]
       public abstract bool get_playing () throws DBus.Error;
       [DBus (name = "next")]
@@ -39,6 +48,7 @@ namespace Synapse
       [DBus (name = "playPause")]
       public abstract void play_pause (bool b) throws DBus.Error;
   }
+  
   public class RhythmboxActions: ActionPlugin
   {
     static construct
@@ -73,6 +83,12 @@ namespace Synapse
       {
         execute_internal (match);
       }
+      public virtual int get_relevancy ()
+      {
+        bool rb_running = DBusNameCache.get_default ().name_has_owner (
+          RhythmboxPlayer.UNIQUE_NAME);
+        return rb_running ? default_relevancy + 20 : default_relevancy;
+      }
     }
     
     private abstract class RhythmboxControlMatch: Object, Match
@@ -92,15 +108,21 @@ namespace Synapse
       }
 
       public abstract void do_action ();
+      
+      public virtual bool action_available ()
+      {
+        return DBusNameCache.get_default ().name_has_owner (
+          RhythmboxPlayer.UNIQUE_NAME);
+      }
     }
 
     /* MATCHES of Type.ACTION */
-    private class PlayPause: RhythmboxControlMatch
+    private class Play: RhythmboxControlMatch
     {
-      public PlayPause ()
+      public Play ()
       {
-        Object (title: "Play / Pause", //fixme i18n
-                description: "Control Rhythmbox playing status",
+        Object (title: "Play", //fixme i18n
+                description: "Start playback in Rhythmbox",
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -115,6 +137,27 @@ namespace Synapse
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
+      }
+
+      public override bool action_available ()
+      {
+        return true;
+      }
+    }
+    private class Pause: Play
+    {
+      public Pause ()
+      {
+        Object (title: "Pause", //fixme i18n
+                description: "Pause playback in Rhythmbox",
+                icon_name: "media-playback-pause", has_thumbnail: false,
+                match_type: MatchType.ACTION);
+      }
+
+      public override bool action_available ()
+      {
+        return DBusNameCache.get_default ().name_has_owner (
+          RhythmboxPlayer.UNIQUE_NAME);
       }
     }
     private class Next: RhythmboxControlMatch
@@ -171,7 +214,7 @@ namespace Synapse
                 description: "Add the song to Rhythmbox playlist",
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 101);
+                default_relevancy: 70);
       }
 
       public override void execute_internal (Match? match)
@@ -216,7 +259,7 @@ namespace Synapse
                 description: "Clears the current playlist and plays the song",
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 102);
+                default_relevancy: 75);
       }
 
       public override void execute_internal (Match? match)
@@ -266,7 +309,8 @@ namespace Synapse
       actions.add (new PlayNow());
       actions.add (new AddToPlaylist());
       
-      matches.add (new PlayPause());
+      matches.add (new Play ());
+      matches.add (new Pause ());
       matches.add (new Previous ());
       matches.add (new Next ());
     }
@@ -287,6 +331,7 @@ namespace Synapse
 
       foreach (var action in matches)
       {
+        if (!action.action_available ()) continue;
         foreach (var matcher in matchers)
         {
           if (matcher.key.match (action.title))
@@ -318,7 +363,7 @@ namespace Synapse
         {
           if (action.valid_for_match (match))
           {
-            results.add (action, action.default_relevancy);
+            results.add (action, action.get_relevancy ());
           }
         }
       }
