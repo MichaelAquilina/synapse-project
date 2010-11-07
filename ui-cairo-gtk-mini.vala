@@ -180,6 +180,7 @@ namespace Synapse
       /* Pref item */
       var pref = new MenuButton ();
       pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+      pref.set_size_request (20, 20);
       {
         var vbox = new VBox (false, 0);
         var spacer = new Label (null);
