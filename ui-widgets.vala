@@ -876,28 +876,16 @@ namespace Synapse
   {
     private Gtk.Spinner throbber;
     public bool active {get; set; default = false;}
-    private bool entered;
     construct
     {
       throbber = new Gtk.Spinner ();
       throbber.active = false;
-      entered = false;
       this.notify["active"].connect ( ()=>{
         throbber.active = active;
         queue_draw ();
       } );
       
       this.add (throbber);
-    }
-    public override void enter ()
-    {
-      entered = true;
-      this.queue_draw ();
-    }
-    public override void leave ()
-    {
-      entered = false;
-      this.queue_draw ();
     }
     public override void size_request (out Requisition requisition)
     {
@@ -922,30 +910,7 @@ namespace Synapse
       }
       else
       {
-        var ctx = Gdk.cairo_create (this.window);
-        double SIZE = 0.5;
-        ctx.translate (SIZE, SIZE);
-        ctx.set_operator (Cairo.Operator.OVER);
-        
-        Gtk.Style style = this.get_style();
-        double r = 0.0, g = 0.0, b = 0.0;
-        double size = 0.4 * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
-        if (entered)
-        {
-          size = 1.5 * size;
-          Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], out r, out g, out b);
-        }
-        else
-        {
-          Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.INSENSITIVE], out r, out g, out b);
-        }
-        ctx.set_source_rgba (r, g, b, 1.0);
-        ctx.new_path ();
-        ctx.move_to (this.allocation.x + this.allocation.width - SIZE * 2 - size, this.allocation.y);
-        ctx.rel_line_to (size, size);
-        ctx.rel_line_to (0, - size);
-        ctx.close_path ();
-        ctx.fill ();
+        base.expose_event (event);
       }
       return true;
     }
@@ -953,8 +918,10 @@ namespace Synapse
   public class MenuButton: Button
   {
     private Gtk.Menu menu;
+    private bool entered;
     public MenuButton ()
     {
+      entered = false;
       menu = new Gtk.Menu ();
       Gtk.MenuItem item = null;
       
@@ -967,6 +934,16 @@ namespace Synapse
       menu.append (item);
       
       menu.show_all ();
+    }
+    public override void enter ()
+    {
+      entered = true;
+      this.queue_draw ();
+    }
+    public override void leave ()
+    {
+      entered = false;
+      this.queue_draw ();
     }
     public override void released ()
     {
@@ -993,15 +970,21 @@ namespace Synapse
       
       Gtk.Style style = this.get_style();
       double r = 0.0, g = 0.0, b = 0.0;
-      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.INSENSITIVE], out r, out g, out b);
+      double size = 0.4 * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
+      if (entered)
+      {
+        size = 1.5 * size;
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], out r, out g, out b);
+      }
+      else
+      {
+        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.INSENSITIVE], out r, out g, out b);
+      }
       ctx.set_source_rgba (r, g, b, 1.0);
-      
-      ctx.new_path ();
-      double size = 0.7 * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
-      ctx.move_to (this.allocation.x + this.allocation.width - SIZE * 2 - size, this.allocation.y);
-      ctx.rel_line_to (size, size);
-      ctx.rel_line_to (0, - size);
-      ctx.close_path ();
+      size /= 2.0;
+      ctx.arc (this.allocation.x + this.allocation.width - SIZE * 2 - size,
+               this.allocation.y + size,
+               size, 0, Math.PI * 2);
       ctx.fill ();
       return true;
     }
