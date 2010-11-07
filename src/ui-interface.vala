@@ -238,6 +238,8 @@ namespace Synapse
     
     private void _send_partial_results (ResultSet rs)
     {
+      /* Search not ready */
+      set_throbber_visible (true);
       partial_result_sent = true;
       /* Try to match the new string on current focus,
        * if it matches, don't waste time on updating results
@@ -266,8 +268,6 @@ namespace Synapse
       {
         focus[T.MATCH] = null;
       }
-      /* Search not ready */
-      set_throbber_visible (true);
       /* If we are here, we are searching for Matches */
       update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);
       /* Send also actions */
