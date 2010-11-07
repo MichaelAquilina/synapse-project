@@ -919,14 +919,24 @@ namespace Synapse
   {
     private Gtk.Menu menu;
     private bool entered;
+    private SynapseAboutDialog about;
     public MenuButton ()
     {
+      about = new SynapseAboutDialog ();
+
       entered = false;
       menu = new Gtk.Menu ();
       Gtk.MenuItem item = null;
       
       item = new Gtk.MenuItem.with_label ("Settings"); //TODO: i18n
       item.activate.connect (()=> {settings_clicked ();});
+      menu.append (item);
+      
+      item = new Gtk.MenuItem.with_label ("About"); //TODO: i18n
+      item.activate.connect (()=> {about.show ();});
+      menu.append (item);
+      
+      item = new Gtk.SeparatorMenuItem ();
       menu.append (item);
       
       item = new Gtk.MenuItem.with_label ("Quit"); //TODO: i18n
@@ -1161,6 +1171,25 @@ namespace Synapse
     public ShrinkingLabel ()
     {
       GLib.Object (label: null);
+    }
+  }
+  
+  public class SynapseAboutDialog: Gtk.AboutDialog
+  {
+    public SynapseAboutDialog ()
+    {
+      //FIXME :-)
+      string[] devs = {"Michal Hruby <michal.mhr@gmail.com>", "Alberto Aldegheri <albyrock87+dev@gmail.com>"};
+      GLib.Object (artists : devs,
+                   authors : devs,
+                   copyright : "Copyright \xc2\xa9 %s %s".printf("2010", "Michal Hruby <michal.mhr@gmail.com>"),
+                   program_name: "Synapse",
+                   logo_icon_name : "synapse",
+                   version: "0.1.0");
+      this.delete_event.connect (this.hide_on_delete);
+      // FIXME!!! Why doesn't work?
+      //this.show.connect (()=>{this.run ();});
+      //this.hide.connect (()=>{this.response ();});
     }
   }
 }

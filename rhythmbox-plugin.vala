@@ -133,26 +133,12 @@ namespace Synapse
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH);
+          if (player.get_playing ())
+            return;
           player.play_pause (true);
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
-      }
-
-      public override bool action_available ()
-      {
-        if (!DBusNameCache.get_default ().name_has_owner (
-            RhythmboxPlayer.UNIQUE_NAME))
-          return false;
-        try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
-                                                          RhythmboxPlayer.OBJECT_PATH);
-          return !player.get_playing ();
-        } catch (DBus.Error e) {
-          stderr.printf ("Rythmbox is not available.\n%s", e.message);
-        }
-        return false;
       }
     }
     private class Pause: Play
@@ -165,20 +151,18 @@ namespace Synapse
                 match_type: MatchType.ACTION);
       }
 
-      public override bool action_available ()
+      public override void do_action ()
       {
-        if (!DBusNameCache.get_default ().name_has_owner (
-            RhythmboxPlayer.UNIQUE_NAME))
-          return false;
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH);
-          return player.get_playing ();
+          if (!player.get_playing ())
+            return;
+          player.play_pause (true);
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
-        return false;
       }
     }
     private class Next: RhythmboxControlMatch
