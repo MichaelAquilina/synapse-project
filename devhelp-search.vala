@@ -65,7 +65,9 @@ namespace Synapse
         typeof (DevhelpPlugin),
         "Devhelp",
         "Search documentation using Devhelp.",
-        "devhelp"
+        "devhelp",
+        Environment.find_program_in_path ("devhelp") != null,
+        "Devhelp is not installed"
       );
     }
 
@@ -77,12 +79,24 @@ namespace Synapse
       action = new Search ();
       has_devhelp =
         Environment.find_program_in_path ("devhelp") != null;
+
+      try
+      {        
+        symbol_re = new Regex ("^([a-z]+_)|([A-Z]+[a-z]+[A-Z])",
+                               RegexCompileFlags.OPTIMIZE);
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
     }
     
     public override bool handles_unknown ()
     {
       return has_devhelp;
     }
+    
+    private Regex symbol_re;
 
     public override ResultSet? find_for_match (Query query, Match match)
     {
@@ -96,7 +110,9 @@ namespace Synapse
 
       if (query_empty)
       {
-        results.add (action, action.default_relevancy);
+        int relevancy = action.default_relevancy;
+        if (symbol_re.match (match.title)) relevancy += 5;
+        results.add (action, relevancy);
       }
       else
       {

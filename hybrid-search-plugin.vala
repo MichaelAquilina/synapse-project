@@ -403,7 +403,7 @@ namespace Synapse
     private async void update_directory_contents (GLib.File directory,
                                                   DirectoryInfo di) throws Error
     {
-      debug ("Scanning %s...", directory.get_path ());
+      print ("%s:: Scanning %s\n", get_type ().name (), directory.get_path ());
       var enumerator = yield directory.enumerate_children_async (
         FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
       var files = yield enumerator.next_files_async (1024, 0);

@@ -65,7 +65,9 @@ namespace Synapse
         typeof (DictionaryPlugin),
         "Dictionary",
         "Look up definitions of words.",
-        "gnome-dictionary"
+        "gnome-dictionary",
+        Environment.find_program_in_path ("gnome-dictionary") != null,
+        "Gnome Dictionary is not installed"
       );
     }
 

@@ -153,7 +153,9 @@ namespace Synapse
         typeof (GnomeSessionPlugin),
         "Gnome session plugin",
         "Allows you to log out from your session, restart and shutdown your computer.",
-        "gnome-session-logout"
+        "gnome-session-logout",
+        DBusNameCache.get_default ().name_has_owner (GnomeSessionManager.UNIQUE_NAME),
+        "Gnome Session Manager wan't found"
       );
     }
 

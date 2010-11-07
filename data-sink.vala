@@ -152,12 +152,18 @@ namespace Synapse
         public string title;
         public string description;
         public string icon_name;
-        public PluginInfo (Type type, string title, string desc, string icon_name)
+        public bool runnable;
+        public string runnable_error;
+        public PluginInfo (Type type, string title, string desc,
+                           string icon_name, bool runnable,
+                           string runnable_error)
         {
           this.plugin_type = type;
           this.title = title;
           this.description = desc;
           this.icon_name = icon_name;
+          this.runnable = runnable;
+          this.runnable_error = runnable_error;
         }
       }
 
@@ -184,9 +190,12 @@ namespace Synapse
       public void register_plugin (Type plugin_type,
                                    string title,
                                    string description,
-                                   string icon_name)
+                                   string icon_name,
+                                   bool runnable = true,
+                                   string runnable_error = "")
       {
-        var p = new PluginInfo (plugin_type, title, description, icon_name);
+        var p = new PluginInfo (plugin_type, title, description, icon_name,
+                                runnable, runnable_error);
         plugins.add (p);
       }
       

@@ -47,7 +47,9 @@ namespace Synapse
         typeof (RhythmboxActions),
         "Rhythmbox",
         "Allows you to control Rhythmbox and add items to playlist.",
-        "rhythmbox"
+        "rhythmbox",
+        Environment.find_program_in_path ("rhythmbox") != null,
+        "Rhythmbox is not installed"
       );
     }
 

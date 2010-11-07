@@ -36,7 +36,8 @@ namespace Synapse
         GLib.Object (name: info.title,
                      description: info.description,
                      icon: info.icon_name,
-                     pi: info);
+                     pi: info,
+                     show_action_button: info.runnable);
       }
 
       construct
@@ -49,11 +50,11 @@ namespace Synapse
 
       public void update_state (bool enabled)
       {
-        this.enabled = enabled;
+        this.enabled = enabled && pi.runnable;
 
-        if (!enabled)
+        if (!this.enabled)
         {
-          sub_description_text = "Disabled"; // i18n!
+          sub_description_text = pi.runnable ? "Disabled" : pi.runnable_error; // i18n!
         }
         else
         {
