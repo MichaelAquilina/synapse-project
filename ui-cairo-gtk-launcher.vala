@@ -39,7 +39,7 @@ namespace Synapse
     };
     
     private UIInterface ui;
-    private SettingsWindow sett;
+    private SettingsWindow settings;
     private DataSink data_sink;
     private GtkHotkey.Info? hotkey;
     
@@ -47,21 +47,21 @@ namespace Synapse
     {
       ui = null;
       data_sink = new DataSink ();
-      sett = new SettingsWindow (data_sink);
-      sett.keybinding_changed.connect (this.change_keyboard_shortcut);
+      settings = new SettingsWindow (data_sink);
+      settings.keybinding_changed.connect (this.change_keyboard_shortcut);
       
       bind_keyboard_shortcut ();
       
-      init_ui (sett.get_current_theme ());
+      init_ui (settings.get_current_theme ());
       if (!is_startup) ui.show ();
       
-      sett.theme_selected.connect (init_ui);
+      settings.theme_selected.connect (init_ui);
     }
     private void init_ui (Type t)
     {
       ui = GLib.Object.new (t, "data-sink", data_sink) as UIInterface;
       ui.show_settings_clicked.connect (()=>{
-        sett.show ();
+        settings.show ();
       });
     }
     private void bind_keyboard_shortcut ()
@@ -80,7 +80,7 @@ namespace Synapse
           registry.store_hotkey (hotkey);
         }
         debug ("Binding activation to %s", hotkey.signature);
-        sett.set_keybinding (hotkey.signature, false);
+        settings.set_keybinding (hotkey.signature, false);
         hotkey.bind ();
         hotkey.activated.connect ((event_time) =>
         {
@@ -130,7 +130,12 @@ namespace Synapse
       }
       catch (Error err)
       {
-        warning ("%s", err.message);
+        Gtk.MessageDialog dialog = new Gtk.MessageDialog (this.settings, 0,
+          Gtk.MessageType.WARNING, Gtk.ButtonsType.OK,
+          "%s", err.message
+        );
+        dialog.run ();
+        dialog.destroy ();
       }
     }
 
