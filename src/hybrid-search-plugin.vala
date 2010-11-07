@@ -19,11 +19,16 @@
  *
  */
 
-namespace Sezen
+/* 
+ * This plugin keeps a cache of file names for directories that are commonly
+ * used. 
+ */
+
+namespace Synapse
 {
   public class HybridSearchPlugin: DataPlugin
   {
-    private class MatchObject: Object, Match
+    private class MatchObject: Object, Match, UriMatch
     {
       // for Match interface
       public string title { get; construct set; }
@@ -33,6 +38,10 @@ namespace Sezen
       public string thumbnail_path { get; construct set; }
       public string uri { get; set; }
       public MatchType match_type { get; construct set; }
+
+      // for FileMatch
+      public QueryFlags file_type { get; set; }
+      public string mime_type { get; set; }
 
       public MatchObject (string? thumbnail_path, string? icon)
       {
@@ -124,16 +133,38 @@ namespace Sezen
             {
               file_type = QueryFlags.DOCUMENTS;
             }
+            // FIXME: this isn't right
             else if (g_content_type_is_a (mime_type, "application/*"))
             {
               file_type = QueryFlags.DOCUMENTS;
             }
+            
+            match_obj.file_type = file_type;
+            match_obj.mime_type = mime_type;
           }
         }
         catch (Error err)
         {
           warning ("%s", err.message);
         }
+      }
+      
+      public async bool exists ()
+      {
+        bool result = true;
+        var f = File.new_for_uri (uri);
+        try
+        {
+          // will throw error if the file doesn't exist
+          yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_TYPE,
+                                    0, 0, null);
+        }
+        catch (Error err)
+        {
+          result = false;
+        }
+        
+        return result;
       }
     }
 
@@ -150,6 +181,17 @@ namespace Sezen
       }
     }
 
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (HybridSearchPlugin),
+        "Hybrid search",
+        "Tries to improve results returned by Zeitgeist plugin by looking " +
+        "for similar files on the filesystem.",
+        "search"
+      );
+    }
+
     construct
     {
       directory_hits = new Gee.HashMap<string, int> ();
@@ -162,9 +204,9 @@ namespace Sezen
     {
       // FIXME: if zeitgeist-plugin available
       unowned DataPlugin? zg_plugin;
-      zg_plugin = data_sink.get_plugin ("SezenZeitgeistPlugin");
+      zg_plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin");
       return_if_fail (zg_plugin != null);
-      
+
       zg_plugin.search_done.connect (this.zg_plugin_search_done);
     }
 
@@ -234,11 +276,12 @@ namespace Sezen
           yield process_directories (directories);
 
           int z = 0;
-          foreach (var x in directory_contents)
+          foreach (var x in directory_contents.entries)
           {
             z += x.value.files.size;
           }
-          debug ("we now have %d file names", z);
+          print ("%s keeps in cache now %d file names\n",
+                 this.get_type ().name (), z);
         }
       }
       catch (Error err)
@@ -247,27 +290,12 @@ namespace Sezen
       }
     }
 
-    private void zg_plugin_search_done (ResultSet? rs)
+    public signal void zeitgeist_search_complete (ResultSet? rs, uint query_id);
+    
+    private void zg_plugin_search_done (ResultSet? rs, uint query_id)
     {
-      // let's mine directories ZG is aware of
-      Gee.Set<string> uris = new Gee.HashSet<string> ();
-      foreach (var match in rs) uris.add (match.key.uri);
-
-      int current_hit_level = hit_level;
-
-      process_uris.begin (uris, (obj, res) =>
-      {
-        process_uris.end (res);
-
-        current_level_uris = uris.size;
-        hit_level = current_hit_level+1;
-        //debug ("Hit_level: %d - %d uris", hit_level, current_level_uris);
-
-        hits_updated (rs);
-      });
+      zeitgeist_search_complete (rs, query_id);
     }
-
-    public signal void hits_updated (ResultSet original_rs);
 
     Gee.Map<string, int> directory_hits;
     int hit_level = 0;
@@ -369,8 +397,19 @@ namespace Sezen
         var child = directory.get_child (name);
         var file_info = new FileInfo (child.get_uri ());
         di.files[file_info.uri] = file_info;
-        //di.files[child.get_uri ()] = null;
       }
+    }
+
+    private async void update_directory_contents (GLib.File directory,
+                                                  DirectoryInfo di) throws Error
+    {
+      print ("%s:: Scanning %s\n", get_type ().name (), directory.get_path ());
+      var enumerator = yield directory.enumerate_children_async (
+        FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
+      var files = yield enumerator.next_files_async (1024, 0);
+
+      di.files.clear ();
+      process_directory_contents (di, directory, files);
     }
 
     private async void process_directories (Gee.Collection<string> directories)
@@ -397,12 +436,7 @@ namespace Sezen
             directory_contents[dir_path] = di;
           }
 
-          debug ("Scanning %s...", dir_path);
-          var enumerator = yield directory.enumerate_children_async (
-            FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
-          var files = yield enumerator.next_files_async (1024, 0);
-
-          process_directory_contents (di, directory, files);
+          yield update_directory_contents (directory, di);
         }
         catch (Error err)
         {
@@ -415,8 +449,12 @@ namespace Sezen
                                                Gee.Collection<string>? dirs)
       throws SearchError
     {
+      uint num_results = 0;
+      bool enough_results = false;
       var results = new ResultSet ();
 
+      // FIXME: casefold the parse_names, so we don't need CASELESS regexes
+      //   but first find out if it really saves some time
       var flags = RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS;
       var matchers = Query.get_matchers_for_query (q.query_string,
                                                    MatcherFlags.NO_FUZZY | MatcherFlags.NO_PARTIAL,
@@ -424,8 +462,27 @@ namespace Sezen
       Gee.Collection<string> directories = dirs ?? directory_contents.keys;
       foreach (var directory in directories)
       {
+        var di = directory_contents[directory];
+        // check if we have fresh directory listing
+        var dir = File.new_for_path (directory);
+        try
+        {
+          var dir_info = yield dir.query_info_async ("time::*", 0, 0, null);
+          var t = TimeVal ();
+          dir_info.get_modification_time (out t);
+          if (t.tv_sec > di.last_update.tv_sec)
+          {
+            // the directory was changed, let's update
+            yield update_directory_contents (dir, di);
+          }
+        }
+        catch (Error err)
+        {
+          warning ("%s", err.message);
+        }
+
         // only add the uri if it matches our query
-        foreach (var entry in directory_contents[directory].files)
+        foreach (var entry in di.files.entries)
         {
           foreach (var matcher in matchers)
           {
@@ -438,23 +495,36 @@ namespace Sezen
                 {
                   yield fi.initialize ();
                 }
-                // FIXME: check if it matches query_type
+                else if (fi.match_obj != null && fi.file_type in q.query_type)
+                {
+                  // make sure the file still exists (could be deleted by now)
+                  bool exists = yield fi.exists ();
+                  if (!exists) break;
+                }
+                // file info is now initialized
                 if (fi.match_obj != null && fi.file_type in q.query_type)
                 {
                   results.add (fi.match_obj, matcher.value - Match.URI_PENALTY);
+                  num_results++;
                 }
               }
               break;
             }
           }
+          if (num_results >= q.max_results)
+          {
+            enough_results = true;
+            break;
+          }
         }
 
         q.check_cancellable ();
+        if (enough_results) break;
       }
 
       if (directories.size == 0) q.check_cancellable ();
 
-      debug ("%s found %d extra uris (ZG returned %d)",
+      print ("%s found %d extra uris (ZG returned %d)\n",
         this.get_type ().name (), results.size, original_rs.size);
 
       return results;
@@ -470,8 +540,6 @@ namespace Sezen
       // ignore short searches
       if (common_flags == 0 || q.query_string.length <= 1) return null;
       
-      var start_time = new Timer ();
-
       // FIXME: what about deleting one character?
       if (current_query != null && !q.query_string.has_prefix (current_query))
       {
@@ -479,13 +547,19 @@ namespace Sezen
         current_level_uris = 0;
         directory_hits.clear ();
       }
+      
+      uint query_id = q.query_id;
       current_query = q.query_string;
       int last_level_uris = current_level_uris;
       ResultSet? original_rs = null;
+      Gee.Set<string> uris = new Gee.HashSet<string> ();
 
       // wait for our signal or cancellable
-      ulong sig_id = this.hits_updated.connect ((rs) =>
+      ulong sig_id = this.zeitgeist_search_complete.connect ((rs, q_id) =>
       {
+        if (q_id != query_id) return;
+        // let's mine directories ZG is aware of
+        foreach (var match in rs) uris.add (match.key.uri);
         original_rs = rs;
         search.callback ();
       });
@@ -500,6 +574,15 @@ namespace Sezen
       q.cancellable.disconnect (canc_sig_id);
 
       q.check_cancellable ();
+
+      // process results from the zeitgeist plugin
+      current_level_uris = uris.size;
+      if (current_level_uris > 0)
+      {
+        yield process_uris (uris);
+        q.check_cancellable ();
+      }
+      hit_level++;
 
       // we weren't cancelled and we should have some directories and hits
       if (hit_level > 1 && q.query_string.length >= 3)
@@ -520,13 +603,9 @@ namespace Sezen
 
       // directory contents are updated now, we can take a look if any
       // files match our query
-      var t = new Timer ();
+
       // FIXME: run this sooner, it doesn't need to wait for the signal
       var result = yield get_extra_results (q, original_rs, null);
-      debug ("%s ran matching %d ms (total %d ms)",
-             this.get_type ().name (),
-             (int) (t.elapsed ()*1000),
-             (int) (start_time.elapsed ()*1000));
 
       return result;
     }

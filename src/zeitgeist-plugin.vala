@@ -19,11 +19,11 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   public class ZeitgeistPlugin: DataPlugin
   {
-    private class MatchObject: Object, Match
+    private class MatchObject: Object, Match, UriMatch
     {
       // for Match interface
       public string title { get; construct set; }
@@ -33,6 +33,10 @@ namespace Sezen
       public string thumbnail_path { get; construct set; }
       public string uri { get; set; }
       public MatchType match_type { get; construct set; }
+      
+      // for FileMatch
+      public QueryFlags file_type { get; set; }
+      public string mime_type { get; set; }
 
       public MatchObject (Zeitgeist.Event event,
                           string? thumbnail_path,
@@ -62,14 +66,153 @@ namespace Sezen
         {
           this.title = text;
         }
+        
+        this.mime_type = subject.get_mimetype ();
+
+        unowned string interpretation = subject.get_interpretation ();
+        if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_AUDIO))
+        {
+          this.file_type = QueryFlags.AUDIO;
+        }
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_VIDEO))
+        {
+          this.file_type = QueryFlags.VIDEO;
+        }
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_IMAGE))
+        {
+          this.file_type = QueryFlags.IMAGES;
+        }
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_DOCUMENT))
+        {
+          this.file_type = QueryFlags.DOCUMENTS;
+        }
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_WEBSITE))
+        {
+          this.file_type = QueryFlags.INTERNET;
+        }
+        else
+        {
+          this.file_type = QueryFlags.UNCATEGORIZED;
+        }
       }
     }
 
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (ZeitgeistPlugin),
+        "Zeitgeist",
+        "Search various items logged by Zeitgeist.",
+        "zeitgeist"
+      );
+    }
+
     private Zeitgeist.Index zg_index;
+    private Zeitgeist.Log zg_log;
+    private Gee.Map<string, int> popularity_map;
 
     construct
     {
+      zg_log = new Zeitgeist.Log ();
       zg_index = new Zeitgeist.Index ();
+      popularity_map = new Gee.HashMap<string, int> ();
+
+      initialize_popularity_map ();
+      Timeout.add_seconds (60*60, refresh_popularity);
+    }
+    
+    private bool refresh_popularity ()
+    {
+      initialize_popularity_map ();
+      return true;
+    }
+    
+    private async void initialize_popularity_map ()
+    {
+      Idle.add (initialize_popularity_map.callback, Priority.LOW);
+      yield;
+      
+      int64 end = Zeitgeist.Timestamp.now ();
+      int64 start = end - Zeitgeist.Timestamp.WEEK * 4;
+      Zeitgeist.TimeRange tr = new Zeitgeist.TimeRange (start, end);
+      
+      var event = new Zeitgeist.Event ();
+      event.set_interpretation ("!" + Zeitgeist.ZG_LEAVE_EVENT);
+      
+      var ptr_arr = new PtrArray ();
+      ptr_arr.add (event);
+      
+      Zeitgeist.ResultSet rs;
+
+      try
+      {
+        rs =
+          yield zg_log.find_events (tr, (owned) ptr_arr,
+                                    Zeitgeist.StorageState.ANY,
+                                    256,
+                                    Zeitgeist.ResultType.MOST_POPULAR_SUBJECTS,
+                                    null);
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+        return;
+      }
+
+      // approximate the higher relevancy of the first results
+      uint size = rs.size ();
+      uint index = 0;
+      foreach (var e in rs)
+      {
+        float power = index / (size * 2) + 0.5f; // linearly <0.5, 1.0>
+        float relevancy = 1.0f / Math.powf (index + 1, power);
+        
+        popularity_map[e.get_subject (0).get_uri ()] = (int)(relevancy * 65535);
+        
+        index++;
+      }
+
+      /*
+      uint requests = 0;
+      
+      foreach (var e in rs)
+      {
+        var uri = e.get_subject (0).get_uri ();
+        
+        var subject = new Zeitgeist.Subject ();
+        subject.set_uri (uri);
+        event = new Zeitgeist.Event ();
+        event.set_interpretation ("!" + Zeitgeist.ZG_LEAVE_EVENT);
+        event.add_subject (subject);
+        
+        ptr_arr = new PtrArray ();
+        ptr_arr.add (event);
+
+        requests++;
+        zg_log.find_event_ids (tr, (owned) ptr_arr,
+                               Zeitgeist.StorageState.ANY, 0,
+                               Zeitgeist.ResultType.MOST_RECENT_EVENTS,
+                               null, (obj, res) =>
+        {
+          try
+          {
+            Array<int> events = zg_log.find_event_ids.end (res);
+            map[uri] = events.length;
+          }
+          catch (Error err)
+          {
+          }
+          requests--;
+          if (requests <= 0) initialize_popularity_map.callback ();
+        });
+      }
+      if (requests > 0) yield;
+
+      foreach (var entry in popularity_map.entries)
+      {
+        print ("%d score - %s\n", entry.value, Path.get_basename (entry.key));
+      }
+      */
     }
 
     private string interesting_attributes =
@@ -147,7 +290,14 @@ namespace Sezen
           {
             if (matcher.key.match (match_obj.title))
             {
-              results.add (match_obj, matcher.value - relevancy_penalty);
+              int relevancy = matcher.value - relevancy_penalty;
+              if (uri in popularity_map)
+              {
+                float pr = popularity_map[uri] / 65535f;
+                float mr = (float) relevancy / Query.MATCH_SCORE_MAX;
+                relevancy = (int) (float.min(pr + mr, 1.0f) * Query.MATCH_SCORE_MAX);
+              }
+              results.add (match_obj, relevancy);
               match_found = true;
               break;
             }
@@ -160,8 +310,8 @@ namespace Sezen
     private GenericArray<Zeitgeist.Event> create_templates (QueryFlags flags)
     {
       var templates = new GenericArray<Zeitgeist.Event> ();
-      var manifestation = QueryFlags.LOCAL_ONLY in flags ?
-        "!" + Zeitgeist.NFO_REMOTE_DATA_OBJECT : "";
+      var manifestation = QueryFlags.INCLUDE_REMOTE in flags ?
+        "" : "!" + Zeitgeist.NFO_REMOTE_DATA_OBJECT;
 
       Zeitgeist.Event event;
       Zeitgeist.Subject subject;
@@ -241,7 +391,7 @@ namespace Sezen
         event.add_subject (subject);
 
         // and one more subject to say that we might not want remote stuff
-        if (QueryFlags.LOCAL_ONLY in flags)
+        if (!(QueryFlags.INCLUDE_REMOTE in flags))
         {
           subject = new Zeitgeist.Subject ();
           subject.set_manifestation (manifestation);
@@ -276,19 +426,23 @@ namespace Sezen
                                         new Zeitgeist.TimeRange (int64.MIN, int64.MAX),
                                         (owned) templates,
                                         0,
-                                        96,
+                                        q.max_results,
                                         Zeitgeist.ResultType.MOST_RECENT_SUBJECTS,
                                         q.cancellable);
 
         if (!q.is_cancelled ())
         {
           yield process_results (q.query_string, rs, q.cancellable, result,
-                                 QueryFlags.LOCAL_ONLY in q.query_type);
+                                 !(QueryFlags.INCLUDE_REMOTE in q.query_type));
         }
       }
       catch (Error err)
       {
-        warning ("Search in Zeitgeist's index failed: %s", err.message);
+        if (!q.is_cancelled ())
+        {
+          // we don't care about message about being cancelled
+          warning ("Search in Zeitgeist's index failed: %s", err.message);
+        }
       }
 
       q.check_cancellable ();

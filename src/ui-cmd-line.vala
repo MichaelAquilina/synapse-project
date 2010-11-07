@@ -30,10 +30,10 @@ int main (string[] argv)
   else
   {
     loop = new MainLoop ();
-    var sink = new Sezen.DataSink ();
+    var sink = new Synapse.DataSink ();
     string query = argv[1];
     debug (@"Searching for $query");
-    sink.search (query, Sezen.QueryFlags.LOCAL_CONTENT, null, null, (obj, res) =>
+    sink.search (query, Synapse.QueryFlags.LOCAL_CONTENT, null, null, (obj, res) =>
     {
       try
       {

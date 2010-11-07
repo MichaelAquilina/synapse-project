@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   [DBus (name = "org.freedesktop.UPower")]
   public interface UPowerObject: Object
@@ -170,6 +170,16 @@ namespace Sezen
           warning ("%s", err.message);
         }
       }
+    }
+
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (UPowerPlugin),
+        "UPower",
+        "Allows you to suspend & hibernate your computer.",
+        "system-suspend"
+      );
     }
 
     private Gee.List<UPowerAction> actions;

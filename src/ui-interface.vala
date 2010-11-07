@@ -20,11 +20,9 @@
  *
  */
 
-using Gtk;
-using Cairo;
 using Gee;
 
-namespace Sezen
+namespace Synapse
 {
   /* The target of this abstract class, is to separate model/control from view. */
   /* Each IU must implement this abstract class by translating user input into actions for this class. */
@@ -34,7 +32,7 @@ namespace Sezen
      - select_prev_match : when user wants to select the prev match in the list
      - select_next_action : when user wants to select the next action in the list
      - select_prev_action : when user wants to select the prev action in the list
-     - reset_search : when user hits the "Esc" button to hide Sezen2
+     - reset_search : when user hits the "Esc" button to hide Synapse2
      - set_match_search : when user writes a new string for searching matches
      - set_action_search : when user writes a new string for searching actions
      - execute : when user wants to execute the match
@@ -54,12 +52,12 @@ namespace Sezen
     This one is to notify the user that search is not yet completed
   */
   
-  public abstract class UIInterface : GLib.Object
+  public abstract class UIInterface : Object
   {
     // FIXME: the partial timeout should be the shortest possible
     //        to send to the user an "instant" response
     private const int PARTIAL_TIMEOUT = 100;
-    private DataSink data_sink;
+    public DataSink data_sink { get; construct; }
     private enum T 
     {
       MATCH,
@@ -71,13 +69,14 @@ namespace Sezen
     private QueryFlags qf;
     private string search[2];
     private Cancellable current_cancellable;
+    private bool partial_result_sent;
     
     private uint tid; //for timer
     
     construct
     {
       tid = 0;
-      data_sink = new DataSink();
+      partial_result_sent = false;
       current_cancellable = new Cancellable ();
       reset_search (false);
     }
@@ -85,6 +84,7 @@ namespace Sezen
     public abstract void show ();
     public abstract void hide ();
     public abstract void present_with_time (uint32 timestamp);
+    public signal void show_settings_clicked ();
 
     protected abstract void focus_match ( int index, Match? match );
     protected abstract void focus_action ( int index, Match? action );
@@ -119,7 +119,10 @@ namespace Sezen
       focus_index[t] = first ? 0 : results[t].size - 1;
       focus[t] = results[t].get (focus_index[t]);
       if (t == T.MATCH)
+      {
         focus_match (focus_index[t], focus[t]);
+        search_for_actions ();
+      }
       else
         focus_action (focus_index[t], focus[t]);
     }
@@ -149,7 +152,10 @@ namespace Sezen
       }
       focus[t] = results[t].get (focus_index[t]);
       if (t == T.MATCH)
+      {
         focus_match (focus_index[t], focus[t]);
+        search_for_actions ();
+      }
       else
         focus_action (focus_index[t], focus[t]);
       return true;
@@ -162,6 +168,7 @@ namespace Sezen
         tid = 0;
       }
       current_cancellable.cancel ();
+      partial_result_sent = false;
       focus_index = {0, 0};
       focus = {null, null};
       results = {null, null};
@@ -215,9 +222,7 @@ namespace Sezen
         reset_search (true, false);
         return;
       }
-      /* we are making a new search => reset current focus */
-      focus[T.MATCH] = null;
-      focus_index[T.MATCH] = 0;
+      partial_result_sent = false;
 
       last_result_set = new ResultSet ();
       if (tid == 0)
@@ -233,6 +238,25 @@ namespace Sezen
     
     private void _send_partial_results (ResultSet rs)
     {
+      partial_result_sent = true;
+      /* Try to match the new string on current focus,
+       * if it matches, don't waste time on updating results
+       */
+      if (focus[T.MATCH] != null)
+      {
+        var matchers = Query.get_matchers_for_query (search[T.MATCH], 0,
+            RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
+        foreach (var matcher in matchers)
+        {
+          if (matcher.key.match (focus[T.MATCH].title))
+          {
+            focus_match (focus_index[T.MATCH], focus[T.MATCH]);
+            return;
+          }
+        }
+      }
+      /* String didn't match, get partial results */
+      focus_index[T.MATCH] = 0;
       results[T.MATCH] = rs.get_sorted_list ();
       if (results[T.MATCH].size > 0)
       {
@@ -257,6 +281,12 @@ namespace Sezen
         results[T.MATCH] = data_sink.search.end (res);
         /* Do not write code before this line */
 
+        if (!partial_result_sent)
+        {
+          /* reset current focus */
+          focus[T.MATCH] = null;
+          focus_index[T.MATCH] = 0;
+        }
         /* Search not cancelled and ready */
         set_throbber_visible (false);
         if (tid != 0)
@@ -328,8 +358,12 @@ namespace Sezen
     {
       if (focus[T.MATCH] == null || focus[T.ACTION] == null)
         return false;
-      focus[T.ACTION].execute (focus[T.MATCH]);
+      _execute (focus[T.MATCH], focus[T.ACTION]);
       return true;
+    }
+    private async void _execute (Match match, Match action)
+    {
+      action.execute (match);
     }
   }
 }

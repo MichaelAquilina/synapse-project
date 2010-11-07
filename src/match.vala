@@ -19,12 +19,12 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   public enum MatchType
   {
     UNKNOWN = 0,
-    DESKTOP_ENTRY,
+    APPLICATION,
     GENERIC_URI,
     ACTION
   }
@@ -48,6 +48,19 @@ namespace Sezen
     }
   }
   
+  public interface ApplicationMatch: Match
+  {
+    public abstract AppInfo? app_info { get; set; }
+    public abstract bool needs_terminal { get; set; }
+    public abstract string? filename { get; construct set; }
+  }
+
+  public interface UriMatch: Match
+  {
+    public abstract QueryFlags file_type { get; set; }
+    public abstract string mime_type { get; set; }
+  }
+  
   public class DefaultMatch: Object, Match
   {
     public string title { get; construct set; }
@@ -58,7 +71,7 @@ namespace Sezen
     public string uri { get; set; }
     public MatchType match_type { get; construct set; }
     
-    public DefaultMatch(string query_string)
+    public DefaultMatch (string query_string)
     {
       Object (title: query_string, description: "", has_thumbnail: false,
               icon_name: "unknown", match_type: MatchType.UNKNOWN);

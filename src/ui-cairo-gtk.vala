@@ -24,9 +24,9 @@ using Gtk;
 using Cairo;
 using Gee;
 
-namespace Sezen
+namespace Synapse
 {
-  public class SezenWindow : UIInterface
+  public class SynapseWindow : UIInterface
   {
     Window window;
     /* Main UI shared components */
@@ -38,12 +38,13 @@ namespace Sezen
     protected Label action_label = null;
     protected HSelectionContainer flag_selector = null;
     protected HBox top_hbox = null;
+    protected FakeInput fake_input = null;
     protected Label top_spacer = null;
     protected VBox container = null;
     protected VBox container_top = null;
     protected ContainerOverlayed match_icon_container_overlayed = null;
     protected ResultBox result_box = null;
-    protected Sezen.Throbber throbber = null;
+    protected Synapse.MenuThrobber throbber = null;
 
     private const int UI_WIDTH = 600; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -54,13 +55,13 @@ namespace Sezen
     
     private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
     private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
-                                             QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.VIDEO, QueryFlags.INTERNET};
+                                             QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.VIDEO, QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE};
 
     /* STATUS */
     private bool list_visible = true;
     private IMContext im_context;
     
-    public SezenWindow ()
+    construct
     {
       window = new Window ();
       window.skip_taskbar_hint = true;
@@ -92,6 +93,11 @@ namespace Sezen
       window.key_press_event.connect (key_press_event);
     }
 
+    ~SynapseWindow ()
+    {
+      window.destroy ();
+    }
+
     protected virtual void build_ui ()
     {
       container = new VBox (false, 0);
@@ -119,7 +125,7 @@ namespace Sezen
       match_label_description.xpad = 6;
       /* Packing Top Hbox with Match Desctiption into Top VBox*/
       container_top.pack_start (top_hbox);
-      container_top.pack_start (match_label_description, false);
+      //container_top.pack_start (match_label_description, false);
       
       /* Match Icon packed into Top HBox */
       match_icon_container_overlayed = new ContainerOverlayed();
@@ -145,9 +151,10 @@ namespace Sezen
         flag_selector.add (new Label(s));
       flag_selector.select (3);
       flag_selector.set_arrows_visible (true);
-      /* Throbber */
-      throbber = new Sezen.Throbber ();
-      throbber.set_size_request (20, -1);
+      /* Throbber and menu */
+      throbber = new Synapse.MenuThrobber ();
+      throbber.set_size_request (22, 22);
+      throbber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       /* HBox for titles and action icon */
       var right_hbox = new HBox (false, 0);
       /* HBox for throbber and flag_selector */
@@ -159,6 +166,7 @@ namespace Sezen
       top_right_vbox.pack_start (top_spacer, true);
       top_right_vbox.pack_start (topright_hbox, false);
       top_right_vbox.pack_start (right_hbox, false);
+      top_right_vbox.pack_start (match_label_description, false);
       
       /* Titles box and Action icon*/
       var labels_hbox = new HBox (false, 0);
@@ -167,7 +175,13 @@ namespace Sezen
       action_icon.set_alignment (0.5f, 0.5f);
       action_icon.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
 
-      right_hbox.pack_start (labels_hbox);
+      fake_input = new FakeInput ();
+      fake_input.add (labels_hbox);
+      fake_input.top_padding = 8;
+      fake_input.bottom_padding = 9;
+      fake_input.yalign = 0.5f;
+      fake_input.focus_height = 8;
+      right_hbox.pack_start (fake_input);
       right_hbox.pack_start (action_icon, false);
       
       match_label = new ShrinkingLabel ();
@@ -177,7 +191,6 @@ namespace Sezen
 
       action_label = new Label (null);
       action_label.set_alignment (1.0f, 0.5f);
-      //action_label.set_ellipsize (Pango.EllipsizeMode.START);
       action_label.xpad = 10;
       
       labels_hbox.pack_start (match_label);
@@ -185,7 +198,13 @@ namespace Sezen
 
       container.show_all ();
     }
-    
+    private void visual_update_search_for ()
+    {
+      if (searching_for_matches)
+        fake_input.focus_widget = match_label;
+      else
+        fake_input.focus_widget = action_label;
+    }
     protected virtual void on_composited_changed (Widget w)
     {
       Gdk.Screen screen = w.get_screen ();
@@ -267,8 +286,8 @@ namespace Sezen
         y += spacing;
         h -= spacing;
         //draw shadow
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
                                           r, g, b, 0.9, SHADOW_SIZE);
         // border
@@ -294,7 +313,7 @@ namespace Sezen
         }
       }
       Pattern pat = new Pattern.linear(0, y, 0, y+h);
-      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
       pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                   double.min(g + 0.15, 1),
                                   double.min(b + 0.15, 1),
@@ -311,7 +330,7 @@ namespace Sezen
       ctx.set_operator (Operator.OVER);
       if (!comp)
       {
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         _cairo_path_for_main (ctx, comp, x, y, w, h);
         ctx.set_source_rgba (r, g, b, 1.0);
         ctx.set_line_width (3.5);
@@ -354,7 +373,7 @@ namespace Sezen
       {
         string s = l.get_text();
         l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
-        l.sensitive = false;
+        //l.sensitive = false;
       }
     }
     bool searching_for_matches = true;
@@ -363,7 +382,10 @@ namespace Sezen
     private void search_add_char (string chr)
     {
       if (searching_for_matches)
+      {
         set_match_search (get_match_search() + chr);
+        set_action_search ("");
+      }
       else
         set_action_search (get_action_search() + chr);
     }
@@ -379,7 +401,10 @@ namespace Sezen
       {
         s = s.substring (0, len - 1);
         if (searching_for_matches)
+        {
           set_match_search (s);
+          set_action_search ("");
+        }
         else
           set_action_search (s);
       }
@@ -392,6 +417,7 @@ namespace Sezen
       flag_selector.select (3);
       searching_for_matches = true;
       reset_search ();
+      visual_update_search_for ();
     }
     
     protected virtual bool key_press_event (Gdk.EventKey event)
@@ -416,6 +442,11 @@ namespace Sezen
           {
             set_action_search ("");
             searching_for_matches = true;
+            visual_update_search_for ();
+            Match m = null;
+            int i = 0;
+            get_match_focus (out i, out m);
+            update_match_result_list (get_match_results (), i, m);
             window.queue_draw ();
           }
           else if (get_match_search() != "")
@@ -433,6 +464,7 @@ namespace Sezen
           if (!searching_for_matches)
           {
             searching_for_matches = true;
+            visual_update_search_for ();
             window.queue_draw ();
           }
           update_query_flags (this.categories_query[flag_selector.get_selected()]);
@@ -442,6 +474,7 @@ namespace Sezen
           if (!searching_for_matches)
           {
             searching_for_matches = true;
+            visual_update_search_for ();
             window.queue_draw ();
           }
           update_query_flags (this.categories_query[flag_selector.get_selected()]);
@@ -506,9 +539,12 @@ namespace Sezen
           set_list_visible (true);
           break;
         case Gdk.KeySyms.Tab:
-          if (searching_for_matches && 
-              (get_match_results () == null || get_match_results ().size == 0 ||
-               get_action_results () == null || get_action_results ().size == 0))
+          if  (searching_for_matches && 
+                (
+                  get_match_results () == null || get_match_results ().size == 0 ||
+                  (get_action_search () == "" && (get_action_results () == null || get_action_results ().size == 0))
+                )
+              )
             return true;
           searching_for_matches = !searching_for_matches;
           Match m = null;
@@ -527,6 +563,7 @@ namespace Sezen
             get_action_focus (out i, out m);
             update_action_result_list (get_action_results (), i, m);
           }
+          visual_update_search_for ();
           window.queue_draw ();
           break;
         default:
@@ -556,7 +593,8 @@ namespace Sezen
     private string get_description_markup (string s)
     {
       // FIXME: i18n
-      return Markup.printf_escaped ("<span size=\"medium\">%s</span>", Utils.replace_home_path_with (s, "Home > "));
+      return Markup.printf_escaped ("<span size=\"medium\">%s</span>",
+        Utils.replace_home_path_with (s, "Home", " > "));
     }
     
     /* UI INTERFACE IMPLEMENTATION */
@@ -576,13 +614,13 @@ namespace Sezen
     protected override void set_throbber_visible (bool visible)
     {
       if (visible)
-        throbber.start ();
+        throbber.active = true;
       else
-        throbber.stop ();
+        throbber.active = false;
     }
     protected override void focus_match ( int index, Match? match )
     {
-      string size = searching_for_matches ? "xx-large": "medium";
+      string size = searching_for_matches ? "x-large": "medium";
       if (match == null)
       {
         /* Show default stuff */
@@ -590,7 +628,7 @@ namespace Sezen
         {
           match_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), size));
           match_label_description.set_markup (
-            get_description_markup (throbber.is_animating ()? "Searching..." : "Match not found.")
+            get_description_markup (throbber.active ? "Searching..." : "Match not found.")
           );
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
@@ -600,7 +638,7 @@ namespace Sezen
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
           match_label.set_markup (
-            Markup.printf_escaped ("<span size=\"xx-large\">%s</span>",
+            Markup.printf_escaped ("<span size=\"x-large\">%s</span>",
                                    "Type to search..."));
           match_label_description.set_markup (
             Markup.printf_escaped ("<span size=\"medium\"> </span>" +
@@ -626,7 +664,7 @@ namespace Sezen
     }
     protected override void focus_action ( int index, Match? action )
     {
-      string size = !searching_for_matches ? "xx-large": "medium";
+      string size = !searching_for_matches ? "x-large": "medium";
       if (action == null)
       {
         action_icon.set_sensitive (false);

@@ -19,25 +19,25 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   [Flags]
   public enum QueryFlags
   {
-    LOCAL_ONLY    = 1 << 0,
+    INCLUDE_REMOTE  = 1 << 0,
 
-    APPLICATIONS  = 1 << 1,
-    ACTIONS       = 1 << 2,
-    AUDIO         = 1 << 3,
-    VIDEO         = 1 << 4,
-    DOCUMENTS     = 1 << 5,
-    IMAGES        = 1 << 6,
-    INTERNET      = 1 << 7,
+    APPLICATIONS    = 1 << 1,
+    ACTIONS         = 1 << 2,
+    AUDIO           = 1 << 3,
+    VIDEO           = 1 << 4,
+    DOCUMENTS       = 1 << 5,
+    IMAGES          = 1 << 6,
+    INTERNET        = 1 << 7,
 
-    UNCATEGORIZED = 1 << 15,
+    UNCATEGORIZED   = 1 << 15,
 
-    LOCAL_CONTENT = 0xFF | QueryFlags.UNCATEGORIZED,
-    ALL           = 0xFE | QueryFlags.UNCATEGORIZED
+    ALL           = 0xFF | QueryFlags.UNCATEGORIZED,
+    LOCAL_CONTENT = ALL ^ QueryFlags.INCLUDE_REMOTE
   }
   
   [Flags]
@@ -55,12 +55,19 @@ namespace Sezen
     string query_string_folded;
     Cancellable cancellable;
     QueryFlags query_type;
+    uint max_results;
+    uint query_id;
 
-    public Query (string query, QueryFlags flags = QueryFlags.LOCAL_CONTENT)
+    public Query (uint query_id,
+                  string query,
+                  QueryFlags flags = QueryFlags.LOCAL_CONTENT,
+                  uint num_results = 96)
     {
+      this.query_id = query_id;
       this.query_string = query;
       this.query_string_folded = query.casefold ();
       this.query_type = flags;
+      this.max_results = num_results;
     }
 
     public bool is_cancelled ()
@@ -75,6 +82,9 @@ namespace Sezen
         throw new SearchError.SEARCH_CANCELLED ("Cancelled");
       }
     }
+    
+    // FIXME: turn into 0.0 - 1.0 floats
+    public const int MATCH_SCORE_MAX = 100;
     
     public const int MATCH_EXACT = 100;
     public const int MATCH_PREFIX = 90;

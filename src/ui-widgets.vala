@@ -26,7 +26,7 @@ using Gee;
 
 public static extern void gtk_style_get_style_property (Style style, Type widget_type, string property_name, out Value val);
 
-namespace Sezen
+namespace Synapse
 {
   /* Result List stuff */
   public class ResultBox: EventBox
@@ -36,8 +36,8 @@ namespace Sezen
     private int mwidth;
     private int nrows;
     private bool no_results;
+    private int items;
 
-    private int cellh;
     private VBox vbox;
     private HBox status_box;
     
@@ -45,7 +45,7 @@ namespace Sezen
     {
       this.mwidth = width;
       this.nrows = nrows;
-      cellh = 0;
+      items = 0;
       no_results = true;
       build_ui();
     }
@@ -70,7 +70,7 @@ namespace Sezen
         Gtk.Style style = w.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
         Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
         pat.add_color_stop_rgba (1.0 - 15.0 / w.allocation.height, double.min(r + 0.15, 1),
                                     double.min(g + 0.15, 1),
                                     double.min(b + 0.15, 1),
@@ -85,7 +85,7 @@ namespace Sezen
         ctx.fill ();
 
         /* Propagate Expose */               
-        Container c = (w is Container) ? (Container) w : null;
+        Bin c = (w is Bin) ? (Bin) w : null;
         if (c != null)
           c.propagate_expose (this.get_child(), event);
         
@@ -109,15 +109,23 @@ namespace Sezen
       status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
       var logo = new Label (null);
       logo.set_alignment (1, 0);
-      logo.set_markup (Markup.printf_escaped ("<i>Sezen 2 </i>"));
+      logo.set_markup (Markup.printf_escaped ("<i>Synapse</i>"));
       status_box.pack_start (status, false, false, 10);
       status_box.pack_start (new Label (null), true, false);
       status_box.pack_start (logo, false, false, 10);
       
 			view.enable_search = false;
+			view.show_expanders = false;
 			view.headers_visible = false;
 			view.fixed_height_mode = true; // speedup but use Gtk.TreeViewColumnSizing.FIXED
 			view.show();
+			view.realize.connect (()=>{
+			  /* Block clicks on list */
+			  Gdk.EventMask mask = view.get_bin_window ().get_events ();
+			  mask = mask & (~Gdk.EventMask.BUTTON_PRESS_MASK);
+			  mask = mask & (~Gdk.EventMask.BUTTON_RELEASE_MASK);
+			  view.get_bin_window ().set_events (mask);
+			});
 
       view.model = results = new ListStore(2, typeof(GLib.Icon), typeof(string));
 
@@ -131,10 +139,9 @@ namespace Sezen
 			ctxt.ellipsize = Pango.EllipsizeMode.END;
 			ctxt.xpad = 5;
 
-			int pad = 1;
       crp.ypad = 0;
       ctxt.ypad = 0;
-      cellh = ICON_SIZE + pad * 2;
+      int cellh = ICON_SIZE;
       crp.set_fixed_size (ICON_SIZE, cellh);
       ctxt.set_fixed_size (mwidth - ICON_SIZE, cellh);
 
@@ -147,28 +154,35 @@ namespace Sezen
       on_view_style_set (view, null);
       view.style_set.connect (on_view_style_set);
     }
-
     private void on_view_style_set (Gtk.Widget widget, Gtk.Style? prev_style)
     {
-      int vspacing = 0;
-      view.style.get (typeof (TreeView), "vertical-separator", out vspacing);
+      /* WORKAROUND FOR ROW HEIGHT */
       Requisition requisition = {0, 0};
+      TreeIter iter;
+      results.append (out iter);
+      results.set (iter, Column.ICON_COLUMN, null, Column.NAME_COLUMN, "");
+      view.size_request (out requisition);
+      results.remove (iter);
+      int cellh = requisition.height / (items + 1);
       status_box.size_request (out requisition);
       requisition.width = mwidth;
-      requisition.height += nrows * (cellh + vspacing * 2);
+      requisition.height += nrows * cellh;
       vbox.set_size_request (requisition.width, requisition.height);
-      vbox.queue_draw ();
+      this.queue_resize ();
+      this.queue_draw ();
     }
 
-    public void update_matches (Gee.List<Sezen.Match>? rs)
+    public void update_matches (Gee.List<Synapse.Match>? rs)
     {
       results.clear();
       if (rs==null || rs.size == 0)
       {
         no_results = true;
+        items = 0;
         status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
         return;
       }
+      items = rs.size;
       no_results = false;
       string desc;
       TreeIter iter;
@@ -176,7 +190,7 @@ namespace Sezen
       foreach (Match m in rs)
       {
         results.append (out iter);
-        desc = Utils.replace_home_path_with (m.description, "Home > "); // FIXME: i18n
+        desc = Utils.replace_home_path_with (m.description, "Home", " > "); // FIXME: i18n
         try {
           icon = GLib.Icon.new_for_string(m.icon_name);
         } catch (GLib.Error err) { icon = null; }
@@ -403,13 +417,13 @@ namespace Sezen
       sep.show ();
       show_arrows = false;
       left = new Label (null);
-      left.set_markup ("<span size=\"medium\">&lt;&lt;</span>");
+      left.set_markup ("<span size=\"small\">&lt;&lt;</span>");
       left.set_parent (this);
-      left.sensitive = false;
+      //left.sensitive = false;
       right = new Label (null);
-      right.set_markup ("<span size=\"medium\">&gt;&gt;</span>");
+      right.set_markup ("<span size=\"small\">&gt;&gt;</span>");
       right.set_parent (this);
-      right.sensitive = false;
+      //right.sensitive = false;
     }
     
     public void set_arrows_visible (bool b)
@@ -651,68 +665,18 @@ namespace Sezen
       }
     }
   }
-  public class Throbber: Label
+  public class Throbber: Spinner
   {
-    private int step;
-    private bool animate;
-    private const int TIMEOUT = 1000 / 30;
-    private const int MAX_STEP = 30;
     construct
     {
-      step = 0;
-      animate = false;
-    }
-    
-    public bool is_animating ()
-    {
-      return animate;
+      this.notify["active"].connect (this.queue_draw);
     }
 
-    public void start ()
-    {
-      if (animate)
-        return;
-      animate = true;
-      Timeout.add (TIMEOUT, () => {
-        step = (step + 1) % MAX_STEP;
-        this.queue_draw ();
-        return animate;
-      } );
-    }
-    
-    public void stop ()
-    {
-      if (!animate)
-        return;
-      animate = false;
-    }
     public override bool expose_event (Gdk.EventExpose event)
     {
-      if (animate)
+      if (this.active)
       {
-        var ctx = Gdk.cairo_create (this.window);
-        ctx.translate (0.5, 0.5);
-        ctx.set_operator (Cairo.Operator.OVER);
-        Gtk.Style style = this.get_style();
-        double r = 0.0, g = 0.0, b = 0.0;
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
-        double xc = this.allocation.x + this.allocation.width / 2;
-        double yc = this.allocation.y + this.allocation.height / 2;
-        double rad = int.min (this.allocation.width, this.allocation.height) / 2 - 0.5;
-        var pat = new Cairo.Pattern.radial (xc, yc, 0, xc, yc, rad);
-        pat.add_color_stop_rgba (0.5, r, g, b, 0);
-        pat.add_color_stop_rgba (0.7, r, g, b, 1.0);
-        Utils.rgb_invert_color (out r, out g, out b);
-        pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
-        double gamma = Math.PI * 2.0 * step / MAX_STEP;
-        ctx.new_path ();
-        ctx.arc (xc, yc, rad, gamma, gamma + Math.PI * 2 / 3);
-        ctx.line_to (xc, yc);
-        ctx.close_path ();
-        ctx.clip ();
-        ctx.set_source (pat);
-        ctx.paint ();
-        base.expose_event (event);
+        return base.expose_event (event);
       }
       return true;
     }
@@ -721,12 +685,23 @@ namespace Sezen
   {
     public string not_found_name {get; set; default = "missing-image";}
     private string current;
+    private IconSize current_size;
+    private uint tid; //for timer
+    public int update_timeout {get; set; default = -1;}
+    public bool stop_prev_timeout {get; set; default = false;}
     public NamedIcon ()
     {
       current = "";
+      current_size = IconSize.DIALOG;
+      tid = 0;
     }
     public new void clear ()
     {
+      if (tid != 0)
+      {
+        Source.remove (tid);
+        tid = 0;
+      }
       current = "";
       base.clear ();
     }
@@ -739,70 +714,242 @@ namespace Sezen
         if (name == "")
         {
           this.clear ();
+          current = "";
           return;
         }
-        try
+        current = name;
+        current_size = size;
+        if (update_timeout <= 0)
         {
-          this.set_from_gicon (GLib.Icon.new_for_string (name), size);
-          current = name;
+          real_update_image ();
         }
-        catch (Error err)
+        else
         {
-          if (current != not_found_name)
+          if (tid != 0 && stop_prev_timeout)
           {
-            if (not_found_name == "")
-              this.clear ();
-            else
-              this.set_from_icon_name (not_found_name, IconSize.DIALOG);
-            current = not_found_name;
+            Source.remove (tid);
+            tid = 0;
           }
+          if (tid == 0)
+          {
+            base.clear ();
+            tid = Timeout.add (update_timeout,
+              () => {tid = 0; real_update_image (); return false;}
+            );
+          }
+        }
+      }
+    }
+    private void real_update_image ()
+    {
+      try
+      {
+        this.set_from_gicon (GLib.Icon.new_for_string (current), current_size);
+      }
+      catch (Error err)
+      {
+        if (current != not_found_name)
+        {
+          if (not_found_name == "")
+            this.clear ();
+          else
+            this.set_from_icon_name (not_found_name, current_size);
+          current = not_found_name;
         }
       }
     }
   }
 
-  public class FakeInput: ShrinkingLabel
+  public class FakeInput: Gtk.Alignment
   {
+    public bool draw_input {get; set; default = true;}
+    public double border_radius {get; set; default = 3.0;}
+    public double shadow_height {get; set; default = 3;}
+    public double focus_height {get; set; default = 3;}
+    public Widget? focus_widget 
+    {
+      get {return _focus_widget;}
+      set {
+        if (value == _focus_widget)
+          return;
+        this.queue_draw ();
+        if (_focus_widget != null)
+          _focus_widget.queue_draw ();
+        _focus_widget = value;
+        if (_focus_widget != null)
+          _focus_widget.queue_draw ();
+      }
+    }
+    private Widget? _focus_widget;
+    construct
+    {
+      _focus_widget = null;
+      this.notify["draw-input"].connect (this.queue_draw);
+      this.notify["border-radius"].connect (this.queue_draw);
+      this.notify["shadow-pct"].connect (this.queue_draw);
+      this.notify["focus-height"].connect (this.queue_draw);
+    }
+
     public override bool expose_event (Gdk.EventExpose event)
     {
-      var ctx = Gdk.cairo_create (this.window);
-      ctx.translate (0.5, 0.5);
-      ctx.set_operator (Cairo.Operator.OVER);
-      ctx.set_line_width (1.25);
-      Gtk.Style style = this.get_style();
-      double r = 0.0, g = 0.0, b = 0.0;
-      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], &r, &g, &b);
-      int rad = int.max (1, int.min(this.xpad, this.ypad));
-      Utils.cairo_rounded_rect (ctx,
-                                this.allocation.x,
-                                this.allocation.y,
-                                this.allocation.width - 1.0,
-                                this.allocation.height - 1.0,
-                                rad);
-      Utils.rgb_invert_color (out r, out g, out b);
-      ctx.set_source_rgba (r, g, b, 1.0);
-      Cairo.Path path = ctx.copy_path ();
-      ctx.save ();
-      ctx.clip ();
-      ctx.paint ();
-      Utils.rgb_invert_color (out r, out g, out b);
-      int shadow_size = int.max(this.allocation.height / 5, 2 * this.ypad);
-      var pat = new Cairo.Pattern.linear (0, this.allocation.y, 0, this.allocation.y + shadow_size);
-      pat.add_color_stop_rgba (0, r, g, b, 0.6);
-      pat.add_color_stop_rgba (0.3, r, g, b, 0.25);
-      pat.add_color_stop_rgba (1.0, r, g, b, 0);
-      ctx.set_source (pat);
-      ctx.paint ();
-      ctx.restore ();
-      ctx.append_path (path);
-      ctx.set_source_rgba (r, g, b, 0.6);
-      ctx.stroke ();
+      if (draw_input)
+      {
+        var ctx = Gdk.cairo_create (this.window);
+        ctx.translate (1.5, 1.5);
+        ctx.set_operator (Cairo.Operator.OVER);
+        ctx.set_line_width (1.25);
+        Gtk.Style style = this.get_style();
+        double r = 0.0, g = 0.0, b = 0.0;
+        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
+        double x = this.allocation.x + this.left_padding,
+               y = this.allocation.y + this.top_padding,
+               w = this.allocation.width - this.left_padding - this.right_padding - 3.0,
+               h = this.allocation.height - this.top_padding - this.bottom_padding - 3.0;
+        Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
+        ctx.set_source_rgba (r, g, b, 1.0);
+        Cairo.Path path = ctx.copy_path ();
+        ctx.save ();
+        ctx.clip ();
+        ctx.paint ();
+        Utils.rgb_invert_color (ref r, ref g, ref b);
+        var pat = new Cairo.Pattern.linear (0, y, 0, y + shadow_height);
+        pat.add_color_stop_rgba (0, r, g, b, 0.6);
+        pat.add_color_stop_rgba (0.3, r, g, b, 0.25);
+        pat.add_color_stop_rgba (1.0, r, g, b, 0);
+        ctx.set_source (pat);
+        ctx.paint ();
+        if (_focus_widget != null)
+        {
+          /*
+                     ____            y1
+                  .-'    '-.
+               .-'          '-.
+            .-'                '-.
+           x1         x2         x3  y2
+          */
+          double x1 = double.max (_focus_widget.allocation.x, x),
+                 x3 = double.min (_focus_widget.allocation.x + _focus_widget.allocation.width,
+                           x + w);
+          double x2 = (x1 + x3) / 2.0;
+          double y2 = y + h;
+          double y1 = y + h - focus_height;
+          ctx.new_path ();
+          ctx.move_to (x1, y2);
+          if (x1 < x + 1)
+          {
+            ctx.line_to (x1, y1);
+            ctx.line_to (x2, y1);
+          }
+          else
+          {
+            ctx.curve_to (x1, y2, x1, y1, x2, y1);
+          }
+          if (x3 > x + w - 1)
+          {
+            ctx.line_to (x3, y1);
+            ctx.line_to (x3, y2);
+          }
+          else
+          {
+            ctx.curve_to (x3, y1, x3, y2, x3, y2);
+          }
+          ctx.close_path ();
+          ctx.clip ();
+          Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], out r, out g, out b);
+          pat = new Cairo.Pattern.linear (0, y2, 0, y1);
+          pat.add_color_stop_rgba (0, r, g, b, 1.0);
+          pat.add_color_stop_rgba (1, r, g, b, 0.0);
+          ctx.set_source (pat);
+          ctx.paint ();
+        }
+        ctx.restore ();
+        ctx.append_path (path);
+        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
+        ctx.set_source_rgba (r, g, b, 0.6);
+        ctx.stroke ();
+      }
       return base.expose_event (event);
     }
   }
-  
+  public class MenuThrobber: MenuButton
+  {
+    private Gtk.Spinner throbber;
+    public bool active {get; set; default = false;}
+    construct
+    {
+      throbber = new Gtk.Spinner ();
+      throbber.active = false;
+      this.notify["active"].connect ( ()=>{
+        throbber.active = active;
+        queue_draw ();
+      } );
+      
+      this.add (throbber);
+    }
+    public override void size_request (out Requisition requisition)
+    {
+      requisition.width = 11;
+      requisition.height = 11;
+    }
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
+      set_allocation (alloc);
+      throbber.size_allocate (allocation);
+    }
+    
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      if (this.active)
+      {
+        /* Propagate Expose */               
+        Bin c = (this is Bin) ? (Bin) this : null;
+        if (c != null)
+          c.propagate_expose (this.get_child(), event);
+      }
+      else
+      {
+        base.expose_event (event);
+      }
+      return true;
+    }
+  }
   public class MenuButton: Button
   {
+    private Gtk.Menu menu;
+    private bool entered;
+    public MenuButton ()
+    {
+      entered = false;
+      menu = new Gtk.Menu ();
+      Gtk.MenuItem item = null;
+      
+      item = new Gtk.MenuItem.with_label ("Settings"); //TODO: i18n
+      item.activate.connect (()=> {settings_clicked ();});
+      menu.append (item);
+      
+      item = new Gtk.MenuItem.with_label ("Quit"); //TODO: i18n
+      item.activate.connect (Gtk.main_quit);
+      menu.append (item);
+      
+      menu.show_all ();
+    }
+    public override void enter ()
+    {
+      entered = true;
+      this.queue_draw ();
+    }
+    public override void leave ()
+    {
+      entered = false;
+      this.queue_draw ();
+    }
+    public override void released ()
+    {
+      menu.popup (null, null, null, 1, 0);
+    }
+    public signal void settings_clicked ();
     public override void size_allocate (Gdk.Rectangle allocation)
     {
       Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
@@ -810,8 +957,8 @@ namespace Sezen
     }
     public override void size_request (out Requisition requisition)
     {
-      requisition.width = 5;
-      requisition.height = 5;
+      requisition.width = 11;
+      requisition.height = 11;
     }
     
     public override bool expose_event (Gdk.EventExpose event)
@@ -821,17 +968,59 @@ namespace Sezen
       ctx.translate (SIZE, SIZE);
       ctx.set_operator (Cairo.Operator.OVER);
       
-      Gtk.Style style = this.get_style();
+      Gtk.Style style = this.get_parent ().get_style();
       double r = 0.0, g = 0.0, b = 0.0;
-      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.INSENSITIVE], &r, &g, &b);
-      ctx.set_source_rgba (r, g, b, 1.0);
+      double size = 0.5 * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
+
       
-      ctx.new_path ();
-      ctx.move_to (this.allocation.x, this.allocation.y);
-      ctx.rel_line_to (this.allocation.width - SIZE * 2, this.allocation.height - SIZE * 2);
-      ctx.rel_line_to (0, - this.allocation.height + SIZE * 2);
-      ctx.close_path ();
+      Pattern pat;
+      pat = new Pattern.linear (this.allocation.x,
+                                this.allocation.y,
+                                this.allocation.x,
+                                this.allocation.y + this.allocation.height);
+      if (entered)
+      {
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], out r, out g, out b);
+      }
+      else
+      {
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+      }
+      pat.add_color_stop_rgb (0.0,
+                              double.max(r - 0.15, 0),
+                              double.max(g - 0.15, 0),
+                              double.max(b - 0.15, 0));
+      if (entered)
+      {
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+      }
+      pat.add_color_stop_rgb (1.0,
+                              double.min(r + 0.15, 1),
+                              double.min(g + 0.15, 1),
+                              double.min(b + 0.15, 1));
+      
+      size *= 0.5;
+      ctx.set_source (pat);
+      ctx.arc (this.allocation.x + this.allocation.width - SIZE * 2 - size,
+               this.allocation.y + size,
+               size, 0, Math.PI * 2);
       ctx.fill ();
+
+      if (entered)
+      {
+        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
+      }
+      else
+      {
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+      }
+      
+      ctx.set_source_rgb (r, g, b);
+      ctx.arc (this.allocation.x + this.allocation.width - SIZE * 2 - size,
+               this.allocation.y + size,
+               size * 0.5, 0, Math.PI * 2);
+      ctx.fill ();
+      
       return true;
     }
   }
@@ -946,7 +1135,11 @@ namespace Sezen
       bool changed = false;
       var context = this.get_layout ();
       var attrs = context.get_attributes ();
+#if VALA_0_12
+      Pango.AttrIterator iter = attrs.get_iterator ();
+#else
       unowned Pango.AttrIterator iter = attrs.get_iterator (); // FIXME: leaks
+#endif
       do
       {
         unowned Pango.Attribute? attr = iter.get (Pango.AttrType.SCALE);

@@ -24,9 +24,9 @@ using Gtk;
 using Cairo;
 using Gee;
 
-namespace Sezen
+namespace Synapse
 {
-  public class SezenWindowMini : UIInterface
+  public class SynapseWindowMini : UIInterface
   {
     Window window;
     bool searching_for_matches = true;
@@ -38,7 +38,7 @@ namespace Sezen
     protected ContainerOverlayed match_icon_container_overlayed = null;
     
     protected Label match_label_description = null;
-    protected FakeInput current_label = null;
+    protected ShrinkingLabel current_label = null;
 
     protected HSelectionContainer flag_selector = null;
     protected HBox container_top = null;
@@ -49,16 +49,16 @@ namespace Sezen
     protected ResultBox results_match = null;
     protected ResultBox results_action = null;
     
-    protected Sezen.Throbber throbber = null;
+    protected Synapse.Throbber throbber = null;
 
-    private const int UI_WIDTH = 600; // height is dynamic
+    private const int UI_WIDTH = 620; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
     private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
     private const int SECTION_PADDING = 10;
     private const int BORDER_RADIUS = 10;
     private const int ICON_SIZE = 160;
     private const int TOP_SPACING = ICON_SIZE / 2;
-    private const int LABEL_INTERNAL_PADDING = 3;
+    private const int LABEL_INTERNAL_PADDING = 4;
     private const string LABEL_TEXT_SIZE = "x-large";
     
     private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
@@ -69,7 +69,7 @@ namespace Sezen
     private bool list_visible = true;
     private IMContext im_context;
     
-    public SezenWindowMini ()
+    construct
     {
       window = new Window ();
       window.skip_taskbar_hint = true;
@@ -101,6 +101,11 @@ namespace Sezen
       window.key_press_event.connect (key_press_event);
     }
 
+    ~SynapseWindowMini ()
+    {
+      window.destroy ();
+    }
+
     protected virtual void build_ui ()
     {
       /* containers holds top hbox and result list */
@@ -130,6 +135,7 @@ namespace Sezen
       match_icon_container_overlayed = new ContainerOverlayed();
       match_icon_thumb = new NamedIcon();
       match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
+      match_icon_thumb.update_timeout = 100;
       match_icon = new NamedIcon ();
       match_icon.set_pixel_size (ICON_SIZE);
       match_icon_container_overlayed.set_size_request (ICON_SIZE, ICON_SIZE);
@@ -155,11 +161,14 @@ namespace Sezen
       }
       
       /* Match or Action Label */
-      current_label = new FakeInput ();
+      current_label = new ShrinkingLabel ();
       current_label.xpad = LABEL_INTERNAL_PADDING * 2;
       current_label.ypad = LABEL_INTERNAL_PADDING;
       current_label.set_alignment (0.0f, 1.0f);
       current_label.set_ellipsize (Pango.EllipsizeMode.END);
+      var fakeinput = new FakeInput ();
+      fakeinput.add (current_label);
+      fakeinput.border_radius = 5;
       
       /* Query flag selector  */
       flag_selector = new HSelectionContainer(_hilight_label, 15);
@@ -170,14 +179,15 @@ namespace Sezen
       
       /* Pref item */
       var pref = new MenuButton ();
-      pref.set_size_request (7, 7);
+      pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+      pref.set_size_request (20, 20);
       {
         var vbox = new VBox (false, 0);
         var spacer = new Label (null);
         spacer.set_size_request (-1, TOP_SPACING);
         vbox.pack_start (spacer, false);
         vbox.pack_start (flag_selector, false);
-        vbox.pack_start (current_label, false);
+        vbox.pack_start (fakeinput, false);
         vbox.pack_start (new Label(null));
         container_top.pack_start (vbox);
       }
@@ -244,12 +254,12 @@ namespace Sezen
       {
         double ly = y + h - border_radius;
         double lh = results_container.allocation.y - ly + results_container.allocation.height;
-        Utils.gdk_color_to_rgb (style.base[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.base[Gtk.StateType.NORMAL], out r, out g, out b);
         ctx.rectangle (x, ly, w, lh);
         ctx.set_source_rgba (r, g, b, 1);
         ctx.fill ();
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         if (comp)
         {
           //draw shadow
@@ -260,14 +270,14 @@ namespace Sezen
       if (comp)
       {
         //draw shadow
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
                                           r, g, b, 0.9, SHADOW_SIZE);
       }
       ctx.set_operator (Operator.OVER);
       Pattern pat = new Pattern.linear(0, y, 0, y + h);
-      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
       pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                   double.min(g + 0.15, 1),
                                   double.min(b + 0.15, 1),
@@ -351,7 +361,10 @@ namespace Sezen
     private void search_add_char (string chr)
     {
       if (searching_for_matches)
+      {
         set_match_search (get_match_search() + chr);
+        set_action_search ("");
+      }
       else
         set_action_search (get_action_search() + chr);
     }
@@ -369,6 +382,7 @@ namespace Sezen
         if (searching_for_matches)
         {
           set_match_search (s);
+          set_action_search ("");
           if (s == "")
             set_list_visible (false);
         }
@@ -429,6 +443,10 @@ namespace Sezen
             set_action_search ("");
             searching_for_matches = true;
             visual_update_search_for ();
+            Match m = null;
+            int i = 0;
+            get_match_focus (out i, out m);
+            focus_match (i, m);
             window.queue_draw ();
           }
           else if (get_match_search() != "")
@@ -522,8 +540,11 @@ namespace Sezen
           break;
         case Gdk.KeySyms.Tab:
           if (searching_for_matches && 
-              (get_match_results () == null || get_match_results ().size == 0 ||
-               get_action_results () == null || get_action_results ().size == 0))
+                (
+                  get_match_results () == null || get_match_results ().size == 0 ||
+                  (get_action_search () == "" && (get_action_results () == null || get_action_results ().size == 0))
+                )
+              )
             return true;
           searching_for_matches = !searching_for_matches;
           Match m = null;
@@ -531,16 +552,12 @@ namespace Sezen
           if (searching_for_matches)
           {
             get_match_focus (out i, out m);
-            update_match_result_list (get_match_results (), i, m);
-            get_action_focus (out i, out m);
-            focus_action (i, m);
+            focus_match (i, m);
           }
           else
           {
-            get_match_focus (out i, out m);
-            focus_match (i, m); 
             get_action_focus (out i, out m);
-            update_action_result_list (get_action_results (), i, m);
+            focus_action (i, m);
           }
           visual_update_search_for ();
           break;

@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   [DBus (name = "org.gnome.SessionManager")]
   public interface GnomeSessionManager: Object
@@ -147,13 +147,27 @@ namespace Sezen
       }
     }
 
-    private bool checks_done = false;
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (GnomeSessionPlugin),
+        "Gnome session plugin",
+        "Allows you to log out from your session, restart and shutdown your computer.",
+        "gnome-session-logout",
+        DBusNameCache.get_default ().name_has_owner (GnomeSessionManager.UNIQUE_NAME),
+        "Gnome Session Manager wan't found"
+      );
+    }
+
     private bool session_manager_available = false;
     private Gee.List<Match> actions;
 
     construct
     {
-      Idle.add (this.check_name_owner);
+      var cache = DBusNameCache.get_default ();
+      session_manager_available = cache.name_has_owner (GnomeSessionManager.UNIQUE_NAME);
+      debug ("%s %s available", GnomeSessionManager.UNIQUE_NAME,
+        session_manager_available ? "is" : "isn't");
       
       actions = new Gee.LinkedList<Match> ();
       actions.add (new LogOutAction ());
@@ -163,53 +177,13 @@ namespace Sezen
     
     private DBus.Connection connection;
     
-    private bool check_name_owner ()
-    {
-      try
-      {
-        connection = DBus.Bus.get (DBus.BusType.SESSION);
-        var dbus_interface = (FreeDesktopDBus)
-          connection.get_object (FreeDesktopDBus.UNIQUE_NAME,
-                                 FreeDesktopDBus.OBJECT_PATH,
-                                 FreeDesktopDBus.INTERFACE_NAME);
-
-        dbus_interface.name_has_owner (GnomeSessionManager.INTERFACE_NAME, 
-                                       (obj, res) =>
-        {
-          try
-          {
-            session_manager_available = dbus_interface.name_has_owner.end (res);
-          }
-          catch (Error err)
-          {
-          }
-          debug ("we %s org.gnome.SessionManager", session_manager_available ? "got" : "don't have");
-          checks_done = true;
-        });
-      }
-      catch (DBus.Error err)
-      {
-        warning ("%s", err.message);
-      }
-
-      return false;
-    }
-    
     public override async ResultSet? search (Query q) throws SearchError
     {
-      // we only search for actions
+      if (!session_manager_available) return null;
+     // we only search for actions
       if (!(QueryFlags.ACTIONS in q.query_type)) return null;
 
       var result = new ResultSet ();
-      
-      while (!checks_done)
-      {
-        Timeout.add (100, search.callback);
-        yield;
-        q.check_cancellable ();
-      }
-
-      if (!session_manager_available) return null;
 
       var matchers = Query.get_matchers_for_query (q.query_string, 0,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
