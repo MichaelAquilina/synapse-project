@@ -41,11 +41,14 @@ namespace Synapse
     private UIInterface ui;
     private SettingsWindow sett;
     private DataSink data_sink;
+    private GtkHotkey.Info? hotkey;
+    
     public UILauncher ()
     {
       ui = null;
       data_sink = new DataSink ();
       sett = new SettingsWindow (data_sink);
+      sett.keybinding_changed.connect (this.change_keyboard_shortcut);
       
       bind_keyboard_shortcut ();
       
@@ -64,20 +67,20 @@ namespace Synapse
     private void bind_keyboard_shortcut ()
     {
       var registry = GtkHotkey.Registry.get_default ();
-      GtkHotkey.Info hotkey;
       try
       {
-        if (registry.has_hotkey ("sezen2", "activate"))
+        if (registry.has_hotkey ("synapse", "activate"))
         {
-          hotkey = registry.get_hotkey ("sezen2", "activate");
+          hotkey = registry.get_hotkey ("synapse", "activate");
         }
         else
         {
-          hotkey = new GtkHotkey.Info ("sezen2", "activate",
+          hotkey = new GtkHotkey.Info ("synapse", "activate",
                                        "<Control>space", null);
           registry.store_hotkey (hotkey);
         }
         debug ("Binding activation to %s", hotkey.signature);
+        sett.set_keybinding (hotkey.signature, false);
         hotkey.bind ();
         hotkey.activated.connect ((event_time) =>
         {
@@ -90,6 +93,45 @@ namespace Synapse
       {
         warning ("%s", err.message);
       }/* */
+    }
+    
+    private void change_keyboard_shortcut (string key)
+    {
+      var registry = GtkHotkey.Registry.get_default ();
+      try
+      {
+        if (hotkey.is_bound ()) hotkey.unbind ();
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
+      
+      try
+      {
+        if (registry.has_hotkey ("synapse", "activate"))
+        {
+          registry.delete_hotkey ("synapse", "activate");
+        }
+        
+        if (key != "")
+        {
+          hotkey = new GtkHotkey.Info ("synapse", "activate",
+                                       key, null);
+          registry.store_hotkey (hotkey);
+          hotkey.bind ();
+          hotkey.activated.connect ((event_time) =>
+          {
+            if (this.ui == null) return;
+            this.ui.show ();
+            this.ui.present_with_time (event_time);
+          });
+        }
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
     }
 
     public void run ()
