@@ -37,7 +37,6 @@ namespace Synapse
     protected NamedIcon action_icon = null;
     protected Label action_label = null;
     protected HSelectionContainer flag_selector = null;
-    protected MenuButton menubtn = null;
     protected HBox top_hbox = null;
     protected FakeInput fake_input = null;
     protected Label top_spacer = null;
@@ -45,7 +44,7 @@ namespace Synapse
     protected VBox container_top = null;
     protected ContainerOverlayed match_icon_container_overlayed = null;
     protected ResultBox result_box = null;
-    protected Synapse.Throbber throbber = null;
+    protected Synapse.MenuThrobber throbber = null;
 
     private const int UI_WIDTH = 600; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -152,12 +151,10 @@ namespace Synapse
         flag_selector.add (new Label(s));
       flag_selector.select (3);
       flag_selector.set_arrows_visible (true);
-      /* Throbber */
-      throbber = new Synapse.Throbber ();
-      throbber.set_size_request (20, -1);
-      /* Menu Button */
-      menubtn = new MenuButton ();
-      menubtn.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+      /* Throbber and menu */
+      throbber = new Synapse.MenuThrobber ();
+      throbber.set_size_request (22, 22);
+      throbber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       /* HBox for titles and action icon */
       var right_hbox = new HBox (false, 0);
       /* HBox for throbber and flag_selector */
@@ -165,7 +162,6 @@ namespace Synapse
       
       topright_hbox.pack_start (flag_selector);
       topright_hbox.pack_start (throbber, false);
-      topright_hbox.pack_start (menubtn, false, false);
 
       top_right_vbox.pack_start (top_spacer, true);
       top_right_vbox.pack_start (topright_hbox, false);
@@ -618,9 +614,9 @@ namespace Synapse
     protected override void set_throbber_visible (bool visible)
     {
       if (visible)
-        throbber.start ();
+        throbber.active = true;
       else
-        throbber.stop ();
+        throbber.active = false;
     }
     protected override void focus_match ( int index, Match? match )
     {

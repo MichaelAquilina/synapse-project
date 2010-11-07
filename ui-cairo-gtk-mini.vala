@@ -49,7 +49,7 @@ namespace Synapse
     protected ResultBox results_match = null;
     protected ResultBox results_action = null;
     
-    protected Synapse.Throbber throbber = null;
+    protected Synapse.MenuThrobber throbber = null;
 
     private const int UI_WIDTH = 620; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -148,7 +148,7 @@ namespace Synapse
             (action_icon, ContainerOverlayed.Position.BOTTOM_RIGHT);
       container_top.pack_start (match_icon_container_overlayed, false);
       
-      throbber = new Throbber ();
+      throbber = new MenuThrobber ();
       throbber.set_size_request (22, 22);
       {
         var vbox = new VBox (false, 0);
@@ -584,9 +584,9 @@ namespace Synapse
     protected override void set_throbber_visible (bool visible)
     {
       if (visible)
-        throbber.start ();
+        throbber.active = true;
       else
-        throbber.stop ();
+        throbber.active = false;
     }
     protected override void focus_match ( int index, Match? match )
     {
