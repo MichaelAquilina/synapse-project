@@ -152,7 +152,7 @@ namespace Synapse
                 description: "Open using default application",
                 icon_name: "fileopen", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 100);
+                default_relevancy: 80);
       }
 
       public override void execute_internal (Match? match)
