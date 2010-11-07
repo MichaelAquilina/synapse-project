@@ -131,14 +131,17 @@ namespace Synapse
       {
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
-                                                          RhythmboxPlayer.OBJECT_PATH);
-          if (player.get_playing ())
-            return;
+          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
+                                                      "/org/gnome/Rhythmbox/Player");
           player.play_pause (true);
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
+      }
+
+      public override bool action_available ()
+      {
+        return true;
       }
     }
     private class Pause: Play
@@ -151,18 +154,10 @@ namespace Synapse
                 match_type: MatchType.ACTION);
       }
 
-      public override void do_action ()
+      public override bool action_available ()
       {
-        try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
-                                                          RhythmboxPlayer.OBJECT_PATH);
-          if (!player.get_playing ())
-            return;
-          player.play_pause (true);
-        } catch (DBus.Error e) {
-          stderr.printf ("Rythmbox is not available.\n%s", e.message);
-        }
+        return DBusNameCache.get_default ().name_has_owner (
+          RhythmboxPlayer.UNIQUE_NAME);
       }
     }
     private class Next: RhythmboxControlMatch
