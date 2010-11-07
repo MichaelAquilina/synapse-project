@@ -69,12 +69,14 @@ namespace Synapse
     private QueryFlags qf;
     private string search[2];
     private Cancellable current_cancellable;
+    private bool partial_result_sent;
     
     private uint tid; //for timer
     
     construct
     {
       tid = 0;
+      partial_result_sent = false;
       current_cancellable = new Cancellable ();
       reset_search (false);
     }
@@ -166,6 +168,7 @@ namespace Synapse
         tid = 0;
       }
       current_cancellable.cancel ();
+      partial_result_sent = false;
       focus_index = {0, 0};
       focus = {null, null};
       results = {null, null};
@@ -219,9 +222,7 @@ namespace Synapse
         reset_search (true, false);
         return;
       }
-      /* we are making a new search => reset current focus */
-      focus[T.MATCH] = null;
-      focus_index[T.MATCH] = 0;
+      partial_result_sent = false;
 
       last_result_set = new ResultSet ();
       if (tid == 0)
@@ -237,6 +238,25 @@ namespace Synapse
     
     private void _send_partial_results (ResultSet rs)
     {
+      partial_result_sent = true;
+      /* Try to match the new string on current focus,
+       * if it matches, don't waste time on updating results
+       */
+      if (focus[T.MATCH] != null)
+      {
+        var matchers = Query.get_matchers_for_query (search[T.MATCH], 0,
+            RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
+        foreach (var matcher in matchers)
+        {
+          if (matcher.key.match (focus[T.MATCH].title))
+          {
+            focus_match (focus_index[T.MATCH], focus[T.MATCH]);
+            return;
+          }
+        }
+      }
+      /* String didn't match, get partial results */
+      focus_index[T.MATCH] = 0;
       results[T.MATCH] = rs.get_sorted_list ();
       if (results[T.MATCH].size > 0)
       {
@@ -261,6 +281,12 @@ namespace Synapse
         results[T.MATCH] = data_sink.search.end (res);
         /* Do not write code before this line */
 
+        if (!partial_result_sent)
+        {
+          /* reset current focus */
+          focus[T.MATCH] = null;
+          focus_index[T.MATCH] = 0;
+        }
         /* Search not cancelled and ready */
         set_throbber_visible (false);
         if (tid != 0)
