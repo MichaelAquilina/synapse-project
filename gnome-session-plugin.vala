@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   [DBus (name = "org.gnome.SessionManager")]
   public interface GnomeSessionManager: Object
@@ -145,6 +145,16 @@ namespace Sezen
           warning ("%s", err.message);
         }
       }
+    }
+
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (GnomeSessionPlugin),
+        "Gnome session plugin",
+        "Allows you to log out from your session, restart and shutdown your computer.",
+        "gnome-session-logout"
+      );
     }
 
     private bool session_manager_available = false;

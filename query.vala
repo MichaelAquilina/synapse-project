@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   [Flags]
   public enum QueryFlags

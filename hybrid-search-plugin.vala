@@ -24,7 +24,7 @@
  * used. 
  */
 
-namespace Sezen
+namespace Synapse
 {
   public class HybridSearchPlugin: DataPlugin
   {
@@ -181,6 +181,17 @@ namespace Sezen
       }
     }
 
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (HybridSearchPlugin),
+        "Hybrid search",
+        "Tries to improve results returned by Zeitgeist plugin by looking" +
+        "for similar files on the filesystem.",
+        "search"
+      );
+    }
+
     construct
     {
       directory_hits = new Gee.HashMap<string, int> ();
@@ -193,7 +204,7 @@ namespace Sezen
     {
       // FIXME: if zeitgeist-plugin available
       unowned DataPlugin? zg_plugin;
-      zg_plugin = data_sink.get_plugin ("SezenZeitgeistPlugin");
+      zg_plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin");
       return_if_fail (zg_plugin != null);
 
       zg_plugin.search_done.connect (this.zg_plugin_search_done);
@@ -265,7 +276,7 @@ namespace Sezen
           yield process_directories (directories);
 
           int z = 0;
-          foreach (var x in directory_contents)
+          foreach (var x in directory_contents.entries)
           {
             z += x.value.files.size;
           }
@@ -390,7 +401,7 @@ namespace Sezen
     }
 
     private async void update_directory_contents (GLib.File directory,
-                                                  DirectoryInfo di)
+                                                  DirectoryInfo di) throws Error
     {
       debug ("Scanning %s...", directory.get_path ());
       var enumerator = yield directory.enumerate_children_async (
@@ -471,7 +482,7 @@ namespace Sezen
         }
 
         // only add the uri if it matches our query
-        foreach (var entry in di.files)
+        foreach (var entry in di.files.entries)
         {
           foreach (var matcher in matchers)
           {

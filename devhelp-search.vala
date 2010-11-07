@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   public class DevhelpPlugin: ActionPlugin
   {
@@ -53,12 +53,22 @@ namespace Sezen
       
       public Search ()
       {
-        Object (title: "Search keyword",
+        Object (title: "Search in Devhelp",
                 description: "Search documentation for this symbol",
                 has_thumbnail: false, icon_name: "devhelp");
       }
     }
-    
+
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (DevhelpPlugin),
+        "Devhelp",
+        "Search documentation using Devhelp.",
+        "devhelp"
+      );
+    }
+
     private Search action;
     private bool has_devhelp;
 

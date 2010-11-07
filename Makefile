@@ -14,15 +14,20 @@ SRC_FILES = \
 	zeitgeist-plugin.vala \
 	rhythmbox-plugin.vala \
 	test-slow-plugin.vala \
+	abstract-tile-object.vala \
+	tile.vala \
+	tile-view.vala \
+	wrap-label.vala \
 	$(NULL)
 
+VALAC = valac
 VALA_FLAGS = --pkg zeitgeist-1.0 --pkg dbus-glib-1 --pkg gtk+-2.0 --pkg gio-unix-2.0 --pkg gee-1.0 --pkg gtkhotkey-1.0 --vapidir ./
 VAPIS = keysyms.vapi cancellable-fix.vapi
-OUTPUT = sezen2
+OUTPUT = synapse
 #VALA_FLAGS += -D TEST_PLUGINS
 
 $(OUTPUT): $(SRC_FILES) FORCE
-	valac $(VALA_FLAGS) $(VAPIS) -g -o $@ $(SRC_FILES)
+	$(VALAC) $(VALA_FLAGS) $(VAPIS) -g -o $@ $(SRC_FILES)
 
 .PHONY: all
 all: $(OUTPUT)

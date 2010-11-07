@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   public class DictionaryPlugin: ActionPlugin
   {
@@ -58,7 +58,17 @@ namespace Sezen
                 has_thumbnail: false, icon_name: "gnome-dictionary");
       }
     }
-    
+
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (DictionaryPlugin),
+        "Dictionary",
+        "Look up definitions of words.",
+        "gnome-dictionary"
+      );
+    }
+
     private Define action;
     private bool has_dictionary;
 

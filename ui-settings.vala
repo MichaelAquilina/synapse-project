@@ -24,17 +24,44 @@ using Gtk;
 using Cairo;
 using Gee;
 
-namespace Sezen
+namespace Synapse
 {
   public class SettingsWindow : Gtk.Window
   {
-    private struct Plugin
+    class PluginTileObject: UI.Widgets.AbstractTileObject
     {
-      string name;
-      string description;
-      bool enabled;
-      Type tclass;
+      public DataSink.PluginRegistry.PluginInfo pi { get; construct set; }
+      public PluginTileObject (DataSink.PluginRegistry.PluginInfo info)
+      {
+        GLib.Object (name: info.title,
+                     description: info.description,
+                     icon: info.icon_name,
+                     pi: info);
+      }
+
+      construct
+      {
+        sub_description_title = "Status"; // FIXME: i18n
+
+        add_button_tooltip = "Enable this plugin"; // FIXME: i18n
+        remove_button_tooltip = "Disable this plugin"; // FIXME: i18n
+      }
+
+      public void update_state (bool enabled)
+      {
+        this.enabled = enabled;
+
+        if (!enabled)
+        {
+          sub_description_text = "Disabled"; // i18n!
+        }
+        else
+        {
+          sub_description_text = "Enabled"; // i18n!
+        }
+      }
     }
+    
     private struct Theme
     {
       string name;
@@ -42,83 +69,26 @@ namespace Sezen
       Type tclass;
     }
 
-    string selected_theme;
-    Gee.Map<string, Theme?> themes;
-    Gee.Map<string, Plugin?> plugins;
-    bool autostart;
+    private string selected_theme;
+    private Gee.Map<string, Theme?> themes;
+    private bool autostart;
+    private unowned DataSink data_sink;
+    private Gtk.ListStore model;
 
-    public SettingsWindow ()
+    public SettingsWindow (DataSink data_sink)
     {
-      this.title = "Sezen 2 - Settings"; //TODO: i18n
+      this.title = "Synapse - Settings"; //TODO: i18n
+      this.data_sink = data_sink;
       this.set_position (WindowPosition.CENTER);
       this.set_size_request (500, 450);
       this.resizable = false;
       this.delete_event.connect (this.hide_on_delete);
       init_settings ();
       build_ui ();
+      
+      this.tile_view.map.connect (this.init_plugin_tiles);
     }
 
-    private void init_plugins ()
-    {
-      plugins = new Gee.HashMap<string, Plugin?>();
-      plugins.set ("DesktopFilePlugin",
-                   Plugin(){
-                     name = "Desktop File", //i18n
-                     description = "", //i18n
-                     tclass = typeof (DesktopFilePlugin),
-                     enabled = true
-                   });
-      plugins.set ("ZeitgeistPlugin",
-                   Plugin(){
-                     name = "Zeitgeist", //i18n
-                     description = "", //i18n
-                     tclass = typeof (ZeitgeistPlugin),
-                     enabled = true
-                   });
-      plugins.set ("HybridSearchPlugin",
-                   Plugin(){
-                     name = "Hybrid Search", //i18n
-                     description = "", //i18n
-                     tclass = typeof (HybridSearchPlugin),
-                     enabled = true
-                   });
-      plugins.set ("GnomeSessionPlugin",
-                   Plugin(){
-                     name = "Gnome Session", //i18n
-                     description = "", //i18n
-                     tclass = typeof (GnomeSessionPlugin),
-                     enabled = true
-                   });
-      plugins.set ("UPowerPlugin",
-                   Plugin(){
-                     name = "Power Management", //i18n
-                     description = "", //i18n
-                     tclass = typeof (UPowerPlugin),
-                     enabled = true
-                   });
-      plugins.set ("TestSlowPlugin",
-                   Plugin(){
-                     name = "Test Slow Search", //i18n
-                     description = "", //i18n
-                     tclass = typeof (TestSlowPlugin),
-                     enabled = false
-                   });
-      plugins.set ("CommonActions",
-                   Plugin(){
-                     name = "Common Actions", //i18n
-                     description = "", //i18n
-                     tclass = typeof (CommonActions),
-                     enabled = true
-                   });
-      plugins.set ("DictionaryPlugin",
-                   Plugin(){
-                     name = "Dictionary Plugin", //i18n
-                     description = "", //i18n
-                     tclass = typeof (DictionaryPlugin),
-                     enabled = true
-                   });
-      // TODO: read from gconf if enabled or not
-    }
     private void init_themes ()
     {
       themes = new Gee.HashMap<string, Theme?>();
@@ -126,13 +96,13 @@ namespace Sezen
                    Theme(){
                      name = "Default", //i18n
                      description = "", //i18n
-                     tclass = typeof (SezenWindow)
+                     tclass = typeof (SynapseWindow)
                    });
       themes.set ("Mini",
                    Theme(){
                      name = "Mini", //i18n
                      description = "", //i18n
-                     tclass = typeof (SezenWindowMini)
+                     tclass = typeof (SynapseWindowMini)
                    });
 
       // TODO: read from gconf the selected one
@@ -143,6 +113,35 @@ namespace Sezen
 #endif
     }
     
+    private void init_plugin_tiles ()
+    {
+      tile_view.clear ();
+      var arr = new Gee.ArrayList<DataSink.PluginRegistry.PluginInfo> ();
+      arr.add_all (DataSink.PluginRegistry.get_default ().get_plugins ());
+      arr.sort ((a, b) => 
+      {
+        unowned DataSink.PluginRegistry.PluginInfo p1 =
+          (DataSink.PluginRegistry.PluginInfo) a;
+        unowned DataSink.PluginRegistry.PluginInfo p2 =
+          (DataSink.PluginRegistry.PluginInfo) b;
+        return strcmp (p1.title, p2.title);
+      });
+      
+      foreach (var pi in arr)
+      {
+        var tile = new PluginTileObject (pi);
+        tile_view.append_tile (tile);
+        tile.update_state (data_sink.is_plugin_enabled (pi.plugin_type));
+        
+        tile.active_changed.connect ((tile_obj) =>
+        {
+          PluginTileObject pto = tile_obj as PluginTileObject;
+          pto.update_state (!tile_obj.enabled);
+          data_sink.set_plugin_enabled (pto.pi.plugin_type, tile_obj.enabled);
+        });
+      }
+    }
+    
     private void init_general_options ()
     {
       autostart = false;
@@ -151,8 +150,30 @@ namespace Sezen
     private void init_settings ()
     {
       init_themes ();
-      init_plugins ();
       init_general_options ();
+    }
+    
+    private UI.Widgets.TileView tile_view;
+
+    private static string? get_name_from_key (uint keyval, Gdk.ModifierType mods)
+    {
+      unowned string keyname = Gdk.keyval_name (Gdk.keyval_to_lower (keyval));
+      if (keyname == null) return null;
+      
+      string res = "";
+      if (Gdk.ModifierType.SHIFT_MASK in mods) res += "<Shift>";
+      if (Gdk.ModifierType.CONTROL_MASK in mods) res += "<Control>";
+      if (Gdk.ModifierType.MOD1_MASK in mods) res += "<Alt>";
+      if (Gdk.ModifierType.MOD2_MASK in mods) res += "<Mod2>";
+      if (Gdk.ModifierType.MOD3_MASK in mods) res += "<Mod3>";
+      if (Gdk.ModifierType.MOD4_MASK in mods) res += "<Mod4>";
+      if (Gdk.ModifierType.MOD5_MASK in mods) res += "<Mod5>";
+      if (Gdk.ModifierType.META_MASK in mods) res += "<Meta>";
+      if (Gdk.ModifierType.SUPER_MASK in mods) res += "<Super>";
+      if (Gdk.ModifierType.HYPER_MASK in mods) res += "<Hyper>";
+
+      res += keyname;
+      return res;
     }
 
     private void build_ui ()
@@ -166,16 +187,74 @@ namespace Sezen
       tabs.append_page (general_tab, new Label ("General"));
       tabs.append_page (plugin_tab, new Label ("Plugins"));
       
-      HBox row;
-
       /* General Tab */
+      HBox row;
       row = new HBox (false, 5);
 
       row.pack_start (new Label ("Select Theme:"), false, false);
       row.pack_start (build_theme_combo (), false, false);
       general_tab.pack_start (row, false, false);
-            
+
+      // keybinding treeview
+      Gtk.TreeView treeview = new Gtk.TreeView ();
+      general_tab.pack_start (treeview, false, false, 0);
+      model = new Gtk.ListStore (2, typeof (string), typeof (string));
+      treeview.set_model (model);
+
+      Gtk.CellRenderer ren;
+      Gtk.TreeViewColumn col;
+      ren = new CellRendererText ();
+      col = new TreeViewColumn.with_attributes ("Action", ren, "text", 0); // FIXME: i18n
+      treeview.append_column (col);
+
+      ren = new CellRendererAccel ();
+      (ren as CellRendererAccel).editable = true;
+      (ren as CellRendererAccel).accel_mode = Gtk.CellRendererAccelMode.OTHER;
+      (ren as CellRendererAccel).accel_edited.connect (
+        (a, path, accel_key, accel_mods, keycode) =>
+      {
+        string? keyname = get_name_from_key (accel_key, accel_mods);
+        this.set_keybinding (keyname ?? "");
+      });
+      (ren as CellRendererAccel).accel_cleared.connect (
+        (a, path) =>
+      {
+        this.set_keybinding ("");
+      });
+      col = new TreeViewColumn.with_attributes ("Shortcut", ren, "text",1);
+      treeview.append_column (col);
+
+      // add the actual item
+      Gtk.TreeIter iter;
+      model.append (out iter);
+      model.set (iter, 0, "Activate");
+
+      /* Plugin Tab */
+      var scroll = new Gtk.ScrolledWindow (null, null);
+      scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+      tile_view = new UI.Widgets.TileView ();
+      tile_view.show_all ();
+      scroll.add_with_viewport (tile_view);
+      scroll.show ();
+
+      plugin_tab.pack_start (scroll);
+
       tabs.show_all ();
+    }
+    
+    public signal void keybinding_changed (string keybinding);
+    
+    public void set_keybinding (string key, bool emit = true)
+    {
+      if (model != null)
+      {
+        Gtk.TreeIter iter;
+        if (model.get_iter_first (out iter))
+        {
+          model.set (iter, 1, key != "" ? key : "Disabled");
+        }
+      }
+      if (emit) keybinding_changed (key);
     }
 
     private ComboBox build_theme_combo ()
@@ -191,7 +270,7 @@ namespace Sezen
       cb_themes.set_attributes (ctxt, "text", 1);
       /* Pack data into the model and select current theme */
       TreeIter iter;
-      foreach (Gee.Map.Entry<string,Theme?> e in themes)
+      foreach (Gee.Map.Entry<string,Theme?> e in themes.entries)
       {
         theme_list.append (out iter);
         theme_list.set (iter, 0, e.key, 1, e.value.name);

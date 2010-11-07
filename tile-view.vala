@@ -1,0 +1,247 @@
+using Gtk;
+
+namespace UI.Widgets
+{
+  public class TileView: EventBox
+  {
+    private List<Tile> tiles = new List<Tile> ();
+    private VBox box = new VBox (false, 0);
+
+    public int icon_size { get; construct set; default = 48; }
+
+    protected int selected_index = -1;
+
+    public TileView ()
+    {
+      GLib.Object (can_focus: true, visible_window: false);
+
+      this.button_press_event.connect (this.on_button_press);
+      this.key_press_event.connect (this.on_key_press);
+      box.show ();
+      this.add (box);
+    }
+
+    public virtual void append_tile (AbstractTileObject tile_obj)
+    {
+      Tile tile = new Tile (tile_obj, this.icon_size);
+      tile.owner = this;
+      tile.active_changed.connect (this.on_tile_active_changed);
+      tile.size_allocate.connect (this.on_tile_size_allocated);
+      tile.show ();
+
+      tiles.append (tile);
+
+      box.pack_start (tile, false, false, 0);
+    }
+
+    public virtual void remove_tile (AbstractTileObject tile_obj)
+    {
+      unowned Tile tile = null;
+      foreach (unowned Tile t in tiles)
+      {
+        if (t.owned_object == tile_obj)
+        {
+          tile = t;
+          break;
+        }
+      }
+
+      if (tile == null)
+      {
+        warning ("Container does not own this AbstractTileObject!");
+        return;
+      }
+
+      if (selected_index == tiles.index (tile))
+      {
+        clear_selection ();
+      }
+
+      tile.hide ();
+      tile.active_changed.disconnect (this.on_tile_active_changed);
+      tile.size_allocate.disconnect (this.on_tile_size_allocated);
+      tile.owner = null;
+
+      box.remove (tile);
+      tiles.remove (tile);
+    }
+
+    public List<unowned AbstractTileObject> get_tiles ()
+    {
+      var result = new List<unowned AbstractTileObject> ();
+
+      foreach (unowned Tile t in tiles)
+      {
+        result.prepend (t.owned_object);
+      }
+      result.reverse ();
+
+      return result;
+    }
+
+    public void clear ()
+    {
+      var tiles_copy = this.get_tiles ();
+      foreach (unowned AbstractTileObject to in tiles_copy)
+      {
+        this.remove_tile (to);
+      }
+    }
+
+    public virtual void clear_selection ()
+    {
+      if (0 <= selected_index < tiles.length ())
+      {
+        tiles.nth_data (selected_index).set_selected (false);
+      }
+
+      selected_index = -1;
+    }
+
+    public virtual AbstractTileObject? get_current_tile ()
+    {
+      if (0 <= selected_index < tiles.length ())
+      {
+        return tiles.nth_data (selected_index).owned_object;
+      }
+
+      return null;
+    }
+
+    private bool changing_style = false;
+
+    protected override void style_set (Gtk.Style? prev_style)
+    {
+      if (changing_style) return;
+
+      changing_style = true;
+      base.style_set (prev_style);
+      parent.modify_bg (StateType.NORMAL, style.@base[StateType.NORMAL]);
+      changing_style = false;
+    }
+
+    public virtual void on_tile_active_changed (Tile tile)
+    {
+      tile.owned_object.active_changed ();
+
+      foreach (unowned Tile t in tiles)
+      {
+        t.update_state ();
+      }
+    }
+
+    public virtual void on_tile_size_allocated (Gtk.Widget w, Gdk.Rectangle alloc)
+    {
+      Tile tile = w as Tile;
+      ScrolledWindow? scroll = null;
+
+      scroll = this.get_parent () == null ? 
+        null : this.get_parent ().get_parent () as ScrolledWindow;
+      if (scroll == null)
+      {
+        return;
+      }
+
+      if (tiles.index (tile) != selected_index)
+      {
+        return;
+      }
+
+      var va = Gdk.Rectangle ();
+      va.x = 0;
+      va.y = (int) scroll.get_vadjustment ().get_value ();
+      va.width = alloc.width;
+      va.height = this.get_parent ().allocation.height;
+
+      var va_region = Gdk.Region.rectangle (va);
+      Gdk.Rectangle* rect_ptr = (Gdk.Rectangle*) (&alloc);
+
+      if (va_region.rect_in (*rect_ptr) == Gdk.OverlapType.OUT)
+      {
+        double delta = 0.0;
+        if (alloc.y + alloc.height > va.y + va.height)
+        {
+          delta = alloc.y + alloc.height - (va.y + va.height);
+        }
+        else if (alloc.y < va.y)
+        {
+          delta = alloc.y - va.y;
+        }
+
+        scroll.get_vadjustment ().set_value (va.y + delta);
+        this.queue_draw ();
+      }
+    }
+
+    protected bool on_button_press (Gdk.EventButton event)
+    {
+      this.has_focus = true;
+
+      clear_selection ();
+
+      for (int i=0; i<tiles.length (); i++)
+      {
+        unowned Tile t = tiles.nth_data (i);
+        Gdk.Rectangle *rect_ptr = (Gdk.Rectangle*) (&t.allocation);
+        var region = Gdk.Region.rectangle (*rect_ptr);
+        if (region.point_in ((int) event.x, (int) event.y))
+        {
+          this.select (i);
+          break;
+        }
+      }
+
+      this.queue_draw ();
+
+      return false;
+    }
+
+    protected bool on_key_press (Gdk.EventKey event)
+    {
+      int index = selected_index;
+
+      switch (event.keyval)
+      {
+        case 0xff52: // GDK_Up
+        case 0x8fc: // GDK_uparrow
+          index--;
+          break;
+        case 0xff54: // GDK_Down
+        case 0x8fe: // GDK_downarrow
+          index++;
+          break;
+      }
+
+      index = index.clamp (0, (int) tiles.length () - 1);
+
+      if (index != selected_index)
+      {
+        clear_selection ();
+        this.select (index);
+        return true;
+      }
+
+      return false;
+    }
+
+    public void select (int index)
+    {
+      if (0 <= index < tiles.length ())
+      {
+        selected_index = index;
+        tiles.nth_data (index).set_selected (true);
+      }
+      else
+      {
+        clear_selection ();
+      }
+
+      if (this.get_parent () != null && this.get_parent ().is_realized ())
+      {
+        this.get_parent ().queue_draw ();
+      }
+
+      this.queue_resize ();
+    }
+  }
+}

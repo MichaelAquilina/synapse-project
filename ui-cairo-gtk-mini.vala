@@ -24,9 +24,9 @@ using Gtk;
 using Cairo;
 using Gee;
 
-namespace Sezen
+namespace Synapse
 {
-  public class SezenWindowMini : UIInterface
+  public class SynapseWindowMini : UIInterface
   {
     Window window;
     bool searching_for_matches = true;
@@ -49,7 +49,7 @@ namespace Sezen
     protected ResultBox results_match = null;
     protected ResultBox results_action = null;
     
-    protected Sezen.Throbber throbber = null;
+    protected Synapse.Throbber throbber = null;
 
     private const int UI_WIDTH = 620; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -101,7 +101,7 @@ namespace Sezen
       window.key_press_event.connect (key_press_event);
     }
 
-    ~SezenWindowMini ()
+    ~SynapseWindowMini ()
     {
       window.destroy ();
     }
@@ -253,12 +253,12 @@ namespace Sezen
       {
         double ly = y + h - border_radius;
         double lh = results_container.allocation.y - ly + results_container.allocation.height;
-        Utils.gdk_color_to_rgb (style.base[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.base[Gtk.StateType.NORMAL], out r, out g, out b);
         ctx.rectangle (x, ly, w, lh);
         ctx.set_source_rgba (r, g, b, 1);
         ctx.fill ();
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         if (comp)
         {
           //draw shadow
@@ -269,14 +269,14 @@ namespace Sezen
       if (comp)
       {
         //draw shadow
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
                                           r, g, b, 0.9, SHADOW_SIZE);
       }
       ctx.set_operator (Operator.OVER);
       Pattern pat = new Pattern.linear(0, y, 0, y + h);
-      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
       pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                   double.min(g + 0.15, 1),
                                   double.min(b + 0.15, 1),

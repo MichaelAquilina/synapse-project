@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   public class ZeitgeistPlugin: DataPlugin
   {
@@ -95,6 +95,16 @@ namespace Sezen
           this.file_type = QueryFlags.UNCATEGORIZED;
         }
       }
+    }
+
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (ZeitgeistPlugin),
+        "Zeitgeist",
+        "Search various items logged by Zeitgeist.",
+        "zeitgeist"
+      );
     }
 
     private Zeitgeist.Index zg_index;

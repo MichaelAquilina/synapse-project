@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   public class ResultSet : Object, Gee.Iterable <Gee.Map.Entry <Match, int>>
   {
@@ -111,15 +111,16 @@ namespace Sezen
     }
   }
 
-  errordomain SearchError
+  public errordomain SearchError
   {
     SEARCH_CANCELLED,
     UNKNOWN_ERROR
   }
-
+  
   public abstract class DataPlugin : Object
   {
     public unowned DataSink data_sink { get; construct; }
+    public bool enabled { get; set; default = true; }
 
     public abstract async ResultSet? search (Query query) throws SearchError;
 
@@ -143,6 +144,58 @@ namespace Sezen
 
   public class DataSink : Object
   {
+    public class PluginRegistry : Object
+    {
+      public class PluginInfo
+      {
+        public Type plugin_type;
+        public string title;
+        public string description;
+        public string icon_name;
+        public PluginInfo (Type type, string title, string desc, string icon_name)
+        {
+          this.plugin_type = type;
+          this.title = title;
+          this.description = desc;
+          this.icon_name = icon_name;
+        }
+      }
+
+      public static unowned PluginRegistry instance = null;
+
+      private Gee.List<PluginInfo> plugins;
+      
+      construct
+      {
+        instance = this;
+        plugins = new Gee.ArrayList<PluginInfo> ();
+      }
+      
+      ~PluginRegistry ()
+      {
+        instance = null;
+      }
+      
+      public static PluginRegistry get_default ()
+      {
+        return instance ?? new PluginRegistry ();
+      }
+      
+      public void register_plugin (Type plugin_type,
+                                   string title,
+                                   string description,
+                                   string icon_name)
+      {
+        var p = new PluginInfo (plugin_type, title, description, icon_name);
+        plugins.add (p);
+      }
+      
+      public Gee.List<PluginInfo> get_plugins ()
+      {
+        return plugins.read_only_view;
+      }
+    }
+    
     public DataSink ()
     {
     }
@@ -158,6 +211,7 @@ namespace Sezen
     // data sink will keep reference to the name cache, so others will get this
     // instance on call to get_default()
     private DBusNameCache dbus_name_cache;
+    private PluginRegistry registry;
 
     construct
     {
@@ -165,6 +219,8 @@ namespace Sezen
       actions = new Gee.HashSet<ActionPlugin> ();
       query_id = 0;
 
+      // oh well, yea we need a few singletons
+      registry = PluginRegistry.get_default ();
       dbus_name_cache = DBusNameCache.get_default ();
       dbus_name_cache.initialization_done.connect (load_plugins);
     }
@@ -190,6 +246,7 @@ namespace Sezen
     
     private DataPlugin? create_plugin (Type t)
     {
+      //t.class_ref ();
       return Object.new (t, "data-sink", this, null) as DataPlugin;
     }
 
@@ -229,6 +286,44 @@ namespace Sezen
       
       return result;
     }
+    
+    public bool is_plugin_enabled (Type plugin_type)
+    {
+      foreach (var plugin in plugins)
+      {
+        if (plugin.get_type () == plugin_type) return plugin.enabled;
+      }
+      
+      foreach (var action in actions)
+      {
+        if (action.get_type () == plugin_type) return action.enabled;
+      }
+      
+      return false;
+    }
+    
+    public void set_plugin_enabled (Type plugin_type, bool enabled)
+    {
+      foreach (var plugin in plugins)
+      {
+        if (plugin.get_type () == plugin_type)
+        {
+          plugin.enabled = enabled;
+          return;
+        }
+      }
+
+      foreach (var action in actions)
+      {
+        if (action.get_type () == plugin_type)
+        {
+          action.enabled = enabled;
+          return;
+        }
+      }
+
+      warn_if_reached ();
+    }
 
     public async Gee.List<Match> search (string query,
                                          QueryFlags flags,
@@ -253,6 +348,11 @@ namespace Sezen
 
       foreach (var data_plugin in plugins)
       {
+        if (!data_plugin.enabled)
+        {
+          search_size--;
+          continue;
+        }
         // we need to pass separate cancellable to each plugin, because we're
         // running them in parallel
         var c = new Cancellable ();
@@ -313,6 +413,7 @@ namespace Sezen
       var q = Query (0, query ?? "");
       foreach (var action_plugin in actions)
       {
+        if (!action_plugin.enabled) continue;
         rs.add_all (action_plugin.find_for_match (q, match));
       }
       

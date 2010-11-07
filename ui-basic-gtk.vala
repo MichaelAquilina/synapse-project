@@ -21,11 +21,11 @@
 
 using Gtk;
 
-namespace Sezen
+namespace Synapse
 {
-  public class SezenWindow: Window
+  public class SynapseWindow: Window
   {
-    public SezenWindow ()
+    public SynapseWindow ()
     {
       GLib.Object (border_width: 4);
 
@@ -295,7 +295,7 @@ namespace Sezen
     public static int main (string[] argv)
     {
       Gtk.init (ref argv);
-      var window = new SezenWindow ();
+      var window = new SynapseWindow ();
       window.show_all ();
 
       var registry = GtkHotkey.Registry.get_default ();

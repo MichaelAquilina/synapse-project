@@ -26,7 +26,7 @@ using Gee;
 
 public static extern void gtk_style_get_style_property (Style style, Type widget_type, string property_name, out Value val);
 
-namespace Sezen
+namespace Synapse
 {
   /* Result List stuff */
   public class ResultBox: EventBox
@@ -70,7 +70,7 @@ namespace Sezen
         Gtk.Style style = w.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
         Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
         pat.add_color_stop_rgba (1.0 - 15.0 / w.allocation.height, double.min(r + 0.15, 1),
                                     double.min(g + 0.15, 1),
                                     double.min(b + 0.15, 1),
@@ -109,7 +109,7 @@ namespace Sezen
       status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
       var logo = new Label (null);
       logo.set_alignment (1, 0);
-      logo.set_markup (Markup.printf_escaped ("<i>Sezen 2 </i>"));
+      logo.set_markup (Markup.printf_escaped ("<i>Synapse</i>"));
       status_box.pack_start (status, false, false, 10);
       status_box.pack_start (new Label (null), true, false);
       status_box.pack_start (logo, false, false, 10);
@@ -172,7 +172,7 @@ namespace Sezen
       this.queue_draw ();
     }
 
-    public void update_matches (Gee.List<Sezen.Match>? rs)
+    public void update_matches (Gee.List<Synapse.Match>? rs)
     {
       results.clear();
       if (rs==null || rs.size == 0)
@@ -665,68 +665,18 @@ namespace Sezen
       }
     }
   }
-  public class Throbber: Label
+  public class Throbber: Spinner
   {
-    private int step;
-    private bool animate;
-    private const int TIMEOUT = 1000 / 30;
-    private const int MAX_STEP = 30;
     construct
     {
-      step = 0;
-      animate = false;
-    }
-    
-    public bool is_animating ()
-    {
-      return animate;
+      this.notify["active"].connect (this.queue_draw);
     }
 
-    public void start ()
-    {
-      if (animate)
-        return;
-      animate = true;
-      Timeout.add (TIMEOUT, () => {
-        step = (step + 1) % MAX_STEP;
-        this.queue_draw ();
-        return animate;
-      } );
-    }
-    
-    public void stop ()
-    {
-      if (!animate)
-        return;
-      animate = false;
-    }
     public override bool expose_event (Gdk.EventExpose event)
     {
-      if (animate)
+      if (this.active)
       {
-        var ctx = Gdk.cairo_create (this.window);
-        ctx.translate (0.5, 0.5);
-        ctx.set_operator (Cairo.Operator.OVER);
-        Gtk.Style style = this.get_style();
-        double r = 0.0, g = 0.0, b = 0.0;
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
-        double xc = this.allocation.x + this.allocation.width / 2;
-        double yc = this.allocation.y + this.allocation.height / 2;
-        double rad = int.min (this.allocation.width, this.allocation.height) / 2 - 0.5;
-        var pat = new Cairo.Pattern.radial (xc, yc, 0, xc, yc, rad);
-        pat.add_color_stop_rgba (0.5, r, g, b, 0);
-        pat.add_color_stop_rgba (0.7, r, g, b, 1.0);
-        Utils.rgb_invert_color (out r, out g, out b);
-        pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
-        double gamma = Math.PI * 2.0 * step / MAX_STEP;
-        ctx.new_path ();
-        ctx.arc (xc, yc, rad, gamma, gamma + Math.PI * 2 / 3);
-        ctx.line_to (xc, yc);
-        ctx.close_path ();
-        ctx.clip ();
-        ctx.set_source (pat);
-        ctx.paint ();
-        base.expose_event (event);
+        return base.expose_event (event);
       }
       return true;
     }
@@ -850,19 +800,19 @@ namespace Sezen
         ctx.set_line_width (1.25);
         Gtk.Style style = this.get_style();
         double r = 0.0, g = 0.0, b = 0.0;
-        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
         double x = this.allocation.x + this.left_padding,
                y = this.allocation.y + this.top_padding,
                w = this.allocation.width - this.left_padding - this.right_padding - 3.0,
                h = this.allocation.height - this.top_padding - this.bottom_padding - 3.0;
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         ctx.set_source_rgba (r, g, b, 1.0);
         Cairo.Path path = ctx.copy_path ();
         ctx.save ();
         ctx.clip ();
         ctx.paint ();
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         var pat = new Cairo.Pattern.linear (0, y, 0, y + shadow_height);
         pat.add_color_stop_rgba (0, r, g, b, 0.6);
         pat.add_color_stop_rgba (0.3, r, g, b, 0.25);
@@ -906,7 +856,7 @@ namespace Sezen
           }
           ctx.close_path ();
           ctx.clip ();
-          Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], &r, &g, &b);
+          Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], out r, out g, out b);
           pat = new Cairo.Pattern.linear (0, y2, 0, y1);
           pat.add_color_stop_rgba (0, r, g, b, 1.0);
           pat.add_color_stop_rgba (1, r, g, b, 0.0);
@@ -915,7 +865,7 @@ namespace Sezen
         }
         ctx.restore ();
         ctx.append_path (path);
-        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], &r, &g, &b);
+        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
         ctx.set_source_rgba (r, g, b, 0.6);
         ctx.stroke ();
       }
@@ -966,7 +916,7 @@ namespace Sezen
       
       Gtk.Style style = this.get_style();
       double r = 0.0, g = 0.0, b = 0.0;
-      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.INSENSITIVE], &r, &g, &b);
+      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.INSENSITIVE], out r, out g, out b);
       ctx.set_source_rgba (r, g, b, 1.0);
       
       ctx.new_path ();
@@ -1090,7 +1040,11 @@ namespace Sezen
       bool changed = false;
       var context = this.get_layout ();
       var attrs = context.get_attributes ();
+#if VALA_0_12
+      Pango.AttrIterator iter = attrs.get_iterator ();
+#else
       unowned Pango.AttrIterator iter = attrs.get_iterator (); // FIXME: leaks
+#endif
       do
       {
         unowned Pango.Attribute? attr = iter.get (Pango.AttrType.SCALE);

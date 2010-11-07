@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   namespace Utils
   {
@@ -151,14 +151,14 @@ namespace Sezen
       widget.composited_changed.connect (on_composited_change);
     }
 
-    public static void gdk_color_to_rgb (Gdk.Color col, double *r, double *g, double *b)
+    public static void gdk_color_to_rgb (Gdk.Color col, out double r, out double g, out double b)
     {
-      *r = col.red / (double)65535;
-      *g = col.green / (double)65535;
-      *b = col.blue / (double)65535;
+      r = col.red / (double)65535;
+      g = col.green / (double)65535;
+      b = col.blue / (double)65535;
     }
 
-    public static void rgb_invert_color (out double r, out double g, out double b)
+    public static void rgb_invert_color (ref double r, ref double g, ref double b)
     {
       if (r >= 0.5) r /= 4; else r = 1 - r / 4;
       if (g >= 0.5) g /= 4; else g = 1 - g / 4;

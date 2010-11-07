@@ -24,9 +24,9 @@ using Gtk;
 using Cairo;
 using Gee;
 
-namespace Sezen
+namespace Synapse
 {
-  public class SezenWindow : UIInterface
+  public class SynapseWindow : UIInterface
   {
     Window window;
     /* Main UI shared components */
@@ -45,7 +45,7 @@ namespace Sezen
     protected VBox container_top = null;
     protected ContainerOverlayed match_icon_container_overlayed = null;
     protected ResultBox result_box = null;
-    protected Sezen.Throbber throbber = null;
+    protected Synapse.Throbber throbber = null;
 
     private const int UI_WIDTH = 600; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -94,7 +94,7 @@ namespace Sezen
       window.key_press_event.connect (key_press_event);
     }
 
-    ~SezenWindow ()
+    ~SynapseWindow ()
     {
       window.destroy ();
     }
@@ -153,7 +153,7 @@ namespace Sezen
       flag_selector.select (3);
       flag_selector.set_arrows_visible (true);
       /* Throbber */
-      throbber = new Sezen.Throbber ();
+      throbber = new Synapse.Throbber ();
       throbber.set_size_request (20, -1);
       /* Menu Button */
       menubtn = new MenuButton ();
@@ -290,8 +290,8 @@ namespace Sezen
         y += spacing;
         h -= spacing;
         //draw shadow
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
                                           r, g, b, 0.9, SHADOW_SIZE);
         // border
@@ -317,7 +317,7 @@ namespace Sezen
         }
       }
       Pattern pat = new Pattern.linear(0, y, 0, y+h);
-      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], &r, &g, &b);
+      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
       pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
                                   double.min(g + 0.15, 1),
                                   double.min(b + 0.15, 1),
@@ -334,7 +334,7 @@ namespace Sezen
       ctx.set_operator (Operator.OVER);
       if (!comp)
       {
-        Utils.rgb_invert_color (out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
         _cairo_path_for_main (ctx, comp, x, y, w, h);
         ctx.set_source_rgba (r, g, b, 1.0);
         ctx.set_line_width (3.5);
@@ -632,7 +632,7 @@ namespace Sezen
         {
           match_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), size));
           match_label_description.set_markup (
-            get_description_markup (throbber.is_animating ()? "Searching..." : "Match not found.")
+            get_description_markup (throbber.active ? "Searching..." : "Match not found.")
           );
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();

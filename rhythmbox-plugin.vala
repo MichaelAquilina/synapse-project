@@ -19,7 +19,7 @@
  *
  */
 
-namespace Sezen
+namespace Synapse
 {
   [DBus (name = "org.gnome.Rhythmbox.Shell")]
   interface RhythmboxShell : Object {
@@ -41,6 +41,16 @@ namespace Sezen
   }
   public class RhythmboxActions: ActionPlugin
   {
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (RhythmboxActions),
+        "Rhythmbox",
+        "Allows you to control Rhythmbox and add items to playlist.",
+        "rhythmbox"
+      );
+    }
+
     private abstract class RhythmboxAction: Object, Match
     {
       // from Match interface

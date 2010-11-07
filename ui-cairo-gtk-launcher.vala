@@ -22,55 +22,69 @@
 
 using Gtk;
 
-namespace Sezen
+namespace Synapse
 {
   public class UILauncher
   {
+    private static bool is_startup = false;
+    const OptionEntry[] options =
+    {
+      {
+        "startup", 's', 0, OptionArg.NONE,
+        out is_startup, "Startup mode (don't show the UI immediately)", ""
+      },
+      {
+        null
+      }
+    };
+    
     private UIInterface ui;
-    private SettingsWindow sett;
+    private SettingsWindow settings;
     private DataSink data_sink;
+    private GtkHotkey.Info? hotkey;
+    
     public UILauncher ()
     {
       ui = null;
       data_sink = new DataSink ();
-      sett = new SettingsWindow ();
+      settings = new SettingsWindow (data_sink);
+      settings.keybinding_changed.connect (this.change_keyboard_shortcut);
       
       bind_keyboard_shortcut ();
       
-      init_ui (sett.get_current_theme ());
+      init_ui (settings.get_current_theme ());
+      if (!is_startup) ui.show ();
       
-      sett.theme_selected.connect (init_ui);
+      settings.theme_selected.connect (init_ui);
     }
     private void init_ui (Type t)
     {
       ui = GLib.Object.new (t, "data-sink", data_sink) as UIInterface;
       ui.show_settings_clicked.connect (()=>{
-        sett.show_all ();
+        settings.show ();
       });
-      ui.show ();
     }
     private void bind_keyboard_shortcut ()
     {
       var registry = GtkHotkey.Registry.get_default ();
-      GtkHotkey.Info hotkey;
       try
       {
-        if (registry.has_hotkey ("sezen2", "activate"))
+        if (registry.has_hotkey ("synapse", "activate"))
         {
-          hotkey = registry.get_hotkey ("sezen2", "activate");
+          hotkey = registry.get_hotkey ("synapse", "activate");
         }
         else
         {
-          hotkey = new GtkHotkey.Info ("sezen2", "activate",
+          hotkey = new GtkHotkey.Info ("synapse", "activate",
                                        "<Control>space", null);
           registry.store_hotkey (hotkey);
         }
         debug ("Binding activation to %s", hotkey.signature);
+        settings.set_keybinding (hotkey.signature, false);
         hotkey.bind ();
         hotkey.activated.connect ((event_time) =>
         {
-          if (this.ui == null)
-            return;
+          if (this.ui == null) return;
           this.ui.show ();
           this.ui.present_with_time (event_time);
         });
@@ -80,20 +94,75 @@ namespace Sezen
         warning ("%s", err.message);
       }/* */
     }
+    
+    private void change_keyboard_shortcut (string key)
+    {
+      var registry = GtkHotkey.Registry.get_default ();
+      try
+      {
+        if (hotkey.is_bound ()) hotkey.unbind ();
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
+      
+      try
+      {
+        if (registry.has_hotkey ("synapse", "activate"))
+        {
+          registry.delete_hotkey ("synapse", "activate");
+        }
+        
+        if (key != "")
+        {
+          hotkey = new GtkHotkey.Info ("synapse", "activate",
+                                       key, null);
+          registry.store_hotkey (hotkey);
+          hotkey.bind ();
+          hotkey.activated.connect ((event_time) =>
+          {
+            if (this.ui == null) return;
+            this.ui.show ();
+            this.ui.present_with_time (event_time);
+          });
+        }
+      }
+      catch (Error err)
+      {
+        Gtk.MessageDialog dialog = new Gtk.MessageDialog (this.settings, 0,
+          Gtk.MessageType.WARNING, Gtk.ButtonsType.OK,
+          "%s", err.message
+        );
+        dialog.run ();
+        dialog.destroy ();
+      }
+    }
 
     public void run ()
     {
+      Environment.unset_variable ("DESKTOP_AUTOSTART_ID");
       Gtk.main ();
     }
-  }
-  
 
-  
-  public static int main (string[] argv)
-  {
-    Gtk.init (ref argv);
-    var launcher = new UILauncher ();
-    launcher.run ();
-    return 0;
+    public static int main (string[] argv)
+    {
+      var context = new OptionContext (" - Awn Applet Activation Options");
+      context.add_main_entries (options, null);
+      context.add_group (Gtk.get_option_group (false));
+      try
+      {
+        context.parse (ref argv);
+
+        Gtk.init (ref argv);
+        var launcher = new UILauncher ();
+        launcher.run ();
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
+      return 0;
+    }
   }
 }
