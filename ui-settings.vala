@@ -178,12 +178,16 @@ namespace Synapse
 
     private void build_ui ()
     {
+      var main_vbox = new VBox (false, 6);
+      main_vbox.border_width = 4;
+      this.add (main_vbox);
+      
       var tabs = new Gtk.Notebook ();
       var general_tab = new VBox (false, 4);
       general_tab.border_width = 5;
       var plugin_tab = new VBox (false, 4);
       plugin_tab.border_width = 5;
-      this.add (tabs);
+      main_vbox.pack_start (tabs);
       tabs.append_page (general_tab, new Label ("General"));
       tabs.append_page (plugin_tab, new Label ("Plugins"));
       
@@ -239,7 +243,16 @@ namespace Synapse
 
       plugin_tab.pack_start (scroll);
 
-      tabs.show_all ();
+      /* Button */
+      var bbox = new Gtk.HButtonBox ();
+      bbox.set_layout (Gtk.ButtonBoxStyle.END);
+      var close_button = new Gtk.Button.from_stock (Gtk.STOCK_CLOSE);
+      close_button.clicked.connect (() => { this.hide (); });
+      bbox.pack_start (close_button);
+      
+      main_vbox.pack_start (bbox, false);
+      
+      main_vbox.show_all ();
     }
     
     public signal void keybinding_changed (string keybinding);
