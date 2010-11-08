@@ -154,7 +154,12 @@ namespace Synapse
       /* flag_selector */
       flag_selector = new HSelectionContainer(_hilight_label, 15);
       foreach (string s in this.categories)
-        flag_selector.add (new Label(s));
+      {
+        var label = new LabelWithOriginal();
+        label.set_text (s);
+        label.original_string = s;
+        flag_selector.add (label);
+      }
       flag_selector.select (3);
       flag_selector.set_arrows_visible (true);
       /* Throbber and menu */
@@ -368,18 +373,15 @@ namespace Synapse
 
     private static void _hilight_label (Widget w, bool b)
     {
-      Label l = (Label) w;
+      LabelWithOriginal l = (LabelWithOriginal) w;
+      string s = l.original_string;
       if (b)
       {
-        string s = l.get_text();
-        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><b>%s</b></span>", s));
-        l.sensitive = true;
+        l.set_markup (Markup.printf_escaped ("<span size=\"large\">&#x2190;<b>%s</b>&#x2192;</span>", s));
       }
       else
       {
-        string s = l.get_text();
         l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
-        //l.sensitive = false;
       }
     }
     bool searching_for_matches = true;
