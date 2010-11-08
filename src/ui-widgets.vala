@@ -896,6 +896,9 @@ namespace Synapse
     {
       Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
       set_allocation (alloc);
+      int min = int.min (allocation.width, allocation.height);
+      allocation.x = allocation.x + allocation.width - min;
+      allocation.height = allocation.width = min;
       throbber.size_allocate (allocation);
     }
     

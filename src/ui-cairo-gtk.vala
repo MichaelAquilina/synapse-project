@@ -161,7 +161,7 @@ namespace Synapse
 
       /* Throbber and menu */
       throbber = new Synapse.MenuThrobber ();
-      throbber.set_size_request (22, 22);
+      throbber.set_size_request (ACTION_ICON_SIZE, 22);
       throbber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       /* HBox for titles and action icon */
       var right_hbox = new HBox (false, 0);
