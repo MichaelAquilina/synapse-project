@@ -417,11 +417,11 @@ namespace Synapse
       sep.show ();
       show_arrows = false;
       left = new Label (null);
-      left.set_markup ("<span size=\"small\">&lt;&lt;</span>");
+      left.set_markup ("<span size=\"medium\"><b>&#x2190;</b></span>");
       left.set_parent (this);
       //left.sensitive = false;
       right = new Label (null);
-      right.set_markup ("<span size=\"small\">&gt;&gt;</span>");
+      right.set_markup ("<span size=\"medium\"><b>&#x2192;</b></span>");
       right.set_parent (this);
       //right.sensitive = false;
     }
