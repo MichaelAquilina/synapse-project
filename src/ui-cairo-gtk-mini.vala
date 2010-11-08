@@ -288,20 +288,30 @@ namespace Synapse
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
                                           r, g, b, 0.9, SHADOW_SIZE);
       }
-      ctx.set_operator (Operator.OVER);
+      ctx.set_operator (Operator.SOURCE);
       Pattern pat = new Pattern.linear(0, y, 0, y + h);
+      Utils.gdk_color_to_rgb (style.light[Gtk.StateType.NORMAL], out r, out g, out b);
+      pat.add_color_stop_rgba (0, r, g, b, 0.97);
       Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
-      pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
-                                  double.min(g + 0.15, 1),
-                                  double.min(b + 0.15, 1),
-                                  0.98);
-      pat.add_color_stop_rgba (1, double.max(r - 0.15, 0),
-                                  double.max(g - 0.15, 0),
-                                  double.max(b - 0.15, 0),
-                                  1.0);
+      pat.add_color_stop_rgba (0.5, r, g, b, 0.97);
+      Utils.gdk_color_to_rgb (style.dark[Gtk.StateType.NORMAL], out r, out g, out b);
+      pat.add_color_stop_rgba (1, r, g, b, 0.97);
       Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
       ctx.set_source (pat);
-      ctx.fill ();
+      ctx.save ();
+      ctx.clip ();
+      ctx.paint ();
+      ctx.restore ();
+      if (comp)
+      {
+        // border
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
+        Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
+        ctx.set_source_rgba (r, g, b, 0.5);
+        ctx.set_line_width (1.0);
+        ctx.stroke ();
+      }
 
       Bin c = (widget is Bin) ? (Bin) widget : null;
       if (c != null)
