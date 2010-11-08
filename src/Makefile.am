@@ -1,23 +1,18 @@
-VALAFLAGS = \
+synapsedir = $(bindir)
+
+synapse_PROGRAMS = synapse
+
+synapse_VALAFLAGS = \
 	--pkg dbus-glib-1 \
 	--pkg gtk+-2.0 \
 	--pkg gio-unix-2.0 \
 	--pkg zeitgeist-1.0 \
 	--pkg gee-1.0 \
 	--pkg gtkhotkey-1.0 \
-	--vapidir $(top_srcdir)/vapi
-	$(NULL)
-
-VAPIS = \
+	--vapidir $(top_srcdir)/vapi \
 	keysyms.vapi \
 	cancellable-fix.vapi \
 	$(NULL)
-
-VALAFLAGS += $(VAPIS)
-
-synapsedir = $(bindir)
-
-synapse_PROGRAMS = synapse
 
 synapse_CFLAGS = $(SYNAPSE_MODULES_CFLAGS)
 synapse_LDADD = $(SYNAPSE_MODULES_LIBS)
