@@ -1223,16 +1223,22 @@ namespace Synapse
       update_all_sizes ();
       update_cached_surface ();
       queue_draw ();
+      if (tid == 0)
+        tid = Timeout.add (30, ()=>{
+          return update_current_offset ();
+        });
     }}
     private Gee.List<PangoReadyText> texts;
     private Cairo.ImageSurface cached_surface;
     private int wmax;
     private int hmax;
+    private int current_offset;
     
     public HTextSelector ()
     {
       cached_surface = null;
-      wmax = hmax = 0;
+      tid = 0;
+      wmax = hmax = current_offset = 0;
       texts = new Gee.ArrayList<PangoReadyText> ();
       layout = this.create_pango_layout (null);
       this.style_set.connect (()=>{
@@ -1327,6 +1333,23 @@ namespace Synapse
         ctx.restore ();
       }
     }
+    private uint tid;
+    private bool update_current_offset ()
+    {
+      double draw_offset = 0; //target offset
+      PangoReadyText txt = texts.get (_selected);
+      draw_offset = this.allocation.width / 2 - txt.offset - txt.width / 2;
+      int target = (int)Math.round (draw_offset);
+      if (target == current_offset)
+      {
+        tid = 0;
+        return false; // stop animation
+      }
+      int inc = int.max (1, (int) Math.fabs ((target - current_offset) / 6));
+      current_offset += target > current_offset ? inc : - inc;
+      queue_draw ();
+      return true;
+    }
     protected override bool expose_event (Gdk.EventExpose event)
     {
       if (texts.size == 0)
@@ -1336,10 +1359,7 @@ namespace Synapse
       double w = this.allocation.width;
       double h = this.allocation.height;
       ctx.set_operator (Cairo.Operator.OVER);
-      double draw_offset = 0;
-      PangoReadyText txt = texts.get (_selected);
-      draw_offset = w / 2 - txt.offset - txt.width / 2;
-      ctx.set_source_surface (this.cached_surface, draw_offset, (h - this.cached_surface.get_height ()) / 2 ); //TODO: Animation here
+      ctx.set_source_surface (this.cached_surface, current_offset, (h - this.cached_surface.get_height ()) / 2 );
       var pat = new Pattern.linear (0, 0, w, h);
       double fadepct = wmax / (double)w;
       if (w / 3 < wmax)
