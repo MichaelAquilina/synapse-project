@@ -377,7 +377,7 @@ namespace Synapse
       string s = l.original_string;
       if (b)
       {
-        l.set_markup (Markup.printf_escaped ("<span size=\"large\">&#x2190;<b>%s</b>&#x2192;</span>", s));
+        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><small>&#x2190; </small><b>%s</b><small> &#x2192;</small></span>", s));
       }
       else
       {

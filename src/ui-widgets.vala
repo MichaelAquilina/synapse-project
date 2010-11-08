@@ -419,11 +419,11 @@ namespace Synapse
       left = new Label (null);
       left.set_markup ("<span size=\"small\">&lt;&lt;</span>");
       left.set_parent (this);
-      //left.sensitive = false;
+      left.sensitive = false;
       right = new Label (null);
       right.set_markup ("<span size=\"small\">&gt;&gt;</span>");
       right.set_parent (this);
-      //right.sensitive = false;
+      right.sensitive = false;
     }
     
     public void set_arrows_visible (bool b)
@@ -497,7 +497,7 @@ namespace Synapse
       left.size_request (out req);
       if (show_arrows)
       {
-        requisition.width += req.width * 2;
+        requisition.width += req.width * 2 + padding * 2;
         requisition.height = int.max (req.height, requisition.height);
       }
       sep.size_request (out req);
@@ -518,16 +518,16 @@ namespace Synapse
       if (show_arrows)
       {
         left.size_request (out req);
-        lastx = req.width;
-        max_x -= req.width;
-        min_x += req.width;
+        lastx = req.width + padding;
+        max_x = max_x - req.width - padding;
+        min_x = lastx;
         allocation.x = alloc.x;
         allocation.y = alloc.y + (alloc.height - sep_space - req.height) / 2;
         allocation.height = req.height;
         allocation.width = req.width;
         left.size_allocate (allocation);
         right.size_request (out req);
-        allocation.x = alloc.x + max_x;
+        allocation.x = alloc.x + max_x + padding;
         allocation.y = alloc.y + (alloc.height - sep_space - req.height) / 2;
         allocation.height = req.height;
         allocation.width = req.width;

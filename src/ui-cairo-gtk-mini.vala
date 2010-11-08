@@ -181,7 +181,12 @@ namespace Synapse
       /* Query flag selector  */
       flag_selector = new HSelectionContainer(_hilight_label, 15);
       foreach (string s in this.categories)
-        flag_selector.add (new Label(s));
+      {
+        var label = new LabelWithOriginal();
+        label.set_text (s);
+        label.original_string = s;
+        flag_selector.add (label);
+      }
       flag_selector.select (3);
       flag_selector.set_arrows_visible (true);
       
@@ -351,18 +356,15 @@ namespace Synapse
 
     private static void _hilight_label (Widget w, bool b)
     {
-      Label l = (Label) w;
+      LabelWithOriginal l = (LabelWithOriginal) w;
+      string s = l.original_string;
       if (b)
       {
-        string s = l.get_text();
-        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><b>%s</b></span>", s));
-        l.sensitive = true;
+        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><small>&#x2190; </small><b>%s</b><small> &#x2192;</small></span>", s));
       }
       else
       {
-        string s = l.get_text();
         l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
-        l.sensitive = false;
       }
     }
     
