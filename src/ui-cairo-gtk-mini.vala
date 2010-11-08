@@ -40,7 +40,7 @@ namespace Synapse
     protected Label match_label_description = null;
     protected ShrinkingLabel current_label = null;
 
-    protected HSelectionContainer flag_selector = null;
+    protected HTextSelector flag_selector = null;
     protected HBox container_top = null;
     protected VBox container = null;
     
@@ -179,16 +179,12 @@ namespace Synapse
       fakeinput.border_radius = 5;
       
       /* Query flag selector  */
-      flag_selector = new HSelectionContainer(_hilight_label, 15);
+      flag_selector = new HTextSelector();
       foreach (string s in this.categories)
       {
-        var label = new LabelWithOriginal();
-        label.set_text (s);
-        label.original_string = s;
-        flag_selector.add (label);
+        flag_selector.add_text (s);
       }
-      flag_selector.select (3);
-      flag_selector.set_arrows_visible (true);
+      flag_selector.selected = 3;
       
       /* Pref item */
       pref = new MenuButton ();
@@ -200,6 +196,7 @@ namespace Synapse
         spacer.set_size_request (-1, TOP_SPACING);
         vbox.pack_start (spacer, false);
         vbox.pack_start (flag_selector, false);
+        vbox.pack_start (new HSeparator (), false);
         vbox.pack_start (fakeinput, false);
         vbox.pack_start (new Label(null));
         container_top.pack_start (vbox);
@@ -435,7 +432,7 @@ namespace Synapse
     {
       window.hide ();
       set_list_visible (false);
-      flag_selector.select (3);
+      flag_selector.selected = 3;
       searching_for_matches = true;
       visual_update_search_for ();
       reset_search ();
@@ -487,7 +484,7 @@ namespace Synapse
             visual_update_search_for ();
             window.queue_draw ();
           }
-          update_query_flags (this.categories_query[flag_selector.get_selected()]);
+          update_query_flags (this.categories_query[flag_selector.selected]);
           break;
         case Gdk.KeySyms.Right:
           flag_selector.select_next ();
@@ -497,7 +494,7 @@ namespace Synapse
             visual_update_search_for ();
             window.queue_draw ();
           }
-          update_query_flags (this.categories_query[flag_selector.get_selected()]);
+          update_query_flags (this.categories_query[flag_selector.selected]);
           break;
         case Gdk.KeySyms.Home:
           if (searching_for_matches)

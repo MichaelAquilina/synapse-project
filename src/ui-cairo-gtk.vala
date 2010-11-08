@@ -36,7 +36,7 @@ namespace Synapse
     protected Label match_label_description = null;
     protected NamedIcon action_icon = null;
     protected Label action_label = null;
-    protected HSelectionContainer flag_selector = null;
+    protected HTextSelector flag_selector = null;
     protected HBox top_hbox = null;
     protected FakeInput fake_input = null;
     protected Label top_spacer = null;
@@ -152,16 +152,13 @@ namespace Synapse
       /* Top Spacer */
       top_spacer = new Label(null);
       /* flag_selector */
-      flag_selector = new HSelectionContainer(_hilight_label, 15);
+      flag_selector = new HTextSelector();
       foreach (string s in this.categories)
       {
-        var label = new LabelWithOriginal();
-        label.set_text (s);
-        label.original_string = s;
-        flag_selector.add (label);
+        flag_selector.add_text (s);
       }
-      flag_selector.select (3);
-      flag_selector.set_arrows_visible (true);
+      flag_selector.selected = 3;
+
       /* Throbber and menu */
       throbber = new Synapse.MenuThrobber ();
       throbber.set_size_request (22, 22);
@@ -171,7 +168,12 @@ namespace Synapse
       /* HBox for throbber and flag_selector */
       var topright_hbox = new HBox (false, 0);
       
-      topright_hbox.pack_start (flag_selector);
+      {
+        var vbox = new VBox (false, 0);
+        vbox.pack_start (flag_selector);
+        vbox.pack_start (new Gtk.HSeparator (), false);
+        topright_hbox.pack_start (vbox);
+      }
       topright_hbox.pack_start (throbber, false);
 
       top_right_vbox.pack_start (top_spacer, true);
@@ -377,8 +379,8 @@ namespace Synapse
       LabelWithOriginal l = (LabelWithOriginal) w;
       string s = l.original_string;
       if (b)
-      {
-        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><small>&#x2190; </small><b>%s</b><small> &#x2192;</small></span>", s));
+      { //<sub><small>&#x2190; </small></sub>
+        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><b>%s</b></span>", s));
       }
       else
       {
@@ -423,7 +425,7 @@ namespace Synapse
     {
       window.hide ();
       set_list_visible (false);
-      flag_selector.select (3);
+      flag_selector.selected = 3;
       searching_for_matches = true;
       reset_search ();
       visual_update_search_for ();
@@ -476,7 +478,7 @@ namespace Synapse
             visual_update_search_for ();
             window.queue_draw ();
           }
-          update_query_flags (this.categories_query[flag_selector.get_selected()]);
+          update_query_flags (this.categories_query[flag_selector.selected]);
           break;
         case Gdk.KeySyms.Right:
           flag_selector.select_next ();
@@ -486,7 +488,7 @@ namespace Synapse
             visual_update_search_for ();
             window.queue_draw ();
           }
-          update_query_flags (this.categories_query[flag_selector.get_selected()]);
+          update_query_flags (this.categories_query[flag_selector.selected]);
           break;
         case Gdk.KeySyms.Home:
           if (searching_for_matches)
