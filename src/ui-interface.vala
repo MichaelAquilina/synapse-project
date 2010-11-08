@@ -241,10 +241,10 @@ namespace Synapse
       /* Search not ready */
       set_throbber_visible (true);
       partial_result_sent = true;
-      /* Try to match the new string on current focus,
-       * if it matches, don't waste time on updating results
+      /* If partial result set is empty
+       * Try to match the new string on current focus
        */
-      if (focus[T.MATCH] != null)
+      if (focus[T.MATCH] != null && rs.size == 0)
       {
         var matchers = Query.get_matchers_for_query (search[T.MATCH], 0,
             RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);

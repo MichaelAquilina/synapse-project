@@ -54,7 +54,6 @@ PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   gee-1.0 >= $MIN_GEE_VERSION \
   gio-unix-2.0 \
   dbus-glib-1 \
-  unique-1.0 \
   zeitgeist-1.0 >= $MIN_ZEITGEIST_VERSION \
   )
 

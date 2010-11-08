@@ -957,6 +957,10 @@ namespace Synapse
       entered = false;
       this.queue_draw ();
     }
+    public bool is_menu_visible ()
+    {
+      return menu.visible;
+    }
     public override void released ()
     {
       menu.popup (null, null, null, 1, 0);
