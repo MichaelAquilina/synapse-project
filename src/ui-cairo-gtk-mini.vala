@@ -49,6 +49,8 @@ namespace Synapse
     protected ResultBox results_match = null;
     protected ResultBox results_action = null;
     
+    protected Synapse.MenuButton pref = null;
+    
     protected Synapse.Throbber throbber = null;
 
     private const int UI_WIDTH = 620; // height is dynamic
@@ -77,6 +79,12 @@ namespace Synapse
       window.set_position (WindowPosition.CENTER);
       window.set_decorated (false);
       window.set_resizable (false);
+      window.notify["is-active"].connect (()=>{
+        if (!window.is_active && !pref.is_menu_visible ())
+        {
+          hide ();
+        }
+      }); 
       
       build_ui ();
 
@@ -178,7 +186,7 @@ namespace Synapse
       flag_selector.set_arrows_visible (true);
       
       /* Pref item */
-      var pref = new MenuButton ();
+      pref = new MenuButton ();
       pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       pref.set_size_request (20, 20);
       {

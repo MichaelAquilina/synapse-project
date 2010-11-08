@@ -69,6 +69,12 @@ namespace Synapse
       window.set_position (WindowPosition.CENTER);
       window.set_decorated (false);
       window.set_resizable (false);
+      window.notify["is-active"].connect (()=>{
+        if (!window.is_active && !throbber.is_menu_visible ())
+        {
+          hide ();
+        }
+      });
       
       build_ui ();
 
@@ -605,7 +611,7 @@ namespace Synapse
     }
     public override void hide ()
     {
-      window.hide ();
+      hide_and_reset ();
     }
     public override void present_with_time (uint32 timestamp)
     {
