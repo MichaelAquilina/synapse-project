@@ -1362,7 +1362,7 @@ namespace Synapse
       double w = this.allocation.width;
       double h = this.allocation.height;
       ctx.set_operator (Cairo.Operator.OVER);
-      ctx.set_source_surface (this.cached_surface, current_offset, (h - this.cached_surface.get_height ()) / 2 );
+      ctx.set_source_surface (this.cached_surface, current_offset, Math.round ((h - this.cached_surface.get_height ()) / 2 ));
       var pat = new Pattern.linear (0, 0, w, h);
       double fadepct = wmax / (double)w;
       if (w / 3 < wmax)
