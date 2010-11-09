@@ -1320,6 +1320,8 @@ namespace Synapse
       h = hmax * 3; //triple h for nice vertical placement
       this.cached_surface = new ImageSurface (Cairo.Format.ARGB32, w, h);
       var ctx = new Cairo.Context (this.cached_surface);
+      // FIXME: Why no-antialias?
+      Pango.cairo_update_context (ctx, layout.get_context ());
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, StateType.NORMAL);
       ctx.set_operator (Cairo.Operator.OVER);
       string s;
