@@ -36,7 +36,7 @@ namespace Synapse
     protected Label match_label_description = null;
     protected NamedIcon action_icon = null;
     protected Label action_label = null;
-    protected HSelectionContainer flag_selector = null;
+    protected HTextSelector flag_selector = null;
     protected HBox top_hbox = null;
     protected FakeInput fake_input = null;
     protected Label top_spacer = null;
@@ -152,21 +152,28 @@ namespace Synapse
       /* Top Spacer */
       top_spacer = new Label(null);
       /* flag_selector */
-      flag_selector = new HSelectionContainer(_hilight_label, 15);
+      flag_selector = new HTextSelector();
       foreach (string s in this.categories)
-        flag_selector.add (new Label(s));
-      flag_selector.select (3);
-      flag_selector.set_arrows_visible (true);
+      {
+        flag_selector.add_text (s);
+      }
+      flag_selector.selected = 3;
+
       /* Throbber and menu */
       throbber = new Synapse.MenuThrobber ();
-      throbber.set_size_request (22, 22);
+      throbber.set_size_request (ACTION_ICON_SIZE, 22);
       throbber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       /* HBox for titles and action icon */
       var right_hbox = new HBox (false, 0);
       /* HBox for throbber and flag_selector */
       var topright_hbox = new HBox (false, 0);
       
-      topright_hbox.pack_start (flag_selector);
+      {
+        var vbox = new VBox (false, 0);
+        vbox.pack_start (flag_selector);
+        vbox.pack_start (new Gtk.HSeparator (), false);
+        topright_hbox.pack_start (vbox);
+      }
       topright_hbox.pack_start (throbber, false);
 
       top_right_vbox.pack_start (top_spacer, true);
@@ -298,7 +305,7 @@ namespace Synapse
                                           r, g, b, 0.9, SHADOW_SIZE);
         // border
         _cairo_path_for_main (ctx, comp, x + 0.5, y + 0.5, w - 1, h - 1);
-        ctx.set_source_rgba (r, g, b, 0.9);
+        ctx.set_source_rgba (r, g, b, 0.5);
         ctx.set_line_width (2.5);
         ctx.stroke ();
         if (this.list_visible)
@@ -318,24 +325,25 @@ namespace Synapse
           ctx.stroke ();
         }
       }
+      ctx.save ();
       Pattern pat = new Pattern.linear(0, y, 0, y+h);
+      Utils.gdk_color_to_rgb (style.light[Gtk.StateType.NORMAL], out r, out g, out b);
+      pat.add_color_stop_rgba (0, r, g, b, 0.97);
       Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
-      pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
-                                  double.min(g + 0.15, 1),
-                                  double.min(b + 0.15, 1),
-                                  0.95);
-      pat.add_color_stop_rgba (1, double.max(r - 0.15, 0),
-                                  double.max(g - 0.15, 0),
-                                  double.max(b - 0.15, 0),
-                                  0.95);
+      pat.add_color_stop_rgba (0.5, r, g, b, 0.97);
+      Utils.gdk_color_to_rgb (style.dark[Gtk.StateType.NORMAL], out r, out g, out b);
+      pat.add_color_stop_rgba (1, r, g, b, 0.97);
 
       _cairo_path_for_main (ctx, comp, x, y, w, h);
       ctx.set_source (pat);
       ctx.set_operator (Operator.SOURCE);
-      ctx.fill ();
+      ctx.clip ();
+      ctx.paint ();
       ctx.set_operator (Operator.OVER);
+      ctx.restore ();
       if (!comp)
       {
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
         Utils.rgb_invert_color (ref r, ref g, ref b);
         _cairo_path_for_main (ctx, comp, x, y, w, h);
         ctx.set_source_rgba (r, g, b, 1.0);
@@ -368,18 +376,15 @@ namespace Synapse
 
     private static void _hilight_label (Widget w, bool b)
     {
-      Label l = (Label) w;
+      LabelWithOriginal l = (LabelWithOriginal) w;
+      string s = l.original_string;
       if (b)
-      {
-        string s = l.get_text();
+      { //<sub><small>&#x2190; </small></sub>
         l.set_markup (Markup.printf_escaped ("<span size=\"large\"><b>%s</b></span>", s));
-        l.sensitive = true;
       }
       else
       {
-        string s = l.get_text();
         l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
-        //l.sensitive = false;
       }
     }
     bool searching_for_matches = true;
@@ -420,7 +425,7 @@ namespace Synapse
     {
       window.hide ();
       set_list_visible (false);
-      flag_selector.select (3);
+      flag_selector.selected = 3;
       searching_for_matches = true;
       reset_search ();
       visual_update_search_for ();
@@ -473,7 +478,7 @@ namespace Synapse
             visual_update_search_for ();
             window.queue_draw ();
           }
-          update_query_flags (this.categories_query[flag_selector.get_selected()]);
+          update_query_flags (this.categories_query[flag_selector.selected]);
           break;
         case Gdk.KeySyms.Right:
           flag_selector.select_next ();
@@ -483,7 +488,7 @@ namespace Synapse
             visual_update_search_for ();
             window.queue_draw ();
           }
-          update_query_flags (this.categories_query[flag_selector.get_selected()]);
+          update_query_flags (this.categories_query[flag_selector.selected]);
           break;
         case Gdk.KeySyms.Home:
           if (searching_for_matches)

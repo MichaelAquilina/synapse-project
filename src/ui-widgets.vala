@@ -419,11 +419,11 @@ namespace Synapse
       left = new Label (null);
       left.set_markup ("<span size=\"small\">&lt;&lt;</span>");
       left.set_parent (this);
-      //left.sensitive = false;
+      left.sensitive = false;
       right = new Label (null);
       right.set_markup ("<span size=\"small\">&gt;&gt;</span>");
       right.set_parent (this);
-      //right.sensitive = false;
+      right.sensitive = false;
     }
     
     public void set_arrows_visible (bool b)
@@ -497,7 +497,7 @@ namespace Synapse
       left.size_request (out req);
       if (show_arrows)
       {
-        requisition.width += req.width * 2;
+        requisition.width += req.width * 2 + padding * 2;
         requisition.height = int.max (req.height, requisition.height);
       }
       sep.size_request (out req);
@@ -518,16 +518,16 @@ namespace Synapse
       if (show_arrows)
       {
         left.size_request (out req);
-        lastx = req.width;
-        max_x -= req.width;
-        min_x += req.width;
+        lastx = req.width + padding;
+        max_x = max_x - req.width - padding;
+        min_x = lastx;
         allocation.x = alloc.x;
         allocation.y = alloc.y + (alloc.height - sep_space - req.height) / 2;
         allocation.height = req.height;
         allocation.width = req.width;
         left.size_allocate (allocation);
         right.size_request (out req);
-        allocation.x = alloc.x + max_x;
+        allocation.x = alloc.x + max_x + padding;
         allocation.y = alloc.y + (alloc.height - sep_space - req.height) / 2;
         allocation.height = req.height;
         allocation.width = req.width;
@@ -896,6 +896,9 @@ namespace Synapse
     {
       Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
       set_allocation (alloc);
+      int min = int.min (allocation.width, allocation.height);
+      allocation.x = allocation.x + allocation.width - min;
+      allocation.height = allocation.width = min;
       throbber.size_allocate (allocation);
     }
     
@@ -1179,6 +1182,12 @@ namespace Synapse
       GLib.Object (label: null);
     }
   }
+  public class LabelWithOriginal: Label
+  {
+    public string original_string {
+      get; set; default = "";
+    }
+  }
   
   public class SynapseAboutDialog: Gtk.AboutDialog
   {
@@ -1191,6 +1200,179 @@ namespace Synapse
                    program_name: "Synapse",
                    logo_icon_name : "synapse",
                    version: "0.1.0");
+    }
+  }
+  
+  public class HTextSelector : Label
+  {
+    private Pango.Layout layout;
+    public string selected_markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>";}
+    public string unselected_markup {get; set; default = "<span size=\"small\">%s</span>";}
+    public int padding {get; set; default = 15;}
+    private class PangoReadyText
+    {
+      public string text {get; set; default = "";}
+      public int offset {get; set; default = 0;}
+      public int width {get; set; default = 0;}
+      public int height {get; set; default = 0;}
+    }
+    private int _selected;
+    public int selected {get {return _selected;} set {
+      if (value == _selected ||
+          value < 0 ||
+          value >= texts.size)
+        return;
+      _selected = value;
+      update_all_sizes ();
+      update_cached_surface ();
+      queue_draw ();
+      if (tid == 0)
+        tid = Timeout.add (30, ()=>{
+          return update_current_offset ();
+        });
+    }}
+    private Gee.List<PangoReadyText> texts;
+    private Cairo.ImageSurface cached_surface;
+    private int wmax;
+    private int hmax;
+    private int current_offset;
+    
+    public HTextSelector ()
+    {
+      cached_surface = null;
+      tid = 0;
+      wmax = hmax = current_offset = 0;
+      texts = new Gee.ArrayList<PangoReadyText> ();
+      layout = this.create_pango_layout (null);
+      this.style_set.connect (()=>{
+        layout.context_changed ();
+        update_all_sizes ();
+        update_cached_surface ();
+        queue_resize ();
+        queue_draw ();
+      });
+      this.notify["selected-markup"].connect (_global_update);
+      this.notify["unselected-markup"].connect (_global_update);
+      _selected = 0;
+    }
+    public void add_text (string txt)
+    {
+      texts.add (new PangoReadyText(){
+        text = txt,
+        offset = 0,
+        width = 0,
+        height = 0
+      });
+      _global_update ();
+    }
+    private void _global_update ()
+    {
+      update_all_sizes ();
+      update_cached_surface ();
+      queue_resize ();
+      queue_draw ();
+    }
+    private void update_all_sizes ()
+    {
+      // also updates offsets
+      int w = 0, h = 0;
+      wmax = hmax = 0;
+      string s;
+      PangoReadyText txt = null;
+      int lastx = 0;
+      for (int i = 0; i < texts.size; i++)
+      {
+        txt = texts.get (i);
+        if (txt == null) continue;
+        s = Markup.printf_escaped (i == _selected ? selected_markup : unselected_markup, txt.text);
+        layout.set_markup (s, (int)s.length);
+        layout.get_pixel_size (out w, out h);
+        txt.width = w;
+        txt.height = h;
+        txt.offset = lastx;
+        lastx += w + padding;
+        wmax = int.max (wmax , txt.width);
+        hmax = int.max (hmax, txt.height);
+      }
+    }
+    protected override void size_request (out Gtk.Requisition req)
+    {
+      req.width = wmax * 3; // triple for fading
+      req.height = hmax;
+    }
+    public void select_prev ()
+    {
+      selected = selected - 1;
+    }
+    public void select_next ()
+    {
+      selected = selected + 1;
+    }
+    private void update_cached_surface ()
+    {
+      int w = 0, h = 0;
+      PangoReadyText txt;
+      txt = texts.last ();
+      w = txt.offset + txt.width;
+      h = hmax * 2; //double h for nice vertical placement
+      this.cached_surface = new ImageSurface (Cairo.Format.ARGB32, w, h);
+      var ctx = new Cairo.Context (this.cached_surface);
+      Gtk.Style style = this.get_style();
+      double r = 0, g = 0, b = 0;
+      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
+      ctx.set_source_rgba (r, g, b, 1.0);
+      ctx.set_operator (Cairo.Operator.OVER);
+      string s;
+      for (int i = 0; i < texts.size; i++)
+      {
+        txt = texts.get (i);
+        if (txt == null)
+          continue;
+        ctx.save ();
+        ctx.translate (txt.offset, (h - txt.height) / 2);
+        s = Markup.printf_escaped (i == _selected ? selected_markup : unselected_markup, txt.text);
+        layout.set_markup (s, (int)s.length);
+        Pango.cairo_show_layout (ctx, layout);
+        ctx.restore ();
+      }
+    }
+    private uint tid;
+    private bool update_current_offset ()
+    {
+      double draw_offset = 0; //target offset
+      PangoReadyText txt = texts.get (_selected);
+      draw_offset = this.allocation.width / 2 - txt.offset - txt.width / 2;
+      int target = (int)Math.round (draw_offset);
+      if (target == current_offset)
+      {
+        tid = 0;
+        return false; // stop animation
+      }
+      int inc = int.max (1, (int) Math.fabs ((target - current_offset) / 6));
+      current_offset += target > current_offset ? inc : - inc;
+      queue_draw ();
+      return true;
+    }
+    protected override bool expose_event (Gdk.EventExpose event)
+    {
+      if (texts.size == 0)
+        return true;
+      var ctx = Gdk.cairo_create (this.window);
+      ctx.translate (this.allocation.x, this.allocation.y);
+      double w = this.allocation.width;
+      double h = this.allocation.height;
+      ctx.set_operator (Cairo.Operator.OVER);
+      ctx.set_source_surface (this.cached_surface, current_offset, Math.round ((h - this.cached_surface.get_height ()) / 2 ));
+      var pat = new Pattern.linear (0, 0, w, h);
+      double fadepct = wmax / (double)w;
+      if (w / 3 < wmax)
+        fadepct = (w - wmax) / 2 / (double)w;
+      pat.add_color_stop_rgba (0, 1, 1, 1, 0);
+      pat.add_color_stop_rgba (fadepct, 1, 1, 1, 1);
+      pat.add_color_stop_rgba (1 - fadepct, 1, 1, 1, 1);
+      pat.add_color_stop_rgba (1, 1, 1, 1, 0);
+      ctx.mask (pat);
+      return true;
     }
   }
 }

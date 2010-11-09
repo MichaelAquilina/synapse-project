@@ -40,7 +40,7 @@ namespace Synapse
     protected Label match_label_description = null;
     protected ShrinkingLabel current_label = null;
 
-    protected HSelectionContainer flag_selector = null;
+    protected HTextSelector flag_selector = null;
     protected HBox container_top = null;
     protected VBox container = null;
     
@@ -179,11 +179,12 @@ namespace Synapse
       fakeinput.border_radius = 5;
       
       /* Query flag selector  */
-      flag_selector = new HSelectionContainer(_hilight_label, 15);
+      flag_selector = new HTextSelector();
       foreach (string s in this.categories)
-        flag_selector.add (new Label(s));
-      flag_selector.select (3);
-      flag_selector.set_arrows_visible (true);
+      {
+        flag_selector.add_text (s);
+      }
+      flag_selector.selected = 3;
       
       /* Pref item */
       pref = new MenuButton ();
@@ -195,6 +196,7 @@ namespace Synapse
         spacer.set_size_request (-1, TOP_SPACING);
         vbox.pack_start (spacer, false);
         vbox.pack_start (flag_selector, false);
+        vbox.pack_start (new HSeparator (), false);
         vbox.pack_start (fakeinput, false);
         vbox.pack_start (new Label(null));
         container_top.pack_start (vbox);
@@ -283,20 +285,30 @@ namespace Synapse
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
                                           r, g, b, 0.9, SHADOW_SIZE);
       }
-      ctx.set_operator (Operator.OVER);
+      ctx.set_operator (Operator.SOURCE);
       Pattern pat = new Pattern.linear(0, y, 0, y + h);
+      Utils.gdk_color_to_rgb (style.light[Gtk.StateType.NORMAL], out r, out g, out b);
+      pat.add_color_stop_rgba (0, r, g, b, 0.97);
       Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
-      pat.add_color_stop_rgba (0, double.min(r + 0.15, 1),
-                                  double.min(g + 0.15, 1),
-                                  double.min(b + 0.15, 1),
-                                  0.98);
-      pat.add_color_stop_rgba (1, double.max(r - 0.15, 0),
-                                  double.max(g - 0.15, 0),
-                                  double.max(b - 0.15, 0),
-                                  1.0);
+      pat.add_color_stop_rgba (0.5, r, g, b, 0.97);
+      Utils.gdk_color_to_rgb (style.dark[Gtk.StateType.NORMAL], out r, out g, out b);
+      pat.add_color_stop_rgba (1, r, g, b, 0.97);
       Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
       ctx.set_source (pat);
-      ctx.fill ();
+      ctx.save ();
+      ctx.clip ();
+      ctx.paint ();
+      ctx.restore ();
+      if (comp)
+      {
+        // border
+        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        Utils.rgb_invert_color (ref r, ref g, ref b);
+        Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
+        ctx.set_source_rgba (r, g, b, 0.5);
+        ctx.set_line_width (1.0);
+        ctx.stroke ();
+      }
 
       Bin c = (widget is Bin) ? (Bin) widget : null;
       if (c != null)
@@ -351,18 +363,15 @@ namespace Synapse
 
     private static void _hilight_label (Widget w, bool b)
     {
-      Label l = (Label) w;
+      LabelWithOriginal l = (LabelWithOriginal) w;
+      string s = l.original_string;
       if (b)
       {
-        string s = l.get_text();
-        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><b>%s</b></span>", s));
-        l.sensitive = true;
+        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><small>&#x2190; </small><b>%s</b><small> &#x2192;</small></span>", s));
       }
       else
       {
-        string s = l.get_text();
         l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
-        l.sensitive = false;
       }
     }
     
@@ -423,7 +432,7 @@ namespace Synapse
     {
       window.hide ();
       set_list_visible (false);
-      flag_selector.select (3);
+      flag_selector.selected = 3;
       searching_for_matches = true;
       visual_update_search_for ();
       reset_search ();
@@ -475,7 +484,7 @@ namespace Synapse
             visual_update_search_for ();
             window.queue_draw ();
           }
-          update_query_flags (this.categories_query[flag_selector.get_selected()]);
+          update_query_flags (this.categories_query[flag_selector.selected]);
           break;
         case Gdk.KeySyms.Right:
           flag_selector.select_next ();
@@ -485,7 +494,7 @@ namespace Synapse
             visual_update_search_for ();
             window.queue_draw ();
           }
-          update_query_flags (this.categories_query[flag_selector.get_selected()]);
+          update_query_flags (this.categories_query[flag_selector.selected]);
           break;
         case Gdk.KeySyms.Home:
           if (searching_for_matches)
