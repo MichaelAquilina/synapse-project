@@ -192,6 +192,8 @@ namespace Synapse
       fake_input.add (labels_hbox);
       fake_input.top_padding = 8;
       fake_input.bottom_padding = 9;
+      fake_input.left_padding = 6;
+      fake_input.right_padding = 6;
       fake_input.yalign = 0.5f;
       fake_input.focus_height = 8;
       right_hbox.pack_start (fake_input);
