@@ -1251,6 +1251,12 @@ namespace Synapse
         queue_resize ();
         queue_draw ();
       });
+      this.size_allocate.connect (()=>{
+        if (tid == 0)
+          tid = Timeout.add (30, ()=>{
+            return update_current_offset ();
+          });
+      });
       this.notify["selected-markup"].connect (_global_update);
       this.notify["unselected-markup"].connect (_global_update);
       _selected = 0;
