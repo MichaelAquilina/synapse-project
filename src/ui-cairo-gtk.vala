@@ -374,19 +374,6 @@ namespace Synapse
       }
     }
 
-    private static void _hilight_label (Widget w, bool b)
-    {
-      LabelWithOriginal l = (LabelWithOriginal) w;
-      string s = l.original_string;
-      if (b)
-      { //<sub><small>&#x2190; </small></sub>
-        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><b>%s</b></span>", s));
-      }
-      else
-      {
-        l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
-      }
-    }
     bool searching_for_matches = true;
     
     /* EVENTS HANDLING HERE */

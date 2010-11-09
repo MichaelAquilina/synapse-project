@@ -1206,9 +1206,11 @@ namespace Synapse
   public class HTextSelector : Label
   {
     private Pango.Layout layout;
+    private const int ARROW_SIZE = 7;
     public string selected_markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>";}
     public string unselected_markup {get; set; default = "<span size=\"small\">%s</span>";}
-    public int padding {get; set; default = 15;}
+    public int padding {get; set; default = 18;}
+    public bool show_arrows {get; set; default = true;}
     private class PangoReadyText
     {
       public string text {get; set; default = "";}
@@ -1320,7 +1322,7 @@ namespace Synapse
       PangoReadyText txt;
       txt = texts.last ();
       w = txt.offset + txt.width;
-      h = hmax * 2; //double h for nice vertical placement
+      h = hmax * 3; //triple h for nice vertical placement
       this.cached_surface = new ImageSurface (Cairo.Format.ARGB32, w, h);
       var ctx = new Cairo.Context (this.cached_surface);
       Gtk.Style style = this.get_style();
@@ -1340,6 +1342,34 @@ namespace Synapse
         layout.set_markup (s, (int)s.length);
         Pango.cairo_show_layout (ctx, layout);
         ctx.restore ();
+      }
+      /* Arrows */
+      if (!this.show_arrows)
+        return;
+      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], out r, out g, out b);
+      ctx.set_source_rgba (r, g, b, 1.0);
+      txt = texts.get (_selected);
+      double asize = double.min (ARROW_SIZE, h);
+      double px, py = h / 2;
+      double f = 2; //curvature
+      f = asize - f;
+      if (_selected < texts.size - 1)
+      {
+        px = txt.offset + txt.width + asize + (padding-asize) / 2;
+        ctx.move_to (px, py);
+        ctx.rel_line_to (-asize, -asize/2);
+        ctx.curve_to (px - f, py, px - f, py, px - asize, py + asize / 2);
+        ctx.line_to (px, py);
+        ctx.fill ();
+      }
+      if (_selected > 0)
+      {
+        px = txt.offset - asize - (padding-asize) / 2;
+        ctx.move_to (px, py);
+        ctx.rel_line_to (asize, -asize/2);
+        ctx.curve_to (px + f, py, px + f, py, px + asize, py + asize / 2);
+        ctx.line_to (px, py);
+        ctx.fill ();
       }
     }
     private uint tid;
@@ -1367,6 +1397,7 @@ namespace Synapse
       ctx.translate (this.allocation.x, this.allocation.y);
       double w = this.allocation.width;
       double h = this.allocation.height;
+      
       ctx.set_operator (Cairo.Operator.OVER);
       ctx.set_source_surface (this.cached_surface, current_offset, Math.round ((h - this.cached_surface.get_height ()) / 2 ));
       var pat = new Pattern.linear (0, 0, w, h);
