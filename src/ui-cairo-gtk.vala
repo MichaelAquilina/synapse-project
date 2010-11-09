@@ -337,7 +337,7 @@ namespace Synapse
       ctx.save ();
       Pattern pat = new Pattern.linear(0, y, 0, y+h);
       ch.add_color_stop_rgba (pat, 0, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.LIGHTER);
-      ch.add_color_stop_rgba (pat, 0.5, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
+      ch.add_color_stop_rgba (pat, 0.75, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
       ch.add_color_stop_rgba (pat, 1, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
 
       _cairo_path_for_main (ctx, comp, x, y, w, h);
