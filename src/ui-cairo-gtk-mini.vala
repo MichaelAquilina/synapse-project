@@ -23,6 +23,7 @@
 using Gtk;
 using Cairo;
 using Gee;
+using Synapse.Utils;
 
 namespace Synapse
 {
@@ -209,6 +210,13 @@ namespace Synapse
         vbox.pack_start (pref, false, false);
         container_top.pack_start (vbox, false);
       }
+      
+      /* Prepare colors using label */
+      ColorHelper.get_default ().init_from_widget (current_label);
+      current_label.style_set.connect (()=>{
+        ColorHelper.get_default ().init_from_widget (current_label);
+      });
+      
       container.show_all ();
     }
     

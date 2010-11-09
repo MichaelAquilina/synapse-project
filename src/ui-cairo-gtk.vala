@@ -23,6 +23,7 @@
 using Gtk;
 using Cairo;
 using Gee;
+using Synapse.Utils;
 
 namespace Synapse
 {
@@ -75,7 +76,7 @@ namespace Synapse
           hide ();
         }
       });
-      
+
       build_ui ();
 
       Utils.ensure_transparent_bg (window);
@@ -210,6 +211,12 @@ namespace Synapse
       
       labels_hbox.pack_start (match_label);
       labels_hbox.pack_start (action_label, false);
+      
+      /* Prepare colors using label */
+      ColorHelper.get_default ().init_from_widget (match_label);
+      match_label.style_set.connect (()=>{
+        ColorHelper.get_default ().init_from_widget (match_label);
+      });
 
       container.show_all ();
     }
@@ -293,21 +300,20 @@ namespace Synapse
       double h = container_top.allocation.height;
       double x = container_top.allocation.x;
       double y = container_top.allocation.y;
-      Gtk.Style style = widget.get_style();
-      double r = 0.0, g = 0.0, b = 0.0;
+      unowned Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
       if (comp)
       {
         int spacing = top_spacer.allocation.height;
         y += spacing;
         h -= spacing;
+        double r = 0, b = 0, g = 0;
+        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
         //draw shadow
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
-        Utils.rgb_invert_color (ref r, ref g, ref b);
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
                                           r, g, b, 0.9, SHADOW_SIZE);
         // border
         _cairo_path_for_main (ctx, comp, x + 0.5, y + 0.5, w - 1, h - 1);
-        ctx.set_source_rgba (r, g, b, 0.5);
+        ch.set_source_rgba (ctx, 0.6, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
         ctx.set_line_width (2.5);
         ctx.stroke ();
         if (this.list_visible)
@@ -322,33 +328,28 @@ namespace Synapse
                          result_box.allocation.y,
                          result_box.allocation.width,
                          result_box.allocation.height);
-          ctx.set_source_rgba (r, g, b, 0.9);
+          ch.set_source_rgba (ctx, 0.9, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
           ctx.set_line_width (2.5);
           ctx.stroke ();
         }
       }
       ctx.save ();
       Pattern pat = new Pattern.linear(0, y, 0, y+h);
-      Utils.gdk_color_to_rgb (style.light[Gtk.StateType.NORMAL], out r, out g, out b);
-      pat.add_color_stop_rgba (0, r, g, b, 0.97);
-      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
-      pat.add_color_stop_rgba (0.5, r, g, b, 0.97);
-      Utils.gdk_color_to_rgb (style.dark[Gtk.StateType.NORMAL], out r, out g, out b);
-      pat.add_color_stop_rgba (1, r, g, b, 0.97);
+      ch.add_color_stop_rgba (pat, 0, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.LIGHTER);
+      ch.add_color_stop_rgba (pat, 0.5, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
+      ch.add_color_stop_rgba (pat, 1, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
 
       _cairo_path_for_main (ctx, comp, x, y, w, h);
       ctx.set_source (pat);
       ctx.set_operator (Operator.SOURCE);
       ctx.clip ();
       ctx.paint ();
-      ctx.set_operator (Operator.OVER);
       ctx.restore ();
       if (!comp)
       {
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
-        Utils.rgb_invert_color (ref r, ref g, ref b);
+        ctx.set_operator (Operator.OVER);
         _cairo_path_for_main (ctx, comp, x, y, w, h);
-        ctx.set_source_rgba (r, g, b, 1.0);
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
         ctx.set_line_width (3.5);
         ctx.stroke (); 
       }

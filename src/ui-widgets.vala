@@ -67,18 +67,10 @@ namespace Synapse
         ctx.set_operator (Cairo.Operator.OVER);
 
         /* Prepare bg's colors using GtkStyle */
-        Gtk.Style style = w.get_style();
-        double r = 0.0, g = 0.0, b = 0.0;
         Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
-        pat.add_color_stop_rgba (1.0 - 15.0 / w.allocation.height, double.min(r + 0.15, 1),
-                                    double.min(g + 0.15, 1),
-                                    double.min(b + 0.15, 1),
-                                    0.95);
-        pat.add_color_stop_rgba (1, double.max(r - 0.15, 0),
-                                    double.max(g - 0.15, 0),
-                                    double.max(b - 0.15, 0),
-                                    0.95);
+        unowned Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
+        ch.add_color_stop_rgba (pat, 1.0 - 15.0 / w.allocation.height, 0.95, ch.StyleType.BASE, StateType.NORMAL);
+        ch.add_color_stop_rgba (pat, 1, 0.95, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
         /* Prepare and draw top bg's rect */
         ctx.rectangle (0, 0, w.allocation.width, w.allocation.height);
         ctx.set_source (pat);
@@ -798,25 +790,21 @@ namespace Synapse
         ctx.translate (1.5, 1.5);
         ctx.set_operator (Cairo.Operator.OVER);
         ctx.set_line_width (1.25);
-        Gtk.Style style = this.get_style();
-        double r = 0.0, g = 0.0, b = 0.0;
-        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
+        unowned Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
         double x = this.allocation.x + this.left_padding,
                y = this.allocation.y + this.top_padding,
                w = this.allocation.width - this.left_padding - this.right_padding - 3.0,
                h = this.allocation.height - this.top_padding - this.bottom_padding - 3.0;
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        Utils.rgb_invert_color (ref r, ref g, ref b);
-        ctx.set_source_rgba (r, g, b, 1.0);
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, StateType.NORMAL, ch.Mod.INVERTED);
         Cairo.Path path = ctx.copy_path ();
         ctx.save ();
         ctx.clip ();
         ctx.paint ();
-        Utils.rgb_invert_color (ref r, ref g, ref b);
         var pat = new Cairo.Pattern.linear (0, y, 0, y + shadow_height);
-        pat.add_color_stop_rgba (0, r, g, b, 0.6);
-        pat.add_color_stop_rgba (0.3, r, g, b, 0.25);
-        pat.add_color_stop_rgba (1.0, r, g, b, 0);
+        ch.add_color_stop_rgba (pat, 0, 0.6, ch.StyleType.FG, StateType.NORMAL);
+        ch.add_color_stop_rgba (pat, 0.3, 0.25, ch.StyleType.FG, StateType.NORMAL);
+        ch.add_color_stop_rgba (pat, 1.0, 0, ch.StyleType.FG, StateType.NORMAL);
         ctx.set_source (pat);
         ctx.paint ();
         if (_focus_widget != null)
@@ -856,17 +844,15 @@ namespace Synapse
           }
           ctx.close_path ();
           ctx.clip ();
-          Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], out r, out g, out b);
           pat = new Cairo.Pattern.linear (0, y2, 0, y1);
-          pat.add_color_stop_rgba (0, r, g, b, 1.0);
-          pat.add_color_stop_rgba (1, r, g, b, 0.0);
+          ch.add_color_stop_rgba (pat, 0, 1, ch.StyleType.BG, StateType.SELECTED);
+          ch.add_color_stop_rgba (pat, 1, 0, ch.StyleType.BG, StateType.SELECTED);
           ctx.set_source (pat);
           ctx.paint ();
         }
         ctx.restore ();
         ctx.append_path (path);
-        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
-        ctx.set_source_rgba (r, g, b, 0.6);
+        ch.set_source_rgba (ctx, 0.6, ch.StyleType.FG, StateType.NORMAL);
         ctx.stroke ();
       }
       return base.expose_event (event);
@@ -1327,16 +1313,14 @@ namespace Synapse
     private void update_cached_surface ()
     {
       int w = 0, h = 0;
+      unowned Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
       PangoReadyText txt;
       txt = texts.last ();
       w = txt.offset + txt.width;
       h = hmax * 3; //triple h for nice vertical placement
       this.cached_surface = new ImageSurface (Cairo.Format.ARGB32, w, h);
       var ctx = new Cairo.Context (this.cached_surface);
-      Gtk.Style style = this.get_style();
-      double r = 0, g = 0, b = 0;
-      Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
-      ctx.set_source_rgba (r, g, b, 1.0);
+      ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, StateType.NORMAL);
       ctx.set_operator (Cairo.Operator.OVER);
       string s;
       for (int i = 0; i < texts.size; i++)
@@ -1354,8 +1338,7 @@ namespace Synapse
       /* Arrows */
       if (!this.show_arrows)
         return;
-      Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], out r, out g, out b);
-      ctx.set_source_rgba (r, g, b, 1.0);
+      ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.SELECTED);
       txt = texts.get (_selected);
       double asize = double.min (ARROW_SIZE, h);
       double px, py = h / 2;
