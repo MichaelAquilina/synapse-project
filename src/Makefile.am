@@ -36,6 +36,7 @@ synapse_SOURCES = \
 	upower-plugin.vala \
 	zeitgeist-plugin.vala \
 	rhythmbox-plugin.vala \
+	open-with-plugin.vala \
 	ui-cairo-gtk.vala \
 	ui-cairo-gtk-mini.vala \
 	ui-interface.vala \
