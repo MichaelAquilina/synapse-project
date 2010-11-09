@@ -567,9 +567,10 @@ namespace Synapse
             for (int k = 0; k < 4; k++)
               c[i,j,k] = new Color ();
       }
-      public void init_from_widget (Gtk.Widget w)
+      public void init_from_widget_type (Type widget_type)
       {
-        Gtk.Style s = w.get_style();
+      	Gtk.Widget widget = (Gtk.Widget) Object.new (widget_type);
+      	Gtk.Style s = Gtk.rc_get_style (widget);
         for (int j = 0; j < 5; j++)
         {
           c[StyleType.BG,j,0].init_from_gdk_color (s.bg[j]);

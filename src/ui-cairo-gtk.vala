@@ -213,9 +213,10 @@ namespace Synapse
       labels_hbox.pack_start (action_label, false);
       
       /* Prepare colors using label */
-      ColorHelper.get_default ().init_from_widget (match_label);
-      match_label.style_set.connect (()=>{
-        ColorHelper.get_default ().init_from_widget (match_label);
+      ColorHelper.get_default ().init_from_widget_type (typeof (Label));
+      window.style_set.connect (()=>{
+        ColorHelper.get_default ().init_from_widget_type (typeof (Label));
+        window.queue_draw ();
       });
 
       container.show_all ();

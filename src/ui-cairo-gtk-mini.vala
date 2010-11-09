@@ -212,9 +212,10 @@ namespace Synapse
       }
       
       /* Prepare colors using label */
-      ColorHelper.get_default ().init_from_widget (current_label);
-      current_label.style_set.connect (()=>{
-        ColorHelper.get_default ().init_from_widget (current_label);
+      ColorHelper.get_default ().init_from_widget_type (typeof (Label));
+      window.style_set.connect (()=>{
+        ColorHelper.get_default ().init_from_widget_type (typeof (Label));
+        window.queue_draw ();
       });
       
       container.show_all ();
