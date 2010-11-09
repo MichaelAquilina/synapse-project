@@ -276,7 +276,6 @@ namespace Synapse
       register_plugin (create_plugin (typeof (CommonActions)));
       register_plugin (create_plugin (typeof (DictionaryPlugin)));
       register_plugin (create_plugin (typeof (DevhelpPlugin)));
-      register_plugin (create_plugin (typeof (OpenWithActions)));
       
       plugins_loaded = true;
     }
