@@ -1211,6 +1211,7 @@ namespace Synapse
     public string unselected_markup {get; set; default = "<span size=\"small\">%s</span>";}
     public int padding {get; set; default = 18;}
     public bool show_arrows {get; set; default = true;}
+    public bool animation_enabled {get; set; default = true;}
     private class PangoReadyText
     {
       public string text {get; set; default = "";}
@@ -1228,10 +1229,17 @@ namespace Synapse
       update_all_sizes ();
       update_cached_surface ();
       queue_draw ();
+      if (!animation_enabled)
+      {
+        update_current_offset ();
+        return;
+      }
       if (tid == 0)
+      {
         tid = Timeout.add (30, ()=>{
           return update_current_offset ();
         });
+      }
     }}
     private Gee.List<PangoReadyText> texts;
     private Cairo.ImageSurface cached_surface;
@@ -1379,6 +1387,12 @@ namespace Synapse
       PangoReadyText txt = texts.get (_selected);
       draw_offset = this.allocation.width / 2 - txt.offset - txt.width / 2;
       int target = (int)Math.round (draw_offset);
+      if (!animation_enabled)
+      {
+        current_offset = target;
+        queue_draw ();
+        return false;
+      }
       if (target == current_offset)
       {
         tid = 0;
