@@ -68,7 +68,7 @@ namespace Synapse
 
         /* Prepare bg's colors using GtkStyle */
         Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
-        unowned Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
+        Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
         ch.add_color_stop_rgba (pat, 1.0 - 15.0 / w.allocation.height, 0.95, ch.StyleType.BASE, StateType.NORMAL);
         ch.add_color_stop_rgba (pat, 1, 0.95, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
         /* Prepare and draw top bg's rect */
@@ -790,7 +790,7 @@ namespace Synapse
         ctx.translate (1.5, 1.5);
         ctx.set_operator (Cairo.Operator.OVER);
         ctx.set_line_width (1.25);
-        unowned Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
+        Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
         double x = this.allocation.x + this.left_padding,
                y = this.allocation.y + this.top_padding,
                w = this.allocation.width - this.left_padding - this.right_padding - 3.0,
@@ -1313,7 +1313,7 @@ namespace Synapse
     private void update_cached_surface ()
     {
       int w = 0, h = 0;
-      unowned Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
+      Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
       PangoReadyText txt;
       txt = texts.last ();
       w = txt.offset + txt.width;
