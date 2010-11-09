@@ -23,6 +23,7 @@
 using Gtk;
 using Cairo;
 using Gee;
+using Synapse.Utils;
 
 namespace Synapse
 {
@@ -209,6 +210,13 @@ namespace Synapse
         vbox.pack_start (pref, false, false);
         container_top.pack_start (vbox, false);
       }
+      
+      /* Prepare colors using label */
+      ColorHelper.get_default ().init_from_widget (current_label);
+      current_label.style_set.connect (()=>{
+        ColorHelper.get_default ().init_from_widget (current_label);
+      });
+      
       container.show_all ();
     }
     
@@ -361,20 +369,6 @@ namespace Synapse
       window.input_shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
     }
 
-    private static void _hilight_label (Widget w, bool b)
-    {
-      LabelWithOriginal l = (LabelWithOriginal) w;
-      string s = l.original_string;
-      if (b)
-      {
-        l.set_markup (Markup.printf_escaped ("<span size=\"large\"><small>&#x2190; </small><b>%s</b><small> &#x2192;</small></span>", s));
-      }
-      else
-      {
-        l.set_markup (Markup.printf_escaped ("<span size=\"small\">%s</span>", s));
-      }
-    }
-    
     private void search_add_char (string chr)
     {
       if (searching_for_matches)

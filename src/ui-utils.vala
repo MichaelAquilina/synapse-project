@@ -294,6 +294,337 @@ namespace Synapse
       
       ctx.restore ();
     }
+    public class ColorHelper 
+    {
+      public enum StyleType
+      {
+        BG,
+        FG,
+        BASE,
+        TEXT
+      }
+      public enum Mod
+      {
+        NORMAL,
+        LIGHTER,
+        DARKER,
+        INVERTED
+      }
+      private static ColorHelper helper = null;
+      public static unowned ColorHelper get_default ()
+      {
+        if (helper == null)
+          helper = new ColorHelper ();
+        return helper;
+      }
+      private class Color
+      {
+        public double r;
+        public double g;
+        public double b;
+        public Color ()
+        {
+          this.r = 0;
+          this.g = 0;
+          this.b = 0;
+        }
+        public void init_from_gdk_color (Gdk.Color col)
+        {
+          gdk_color_to_rgb (col, out this.r, out this.g, out this.b);
+        }
+        public void init_from_rgb (double r, double g, double b)
+        {
+          this.r = r;
+          this.g = g;
+          this.b = b;
+        }
+
+        public void clone (Color col)
+        {
+          this.r = col.r;
+          this.g = col.g;
+          this.b = col.b;
+        }
+        
+        public void apply_mod (Mod k)
+        {
+          switch (k)
+          {
+            case Mod.INVERTED:
+              Utils.rgb_invert_color (ref this.r, ref this.g, ref this.b);
+              break;
+            case Mod.LIGHTER:
+            	murrine_shade (ref this.r, ref this.g, ref this.b, 1.10);
+            	break;
+           	case Mod.DARKER:
+           		murrine_shade (ref this.r, ref this.g, ref this.b, 0.90);
+           		break;
+            default:
+              break;
+          }
+        }
+        /* RGB / HLS utils - from Murrine gtk-engine:
+         * Copyright (C) 2006-2007-2008-2009 Andrea Cimitan
+         */
+        private static void murrine_rgb_to_hls (double *r,
+								                                double *g,
+								                                double *b)
+        {
+	        double min;
+	        double max;
+	        double red;
+	        double green;
+	        double blue;
+	        double h = 0, l = 0, s = 0;
+	        double delta;
+
+	        red = *r;
+	        green = *g;
+	        blue = *b;
+
+	        if (red > green)
+	        {
+		        if (red > blue)
+			        max = red;
+		        else
+			        max = blue;
+
+		        if (green < blue)
+			        min = green;
+		        else
+			        min = blue;
+	        }
+	        else
+	        {
+		        if (green > blue)
+			        max = green;
+		        else
+			        max = blue;
+
+		        if (red < blue)
+			        min = red;
+		        else
+			        min = blue;
+	        }
+
+	        l = (max+min)/2;
+	        if (Math.fabs (max-min) < 0.0001)
+	        {
+		        h = 0;
+		        s = 0;
+	        }
+	        else
+	        {
+		        if (l <= 0.5)
+			        s = (max-min)/(max+min);
+		        else
+			        s = (max-min)/(2-max-min);
+
+		        delta = max -min;
+		        if (red == max)
+			        h = (green-blue)/delta;
+		        else if (green == max)
+			        h = 2+(blue-red)/delta;
+		        else if (blue == max)
+			        h = 4+(red-green)/delta;
+
+		        h *= 60;
+		        if (h < 0.0)
+			        h += 360;
+	        }
+
+	        *r = h;
+	        *g = l;
+	        *b = s;
+        }
+
+        private static void murrine_hls_to_rgb (double *h,
+								                                double *l,
+								                                double *s)
+        {
+	        double hue;
+	        double lightness;
+	        double saturation;
+	        double m1, m2;
+	        double r = 0, g = 0, b = 0;
+
+	        lightness = *l;
+	        saturation = *s;
+
+	        if (lightness <= 0.5)
+		        m2 = lightness*(1+saturation);
+	        else
+		        m2 = lightness+saturation-lightness*saturation;
+
+	        m1 = 2*lightness-m2;
+
+	        if (saturation == 0)
+	        {
+		        *h = lightness;
+		        *l = lightness;
+		        *s = lightness;
+	        }
+	        else
+	        {
+		        hue = *h+120;
+		        while (hue > 360)
+			        hue -= 360;
+		        while (hue < 0)
+			        hue += 360;
+
+		        if (hue < 60)
+			        r = m1+(m2-m1)*hue/60;
+		        else if (hue < 180)
+			        r = m2;
+		        else if (hue < 240)
+			        r = m1+(m2-m1)*(240-hue)/60;
+		        else
+			        r = m1;
+
+		        hue = *h;
+		        while (hue > 360)
+			        hue -= 360;
+		        while (hue < 0)
+			        hue += 360;
+
+		        if (hue < 60)
+			        g = m1+(m2-m1)*hue/60;
+		        else if (hue < 180)
+			        g = m2;
+		        else if (hue < 240)
+			        g = m1+(m2-m1)*(240-hue)/60;
+		        else
+			        g = m1;
+
+		        hue = *h-120;
+		        while (hue > 360)
+			        hue -= 360;
+		        while (hue < 0)
+			        hue += 360;
+
+		        if (hue < 60)
+			        b = m1+(m2-m1)*hue/60;
+		        else if (hue < 180)
+			        b = m2;
+		        else if (hue < 240)
+			        b = m1+(m2-m1)*(240-hue)/60;
+		        else
+			        b = m1;
+
+		        *h = r;
+		        *l = g;
+		        *s = b;
+	        }
+        }
+
+        private static void murrine_shade (ref double r, ref double g, ref double b, double k)
+        {
+	        double red;
+	        double green;
+	        double blue;
+
+	        red   = r;
+	        green = g;
+	        blue  = b;
+
+	        if (k == 1.0)
+	        {
+		        r = red;
+		        g = green;
+		        b = blue;
+		        return;
+	        }
+
+	        murrine_rgb_to_hls (&red, &green, &blue);
+
+	        green *= k;
+	        if (green > 1.0)
+		        green = 1.0;
+	        else if (green < 0.0)
+		        green = 0.0;
+
+	        blue *= k;
+	        if (blue > 1.0)
+		        blue = 1.0;
+	        else if (blue < 0.0)
+		        blue = 0.0;
+
+	        murrine_hls_to_rgb (&red, &green, &blue);
+
+	        r = red;
+	        g = green;
+	        b = blue;
+        }
+      }
+      /* [StyleType, StateType, Mod] */
+      private Color[,,] c;
+      /* End of static section */
+      public ColorHelper ()
+      {
+        c = new Color[4,5,4];
+        for (int i = 0; i < 4; i++)
+          for (int j = 0; j < 5; j++)
+            for (int k = 0; k < 4; k++)
+              c[i,j,k] = new Color ();
+      }
+      public void init_from_widget (Gtk.Widget w)
+      {
+        Gtk.Style s = w.get_style();
+        for (int j = 0; j < 5; j++)
+        {
+          c[StyleType.BG,j,0].init_from_gdk_color (s.bg[j]);
+          for (int k = 1; k < 4; k++)
+          {
+            c[StyleType.BG,j,k].clone (c[StyleType.BG,j,0]);
+            c[StyleType.BG,j,k].apply_mod ((Mod)k);
+          }
+        }
+        for (int j = 0; j < 5; j++)
+        {
+          c[StyleType.FG,j,0].init_from_gdk_color (s.fg[j]);
+          for (int k = 1; k < 4; k++)
+          {
+            c[StyleType.FG,j,k].clone (c[StyleType.FG,j,0]);
+            c[StyleType.FG,j,k].apply_mod ((Mod)k);
+          }
+        }
+        for (int j = 0; j < 5; j++)
+        {
+          c[StyleType.TEXT,j,0].init_from_gdk_color (s.text[j]);
+          for (int k = 1; k < 4; k++)
+          {
+            c[StyleType.TEXT,j,k].clone (c[StyleType.TEXT,j,0]);
+            c[StyleType.TEXT,j,k].apply_mod ((Mod)k);
+          }
+        }
+        for (int j = 0; j < 5; j++)
+        {
+          c[StyleType.BASE,j,0].init_from_gdk_color (s.base[j]);
+          for (int k = 1; k < 4; k++)
+          {
+            c[StyleType.BASE,j,k].clone (c[StyleType.BASE,j,0]);
+            c[StyleType.BASE,j,k].apply_mod ((Mod)k);
+          }
+        }
+      }
+      public void set_source_rgba (Cairo.Context ctx, double alpha, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      {
+        Color col = c[t,st,mod];
+        ctx.set_source_rgba (col.r, col.g, col.b, alpha);
+      }
+      public void add_color_stop_rgba (Cairo.Pattern pat, double val, double alpha, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      {
+        Color col = c[t,st,mod];
+        pat.add_color_stop_rgba (val, col.r, col.g, col.b, alpha);
+      }
+      public void get_rgb (out double r, out double g, out double b, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      {
+        Color col = c[t,st,mod];
+        r = col.r;
+        g = col.g;
+        b = col.b;
+      }
+    }
   }
 }
 
