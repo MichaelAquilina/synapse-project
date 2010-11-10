@@ -199,6 +199,7 @@ namespace Synapse
     public void set_list (Gee.List<T>? new_data)
     {
       data = new_data;
+      clear_surfaces ();
       cached_surfaces = {};
       if (data != null && data.size > 0)
         cached_surfaces.resize (data.size);
@@ -227,6 +228,8 @@ namespace Synapse
     {
       for (long i = 0; i < cached_surfaces.length; i++)
       {
+        if (cached_surfaces[i] != null)
+          cached_surfaces[i].finish ();
         cached_surfaces[i] = null;
       }
     }
