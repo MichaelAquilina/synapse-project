@@ -37,10 +37,13 @@ namespace Synapse
     private Pango.Layout layout;
     private const string MARKUP = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";
     private Requisition precalc_req;
+    private Gtk.TextDirection rtl;
+    private int text_displacement = 0;
     
     public MatchRenderer ()
     {
       ch = new Utils.ColorHelper ();
+      rtl = Gtk.TextDirection.LTR;
       precalc_req = {400, ICON_SIZE + PADDING * 2};
       label = new Label (null);
       layout = label.create_pango_layout (null);
@@ -48,6 +51,7 @@ namespace Synapse
         Gtk.Style s = Gtk.rc_get_style (label);
         ch.init_from_widget_type (typeof (Gtk.Label));
         label.style = s;
+        rtl = label.get_default_direction ();
         layout.context_changed ();
         calc_requisition ();
       });
@@ -63,6 +67,7 @@ namespace Synapse
       int width = 0, height = 0;
       layout.get_pixel_size (out width, out height);
       this.precalc_req.height = int.max (height, ICON_SIZE + PADDING * 2);
+      text_displacement = height < ICON_SIZE ? (ICON_SIZE - height) / 2 : 0;
     }
     public override void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj)
     {
@@ -81,13 +86,25 @@ namespace Synapse
         Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
         if (icon_pixbuf != null)
         {
-          Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, PADDING, PADDING);
+          int rtl_spacing = 0;
+          if (rtl == Gtk.TextDirection.RTL)
+            rtl_spacing = req.width - ICON_SIZE - PADDING * 2;
+          Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, PADDING + rtl_spacing, PADDING);
           ctx.paint ();
         }
       } catch (GLib.Error err) { /* do not render icon */ }
       /* Now the label + description part */
-
-      ctx.translate (ICON_SIZE + PADDING * 2, PADDING);
+      if (rtl == Gtk.TextDirection.RTL)
+      {
+        ctx.rectangle (PADDING, PADDING, req.width - ICON_SIZE - PADDING * 3, req.height - PADDING * 2);
+        ctx.clip ();
+        ctx.translate (PADDING, PADDING);
+      }
+      else
+      {
+        ctx.translate (ICON_SIZE + PADDING * 2, PADDING);
+      }
+      ctx.translate (0, text_displacement);
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
       string s = Markup.printf_escaped (MARKUP, m.title, m.description);
       layout.set_markup (s, (int)s.length);
