@@ -28,6 +28,353 @@ public static extern void gtk_style_get_style_property (Style style, Type widget
 
 namespace Synapse
 {
+  public class MatchRenderer : ListView.Renderer
+  {
+    private const int ICON_SIZE = 35;
+    private const int PADDING = 2;
+    private Utils.ColorHelper ch;
+    private Label label;
+    private Pango.Layout layout;
+    private const string MARKUP = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";
+    private Requisition precalc_req;
+    
+    public MatchRenderer ()
+    {
+      ch = new Utils.ColorHelper ();
+      precalc_req = {400, ICON_SIZE + PADDING * 2};
+      label = new Label (null);
+      layout = label.create_pango_layout (null);
+      on_style_set.connect (()=>{
+        Gtk.Style s = Gtk.rc_get_style (label);
+        ch.init_from_widget_type (typeof (Gtk.Label));
+        label.style = s;
+        layout.context_changed ();
+        calc_requisition ();
+      });
+    }
+    public void set_width_request (int w)
+    {
+      this.precalc_req.width = w;
+    }
+    private void calc_requisition ()
+    {
+      string s = Markup.printf_escaped (MARKUP, " ", " ");
+      layout.set_markup (s, (int)s.length);
+      int width = 0, height = 0;
+      layout.get_pixel_size (out width, out height);
+      this.precalc_req.height = int.max (height, ICON_SIZE + PADDING * 2);
+    }
+    public override void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj)
+    {
+      if (obj == null)
+        return;
+      Match m = (Match) obj;
+      ctx.set_operator (Cairo.Operator.OVER);
+      if (state == Gtk.StateType.SELECTED)
+      {
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.SELECTED);
+        ctx.paint ();
+      }
+      try {
+        var icon = GLib.Icon.new_for_string(m.icon_name);
+        Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, ICON_SIZE, Gtk.IconLookupFlags.FORCE_SIZE);
+        Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
+        if (icon_pixbuf != null)
+        {
+          Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, PADDING, PADDING);
+          ctx.paint ();
+        }
+      } catch (GLib.Error err) { /* do not render icon */ }
+      /* Now the label + description part */
+
+      ctx.translate (ICON_SIZE + PADDING * 2, PADDING);
+      ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
+      string s = Markup.printf_escaped (MARKUP, m.title, m.description);
+      layout.set_markup (s, (int)s.length);
+      Pango.cairo_show_layout (ctx, layout);
+    }
+    public override void size_request (out Requisition requisition)
+    {
+      requisition.width = 400;
+      requisition.height = PADDING + ICON_SIZE;
+    }
+  }
+  public class ListView<T>: Gtk.Label
+  {
+    private Utils.ColorHelper ch;
+    private Gee.List<T> data;
+    private Cairo.Surface[] cached_surfaces;
+    private Renderer renderer;
+    private int min_rows;
+    private int scrollto;
+    public ScrollMode scroll_mode {get; set; default = ScrollMode.MIDDLE;}
+    public bool use_base_background {get; set; default = true;}
+    private int selected_index; //for now only single selection mode
+    public int selected {
+      get {
+        return selected_index;
+      }
+      set {
+        if (selected_index == value || value < 0 || data == null || value >= data.size) return;
+        if (selected_index >= 0 && selected_index < cached_surfaces.length) cached_surfaces[selected_index] = null;
+        selected_index = value;
+        if (selected_index >= 0 && selected_index < cached_surfaces.length) cached_surfaces[value] = null;
+        queue_draw ();
+      }
+    }
+    public bool animation_enabled {get; set; default = true;}
+    private const int ANIM_TIMEOUT = 30;
+    public enum ScrollMode
+    {
+      TOP,
+      MIDDLE,
+      BOTTOM,
+      TOP_FORCED,
+      MIDDLE_FORCED,
+      BOTTOM_FORCED
+    }
+    public int min_visible_rows {
+      get {
+        return min_rows;
+      }
+      set {
+        if (min_rows == value || value < 1) return;
+        min_rows = value;
+        queue_resize ();
+      }
+    }
+    public abstract class Renderer: GLib.Object
+    {
+      /* Render ojb at state on ctx with req.width and req.height */
+      public abstract void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj);
+      public abstract void size_request (out Requisition requisition);
+      public signal void request_redraw ();
+      public signal void on_style_set ();
+    }
+    public ListView (ListView.Renderer rend)
+    {
+      min_rows = 1;
+      selected_index = -1;
+      scrollto = 0;
+      data = null;
+      cached_surfaces = {};
+      this.renderer = rend;
+      this.renderer.on_style_set ();
+      renderer.request_redraw.connect (()=>{
+        clear_surfaces ();
+        this.queue_resize ();
+        this.queue_draw ();
+      });
+
+      ch = new Utils.ColorHelper ();
+      ch.init_from_widget_type (typeof (Gtk.Label));
+      this.style_set.connect (()=>{
+        ch.init_from_widget_type (typeof (Gtk.Label));
+        this.renderer.on_style_set ();
+      });
+      this.show.connect (()=>{
+        scroll_to (scrollto);
+      });
+      this.realize.connect (()=>{
+        scroll_to (scrollto);
+      });
+    }
+    public void set_list (Gee.List<T>? new_data)
+    {
+      data = new_data;
+      cached_surfaces = {};
+      if (data != null && data.size > 0)
+        cached_surfaces.resize (data.size);
+      scrollto = 0;
+      this.queue_draw ();
+    }
+    public void add_data (T obj)
+    {
+      if (data == null)
+      {
+        data = new Gee.ArrayList<T> ();
+        clear_surfaces ();
+        scrollto = 0;
+      }
+      data.add (obj);
+      cached_surfaces.resize (cached_surfaces.length + 1);
+      this.queue_draw ();
+    }
+    public void clear ()
+    {
+      data = null;
+      clear_surfaces ();
+      this.queue_draw ();
+    }
+    private void clear_surfaces ()
+    {
+      for (long i = 0; i < cached_surfaces.length; i++)
+      {
+        cached_surfaces[i] = null;
+      }
+    }
+    public override void size_request (out Requisition requisition)
+    {
+      renderer.size_request (out requisition);
+      requisition.height *= min_rows;
+    }
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      clear_surfaces ();
+      base.size_allocate (allocation);
+      if (!animation_enabled)
+      {
+        update_current_voffset ();
+        this.queue_draw ();
+      }
+    }
+    public void scroll_to (int index)
+    {
+      if (data == null || index < 0 || index >= data.size)
+      {
+        scrollto = 0;
+        return;
+      }
+      scrollto = index;
+      if (!animation_enabled)
+      {
+        update_current_voffset ();
+        this.queue_draw ();
+      }
+      else
+      {
+        if (tid == 0)
+        {
+          tid = Timeout.add (ANIM_TIMEOUT, ()=>{
+            return update_current_voffset ();
+          });
+        }
+      }
+    }
+    private uint tid = 0;
+    private int current_voffset = 0;
+    private bool update_current_voffset ()
+    {
+      Requisition req = {0, 0};
+      renderer.size_request (out req);
+      int target = 0;
+      switch (scroll_mode)
+      {
+        //TODO: other layouts -> TOP, TOP_FORCED, etc
+        case ScrollMode.MIDDLE:
+          target = (int) (this.allocation.height / 2 - req.height / 2 - scrollto * req.height);
+          if (target > 0)
+            target = 0;
+          else if (data != null)
+          {
+            if (data.size * req.height + target < this.allocation.height)
+              target = this.allocation.height - (data.size * req.height);
+          }
+          break;
+        default: //middle forced mode
+          target = (int) (this.allocation.height / 2 - req.height / 2 - scrollto * req.height);
+          break;
+      }
+      if (!animation_enabled)
+      {
+        current_voffset = target;
+        queue_draw ();
+        return false;
+      }
+      if (target == current_voffset)
+      {
+        tid = 0;
+        return false; // stop animation
+      }
+      int inc = int.max (1, (int) Math.fabs ((target - current_voffset) / 4));
+      current_voffset += target > current_voffset ? inc : - inc;
+      queue_draw ();
+      return true;
+    }
+    public int get_list_size ()
+    {
+      if (data == null) return 0;
+      return data.size;
+    }
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      var ctx = Gdk.cairo_create (this.window);
+      ctx.translate (this.allocation.x, this.allocation.y);
+      double w = this.allocation.width;
+      double h = this.allocation.height;
+      ctx.rectangle (0, 0, w, h);
+      ctx.clip ();
+
+      Cairo.Pattern pat = null;
+      /*pat = new Cairo.Pattern.linear (0, 0, 0, h);
+      pat.add_color_stop_rgba (0.8, 1, 1, 1, 1);
+      pat.add_color_stop_rgba (1, 1, 1, 1, 0);*/
+
+      if (use_base_background)
+      {
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
+        if (pat != null)
+          ctx.mask (pat);
+        else
+          ctx.paint ();
+      }
+      
+      if (data == null || data.size < 1) return true;
+      
+      Requisition req = {0, 0};
+      renderer.size_request (out req);
+      req.width = (int)w; //use allocation width
+
+      int rows_to_process = (int)(h / req.height) * 3;
+      int i = (- current_voffset) / req.height - rows_to_process / 2;
+      if (i < 0)
+        i = 0;
+      rows_to_process += i;
+      double y1, y2;
+      for (; i < rows_to_process && i < data.size; i++)
+      {
+        y1 = req.height * i + current_voffset;
+        y2 = y1 + req.height;
+        render_row_at (ctx, i, y1, req, ( 0 <= y1 <= h ) || ( 0 <= y2 <= h ) , pat);
+      }
+      return true;
+    }
+    private void render_row_at (Cairo.Context ctx, int row, double y, Requisition req, bool required_now, Cairo.Pattern? pat = null)
+    {
+      Cairo.Surface surf = null;
+      if (cached_surfaces[row] == null)
+      {
+        if (required_now)
+          render_row_to_surface (row, req);
+        else
+          async_render_row_to_surface (row, req);
+      }
+      if (!required_now) return;
+      ctx.set_operator (Cairo.Operator.OVER);
+      surf = cached_surfaces[row];
+      ctx.set_source_surface (surf, 0, y);
+      if (pat == null)
+        ctx.paint ();
+      else
+        ctx.mask (pat);
+    }
+    private void render_row_to_surface (int row, Requisition req)
+    {
+      _render_row_to_surface (row, req);
+    }
+    private async void async_render_row_to_surface (int row, Requisition req)
+    {
+      _render_row_to_surface (row, req);
+    }    
+    private void _render_row_to_surface (int row, Requisition req)
+    {
+      if (cached_surfaces[row] != null) return; //already rendered
+      Cairo.Surface surf = new Cairo.ImageSurface (Cairo.Format.ARGB32, req.width, req.height);
+      var ctx = new Cairo.Context (surf);
+      renderer.render (ctx, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
+      cached_surfaces[row] = surf;
+    }
+  }
   /* Result List stuff */
   public class ResultBox: EventBox
   {
@@ -35,8 +382,6 @@ namespace Synapse
     private const int ICON_SIZE = 36;
     private int mwidth;
     private int nrows;
-    private bool no_results;
-    private int items;
 
     private VBox vbox;
     private HBox status_box;
@@ -45,18 +390,11 @@ namespace Synapse
     {
       this.mwidth = width;
       this.nrows = nrows;
-      items = 0;
-      no_results = true;
       build_ui();
     }
-    
-    private enum Column {
-			ICON_COLUMN = 0,
-			NAME_COLUMN = 1,
-		}
-		
-		private TreeView view;
-		ListStore results;
+
+		private ListView<Match> view;
+		private MatchRenderer rend;
 		private Label status;
 		
 		private bool on_expose (Widget w, Gdk.EventExpose event) {
@@ -86,7 +424,10 @@ namespace Synapse
 
     private void build_ui()
     {
-      view = new TreeView ();
+      rend = new MatchRenderer ();
+      rend.set_width_request (this.mwidth);
+      view = new ListView<Match> (rend);
+      view.min_visible_rows = this.nrows;
       
       vbox = new VBox (false, 0);
       this.expose_event.connect (on_expose);
@@ -105,142 +446,21 @@ namespace Synapse
       status_box.pack_start (status, false, false, 10);
       status_box.pack_start (new Label (null), true, false);
       status_box.pack_start (logo, false, false, 10);
-      
-			view.enable_search = false;
-			view.show_expanders = false;
-			view.headers_visible = false;
-			view.fixed_height_mode = true; // speedup but use Gtk.TreeViewColumnSizing.FIXED
-			view.show();
-			view.realize.connect (()=>{
-			  /* Block clicks on list */
-			  Gdk.EventMask mask = view.get_bin_window ().get_events ();
-			  mask = mask & (~Gdk.EventMask.BUTTON_PRESS_MASK);
-			  mask = mask & (~Gdk.EventMask.BUTTON_RELEASE_MASK);
-			  view.get_bin_window ().set_events (mask);
-			});
-
-      view.model = results = new ListStore(2, typeof(GLib.Icon), typeof(string));
-
-      var column = new TreeViewColumn ();
-			column.sizing = Gtk.TreeViewColumnSizing.FIXED; // needed for speedup
-			column.spacing = 0;
-
-			var crp = new CellRendererPixbuf ();
-      crp.stock_size = IconSize.DND;
-			var ctxt = new CellRendererText ();
-			ctxt.ellipsize = Pango.EllipsizeMode.END;
-			ctxt.xpad = 5;
-
-      crp.ypad = 0;
-      ctxt.ypad = 0;
-      int cellh = ICON_SIZE;
-      crp.set_fixed_size (ICON_SIZE, cellh);
-      ctxt.set_fixed_size (mwidth - ICON_SIZE, cellh);
-
-			column.pack_start (crp, false);
-			column.add_attribute (crp, "gicon", (int) Column.ICON_COLUMN);
-			column.pack_start (ctxt, false);
-      column.add_attribute (ctxt, "markup", (int) Column.NAME_COLUMN);
-
-      view.append_column (column);
-      on_view_style_set (view, null);
-      view.style_set.connect (on_view_style_set);
-    }
-    private void on_view_style_set (Gtk.Widget widget, Gtk.Style? prev_style)
-    {
-      /* WORKAROUND FOR ROW HEIGHT */
-      Requisition requisition = {0, 0};
-      TreeIter iter;
-      results.append (out iter);
-      results.set (iter, Column.ICON_COLUMN, null, Column.NAME_COLUMN, "");
-      view.size_request (out requisition);
-      results.remove (iter);
-      int cellh = requisition.height / (items + 1);
-      status_box.size_request (out requisition);
-      requisition.width = mwidth;
-      requisition.height += nrows * cellh;
-      vbox.set_size_request (requisition.width, requisition.height);
-      this.queue_resize ();
-      this.queue_draw ();
     }
 
     public void update_matches (Gee.List<Synapse.Match>? rs)
     {
-      results.clear();
+      view.set_list (rs);
       if (rs==null || rs.size == 0)
-      {
-        no_results = true;
-        items = 0;
         status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
-        return;
-      }
-      items = rs.size;
-      no_results = false;
-      string desc;
-      TreeIter iter;
-      GLib.Icon icon = null;
-      foreach (Match m in rs)
-      {
-        results.append (out iter);
-        desc = Utils.replace_home_path_with (m.description, "Home", " > "); // FIXME: i18n
-        try {
-          icon = GLib.Icon.new_for_string(m.icon_name);
-        } catch (GLib.Error err) { icon = null; }
-        results.set (iter, Column.ICON_COLUMN, icon, Column.NAME_COLUMN, 
-                     Markup.printf_escaped ("<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>",m.title, desc));
-      }
-      var sel = view.get_selection ();
-      sel.select_path (new TreePath.first());
-      status.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", results.length));
+      else
+        status.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", view.get_list_size ()));
     }
     public void move_selection_to_index (int i)
     {
-      var sel = view.get_selection ();
-      if (no_results)
-        return;
-      Gtk.TreePath path = new TreePath.from_string( i.to_string() );
-      /* Scroll to path */
-      Timeout.add(1, () => {
-          sel.unselect_all ();
-          sel.select_path (path);
-          view.scroll_to_cell (path, null, true, 0.5F, 0.0F);
-          return false;
-      });
-      status.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", i + 1, results.length));
-    }
-    public int move_selection (int val, out int old_index)
-    {
-      if (no_results)
-        return -1;
-      var sel = view.get_selection ();
-      int index = -1, oindex = -1;
-      GLib.List<TreePath> sel_paths = sel.get_selected_rows(null);
-      TreePath path = sel_paths.first ().data;
-      TreePath opath = path;
-      oindex = path.to_string().to_int();
-      old_index = oindex;
-      if (val == 0)
-        return oindex;
-      if (val > 0)
-        path.next ();
-      else if (val < 0)
-        path.prev ();
-      
-      index = path.to_string().to_int();
-      if (index < 0 || index >= results.length)
-      {
-        index = oindex;
-        path = opath;
-      }
-      /* Scroll to path */
-      Timeout.add(1, () => {
-          sel.unselect_all ();
-          sel.select_path (path);
-          view.scroll_to_cell (path, null, true, 0.5F, 0.0F);
-          return false;
-      });
-      
-      return index;
+      view.scroll_to (i);
+      view.selected = i;
+      status.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", i + 1, view.get_list_size ()));
     }
   }
 

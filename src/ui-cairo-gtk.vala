@@ -38,7 +38,7 @@ namespace Synapse
     protected NamedIcon action_icon = null;
     protected ContainerOverlayed match_icon_container_overlayed = null;
     
-    protected Label match_label_description = null;
+    protected ShrinkingLabel match_label_description = null;
     protected ShrinkingLabel current_label = null;
 
     protected HTextSelector flag_selector = null;
@@ -63,6 +63,7 @@ namespace Synapse
     private const int TOP_SPACING = ICON_SIZE / 2;
     private const int LABEL_INTERNAL_PADDING = 4;
     private const string LABEL_TEXT_SIZE = "x-large";
+    private const string DESCRIPTION_TEXT_SIZE = "medium";
     
     private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
     private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
@@ -187,6 +188,12 @@ namespace Synapse
       }
       flag_selector.selected = 3;
       
+      /* Description */
+      match_label_description = new ShrinkingLabel ();
+      match_label_description.set_alignment (0.0f, 1.0f);
+      match_label_description.set_ellipsize (Pango.EllipsizeMode.END);
+      match_label_description.xpad = LABEL_INTERNAL_PADDING * 2;
+      
       /* Pref item */
       pref = new MenuButton ();
       pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
@@ -200,6 +207,7 @@ namespace Synapse
         vbox.pack_start (new HSeparator (), false);
         vbox.pack_start (fakeinput, false);
         vbox.pack_start (new Label(null));
+        vbox.pack_start (match_label_description, false);
         container_top.pack_start (vbox);
       }
       {
@@ -607,6 +615,7 @@ namespace Synapse
 
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
+          match_label_description.set_markup (Utils.markup_string_with_search (" ", "", DESCRIPTION_TEXT_SIZE));
         }
         else
         {
@@ -616,6 +625,7 @@ namespace Synapse
                                    "Type to search..."));
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
+          match_label_description.set_markup (Utils.markup_string_with_search ("Powered by Zeitgeist", "", "small"));
         }
       }
       else
@@ -628,6 +638,7 @@ namespace Synapse
 
         if (searching_for_matches)
           current_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE));
+        match_label_description.set_markup (Utils.markup_string_with_search (match.description, get_match_search (), DESCRIPTION_TEXT_SIZE));
       }
       results_match.move_selection_to_index (index);
     }
