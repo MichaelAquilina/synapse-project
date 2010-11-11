@@ -75,14 +75,7 @@ namespace Synapse
         return;
       Match m = (Match) obj;
       if (direct_rendering)
-      {
         ctx.set_operator (Cairo.Operator.OVER);
-        if (state == Gtk.StateType.SELECTED)
-        {
-          ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.SELECTED);
-          ctx.paint ();
-        }
-      }
       else
         ctx.set_operator (Cairo.Operator.SOURCE);
       ctx.save ();
@@ -116,12 +109,6 @@ namespace Synapse
       layout.set_markup (s, (int)s.length);
       Pango.cairo_show_layout (ctx, layout);
       ctx.restore ();
-      if (!direct_rendering && state == Gtk.StateType.SELECTED)
-      {
-        ctx.set_operator (Cairo.Operator.DEST_OVER);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.SELECTED);
-        ctx.paint ();
-      }
     }
     public override void size_request (out Requisition requisition)
     {
@@ -158,7 +145,7 @@ namespace Synapse
     private int selected_index; //for now only single selection mode
     public bool animation_enabled {get; set; default = true;}
     private const int ANIM_TIMEOUT = 40;
-    private const int ANIM_MAX_PIXEL_JUMP = 4;
+    private const int ANIM_MAX_PIXEL_JUMP = 3;
     public int selected {
       get {
         return selected_index;
@@ -184,6 +171,7 @@ namespace Synapse
     {
       min_rows = 1;
       selected_index = -1;
+      selection_voffset = 0;
       scrollto = 0;
       data = null;
       this.renderer = rend;
@@ -210,6 +198,7 @@ namespace Synapse
     {
       data = new_data;
       scrollto = 0;
+      selection_voffset = 0;
       current_voffset = 0;
       selected_index = -1;
       this.queue_draw ();
@@ -220,6 +209,7 @@ namespace Synapse
       {
         data = new Gee.ArrayList<T> ();
         current_voffset = 0;
+        selection_voffset = 0;
         scrollto = 0;
       }
       data.add (obj);
@@ -229,6 +219,7 @@ namespace Synapse
     {
       data = null;
       scrollto = 0;
+      selection_voffset = 0;
       current_voffset = 0;
       selected_index = -1;
       this.queue_draw ();
@@ -270,11 +261,12 @@ namespace Synapse
     }
     private uint tid = 0;
     private int current_voffset = 0;
+    private int selection_voffset = 0;
     private bool update_current_voffset ()
     {
       Requisition req = {0, 0};
       renderer.size_request (out req);
-      int target = 0;
+      int target = 0, selection_target = 0;
       switch (scroll_mode)
       {
         //TODO: other layouts -> TOP, TOP_FORCED, etc
@@ -294,19 +286,32 @@ namespace Synapse
           target = (int) (this.allocation.height / 2 - req.height / 2 - scrollto * req.height);
           break;
       }
+      if (selected_index >= 0)
+        selection_target = target + req.height * selected_index;
+      else
+        selection_target = 0;
       if (!animation_enabled)
       {
         current_voffset = target;
+        selection_voffset = selection_target;
         queue_draw ();
         return false;
       }
-      if (target == current_voffset)
+      if (target == current_voffset && selection_target == selection_voffset)
       {
         tid = 0;
         return false; // stop animation
       }
-      int inc = int.max (1, (int) Math.fabs ((target - current_voffset) / ANIM_MAX_PIXEL_JUMP));
-      current_voffset += target > current_voffset ? inc : - inc;
+      if (target != current_voffset)
+      {
+        int inc = int.max (1, (int) Math.fabs ((target - current_voffset) / ANIM_MAX_PIXEL_JUMP));
+        current_voffset += target > current_voffset ? inc : - inc;
+      }
+      if (selection_target != selection_voffset)
+      {
+        int inc = int.max (1, (int) Math.fabs ((selection_target - selection_voffset) / ANIM_MAX_PIXEL_JUMP));
+        selection_voffset += selection_target > selection_voffset ? inc : - inc;
+      }
       queue_draw ();
       return true;
     }
@@ -318,6 +323,7 @@ namespace Synapse
     public override bool expose_event (Gdk.EventExpose event)
     {
       var ctx = Gdk.cairo_create (this.window);
+      ctx.set_operator (Cairo.Operator.OVER);
       ctx.translate (this.allocation.x, this.allocation.y);
       double w = this.allocation.width;
       double h = this.allocation.height;
@@ -337,6 +343,17 @@ namespace Synapse
       Requisition req = {0, 0};
       renderer.size_request (out req);
       req.width = (int)w; //use allocation width
+      
+      if (selected_index >= 0 && 
+          ( (0 <= selection_voffset <= h) || 
+            (0 <= (selection_voffset+req.height) <= h)
+          )
+         )
+      {
+        ctx.rectangle (0, selection_voffset, w, req.height);
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.SELECTED);
+        ctx.fill ();
+      }
 
       int rows_to_process = (int)(h / req.height) * 2;
       int i = (- current_voffset) / req.height - rows_to_process / 4;
@@ -344,7 +361,6 @@ namespace Synapse
         i = 0;
       rows_to_process += i;
       double y1, y2;
-      ctx.set_operator (Cairo.Operator.OVER);
       //Timer t = new Timer ();
       for (; i < rows_to_process && i < data.size; i++)
       {
@@ -356,8 +372,7 @@ namespace Synapse
       //stderr.printf ("timer %.3f\n", elap);
       return true;
     }
-    double max_timing = 0.0;
-    double med_timing = 0.0;
+
     private void render_row_at (Cairo.Context ctx, int row, double y, double h, Requisition req, bool required_now)
     {
       if (!required_now) return;
@@ -365,7 +380,10 @@ namespace Synapse
       ctx.rectangle (0, double.max (0, y), req.width, double.min (req.height, h - y));
       ctx.clip ();
       ctx.translate (0, y);
-      renderer.render (ctx, true, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
+      renderer.render (ctx, true, req, 
+                       selected_index == row && y == selection_voffset? 
+                       Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, 
+                       data.get (row));
       ctx.restore ();
     }
     private Cairo.Surface _render_row_to_surface (int row, Requisition req)
