@@ -150,13 +150,11 @@ namespace Synapse
     }
     private Utils.ColorHelper ch;
     private Gee.List<T> data;
-    private Gee.List<Cairo.Surface?> cached_surfaces;
     private Renderer renderer;
     private int min_rows;
     private int scrollto;
     public ScrollMode scroll_mode {get; set; default = ScrollMode.MIDDLE;}
     public bool use_base_background {get; set; default = true;}
-    public bool direct_rendering {get; set; default = true;}
     private int selected_index; //for now only single selection mode
     public bool animation_enabled {get; set; default = true;}
     private const int ANIM_TIMEOUT = 40;
@@ -167,9 +165,7 @@ namespace Synapse
       }
       set {
         if (selected_index == value || value < 0 || data == null || value >= data.size) return;
-        if (selected_index >= 0 && selected_index < cached_surfaces.size) cached_surfaces.set (selected_index, null);
         selected_index = value;
-        if (selected_index >= 0 && selected_index < cached_surfaces.size) cached_surfaces.set (value, null);
         queue_draw ();
       }
     }
@@ -190,11 +186,9 @@ namespace Synapse
       selected_index = -1;
       scrollto = 0;
       data = null;
-      cached_surfaces = new Gee.ArrayList<Cairo.Surface?> ();
       this.renderer = rend;
       this.renderer.on_style_set ();
       renderer.request_redraw.connect (()=>{
-        clear_surfaces ();
         this.queue_resize ();
         this.queue_draw ();
       });
@@ -215,14 +209,9 @@ namespace Synapse
     public void set_list (Gee.List<T>? new_data)
     {
       data = new_data;
-      cached_surfaces = new Gee.ArrayList<Cairo.Surface?> ();
-      if (data != null && data.size > 0)
-      {
-        for (int i = 0; i < data.size; i++)
-          cached_surfaces.add (null);
-      }
       scrollto = 0;
       current_voffset = 0;
+      selected_index = -1;
       this.queue_draw ();
     }
     public void add_data (T obj)
@@ -230,25 +219,19 @@ namespace Synapse
       if (data == null)
       {
         data = new Gee.ArrayList<T> ();
-        cached_surfaces = new Gee.ArrayList<Cairo.Surface?> ();
+        current_voffset = 0;
         scrollto = 0;
       }
       data.add (obj);
-      cached_surfaces.add (null);
       this.queue_draw ();
     }
     public void clear ()
     {
       data = null;
-      clear_surfaces ();
+      scrollto = 0;
+      current_voffset = 0;
+      selected_index = -1;
       this.queue_draw ();
-    }
-    private void clear_surfaces ()
-    {
-      for (int i = 0; i < cached_surfaces.size; i++)
-      {
-        cached_surfaces.set (i, null);
-      }
     }
     public override void size_request (out Requisition requisition)
     {
@@ -257,13 +240,10 @@ namespace Synapse
     }
     public override void size_allocate (Gdk.Rectangle allocation)
     {
-      clear_surfaces ();
       base.size_allocate (allocation);
-      if (!animation_enabled)
-      {
+      if (!animation_enabled || tid == 0)
         update_current_voffset ();
-        this.queue_draw ();
-      }
+      this.queue_draw ();
     }
     public void scroll_to (int index)
     {
@@ -380,39 +360,20 @@ namespace Synapse
     double med_timing = 0.0;
     private void render_row_at (Cairo.Context ctx, int row, double y, double h, Requisition req, bool required_now)
     {
-      if (!direct_rendering)
-      {
-        if (cached_surfaces.get (row) == null)
-        {
-          _render_row_to_surface (row, req);
-        }
-        if (!required_now) return;
-        Cairo.Surface surf = null;
-        surf = cached_surfaces.get (row);
-        ctx.set_source_surface (surf, 0, y);
-        ctx.save ();
-        ctx.rectangle (0, y, req.width, req.height);
-        ctx.clip ();
-        ctx.paint ();
-        ctx.restore ();
-      }
-      else
-      {
-        if (!required_now) return;
-        ctx.save ();
-        ctx.rectangle (0, double.max (0, y), req.width, double.min (req.height, h - y));
-        ctx.clip ();
-        ctx.translate (0, y);
-        renderer.render (ctx, true, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
-        ctx.restore ();
-      }
+      if (!required_now) return;
+      ctx.save ();
+      ctx.rectangle (0, double.max (0, y), req.width, double.min (req.height, h - y));
+      ctx.clip ();
+      ctx.translate (0, y);
+      renderer.render (ctx, true, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
+      ctx.restore ();
     }
-    private void _render_row_to_surface (int row, Requisition req)
+    private Cairo.Surface _render_row_to_surface (int row, Requisition req)
     {
       Cairo.Surface surf = new Cairo.ImageSurface (Cairo.Format.ARGB32, req.width, req.height);
       var ctx = new Cairo.Context (surf);
       renderer.render (ctx, false, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
-      cached_surfaces.set (row, surf);
+      return surf;
     }
   }
   /* Result List stuff */
@@ -498,6 +459,7 @@ namespace Synapse
     }
     public void move_selection_to_index (int i)
     {
+      if (view.get_list_size () == 0) return;
       view.scroll_to (i);
       view.selected = i;
       status.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", i + 1, view.get_list_size ()));
