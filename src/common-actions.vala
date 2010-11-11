@@ -31,7 +31,6 @@ namespace Synapse
       public string icon_name { get; construct set; }
       public bool has_thumbnail { get; construct set; }
       public string thumbnail_path { get; construct set; }
-      public string uri { get; set; }
       public MatchType match_type { get; construct set; }
       
       public int default_relevancy { get; set; }
@@ -157,7 +156,9 @@ namespace Synapse
 
       public override void execute_internal (Match? match)
       {
-        var f = File.new_for_uri (match.uri);
+        UriMatch uri_match = match as UriMatch;
+        return_if_fail (uri_match != null);
+        var f = File.new_for_uri (uri_match.uri);
         try
         {
           var app_info = f.query_default_handler (null);
@@ -196,7 +197,9 @@ namespace Synapse
 
       public override void execute_internal (Match? match)
       {
-        var f = File.new_for_uri (match.uri);
+        UriMatch uri_match = match as UriMatch;
+        return_if_fail (uri_match != null);
+        var f = File.new_for_uri (uri_match.uri);
         f = f.get_parent ();
         try
         {
@@ -214,7 +217,8 @@ namespace Synapse
       public override bool valid_for_match (Match match)
       {
         if (match.match_type != MatchType.GENERIC_URI) return false;
-        var f = File.new_for_uri (match.uri);
+        UriMatch uri_match = match as UriMatch;
+        var f = File.new_for_uri (uri_match.uri);
         var parent = f.get_parent ();
         return parent != null && f.is_native ();
       }

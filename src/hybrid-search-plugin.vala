@@ -36,10 +36,10 @@ namespace Synapse
       public string icon_name { get; construct set; default = ""; }
       public bool has_thumbnail { get; construct set; default = false; }
       public string thumbnail_path { get; construct set; }
-      public string uri { get; set; }
       public MatchType match_type { get; construct set; }
 
       // for FileMatch
+      public string uri { get; set; }
       public QueryFlags file_type { get; set; }
       public string mime_type { get; set; }
 
@@ -559,7 +559,12 @@ namespace Synapse
       {
         if (q_id != query_id) return;
         // let's mine directories ZG is aware of
-        foreach (var match in rs) uris.add (match.key.uri);
+        foreach (var match in rs)
+        {
+          unowned UriMatch uri_match = match.key as UriMatch;
+          if (uri_match == null) continue;
+          uris.add (uri_match.uri);
+        }
         original_rs = rs;
         search.callback ();
       });

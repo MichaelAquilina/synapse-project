@@ -22,6 +22,7 @@ synapse_SOURCES = \
 	match.vala \
 	query.vala \
 	dbus-service.vala \
+	desktop-file-service.vala \
 	command-plugin.vala \
 	desktop-file-plugin.vala \
 	dictionary.vala \

@@ -39,7 +39,6 @@ namespace Synapse
     public abstract string icon_name { get; construct set; }
     public abstract bool has_thumbnail { get; construct set; }
     public abstract string thumbnail_path { get; construct set; }
-    public abstract string uri { get; set; }
     public abstract MatchType match_type { get; construct set; }
 
     public virtual void execute (Match? match)
@@ -57,6 +56,7 @@ namespace Synapse
 
   public interface UriMatch: Match
   {
+    public abstract string uri { get; set; }
     public abstract QueryFlags file_type { get; set; }
     public abstract string mime_type { get; set; }
   }
@@ -68,7 +68,6 @@ namespace Synapse
     public string icon_name { get; construct set; }
     public bool has_thumbnail { get; construct set; }
     public string thumbnail_path { get; construct set; }
-    public string uri { get; set; }
     public MatchType match_type { get; construct set; }
     
     public DefaultMatch (string query_string)

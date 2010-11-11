@@ -67,10 +67,13 @@ namespace Synapse
     {
       matches.set (match, relevancy);
 
-      unowned string uri = match.uri;
-      if (uri != null && uri != "")
+      if (match is UriMatch)
       {
-        uris.add (uri);
+        unowned string uri = (match as UriMatch).uri;
+        if (uri != null && uri != "")
+        {
+          uris.add (uri);
+        }
       }
     }
 
@@ -220,6 +223,7 @@ namespace Synapse
     // data sink will keep reference to the name cache, so others will get this
     // instance on call to get_default()
     private DBusNameCache dbus_name_cache;
+    private DesktopFileService desktop_file_service;
     private PluginRegistry registry;
 
     construct
@@ -230,8 +234,40 @@ namespace Synapse
 
       // oh well, yea we need a few singletons
       registry = PluginRegistry.get_default ();
+      
+      initialize_caches ();
+    }
+    
+    private async void initialize_caches ()
+    {
+      int initialized_components = 0;
+      int NUM_COMPONENTS = 2;
+      
       dbus_name_cache = DBusNameCache.get_default ();
-      dbus_name_cache.initialization_done.connect (load_plugins);
+      ulong sid1 = dbus_name_cache.initialization_done.connect (() =>
+      {
+        initialized_components++;
+        if (initialized_components >= NUM_COMPONENTS)
+        {
+          initialize_caches.callback ();
+        }
+      });
+      
+      desktop_file_service = DesktopFileService.get_default ();
+      ulong sid2 = desktop_file_service.initialization_done.connect (() =>
+      {
+        initialized_components++;
+        if (initialized_components >= NUM_COMPONENTS)
+        {
+          initialize_caches.callback ();
+        }
+      });
+      
+      yield;
+      SignalHandler.disconnect (dbus_name_cache, sid1);
+      SignalHandler.disconnect (desktop_file_service, sid2);
+
+      Idle.add (() => { this.load_plugins (); return false; });
     }
 
     private bool has_unknown_handlers = false;

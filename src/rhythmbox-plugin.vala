@@ -71,7 +71,6 @@ namespace Synapse
       public string icon_name { get; construct set; }
       public bool has_thumbnail { get; construct set; }
       public string thumbnail_path { get; construct set; }
-      public string uri { get; set; }
       public MatchType match_type { get; construct set; }
       
       public int default_relevancy { get; set; }
@@ -99,7 +98,6 @@ namespace Synapse
       public string icon_name { get; construct set; default = ""; }
       public bool has_thumbnail { get; construct set; default = false; }
       public string thumbnail_path { get; construct set; }
-      public string uri { get; set; }
       public MatchType match_type { get; construct set; }
 
       public void execute (Match? match)
