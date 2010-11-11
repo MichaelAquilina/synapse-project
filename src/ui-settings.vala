@@ -193,6 +193,7 @@ namespace Synapse
       
       /* General Tab */
       var theme_frame = new Frame (null);
+      theme_frame.set_shadow_type (Gtk.ShadowType.NONE);
       var theme_frame_label = new Label (null);
       theme_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", "Behavior & Look"));
       theme_frame.set_label_widget (theme_frame_label);
@@ -221,6 +222,7 @@ namespace Synapse
 
       /* keybinding treeview */
       var shortcut_frame = new Frame (null);
+      shortcut_frame.set_shadow_type (Gtk.ShadowType.NONE);
       var shortcut_frame_label = new Label (null);
       shortcut_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", "Shortcuts"));
       shortcut_frame.set_label_widget (shortcut_frame_label);

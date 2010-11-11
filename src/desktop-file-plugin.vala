@@ -21,102 +21,50 @@
 
 namespace Synapse
 {
-  errordomain DesktopFileError
+  public class DesktopFilePlugin: ActionPlugin
   {
-    UNINTERESTING_ENTRY
-  }
-
-  public class DesktopFileInfo: Object, Match, ApplicationMatch
-  {
-    // for Match interface
-    public string title { get; construct set; }
-    public string description { get; set; default = ""; }
-    public string icon_name { get; construct set; default = ""; }
-    public bool has_thumbnail { get; construct set; default = false; }
-    public string thumbnail_path { get; construct set; }
-    public string uri { get; set; }
-    public MatchType match_type { get; construct set; }
-
-    // for ApplicationMatch
-    public AppInfo? app_info { get; set; default = null; }
-    public bool needs_terminal { get; set; default = false; }
-    public string? filename { get; construct set; }
-
-    private string? title_folded = null;
-    public unowned string get_title_folded ()
+    private class DesktopFileMatch: Object, Match, ApplicationMatch
     {
-      if (title_folded == null) title_folded = title.casefold ();
-      return title_folded;
-    }
+      // for Match interface
+      public string title { get; construct set; }
+      public string description { get; set; default = ""; }
+      public string icon_name { get; construct set; default = ""; }
+      public bool has_thumbnail { get; construct set; default = false; }
+      public string thumbnail_path { get; construct set; }
+      public MatchType match_type { get; construct set; }
 
-    public string exec { get; set; }
+      // for ApplicationMatch
+      public AppInfo? app_info { get; set; default = null; }
+      public bool needs_terminal { get; set; default = false; }
+      public string? filename { get; construct set; }
 
-    public bool is_valid { get; private set; default = true; }
-
-    private static string GROUP = "Desktop Entry";
-
-    public DesktopFileInfo.for_keyfile (string path, KeyFile keyfile)
-    {
-      Object (filename: path, match_type: MatchType.APPLICATION);
-
-      init_from_keyfile (keyfile);
-    }
-
-    private void init_from_keyfile (KeyFile keyfile)
-    {
-      try
+      private string? title_folded = null;
+      public unowned string get_title_folded ()
       {
-        if (keyfile.get_string (GROUP, "Type") != "Application")
-        {
-          throw new DesktopFileError.UNINTERESTING_ENTRY ("Not Application-type desktop entry");
-        }
-
-        title = keyfile.get_locale_string (GROUP, "Name");
-        exec = keyfile.get_string (GROUP, "Exec");
-
-        // check for hidden desktop files
-        if (keyfile.has_key (GROUP, "Hidden") &&
-          keyfile.get_boolean (GROUP, "Hidden"))
-        {
-          is_valid = false;
-          return;
-        }
-        if (keyfile.has_key (GROUP, "NoDisplay") &&
-          keyfile.get_boolean (GROUP, "NoDisplay"))
-        {
-          is_valid = false;
-          return;
-        }
-        if (keyfile.has_key (GROUP, "Comment"))
-        {
-          description = keyfile.get_locale_string (GROUP, "Comment");
-        }
-        if (keyfile.has_key (GROUP, "Icon"))
-        {
-          icon_name = keyfile.get_locale_string (GROUP, "Icon");
-          if (!Path.is_absolute (icon_name) &&
-              (icon_name.has_suffix (".png") ||
-              icon_name.has_suffix (".svg") ||
-              icon_name.has_suffix (".xpm")))
-          {
-            icon_name = icon_name.ndup (icon_name.size () - 4);
-          }
-        }
-        if (keyfile.has_key (GROUP, "Terminal"))
-        {
-          needs_terminal = keyfile.get_boolean (GROUP, "Terminal");
-        }
+        if (title_folded == null) title_folded = title.casefold ();
+        return title_folded;
       }
-      catch (Error err)
+
+      public string exec { get; set; }
+
+      public DesktopFileMatch.for_info (DesktopFileInfo info)
       {
-        warning ("%s", err.message);
-        is_valid = false;
+        Object (filename: info.filename, match_type: MatchType.APPLICATION);
+
+        init_from_info (info);
+      }
+
+      private void init_from_info (DesktopFileInfo info)
+      {
+        this.title = info.name;
+        this.description = info.comment;
+        this.icon_name = info.icon_name;
+        this.exec = info.exec;
+        this.needs_terminal = info.needs_terminal;
+        this.title_folded = info.get_name_folded ();
       }
     }
-  }
 
-  public class DesktopFilePlugin: DataPlugin
-  {
     static construct
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -127,11 +75,22 @@ namespace Synapse
       );
     }
     
-    private Gee.List<DesktopFileInfo> desktop_files;
+    protected override bool handles_unknown ()
+    {
+      return false;
+    }
+    
+    protected override bool provides_data ()
+    {
+      return true;
+    }
+    
+    private Gee.List<DesktopFileMatch> desktop_files;
 
     construct
     {
-      desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
+      desktop_files = new Gee.ArrayList<DesktopFileMatch> ();
+      mimetype_map = new Gee.HashMap<string, OpenWithAction> ();
 
       load_all_desktop_files ();
     }
@@ -141,60 +100,19 @@ namespace Synapse
 
     private async void load_all_desktop_files ()
     {
-      string[] data_dirs = Environment.get_system_data_dirs ();
-      data_dirs += Environment.get_user_data_dir ();
-
       loading_in_progress = true;
+      Idle.add_full (Priority.LOW, load_all_desktop_files.callback);
+      yield;
 
-      foreach (unowned string data_dir in data_dirs)
+      var dfs = DesktopFileService.get_default ();
+
+      foreach (DesktopFileInfo dfi in dfs.get_desktop_files ())
       {
-        string dir_path = Path.build_filename (data_dir, "applications", null);
-        try
-        {
-          var directory = File.new_for_path (dir_path);
-          if (!directory.query_exists ()) continue;
-          var enumerator = yield directory.enumerate_children_async (
-            FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
-          var files = yield enumerator.next_files_async (1024, 0);
-          foreach (var f in files)
-          {
-            unowned string name = f.get_name ();
-            if (name.has_suffix (".desktop"))
-            {
-              yield load_desktop_file (directory.get_child (name));
-            }
-          }
-        }
-        catch (Error err)
-        {
-          warning ("%s", err.message);
-        }
+        desktop_files.add (new DesktopFileMatch.for_info (dfi));
       }
 
       loading_in_progress = false;
       load_complete ();
-    }
-
-    private async void load_desktop_file (File file)
-    {
-      try
-      {
-        size_t len;
-        string contents;
-        bool success = yield file.load_contents_async (null, 
-                                                       out contents, out len);
-        if (success)
-        {
-          var keyfile = new KeyFile ();
-          keyfile.load_from_data (contents, len, 0);
-          var dfi = new DesktopFileInfo.for_keyfile (file.get_path(), keyfile);
-          if (dfi.is_valid) desktop_files.add (dfi);
-        }
-      }
-      catch (Error err)
-      {
-        warning ("%s", err.message);
-      }
     }
 
     private void simple_search (Query q, ResultSet results)
@@ -206,7 +124,7 @@ namespace Synapse
       {
         if (dfi.get_title_folded ().has_prefix (query))
         {
-          results.add (dfi, 90);
+          results.add (dfi, Query.MATCH_PREFIX);
         }
         else if (dfi.exec.has_prefix (q.query_string))
         {
@@ -284,6 +202,106 @@ namespace Synapse
       q.check_cancellable ();
 
       return result;
+    }
+    
+    private class OpenWithAction: Object, Match
+    {
+       // for Match interface
+      public string title { get; construct set; }
+      public string description { get; set; default = ""; }
+      public string icon_name { get; construct set; default = ""; }
+      public bool has_thumbnail { get; construct set; default = false; }
+      public string thumbnail_path { get; construct set; }
+      public MatchType match_type { get; construct set; }
+      
+      public DesktopFileInfo desktop_info { get; private set; }
+      
+      public OpenWithAction (DesktopFileInfo info)
+      {
+        Object ();
+        
+        init_with_info (info);
+      }
+
+      private void init_with_info (DesktopFileInfo info)
+      {
+        this.title = "Open with %s".printf (info.name);
+        this.icon_name = info.icon_name;
+        this.description = "Opens current selection using %s".printf (info.name);
+        this.desktop_info = info;
+      }
+      
+      protected void execute (Match? match)
+      {
+        UriMatch uri_match = match as UriMatch;
+        return_if_fail (uri_match != null);
+        
+        var f = File.new_for_uri (uri_match.uri);
+        try
+        {
+          var app_info = new DesktopAppInfo.from_filename (desktop_info.filename);
+          List<File> files = new List<File> ();
+          files.prepend (f);
+          app_info.launch (files, new Gdk.AppLaunchContext ());
+        }
+        catch (Error err)
+        {
+          warning ("%s", err.message);
+        }
+      }
+   }
+    
+    private Gee.Map<string, Gee.List<OpenWithAction> > mimetype_map;
+    
+    public override ResultSet? find_for_match (Query query, Match match)
+    {
+      if (match.match_type != MatchType.GENERIC_URI) return null;
+
+      var uri_match = match as UriMatch;
+      return_val_if_fail (uri_match != null, null);
+      
+      var dfs = DesktopFileService.get_default ();
+
+      var list_for_mimetype = dfs.get_desktop_files_for_type (uri_match.mime_type);
+      if (list_for_mimetype.size < 2) return null;
+
+      var rs = new ResultSet ();
+      Gee.List<OpenWithAction> ow_list = mimetype_map[uri_match.mime_type];
+      if (ow_list == null)
+      {
+        ow_list = new Gee.LinkedList<OpenWithAction> ();
+        mimetype_map[uri_match.mime_type] = ow_list;
+        foreach (var entry in list_for_mimetype)
+        {
+          ow_list.add (new OpenWithAction (entry));
+        }
+      }
+      
+      if (query.query_string == "")
+      {
+        foreach (var action in ow_list)
+        {
+          rs.add (action, Query.MATCH_FUZZY);
+        }
+      }
+      else
+      {
+        var matchers = Query.get_matchers_for_query (query.query_string, 0,
+          RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
+        foreach (var action in ow_list)
+        {
+          foreach (var matcher in matchers)
+          {
+            if (matcher.key.match (action.title))
+            {
+              rs.add (action, matcher.value);
+              break;
+            }
+          }
+        }
+      }
+
+      return rs;
     }
   }
 }
