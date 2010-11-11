@@ -112,8 +112,8 @@ namespace Synapse
     }
     public override void size_request (out Requisition requisition)
     {
-      requisition.width = 400;
-      requisition.height = PADDING + ICON_SIZE;
+      requisition.width = precalc_req.width;
+      requisition.height = precalc_req.height;
     }
   }
   public class ListView<T>: Gtk.Label
