@@ -120,7 +120,7 @@ namespace Synapse
   {
     private Utils.ColorHelper ch;
     private Gee.List<T> data;
-    private Cairo.Surface[] cached_surfaces;
+    private Gee.List<Cairo.Surface?> cached_surfaces;
     private Renderer renderer;
     private int min_rows;
     private int scrollto;
@@ -133,9 +133,9 @@ namespace Synapse
       }
       set {
         if (selected_index == value || value < 0 || data == null || value >= data.size) return;
-        if (selected_index >= 0 && selected_index < cached_surfaces.length) cached_surfaces[selected_index] = null;
+        if (selected_index >= 0 && selected_index < cached_surfaces.size) cached_surfaces.set (selected_index, null);
         selected_index = value;
-        if (selected_index >= 0 && selected_index < cached_surfaces.length) cached_surfaces[value] = null;
+        if (selected_index >= 0 && selected_index < cached_surfaces.size) cached_surfaces.set (value, null);
         queue_draw ();
       }
     }
@@ -174,7 +174,7 @@ namespace Synapse
       selected_index = -1;
       scrollto = 0;
       data = null;
-      cached_surfaces = {};
+      cached_surfaces = new Gee.ArrayList<Cairo.Surface?> ();
       this.renderer = rend;
       this.renderer.on_style_set ();
       renderer.request_redraw.connect (()=>{
@@ -199,10 +199,12 @@ namespace Synapse
     public void set_list (Gee.List<T>? new_data)
     {
       data = new_data;
-      clear_surfaces ();
-      cached_surfaces = {};
+      cached_surfaces = new Gee.ArrayList<Cairo.Surface?> ();
       if (data != null && data.size > 0)
-        cached_surfaces.resize (data.size);
+      {
+        for (int i = 0; i < data.size; i++)
+          cached_surfaces.add (null);
+      }
       scrollto = 0;
       this.queue_draw ();
     }
@@ -211,11 +213,11 @@ namespace Synapse
       if (data == null)
       {
         data = new Gee.ArrayList<T> ();
-        clear_surfaces ();
+        cached_surfaces = new Gee.ArrayList<Cairo.Surface?> ();
         scrollto = 0;
       }
       data.add (obj);
-      cached_surfaces.resize (cached_surfaces.length + 1);
+      cached_surfaces.add (null);
       this.queue_draw ();
     }
     public void clear ()
@@ -226,11 +228,9 @@ namespace Synapse
     }
     private void clear_surfaces ()
     {
-      for (long i = 0; i < cached_surfaces.length; i++)
+      for (int i = 0; i < cached_surfaces.size; i++)
       {
-        if (cached_surfaces[i] != null)
-          cached_surfaces[i].finish ();
-        cached_surfaces[i] = null;
+        cached_surfaces.set (i, null);
       }
     }
     public override void size_request (out Requisition requisition)
@@ -362,7 +362,7 @@ namespace Synapse
     private void render_row_at (Cairo.Context ctx, int row, double y, Requisition req, bool required_now, Cairo.Pattern? pat = null)
     {
       Cairo.Surface surf = null;
-      if (cached_surfaces[row] == null)
+      if (cached_surfaces.get (row) == null)
       {
         if (required_now)
           render_row_to_surface (row, req);
@@ -371,7 +371,7 @@ namespace Synapse
       }
       if (!required_now) return;
       ctx.set_operator (Cairo.Operator.OVER);
-      surf = cached_surfaces[row];
+      surf = cached_surfaces.get (row);
       ctx.set_source_surface (surf, 0, y);
       if (pat == null)
         ctx.paint ();
@@ -384,15 +384,16 @@ namespace Synapse
     }
     private async void async_render_row_to_surface (int row, Requisition req)
     {
+      if (row < 0 || row >= cached_surfaces.size) return;
       _render_row_to_surface (row, req);
     }    
     private void _render_row_to_surface (int row, Requisition req)
     {
-      if (cached_surfaces[row] != null) return; //already rendered
+      if (cached_surfaces.get (row) != null) return; //already rendered
       Cairo.Surface surf = new Cairo.ImageSurface (Cairo.Format.ARGB32, req.width, req.height);
       var ctx = new Cairo.Context (surf);
       renderer.render (ctx, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
-      cached_surfaces[row] = surf;
+      cached_surfaces.set (row, surf);
     }
   }
   /* Result List stuff */
