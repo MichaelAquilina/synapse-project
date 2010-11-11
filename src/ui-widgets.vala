@@ -373,10 +373,14 @@ namespace Synapse
       ctx.set_operator (Cairo.Operator.OVER);
       surf = cached_surfaces.get (row);
       ctx.set_source_surface (surf, 0, y);
+      ctx.save ();
+      ctx.rectangle (0, y, req.width, req.height);
+      ctx.clip ();
       if (pat == null)
         ctx.paint ();
       else
         ctx.mask (pat);
+      ctx.restore ();
     }
     private void render_row_to_surface (int row, Requisition req)
     {
@@ -1639,7 +1643,12 @@ namespace Synapse
       double h = this.allocation.height;
       
       ctx.set_operator (Cairo.Operator.OVER);
-      ctx.set_source_surface (this.cached_surface, current_offset, Math.round ((h - this.cached_surface.get_height ()) / 2 ));
+      double x, y;
+      x = current_offset;
+      y = Math.round ((h - this.cached_surface.get_height ()) / 2 );
+      ctx.set_source_surface (this.cached_surface, x, y);
+      ctx.rectangle (0, 0, w, h);
+      ctx.clip ();
       var pat = new Pattern.linear (0, 0, w, h);
       double fadepct = wmax / (double)w;
       if (w / 3 < wmax)
