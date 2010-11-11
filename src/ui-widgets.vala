@@ -74,21 +74,17 @@ namespace Synapse
       if (obj == null)
         return;
       Match m = (Match) obj;
-      ctx.set_operator (Cairo.Operator.OVER);
-      if (state == Gtk.StateType.SELECTED)
-      {
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.SELECTED);
-        ctx.paint ();
-      }
+      ctx.set_operator (Cairo.Operator.SOURCE);
+      ctx.save ();
+      int rtl_spacing = 0;
+      if (rtl == Gtk.TextDirection.RTL)
+        rtl_spacing = req.width - ICON_SIZE - PADDING * 2;
       try {
         var icon = GLib.Icon.new_for_string(m.icon_name);
         Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, ICON_SIZE, Gtk.IconLookupFlags.FORCE_SIZE);
         Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
         if (icon_pixbuf != null)
         {
-          int rtl_spacing = 0;
-          if (rtl == Gtk.TextDirection.RTL)
-            rtl_spacing = req.width - ICON_SIZE - PADDING * 2;
           Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, PADDING + rtl_spacing, PADDING);
           ctx.paint ();
         }
@@ -96,7 +92,7 @@ namespace Synapse
       /* Now the label + description part */
       if (rtl == Gtk.TextDirection.RTL)
       {
-        ctx.rectangle (PADDING, PADDING, req.width - ICON_SIZE - PADDING * 3, req.height - PADDING * 2);
+        ctx.rectangle (PADDING, PADDING, rtl_spacing - PADDING, req.height - PADDING * 2);
         ctx.clip ();
         ctx.translate (PADDING, PADDING);
       }
@@ -109,6 +105,13 @@ namespace Synapse
       string s = Markup.printf_escaped (MARKUP, m.title, m.description);
       layout.set_markup (s, (int)s.length);
       Pango.cairo_show_layout (ctx, layout);
+      ctx.restore ();
+      if (state == Gtk.StateType.SELECTED)
+      {
+        ctx.set_operator (Cairo.Operator.DEST_OVER);
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.SELECTED);
+        ctx.paint ();
+      }
     }
     public override void size_request (out Requisition requisition)
     {
@@ -118,6 +121,23 @@ namespace Synapse
   }
   public class ListView<T>: Gtk.Label
   {
+    public abstract class Renderer: GLib.Object
+    {
+      /* Render ojb at state on ctx with req.width and req.height */
+      public abstract void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj);
+      public abstract void size_request (out Requisition requisition);
+      public signal void request_redraw ();
+      public signal void on_style_set ();
+    }
+    public enum ScrollMode
+    {
+      TOP,
+      MIDDLE,
+      BOTTOM,
+      TOP_FORCED,
+      MIDDLE_FORCED,
+      BOTTOM_FORCED
+    }
     private Utils.ColorHelper ch;
     private Gee.List<T> data;
     private Gee.List<Cairo.Surface?> cached_surfaces;
@@ -127,6 +147,9 @@ namespace Synapse
     public ScrollMode scroll_mode {get; set; default = ScrollMode.MIDDLE;}
     public bool use_base_background {get; set; default = true;}
     private int selected_index; //for now only single selection mode
+    public bool animation_enabled {get; set; default = true;}
+    private const int ANIM_TIMEOUT = 40;
+    private const int ANIM_MAX_PIXEL_JUMP = 4;
     public int selected {
       get {
         return selected_index;
@@ -139,17 +162,6 @@ namespace Synapse
         queue_draw ();
       }
     }
-    public bool animation_enabled {get; set; default = true;}
-    private const int ANIM_TIMEOUT = 30;
-    public enum ScrollMode
-    {
-      TOP,
-      MIDDLE,
-      BOTTOM,
-      TOP_FORCED,
-      MIDDLE_FORCED,
-      BOTTOM_FORCED
-    }
     public int min_visible_rows {
       get {
         return min_rows;
@@ -160,14 +172,7 @@ namespace Synapse
         queue_resize ();
       }
     }
-    public abstract class Renderer: GLib.Object
-    {
-      /* Render ojb at state on ctx with req.width and req.height */
-      public abstract void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj);
-      public abstract void size_request (out Requisition requisition);
-      public signal void request_redraw ();
-      public signal void on_style_set ();
-    }
+
     public ListView (ListView.Renderer rend)
     {
       min_rows = 1;
@@ -206,6 +211,7 @@ namespace Synapse
           cached_surfaces.add (null);
       }
       scrollto = 0;
+      current_voffset = 0;
       this.queue_draw ();
     }
     public void add_data (T obj)
@@ -290,8 +296,10 @@ namespace Synapse
             if (data.size * req.height + target < this.allocation.height)
               target = this.allocation.height - (data.size * req.height);
           }
+          if (target > 0)
+            target = 0;
           break;
-        default: //middle forced mode
+        default: //ScrollMode.MIDDLE_FORCED
           target = (int) (this.allocation.height / 2 - req.height / 2 - scrollto * req.height);
           break;
       }
@@ -306,7 +314,7 @@ namespace Synapse
         tid = 0;
         return false; // stop animation
       }
-      int inc = int.max (1, (int) Math.fabs ((target - current_voffset) / 4));
+      int inc = int.max (1, (int) Math.fabs ((target - current_voffset) / ANIM_MAX_PIXEL_JUMP));
       current_voffset += target > current_voffset ? inc : - inc;
       queue_draw ();
       return true;
@@ -345,12 +353,13 @@ namespace Synapse
       renderer.size_request (out req);
       req.width = (int)w; //use allocation width
 
-      int rows_to_process = (int)(h / req.height) * 3;
-      int i = (- current_voffset) / req.height - rows_to_process / 2;
+      int rows_to_process = (int)(h / req.height) * 2;
+      int i = (- current_voffset) / req.height - rows_to_process / 4;
       if (i < 0)
         i = 0;
       rows_to_process += i;
       double y1, y2;
+      ctx.set_operator (Cairo.Operator.OVER);
       for (; i < rows_to_process && i < data.size; i++)
       {
         y1 = req.height * i + current_voffset;
@@ -359,18 +368,16 @@ namespace Synapse
       }
       return true;
     }
+    double max_timing = 0.0;
+    double med_timing = 0.0;
     private void render_row_at (Cairo.Context ctx, int row, double y, Requisition req, bool required_now, Cairo.Pattern? pat = null)
     {
-      Cairo.Surface surf = null;
       if (cached_surfaces.get (row) == null)
       {
-        if (required_now)
-          render_row_to_surface (row, req);
-        else
-          async_render_row_to_surface (row, req);
+        _render_row_to_surface (row, req);
       }
       if (!required_now) return;
-      ctx.set_operator (Cairo.Operator.OVER);
+      Cairo.Surface surf = null;
       surf = cached_surfaces.get (row);
       ctx.set_source_surface (surf, 0, y);
       ctx.save ();
@@ -382,18 +389,8 @@ namespace Synapse
         ctx.mask (pat);
       ctx.restore ();
     }
-    private void render_row_to_surface (int row, Requisition req)
-    {
-      _render_row_to_surface (row, req);
-    }
-    private async void async_render_row_to_surface (int row, Requisition req)
-    {
-      if (row < 0 || row >= cached_surfaces.size) return;
-      _render_row_to_surface (row, req);
-    }    
     private void _render_row_to_surface (int row, Requisition req)
     {
-      if (cached_surfaces.get (row) != null) return; //already rendered
       Cairo.Surface surf = new Cairo.ImageSurface (Cairo.Format.ARGB32, req.width, req.height);
       var ctx = new Cairo.Context (surf);
       renderer.render (ctx, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
