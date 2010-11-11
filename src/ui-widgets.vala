@@ -69,12 +69,22 @@ namespace Synapse
       this.precalc_req.height = int.max (height, ICON_SIZE + PADDING * 2);
       text_displacement = height < ICON_SIZE ? (ICON_SIZE - height) / 2 : 0;
     }
-    public override void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj)
+    public override void render (Cairo.Context ctx, bool direct_rendering, Requisition req, Gtk.StateType state, void* obj)
     {
       if (obj == null)
         return;
       Match m = (Match) obj;
-      ctx.set_operator (Cairo.Operator.SOURCE);
+      if (direct_rendering)
+      {
+        ctx.set_operator (Cairo.Operator.OVER);
+        if (state == Gtk.StateType.SELECTED)
+        {
+          ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.SELECTED);
+          ctx.paint ();
+        }
+      }
+      else
+        ctx.set_operator (Cairo.Operator.SOURCE);
       ctx.save ();
       int rtl_spacing = 0;
       if (rtl == Gtk.TextDirection.RTL)
@@ -106,7 +116,7 @@ namespace Synapse
       layout.set_markup (s, (int)s.length);
       Pango.cairo_show_layout (ctx, layout);
       ctx.restore ();
-      if (state == Gtk.StateType.SELECTED)
+      if (!direct_rendering && state == Gtk.StateType.SELECTED)
       {
         ctx.set_operator (Cairo.Operator.DEST_OVER);
         ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.SELECTED);
@@ -124,7 +134,7 @@ namespace Synapse
     public abstract class Renderer: GLib.Object
     {
       /* Render ojb at state on ctx with req.width and req.height */
-      public abstract void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj);
+      public abstract void render (Cairo.Context ctx, bool direct_rendering, Requisition req, Gtk.StateType state, void* obj);
       public abstract void size_request (out Requisition requisition);
       public signal void request_redraw ();
       public signal void on_style_set ();
@@ -146,6 +156,7 @@ namespace Synapse
     private int scrollto;
     public ScrollMode scroll_mode {get; set; default = ScrollMode.MIDDLE;}
     public bool use_base_background {get; set; default = true;}
+    public bool direct_rendering {get; set; default = true;}
     private int selected_index; //for now only single selection mode
     public bool animation_enabled {get; set; default = true;}
     private const int ANIM_TIMEOUT = 40;
@@ -333,18 +344,12 @@ namespace Synapse
       ctx.rectangle (0, 0, w, h);
       ctx.clip ();
 
-      Cairo.Pattern pat = null;
-      /*pat = new Cairo.Pattern.linear (0, 0, 0, h);
-      pat.add_color_stop_rgba (0.8, 1, 1, 1, 1);
-      pat.add_color_stop_rgba (1, 1, 1, 1, 0);*/
+      ctx.set_font_options (this.get_screen().get_font_options());
 
       if (use_base_background)
       {
         ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
-        if (pat != null)
-          ctx.mask (pat);
-        else
-          ctx.paint ();
+        ctx.paint ();
       }
       
       if (data == null || data.size < 1) return true;
@@ -360,40 +365,53 @@ namespace Synapse
       rows_to_process += i;
       double y1, y2;
       ctx.set_operator (Cairo.Operator.OVER);
+      //Timer t = new Timer ();
       for (; i < rows_to_process && i < data.size; i++)
       {
         y1 = req.height * i + current_voffset;
         y2 = y1 + req.height;
-        render_row_at (ctx, i, y1, req, ( 0 <= y1 <= h ) || ( 0 <= y2 <= h ) , pat);
+        render_row_at (ctx, i, y1, h, req, ( 0 <= y1 <= h ) || ( 0 <= y2 <= h ));
       }
+      //double elap = t.elapsed ();
+      //stderr.printf ("timer %.3f\n", elap);
       return true;
     }
     double max_timing = 0.0;
     double med_timing = 0.0;
-    private void render_row_at (Cairo.Context ctx, int row, double y, Requisition req, bool required_now, Cairo.Pattern? pat = null)
+    private void render_row_at (Cairo.Context ctx, int row, double y, double h, Requisition req, bool required_now)
     {
-      if (cached_surfaces.get (row) == null)
+      if (!direct_rendering)
       {
-        _render_row_to_surface (row, req);
-      }
-      if (!required_now) return;
-      Cairo.Surface surf = null;
-      surf = cached_surfaces.get (row);
-      ctx.set_source_surface (surf, 0, y);
-      ctx.save ();
-      ctx.rectangle (0, y, req.width, req.height);
-      ctx.clip ();
-      if (pat == null)
+        if (cached_surfaces.get (row) == null)
+        {
+          _render_row_to_surface (row, req);
+        }
+        if (!required_now) return;
+        Cairo.Surface surf = null;
+        surf = cached_surfaces.get (row);
+        ctx.set_source_surface (surf, 0, y);
+        ctx.save ();
+        ctx.rectangle (0, y, req.width, req.height);
+        ctx.clip ();
         ctx.paint ();
+        ctx.restore ();
+      }
       else
-        ctx.mask (pat);
-      ctx.restore ();
+      {
+        if (!required_now) return;
+        ctx.save ();
+        ctx.rectangle (0, double.max (0, y), req.width, double.min (req.height, h - y));
+        ctx.clip ();
+        ctx.translate (0, y);
+        renderer.render (ctx, true, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
+        ctx.restore ();
+      }
     }
     private void _render_row_to_surface (int row, Requisition req)
     {
       Cairo.Surface surf = new Cairo.ImageSurface (Cairo.Format.ARGB32, req.width, req.height);
       var ctx = new Cairo.Context (surf);
-      renderer.render (ctx, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
+      renderer.render (ctx, false, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
       cached_surfaces.set (row, surf);
     }
   }
