@@ -1,0 +1,223 @@
+/*
+ * Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
+ *
+ * Authored by Michal Hruby <michal.mhr@gmail.com>
+ *
+ */
+
+/* 
+ * This plugin keeps a cache of file names for directories that are commonly
+ * used. 
+ */
+
+namespace Synapse
+{
+  public class DirectoryPlugin: DataPlugin
+  {
+    private class MatchObject: Object, Match, UriMatch
+    {
+      // for Match interface
+      public string title { get; construct set; }
+      public string description { get; set; default = ""; }
+      public string icon_name { get; construct set; default = ""; }
+      public bool has_thumbnail { get; construct set; default = false; }
+      public string thumbnail_path { get; construct set; }
+      public MatchType match_type { get; construct set; }
+
+      // for FileMatch
+      public string uri { get; set; }
+      public QueryFlags file_type { get; set; }
+      public string mime_type { get; set; }
+
+      public MatchObject (string uri)
+      {
+        Object (match_type: MatchType.GENERIC_URI,
+                has_thumbnail: false,
+                uri: uri,
+                file_type: QueryFlags.UNCATEGORIZED,
+                mime_type: "inode/directory");
+      }
+    }
+    
+    private class DirectoryInfo
+    {
+      public MatchObject match_obj;
+      public string name;
+      public string name_folded;
+
+      public DirectoryInfo (string uri)
+      {
+        this.match_obj = new MatchObject (uri);
+        var f = File.new_for_uri (uri);
+        this.match_obj.description = f.get_path ();
+      }
+
+      private bool initialized = false;
+
+      public async void initialize ()
+      {
+        debug ("getting info for %s", match_obj.uri);
+        var f = File.new_for_uri (match_obj.uri);
+        try
+        {
+          var fi = yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_ICON + "," +
+                                             FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
+                                             0, Priority.DEFAULT, null);
+          this.name = fi.get_display_name ();
+          this.name_folded = this.name.casefold ();
+          this.match_obj.title = this.name;
+          this.match_obj.icon_name = fi.get_icon ().to_string ();
+        }
+        catch (Error err)
+        {
+          warning ("%s", err.message);
+        }
+        
+        initialized = true;
+      }
+    }
+
+    static construct
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (DirectoryPlugin),
+        "Directory search",
+        "Allows opening of commonly used directories.",
+        "folder"
+      );
+    }
+    
+    private Gee.Map<unowned string, DirectoryInfo> directory_info_map;
+
+    construct
+    {
+      directory_info_map = new Gee.HashMap<unowned string, DirectoryInfo> ();
+    }
+
+    protected override void constructed ()
+    {
+      // FIXME: if zeitgeist-plugin available
+      unowned DataPlugin? zg_plugin;
+      zg_plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin");
+      return_if_fail (zg_plugin != null);
+
+      zg_plugin.search_done.connect (this.zg_plugin_search_done);
+    }
+    
+    private bool xdg_indexed = false;
+
+    private async void index_xdg_directories ()
+    {
+      if (xdg_indexed) return;
+      
+      for (UserDirectory dir = UserDirectory.DESKTOP;
+           dir <= UserDirectory.VIDEOS; //dir < UserDirectory.N_DIRECTORIES;
+           dir = dir + 1)
+      {
+        var path = Environment.get_user_special_dir (dir);
+        var f = File.new_for_path (path);
+        var uri = f.get_uri ();
+        if (uri in directory_info_map) continue;
+
+        var info = new DirectoryInfo (uri);
+        yield info.initialize ();
+        directory_info_map[info.match_obj.uri] = info;
+      }
+      
+      xdg_indexed = true;
+    }
+
+    public signal void zeitgeist_search_complete (ResultSet? rs, uint query_id);
+    
+    private void zg_plugin_search_done (ResultSet? rs, uint query_id)
+    {
+      zeitgeist_search_complete (rs, query_id);
+    }
+    
+    private Gee.Collection<string> extract_directories (ResultSet rs)
+    {
+      Gee.Set<string> directories = new Gee.HashSet<string> ();
+      
+      foreach (var match in rs)
+      {
+        unowned UriMatch uri_match = match.key as UriMatch;
+        if (uri_match == null) continue;
+        var f = File.new_for_uri (uri_match.uri);
+        if (!f.is_native () || !f.has_parent (null)) continue;
+        var parent = f.get_parent ();
+        var parent_uri = parent.get_uri ();
+        if (parent_uri in directories) continue;
+        
+        directories.add (parent_uri);
+      }
+
+      return directories;
+    }
+    
+    private async void process_directories (Gee.Collection<string> dirs)
+    {
+      foreach (var s in dirs)
+      {
+        debug ("processing %s", s);
+      }
+    }
+
+    public override async ResultSet? search (Query q) throws SearchError
+    {
+      if (!(QueryFlags.UNCATEGORIZED in q.query_type)) return null;
+      
+      Gee.Collection<string>? directories = null;
+      uint query_id = q.query_id;
+      // wait for our signal or cancellable
+      ulong sig_id = this.zeitgeist_search_complete.connect ((rs, q_id) =>
+      {
+        if (q_id != query_id) return;
+        // let's mine directories ZG is aware of
+        directories = extract_directories (rs);
+        search.callback ();
+      });
+      ulong canc_sig_id = CancellableFix.connect (q.cancellable, () =>
+      {
+        // who knows what thread this runs in
+        SignalHandler.block (this, sig_id); // is this thread-safe?
+        Idle.add (search.callback);
+      });
+      yield;
+      SignalHandler.disconnect (this, sig_id);
+      q.cancellable.disconnect (canc_sig_id);
+
+      q.check_cancellable ();
+      if (!xdg_indexed) yield index_xdg_directories ();
+
+      // process results from the zeitgeist plugin
+      yield process_directories (directories);
+      
+      q.check_cancellable ();
+ 
+      var rs = new ResultSet ();
+      foreach (var entry in directory_info_map.values)
+      {
+        if (entry.name_folded.has_prefix (q.query_string_folded))
+        {
+          rs.add (entry.match_obj, Query.MATCH_PREFIX - Match.URI_PENALTY);
+        }
+      }
+      
+      return rs;
+    }
+  }
+}

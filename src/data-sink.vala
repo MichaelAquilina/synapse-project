@@ -305,6 +305,7 @@ namespace Synapse
       register_plugin (create_plugin (typeof (UPowerPlugin)));
       register_plugin (create_plugin (typeof (CommandPlugin)));
       register_plugin (create_plugin (typeof (RhythmboxActions)));
+      register_plugin (create_plugin (typeof (DirectoryPlugin)));
 #if TEST_PLUGINS
       register_plugin (create_plugin (typeof (TestSlowPlugin)));
 #endif

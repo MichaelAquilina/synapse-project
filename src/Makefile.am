@@ -27,6 +27,7 @@ synapse_SOURCES = \
 	desktop-file-plugin.vala \
 	dictionary.vala \
 	devhelp-search.vala \
+	directory-plugin.vala \
 	hybrid-search-plugin.vala \
 	gnome-session-plugin.vala \
 	upower-plugin.vala \
