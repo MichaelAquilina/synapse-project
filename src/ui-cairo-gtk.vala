@@ -66,9 +66,28 @@ namespace Synapse
     private const string LABEL_TEXT_SIZE = "x-large";
     private const string DESCRIPTION_TEXT_SIZE = "medium";
     
-    private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
-    private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
-                                             QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.VIDEO, QueryFlags.INTERNET};
+    private string[] categories =
+    {
+      "Actions",
+      "Audio",
+      "Applications",
+      "All",
+      "Documents",
+      "Images",
+      "Video",
+      "Internet"
+    };
+    private QueryFlags[] categories_query =
+    {
+      QueryFlags.ACTIONS,
+      QueryFlags.AUDIO,
+      QueryFlags.APPLICATIONS,
+      QueryFlags.ALL,
+      QueryFlags.DOCUMENTS,
+      QueryFlags.IMAGES,
+      QueryFlags.VIDEO,
+      QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
+    };
 
     /* STATUS */
     private bool list_visible = true;
@@ -161,17 +180,16 @@ namespace Synapse
 
       /* Match or Action Label */
       main_label = new ShrinkingLabel ();
-      main_label.xpad = LABEL_INTERNAL_PADDING * 2;
-      main_label.ypad = LABEL_INTERNAL_PADDING;
+      main_label.xpad = LABEL_INTERNAL_PADDING;
       main_label.set_alignment (0.0f, 1.0f);
       main_label.set_ellipsize (Pango.EllipsizeMode.END);
       var fakeinput = new FakeInput ();
       fakeinput.border_radius = 5;
       {
         var hbox = new HBox (false, 0);
+        hbox.border_width = LABEL_INTERNAL_PADDING;
         hbox.pack_start (main_label);
         hbox.pack_start (throbber, false, false);
-        hbox.pack_start (new Label ("  "), false, false);
         fakeinput.add (hbox);
       }
       
@@ -420,20 +438,12 @@ namespace Synapse
     {
       if (searching_for_matches)
       {
-        action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
-        match_icon.set_pixel_size (ICON_SIZE);
-        match_icon_container_overlayed.swapif (action_icon,
-                                               ContainerOverlayed.Position.MAIN,
-                                               ContainerOverlayed.Position.BOTTOM_RIGHT);
+        match_icon.set_sensitive (true);
         results_container.select (0);
       }
       else
       {
-        match_icon.set_pixel_size (ICON_SIZE * 29 / 100);
-        action_icon.set_pixel_size (ICON_SIZE);
-        match_icon_container_overlayed.swapif (match_icon,
-                                               ContainerOverlayed.Position.MAIN,
-                                               ContainerOverlayed.Position.BOTTOM_RIGHT);
+        match_icon.set_sensitive (false);
         results_container.select (1);
       }
       focus_current_action ();
@@ -642,7 +652,7 @@ namespace Synapse
             main_label.set_markup (
             Markup.printf_escaped ("<span size=\"%s\">%s</span>", LABEL_TEXT_SIZE,
                                    "Type to search..."));
-            main_label_description.set_markup (Utils.markup_string_with_search ("Powered by Zeitgeist", "", "small"));
+            main_label_description.set_markup (Utils.markup_string_with_search ("", "", "small"));
           }
           //else -> impossible
           match_icon.set_icon_name ("search", IconSize.DIALOG);

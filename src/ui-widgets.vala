@@ -274,6 +274,14 @@ namespace Synapse
     {
       Requisition req = {0, 0};
       renderer.size_request (out req);
+      // don't animate if this is not allocated
+      if (this.allocation.height <= 1)
+      {
+        current_voffset = 0;
+        selection_voffset = 0;
+        tid = 0;
+        return false;
+      }
       int target = 0, selection_target = 0;
       switch (scroll_mode)
       {
@@ -303,6 +311,7 @@ namespace Synapse
         current_voffset = target;
         selection_voffset = selection_target;
         queue_draw ();
+        tid = 0;
         return false;
       }
       if (target == current_voffset && selection_target == selection_voffset)
