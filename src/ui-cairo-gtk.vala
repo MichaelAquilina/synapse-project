@@ -161,17 +161,16 @@ namespace Synapse
 
       /* Match or Action Label */
       main_label = new ShrinkingLabel ();
-      main_label.xpad = LABEL_INTERNAL_PADDING * 2;
-      main_label.ypad = LABEL_INTERNAL_PADDING;
+      main_label.xpad = LABEL_INTERNAL_PADDING;
       main_label.set_alignment (0.0f, 1.0f);
       main_label.set_ellipsize (Pango.EllipsizeMode.END);
       var fakeinput = new FakeInput ();
       fakeinput.border_radius = 5;
       {
         var hbox = new HBox (false, 0);
+        hbox.border_width = LABEL_INTERNAL_PADDING;
         hbox.pack_start (main_label);
         hbox.pack_start (throbber, false, false);
-        hbox.pack_start (new Label ("  "), false, false);
         fakeinput.add (hbox);
       }
       
