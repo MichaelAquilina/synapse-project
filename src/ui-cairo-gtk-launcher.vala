@@ -42,6 +42,7 @@ namespace Synapse
     private SettingsWindow settings;
     private DataSink data_sink;
     private GtkHotkey.Info? hotkey;
+    private Inspector inspector;
     
     public UILauncher ()
     {
@@ -56,6 +57,9 @@ namespace Synapse
       if (!is_startup) ui.show ();
       
       settings.theme_selected.connect (init_ui);
+#if ENABLE_INSPECTOR
+      inspector = new Inspector ();
+#endif
     }
     private void init_ui (Type t)
     {

@@ -42,6 +42,7 @@ synapse_SOURCES = \
 	ui-utils.vala \
 	ui-cairo-gtk-launcher.vala \
 	ui-settings.vala \
+	ui-inspector.vala \
 	abstract-tile-object.vala \
 	tile.vala \
 	tile-view.vala \
