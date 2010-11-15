@@ -38,9 +38,9 @@ namespace Synapse
     protected NamedIcon action_icon = null;
     protected ContainerOverlayed match_icon_container_overlayed = null;
     
-    protected ShrinkingLabel match_label_description = null;
-    protected ShrinkingLabel current_label = null;
-    protected ShrinkingLabel action_label = null;
+    protected ShrinkingLabel main_label_description = null;
+    protected ShrinkingLabel main_label = null;
+    protected ShrinkingLabel secondary_label = null;
 
     protected HTextSelector flag_selector = null;
     protected HBox container_top = null;
@@ -170,13 +170,13 @@ namespace Synapse
       }*/
       
       /* Match or Action Label */
-      current_label = new ShrinkingLabel ();
-      current_label.xpad = LABEL_INTERNAL_PADDING * 2;
-      current_label.ypad = LABEL_INTERNAL_PADDING;
-      current_label.set_alignment (0.0f, 1.0f);
-      current_label.set_ellipsize (Pango.EllipsizeMode.END);
+      main_label = new ShrinkingLabel ();
+      main_label.xpad = LABEL_INTERNAL_PADDING * 2;
+      main_label.ypad = LABEL_INTERNAL_PADDING;
+      main_label.set_alignment (0.0f, 1.0f);
+      main_label.set_ellipsize (Pango.EllipsizeMode.END);
       var fakeinput = new FakeInput ();
-      fakeinput.add (current_label);
+      fakeinput.add (main_label);
       fakeinput.border_radius = 5;
       
       /* Query flag selector  */
@@ -188,14 +188,14 @@ namespace Synapse
       flag_selector.selected = 3;
       
       /* Description */
-      match_label_description = new ShrinkingLabel ();
-      match_label_description.set_alignment (0.0f, 1.0f);
-      match_label_description.set_ellipsize (Pango.EllipsizeMode.END);
-      match_label_description.xpad = LABEL_INTERNAL_PADDING * 2;
-      action_label = new ShrinkingLabel ();
-      action_label.set_alignment (1.0f, 1.0f);
-      action_label.set_ellipsize (Pango.EllipsizeMode.START);
-      action_label.xpad = LABEL_INTERNAL_PADDING * 2;
+      main_label_description = new ShrinkingLabel ();
+      main_label_description.set_alignment (0.0f, 1.0f);
+      main_label_description.set_ellipsize (Pango.EllipsizeMode.END);
+      main_label_description.xpad = LABEL_INTERNAL_PADDING * 2;
+      secondary_label = new ShrinkingLabel ();
+      secondary_label.set_alignment (1.0f, 1.0f);
+      secondary_label.set_ellipsize (Pango.EllipsizeMode.START);
+      secondary_label.xpad = LABEL_INTERNAL_PADDING * 2;
       
       {
         var vbox = new VBox (false, 0);
@@ -219,9 +219,9 @@ namespace Synapse
       
       {
         var hbox = new HBox (false, 0);
-        action_label.set_size_request (ICON_SIZE + ACTION_ICON_DISPLACEMENT, -1);
-        hbox.pack_start (action_label, false);
-        hbox.pack_start (match_label_description);
+        secondary_label.set_size_request (ICON_SIZE + ACTION_ICON_DISPLACEMENT, -1);
+        hbox.pack_start (secondary_label, false);
+        hbox.pack_start (main_label_description);
         vcontainer_top.pack_start (hbox, false, true, 5);
       }
       
@@ -284,7 +284,7 @@ namespace Synapse
       double x = this.container.border_width,
              y = flag_selector.allocation.y - border_radius;
       double w = UI_WIDTH - 1.0,
-             h = match_label_description.allocation.y - y + match_label_description.allocation.height + border_radius - 1.0;
+             h = main_label_description.allocation.y - y + main_label_description.allocation.height + border_radius - 1.0;
       if (!comp)
       {
         y = this.container.border_width;
@@ -363,7 +363,7 @@ namespace Synapse
         double x = this.container.border_width,
                y = flag_selector.allocation.y - BORDER_RADIUS;
         double w = UI_WIDTH,
-               h = match_label_description.allocation.y - y + match_label_description.allocation.height + BORDER_RADIUS;
+               h = main_label_description.allocation.y - y + main_label_description.allocation.height + BORDER_RADIUS;
         Utils.cairo_rounded_rect (ctx, x - SHADOW_SIZE, y - SHADOW_SIZE,
                                        w + SHADOW_SIZE * 2, 
                                        h + SHADOW_SIZE * 2,
@@ -421,6 +421,8 @@ namespace Synapse
     }
     private void visual_update_search_for ()
     {
+      Match m = null;
+      int i = 0;
       if (searching_for_matches)
       {
         action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
@@ -439,6 +441,8 @@ namespace Synapse
                                                ContainerOverlayed.Position.BOTTOM_RIGHT);
         results_container.select (1);
       }
+      focus_current_action ();
+      focus_current_match ();
     }
     private void hide_and_reset ()
     {
@@ -626,21 +630,27 @@ namespace Synapse
         if (get_match_search () != "")
         {
           if (searching_for_matches)
-           current_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), LABEL_TEXT_SIZE));
+          {
+            main_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), LABEL_TEXT_SIZE));
+            main_label_description.set_markup (Utils.markup_string_with_search (" ", "", DESCRIPTION_TEXT_SIZE));
+          }
+          //else -> impossible!
 
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
-          match_label_description.set_markup (Utils.markup_string_with_search (" ", "", DESCRIPTION_TEXT_SIZE));
         }
         else
         {
           if (searching_for_matches)
-            current_label.set_markup (
+          {
+            main_label.set_markup (
             Markup.printf_escaped ("<span size=\"%s\">%s</span>", LABEL_TEXT_SIZE,
                                    "Type to search..."));
+            main_label_description.set_markup (Utils.markup_string_with_search ("Powered by Zeitgeist", "", "small"));
+          }
+          //else -> impossible
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
-          match_label_description.set_markup (Utils.markup_string_with_search ("Powered by Zeitgeist", "", "small"));
         }
       }
       else
@@ -652,8 +662,14 @@ namespace Synapse
           match_icon_thumb.clear ();
 
         if (searching_for_matches)
-          current_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE));
-        match_label_description.set_markup (Utils.markup_string_with_search (match.description, get_match_search (), DESCRIPTION_TEXT_SIZE));
+        {
+          main_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE));
+          main_label_description.set_markup (Utils.markup_string_with_search (match.description, get_match_search (), DESCRIPTION_TEXT_SIZE));
+        }
+        else
+        {
+          secondary_label.set_markup (Utils.markup_string_with_search (match.title, "", DESCRIPTION_TEXT_SIZE));
+        }
       }
       results_match.move_selection_to_index (index);
     }
@@ -663,17 +679,26 @@ namespace Synapse
       {
         action_icon.hide ();
         action_icon.set_icon_name ("system-run", IconSize.DIALOG);
-        action_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), "medium"));
+        secondary_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), "medium"));
         if (!searching_for_matches)
-          current_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), LABEL_TEXT_SIZE));
+        {
+          main_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), LABEL_TEXT_SIZE));
+          main_label_description.set_markup (Utils.markup_string_with_search ("Not Found.", "", DESCRIPTION_TEXT_SIZE));
+        }
       }
       else
       {
         action_icon.show ();
         action_icon.set_icon_name (action.icon_name, IconSize.DIALOG);
-        action_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search(), "medium"));
         if (!searching_for_matches)
-          current_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search (), LABEL_TEXT_SIZE));
+        {
+          main_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search (), LABEL_TEXT_SIZE));
+          main_label_description.set_markup (Utils.markup_string_with_search (action.description, get_action_search (), DESCRIPTION_TEXT_SIZE));
+        }
+        else
+        {
+          secondary_label.set_markup (Utils.markup_string_with_search (action.title, "", DESCRIPTION_TEXT_SIZE));
+        }
       }
       results_action.move_selection_to_index (index);
     }

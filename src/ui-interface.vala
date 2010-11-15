@@ -196,6 +196,7 @@ namespace Synapse
       search[T.MATCH] = pattern;
       search_for_matches ();
     }
+
     protected string get_action_search () {return search[T.ACTION];}
     protected void set_action_search (string pattern)
     {
@@ -205,6 +206,8 @@ namespace Synapse
       search_for_actions ();
     }
     
+    protected void focus_current_match () {focus_match (focus_index[T.MATCH], focus[T.MATCH]);}
+    protected void focus_current_action () {focus_action (focus_index[T.ACTION], focus[T.ACTION]);}
     protected Gee.List<Match>? get_action_results () {return results[T.ACTION];}
     protected Gee.List<Match>? get_match_results () {return results[T.MATCH];}
     protected void get_action_focus (out int index, out Match? action) {index = focus_index[T.ACTION]; action = focus[T.ACTION];}
