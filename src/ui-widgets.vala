@@ -47,6 +47,7 @@ namespace Synapse
       precalc_req = {400, ICON_SIZE + PADDING * 2};
       label = new Label (null);
       layout = label.create_pango_layout (null);
+      layout.set_ellipsize (Pango.EllipsizeMode.END);
       on_style_set.connect (()=>{
         Gtk.Style s = Gtk.rc_get_style (label);
         ch.init_from_widget_type (typeof (Gtk.Label));
@@ -113,7 +114,7 @@ namespace Synapse
       ctx.translate (0, text_displacement);
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
       string s = Markup.printf_escaped (MARKUP, m.title, m.description);
-      layout.set_width (Pango.units_from_double (req.width - PADDING * 3));
+      layout.set_width (Pango.SCALE * (int)(req.width - ICON_SIZE - PADDING * 3));
       layout.set_markup (s, (int)s.length);
       Pango.cairo_show_layout (ctx, layout);
       ctx.restore ();
