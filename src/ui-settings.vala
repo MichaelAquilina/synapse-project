@@ -104,6 +104,12 @@ namespace Synapse
                      description = "", //i18n
                      tclass = typeof (SynapseWindowMini)
                    });
+      themes.set ("Dual",
+                   Theme(){
+                     name = "Dual", //i18n
+                     description = "", //i18n
+                     tclass = typeof (SynapseWindowTwoLines)
+                   });
 
       // TODO: read from gconf the selected one
 #if UI_MINI
