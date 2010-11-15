@@ -84,15 +84,18 @@ namespace Synapse
       if (rtl == Gtk.TextDirection.RTL)
         rtl_spacing = req.width - ICON_SIZE - PADDING * 2;
       try {
-        var icon = GLib.Icon.new_for_string(m.icon_name);
-        Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, ICON_SIZE, Gtk.IconLookupFlags.FORCE_SIZE);
-        if (iconinfo != null)
+        var icon = GLib.Icon.new_for_string(m.icon_name ?? "");
+        if (icon != null)
         {
-          Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
-          if (icon_pixbuf != null)
+          Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, ICON_SIZE, Gtk.IconLookupFlags.FORCE_SIZE);
+          if (iconinfo != null)
           {
-            Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, PADDING + rtl_spacing, (this.precalc_req.height - ICON_SIZE) / 2);
-            ctx.paint ();
+            Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
+            if (icon_pixbuf != null)
+            {
+              Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, PADDING + rtl_spacing, (this.precalc_req.height - ICON_SIZE) / 2);
+              ctx.paint ();
+            }
           }
         }
       } catch (GLib.Error err) { /* do not render icon */ }
@@ -987,8 +990,10 @@ namespace Synapse
       current = "";
       base.clear ();
     }
-    public void set_icon_name (string name, IconSize size)
+    public void set_icon_name (string? name, IconSize size)
     {
+      if (name == null)
+        name = "";
       if (name == current)
         return;
       else
