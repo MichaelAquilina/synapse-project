@@ -612,13 +612,12 @@ namespace Synapse
     {
       if (match == null)
       {
-        /* Show default stuff */
         if (get_match_search () != "")
         {
           if (searching_for_matches)
           {
             main_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), LABEL_TEXT_SIZE));
-            main_label_description.set_markup (Utils.markup_string_with_search (" ", "", DESCRIPTION_TEXT_SIZE));
+            main_label_description.set_markup (Utils.markup_string_with_search ("Not Found.", "", DESCRIPTION_TEXT_SIZE));
           }
           //else -> impossible!
 
@@ -627,6 +626,7 @@ namespace Synapse
         }
         else
         {
+          /* Show default stuff */
           if (searching_for_matches)
           {
             main_label.set_markup (
@@ -669,6 +669,10 @@ namespace Synapse
         {
           main_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), LABEL_TEXT_SIZE));
           main_label_description.set_markup (Utils.markup_string_with_search ("Not Found.", "", DESCRIPTION_TEXT_SIZE));
+        }
+        else
+        {
+          secondary_label.set_markup (Utils.markup_string_with_search (" ", "", DESCRIPTION_TEXT_SIZE));
         }
       }
       else
