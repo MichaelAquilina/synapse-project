@@ -35,6 +35,7 @@ synapse_SOURCES = \
 	rhythmbox-plugin.vala \
 	ui-cairo-gtk.vala \
 	ui-cairo-gtk-mini.vala \
+	ui-cairo-gtk-two-lines.vala \
 	ui-interface.vala \
 	ui-widgets.vala \
 	ui-utils.vala \

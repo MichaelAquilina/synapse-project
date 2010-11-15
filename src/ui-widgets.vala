@@ -995,6 +995,7 @@ namespace Synapse
   public class FakeInput: Gtk.Alignment
   {
     public bool draw_input {get; set; default = true;}
+    public double input_alpha {get; set; default = 1.0;}
     public double border_radius {get; set; default = 3.0;}
     public double shadow_height {get; set; default = 3;}
     public double focus_height {get; set; default = 3;}
@@ -1017,6 +1018,7 @@ namespace Synapse
     {
       _focus_widget = null;
       this.notify["draw-input"].connect (this.queue_draw);
+      this.notify["input-alpha"].connect (this.queue_draw);
       this.notify["border-radius"].connect (this.queue_draw);
       this.notify["shadow-pct"].connect (this.queue_draw);
       this.notify["focus-height"].connect (this.queue_draw);
@@ -1036,14 +1038,14 @@ namespace Synapse
                w = this.allocation.width - this.left_padding - this.right_padding - 3.0,
                h = this.allocation.height - this.top_padding - this.bottom_padding - 3.0;
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, StateType.NORMAL, ch.Mod.INVERTED);
+        ch.set_source_rgba (ctx, input_alpha, ch.StyleType.FG, StateType.NORMAL, ch.Mod.INVERTED);
         Cairo.Path path = ctx.copy_path ();
         ctx.save ();
         ctx.clip ();
         ctx.paint ();
         var pat = new Cairo.Pattern.linear (0, y, 0, y + shadow_height);
-        ch.add_color_stop_rgba (pat, 0, 0.6, ch.StyleType.FG, StateType.NORMAL);
-        ch.add_color_stop_rgba (pat, 0.3, 0.25, ch.StyleType.FG, StateType.NORMAL);
+        ch.add_color_stop_rgba (pat, 0, 0.6 * input_alpha, ch.StyleType.FG, StateType.NORMAL);
+        ch.add_color_stop_rgba (pat, 0.3, 0.25 * input_alpha, ch.StyleType.FG, StateType.NORMAL);
         ch.add_color_stop_rgba (pat, 1.0, 0, ch.StyleType.FG, StateType.NORMAL);
         ctx.set_source (pat);
         ctx.paint ();
@@ -1085,14 +1087,14 @@ namespace Synapse
           ctx.close_path ();
           ctx.clip ();
           pat = new Cairo.Pattern.linear (0, y2, 0, y1);
-          ch.add_color_stop_rgba (pat, 0, 1, ch.StyleType.BG, StateType.SELECTED);
+          ch.add_color_stop_rgba (pat, 0, 1.0 * input_alpha, ch.StyleType.BG, StateType.SELECTED);
           ch.add_color_stop_rgba (pat, 1, 0, ch.StyleType.BG, StateType.SELECTED);
           ctx.set_source (pat);
           ctx.paint ();
         }
         ctx.restore ();
         ctx.append_path (path);
-        ch.set_source_rgba (ctx, 0.6, ch.StyleType.FG, StateType.NORMAL);
+        ch.set_source_rgba (ctx, 0.6 * input_alpha, ch.StyleType.FG, StateType.NORMAL);
         ctx.stroke ();
       }
       return base.expose_event (event);

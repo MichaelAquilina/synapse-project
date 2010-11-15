@@ -27,49 +27,39 @@ using Synapse.Utils;
 
 namespace Synapse
 {
-  public class SynapseWindow : UIInterface
+  public class SynapseWindowTwoLines : UIInterface
   {
     Window window;
-    bool searching_for_matches = true;
-    
     /* Main UI shared components */
     protected NamedIcon match_icon = null;
     protected NamedIcon match_icon_thumb = null;
+    protected ShrinkingLabel match_label = null;
+    protected Label match_label_description = null;
     protected NamedIcon action_icon = null;
-    protected ContainerOverlayed match_icon_container_overlayed = null;
-    
-    protected ShrinkingLabel match_label_description = null;
-    protected ShrinkingLabel current_label = null;
     protected ShrinkingLabel action_label = null;
-
     protected HTextSelector flag_selector = null;
-    protected HBox container_top = null;
+    protected HBox top_hbox = null;
+    protected FakeInput fake_input_match = null;
+    protected FakeInput fake_input_action = null;
+    protected Label top_spacer = null;
     protected VBox container = null;
-    
-    protected HSelectionContainer results_container = null;
-
+    protected VBox container_top = null;
+    protected ContainerOverlayed match_icon_container_overlayed = null;
     protected ResultBox results_match = null;
     protected ResultBox results_action = null;
-    
-    protected Synapse.MenuButton pref = null;
-    
-    protected Synapse.Throbber throbber = null;
+    protected HSelectionContainer results_container = null;
+    protected Synapse.MenuThrobber throbber = null;
 
-    private const int UI_WIDTH = 620; // height is dynamic
+    private const int UI_WIDTH = 600; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
-    private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
-    private const int SECTION_PADDING = 10;
-    private const int BORDER_RADIUS = 10;
-    private const int ICON_SIZE = 160;
-    private const int TOP_SPACING = ICON_SIZE / 2;
-    private const int ACTION_ICON_DISPLACEMENT = ICON_SIZE / 8;
-    private const int LABEL_INTERNAL_PADDING = 4;
-    private const string LABEL_TEXT_SIZE = "x-large";
-    private const string DESCRIPTION_TEXT_SIZE = "medium";
+    private const int SHADOW_SIZE = 12; // assigned to containers's border width in composited
+    private const int BORDER_RADIUS = 20;
+    private const int ICON_SIZE = 172;
+    private const int ACTION_ICON_SIZE = 48;
     
     private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
     private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
-                                             QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.VIDEO, QueryFlags.INTERNET};
+                                             QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.VIDEO, QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE};
 
     /* STATUS */
     private bool list_visible = true;
@@ -84,16 +74,16 @@ namespace Synapse
       window.set_decorated (false);
       window.set_resizable (false);
       window.notify["is-active"].connect (()=>{
-        if (!window.is_active && !pref.is_menu_visible ())
+        if (!window.is_active && !throbber.is_menu_visible ())
         {
           hide ();
         }
-      }); 
-      
+      });
+
       build_ui ();
 
       Utils.ensure_transparent_bg (window);
-      window.expose_event.connect (expose_event);
+      window.expose_event.connect (on_expose);
       on_composited_changed (window);
       window.composited_changed.connect (on_composited_changed);
 
@@ -113,126 +103,127 @@ namespace Synapse
       window.key_press_event.connect (key_press_event);
     }
 
-    ~SynapseWindow ()
+    ~SynapseWindowTwoLines ()
     {
       window.destroy ();
     }
 
     protected virtual void build_ui ()
     {
-      /* containers holds top hbox and result list */
       container = new VBox (false, 0);
-      container.border_width = SHADOW_SIZE;
       window.add (container);
+
+      /* ==> Top container */
+      container_top = new VBox (false, 0);
+      container_top.set_size_request (UI_WIDTH, -1);
+      container_top.border_width = PADDING;
+      /* ==> Result box */
+      results_container = new HSelectionContainer (null, 0);
+      results_container.set_separator_visible (false);
       
-      var vcontainer_top = new VBox (false, 0);
-      vcontainer_top.border_width = BORDER_RADIUS;
+      results_match = new ResultBox (450);
+      results_action = new ResultBox (450);
+      results_container.add (results_match);
+      results_container.add (results_action);
+      var hbox_result_box = new HBox (true, 0);
+      hbox_result_box.pack_start (results_container,false,false);
+      /* <== Pack */
+      container.pack_start (container_top);
+      container.pack_start (hbox_result_box,false);
+
+      /* Top Hbox */
+      top_hbox = new HBox (false, 0);
+      /* Match Description */
+      match_label_description = new Label (null);
+      match_label_description.set_alignment (0, 0);
+      match_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
+      match_label_description.set_line_wrap (true);
+      match_label_description.xpad = 6;
+      /* Packing Top Hbox with Match Desctiption into Top VBox*/
+      container_top.pack_start (top_hbox);
+      //container_top.pack_start (match_label_description, false);
       
-      container_top = new HBox (false, 0);
-      vcontainer_top.set_size_request (UI_WIDTH, -1);
-      
-      
-      vcontainer_top.pack_start (container_top);
-      container.pack_start (vcontainer_top, false);
-      
-      /* Action Icon */
-      action_icon = new NamedIcon ();
-      action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
-      action_icon.set_alignment (0.5f, 0.5f);
-      /* Match Icon packed into container_top */
+      /* Match Icon packed into Top HBox */
       match_icon_container_overlayed = new ContainerOverlayed();
       match_icon_thumb = new NamedIcon();
       match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
-      match_icon_thumb.update_timeout = 100;
       match_icon = new NamedIcon ();
-      match_icon.set_alignment (0.0f, 0.5f);
+      match_icon.set_size_request (ICON_SIZE, ICON_SIZE);
       match_icon.set_pixel_size (ICON_SIZE);
-      match_icon_container_overlayed.set_size_request (ICON_SIZE + ACTION_ICON_DISPLACEMENT, ICON_SIZE);
-      match_icon_container_overlayed.set_scale_for_pos (0.3f, ContainerOverlayed.Position.BOTTOM_RIGHT);
       match_icon_container_overlayed.set_widget_in_position 
             (match_icon, ContainerOverlayed.Position.MAIN);
       match_icon_container_overlayed.set_widget_in_position 
             (match_icon_thumb, ContainerOverlayed.Position.BOTTOM_LEFT);
-      match_icon_container_overlayed.set_widget_in_position 
-            (action_icon, ContainerOverlayed.Position.BOTTOM_RIGHT);
-      container_top.pack_start (match_icon_container_overlayed, false);
+      top_hbox.pack_start (match_icon_container_overlayed, false);
       
-      throbber = new Throbber ();
-      throbber.set_size_request (22, 22);
-      /*{
-        var vbox = new VBox (false, 0);
-        var spacer = new Label (null);
-        spacer.set_size_request (-1, TOP_SPACING);
-        vbox.pack_start (spacer, false);
-        vbox.pack_start (throbber, false);
-        vbox.pack_start (new Label(null));
-        container_top.pack_start (vbox, false, true, 3);
-      }*/
-      
-      /* Match or Action Label */
-      current_label = new ShrinkingLabel ();
-      current_label.xpad = LABEL_INTERNAL_PADDING * 2;
-      current_label.ypad = LABEL_INTERNAL_PADDING;
-      current_label.set_alignment (0.0f, 1.0f);
-      current_label.set_ellipsize (Pango.EllipsizeMode.END);
-      var fakeinput = new FakeInput ();
-      fakeinput.add (current_label);
-      fakeinput.border_radius = 5;
-      
-      /* Query flag selector  */
+      /* VBox to push down the right area */
+      var top_right_vbox = new VBox (false, 0);
+      top_hbox.pack_start (top_right_vbox);
+      /* Top Spacer */
+      top_spacer = new Label(null);
+      /* flag_selector */
       flag_selector = new HTextSelector();
       foreach (string s in this.categories)
       {
         flag_selector.add_text (s);
       }
       flag_selector.selected = 3;
+
+      /* Throbber and menu */
+      throbber = new Synapse.MenuThrobber ();
+      throbber.set_size_request (ACTION_ICON_SIZE, 22);
+      throbber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+      /* HBox for titles and action icon */
+      var right_hbox = new HBox (false, 0);
+      /* HBox for throbber and flag_selector */
+      var topright_hbox = new HBox (false, 0);
       
-      /* Description */
-      match_label_description = new ShrinkingLabel ();
-      match_label_description.set_alignment (0.0f, 1.0f);
-      match_label_description.set_ellipsize (Pango.EllipsizeMode.END);
-      match_label_description.xpad = LABEL_INTERNAL_PADDING * 2;
+      {
+        var vbox = new VBox (false, 0);
+        vbox.pack_start (flag_selector);
+        vbox.pack_start (new Gtk.HSeparator (), false);
+        topright_hbox.pack_start (vbox);
+      }
+      topright_hbox.pack_start (throbber, false);
+
+      top_right_vbox.pack_start (top_spacer, true);
+      top_right_vbox.pack_start (topright_hbox, false);
+      top_right_vbox.pack_start (right_hbox, false);
+      top_right_vbox.pack_start (match_label_description, false);
+      
+      /* Titles box and Action icon*/
+      var labels_hbox = new VBox (false, 0);
+      action_icon = new NamedIcon ();
+      action_icon.set_pixel_size (ACTION_ICON_SIZE);
+      action_icon.set_alignment (0.5f, 0.5f);
+      action_icon.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
+
+      fake_input_action = new FakeInput ();
+      fake_input_match = new FakeInput ();
+      fake_input_action.left_padding = fake_input_match.left_padding = 6;
+      fake_input_action.right_padding = fake_input_match.right_padding = 6;
+      fake_input_action.bottom_padding = 3;
+      
+      right_hbox.pack_start (labels_hbox);
+      right_hbox.pack_start (action_icon, false);
+      
+      match_label = new ShrinkingLabel ();
+      match_label.set_alignment (0.0f, 0.5f);
+      match_label.set_ellipsize (Pango.EllipsizeMode.END);
+      match_label.xpad = 10;
+      match_label.ypad = 3;
+
       action_label = new ShrinkingLabel ();
-      action_label.set_alignment (1.0f, 1.0f);
-      action_label.set_ellipsize (Pango.EllipsizeMode.START);
-      action_label.xpad = LABEL_INTERNAL_PADDING * 2;
+      action_label.set_alignment (1.0f, 0.5f);
+      match_label.set_ellipsize (Pango.EllipsizeMode.START);
+      action_label.xpad = 10;
+      action_label.ypad = 3;
       
-      {
-        var vbox = new VBox (false, 0);
-        vbox.pack_start (new Label(null));
-        vbox.pack_start (flag_selector, false);
-        vbox.pack_start (new HSeparator (), false);
-        vbox.pack_start (fakeinput, false);
-        container_top.pack_start (vbox);
-      }
-      /* Pref item */
-      pref = new MenuButton ();
-      pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
-      pref.set_size_request (20, 20);
- 
-      {
-        var vbox = new VBox (false, 0);
-        vbox.pack_start (new Label(null));
-        vbox.pack_start (pref, false, false);
-        container_top.pack_start (vbox, false);
-      }
+      fake_input_action.add (action_label);
+      fake_input_match.add (match_label);
       
-      {
-        var hbox = new HBox (false, 0);
-        action_label.set_size_request (ICON_SIZE + ACTION_ICON_DISPLACEMENT, -1);
-        hbox.pack_start (action_label, false);
-        hbox.pack_start (match_label_description);
-        vcontainer_top.pack_start (hbox, false, true, 5);
-      }
-      
-      results_container = new HSelectionContainer (null, 0);
-      results_container.set_separator_visible (false);
-      container.pack_start (results_container, false);
-      
-      results_match = new ResultBox (UI_WIDTH - 2);
-      results_action = new ResultBox (UI_WIDTH - 2);
-      results_container.add (results_match);
-      results_container.add (results_action);
+      labels_hbox.pack_start (fake_input_match, false);
+      labels_hbox.pack_start (fake_input_action, false);
       
       /* Prepare colors using label */
       ColorHelper.get_default ().init_from_widget_type (typeof (Label));
@@ -240,25 +231,28 @@ namespace Synapse
         ColorHelper.get_default ().init_from_widget_type (typeof (Label));
         window.queue_draw ();
       });
-      
+
       container.show_all ();
     }
-    
-    private void set_list_visible (bool b)
+    private void visual_update_search_for ()
     {
-      if (b == list_visible)
-        return;
-      list_visible = b;
-      results_container.visible = b;
-      set_input_mask ();
-      window.queue_draw ();
+      if (searching_for_matches)
+      {
+        fake_input_match.input_alpha = 1.0;
+        fake_input_action.input_alpha = 0.1;
+        results_container.select (0);
+      }
+      else
+      {
+        fake_input_match.input_alpha = 0.1;
+        fake_input_action.input_alpha = 1.0;
+        results_container.select (1);
+      }
     }
-    
     protected virtual void on_composited_changed (Widget w)
     {
       Gdk.Screen screen = w.get_screen ();
       bool comp = screen.is_composited ();
-      this.hide_and_reset ();
       Gdk.Colormap? cm = screen.get_rgba_colormap();
       if (cm == null)
       {
@@ -270,84 +264,17 @@ namespace Synapse
       if (comp)
         container.border_width = SHADOW_SIZE;
       else
-        container.border_width = 1;
-    }
-    public bool expose_event (Widget widget, Gdk.EventExpose event)
-    {
-      bool comp = widget.is_composited ();
-      var ctx = Gdk.cairo_create (widget.get_window ());
-      ctx.set_operator (Operator.CLEAR);
-      ctx.paint ();
-      ctx.translate (0.5, 0.5);
-      Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
-      double border_radius = comp ? BORDER_RADIUS : 0;
-      double x = this.container.border_width,
-             y = flag_selector.allocation.y - border_radius;
-      double w = UI_WIDTH - 1.0,
-             h = match_label_description.allocation.y - y + match_label_description.allocation.height + border_radius - 1.0;
-      if (!comp)
-      {
-        y = this.container.border_width;
-        h = container_top.allocation.height;
-      }
-      ctx.set_operator (Operator.OVER);
-      
-      /* Prepare shadow color */
-      double r = 0, b = 0, g = 0;
-      ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
-
-      if (list_visible)
-      {
-        double ly = y + h - border_radius;
-        double lh = results_container.allocation.y - ly + results_container.allocation.height;
-        ctx.rectangle (x, ly, w, lh);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, StateType.NORMAL);
-        ctx.fill ();
-        if (comp)
-        {
-          //draw shadow
-          Utils.cairo_make_shadow_for_rect (ctx, x, ly, w, lh, 0,
-                                            r, g, b, 0.9, SHADOW_SIZE);
-        }
-      }
-      if (comp)
-      {
-        //draw shadow
-        Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
-                                          r, g, b, 0.9, SHADOW_SIZE);
-      }
-      ctx.set_operator (Operator.SOURCE);
-      Pattern pat = new Pattern.linear(0, y, 0, y + h);
-      ch.add_color_stop_rgba (pat, 0, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.LIGHTER);
-      ch.add_color_stop_rgba (pat, 0.75, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
-      ch.add_color_stop_rgba (pat, 1, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
-      Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-      ctx.set_source (pat);
-      ctx.save ();
-      ctx.clip ();
-      ctx.paint ();
-      ctx.restore ();
-      if (comp)
-      {
-        // border
-        Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
-        ctx.set_line_width (1.0);
-        ctx.stroke ();
-      }
-
-      Bin c = (widget is Bin) ? (Bin) widget : null;
-      if (c != null)
-        c.propagate_expose (c.get_child(), event);
-      return true;
+        container.border_width = 2;
+      this.hide_and_reset ();
     }
     
     protected virtual void set_input_mask ()
     {
       Requisition req = {0, 0};
       window.size_request (out req);
+      int w = req.width, h = req.height;
       bool composited = window.is_composited ();
-      var bitmap = new Gdk.Pixmap (null, req.width, req.height, 1);
+      var bitmap = new Gdk.Pixmap (null, w, h, 1);
       var ctx = Gdk.cairo_create (bitmap);
       ctx.set_operator (Cairo.Operator.CLEAR);
       ctx.paint ();
@@ -355,26 +282,24 @@ namespace Synapse
       ctx.set_operator (Cairo.Operator.SOURCE);
       if (composited)
       {
-        Utils.cairo_rounded_rect (ctx, match_icon_container_overlayed.allocation.x,
-                                       match_icon_container_overlayed.allocation.y,
-                                       match_icon_container_overlayed.allocation.width,
-                                       match_icon_container_overlayed.allocation.height, 0);
+        int spacing = top_spacer.allocation.height;
+        Utils.cairo_rounded_rect (ctx, SHADOW_SIZE, SHADOW_SIZE,
+                                       ICON_SIZE + PADDING * 2,
+                                       ICON_SIZE, BORDER_RADIUS);
         ctx.fill ();
-        double x = this.container.border_width,
-               y = flag_selector.allocation.y - BORDER_RADIUS;
-        double w = UI_WIDTH,
-               h = match_label_description.allocation.y - y + match_label_description.allocation.height + BORDER_RADIUS;
-        Utils.cairo_rounded_rect (ctx, x - SHADOW_SIZE, y - SHADOW_SIZE,
-                                       w + SHADOW_SIZE * 2, 
-                                       h + SHADOW_SIZE * 2,
-                                       SHADOW_SIZE);
+        Utils.cairo_rounded_rect (ctx, 0, spacing,
+                                       container_top.allocation.width + SHADOW_SIZE * 2, 
+                                       container_top.allocation.height + SHADOW_SIZE * 2 - spacing,
+                                       BORDER_RADIUS);
         ctx.fill ();
         if (list_visible)
         {
-          ctx.rectangle (0,
-                         y + h,
+          results_container.size_request (out req);
+              
+          ctx.rectangle ((w - req.width) / 2,
+                         container_top.allocation.height,
                          req.width,
-                         req.height - (y + h));
+                         h - container_top.allocation.height);
           ctx.fill ();
         }
       }
@@ -386,7 +311,97 @@ namespace Synapse
       window.input_shape_combine_mask (null, 0, 0);
       window.input_shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
     }
+    
+    protected virtual bool on_expose (Widget widget, Gdk.EventExpose event) {
+      bool comp = widget.is_composited ();
+      var ctx = Gdk.cairo_create (widget.window);
+      ctx.set_operator (Operator.CLEAR);
+      ctx.paint ();
+      ctx.set_operator (Operator.OVER);
+      double w = container_top.allocation.width;
+      double h = container_top.allocation.height;
+      double x = container_top.allocation.x;
+      double y = container_top.allocation.y;
+      unowned Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
+      if (comp)
+      {
+        int spacing = top_spacer.allocation.height;
+        y += spacing;
+        h -= spacing;
+        double r = 0, b = 0, g = 0;
+        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+        //draw shadow
+        Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
+                                          r, g, b, 0.9, SHADOW_SIZE);
+        // border
+        _cairo_path_for_main (ctx, comp, x + 0.5, y + 0.5, w - 1, h - 1);
+        ch.set_source_rgba (ctx, 0.6, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+        ctx.set_line_width (2.5);
+        ctx.stroke ();
+        if (this.list_visible)
+        {
+          //draw shadow
+          Utils.cairo_make_shadow_for_rect (ctx, results_container.allocation.x,
+                                                 results_container.allocation.y,
+                                                 results_container.allocation.width,
+                                                 results_container.allocation.height,
+                                                 0, r, g, b, 0.9, SHADOW_SIZE);
+          ctx.rectangle (results_container.allocation.x,
+                         results_container.allocation.y,
+                         results_container.allocation.width,
+                         results_container.allocation.height);
+          ch.set_source_rgba (ctx, 0.9, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+          ctx.set_line_width (2.5);
+          ctx.stroke ();
+        }
+      }
+      ctx.save ();
+      Pattern pat = new Pattern.linear(0, y, 0, y+h);
+      ch.add_color_stop_rgba (pat, 0, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.LIGHTER);
+      ch.add_color_stop_rgba (pat, 0.75, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
+      ch.add_color_stop_rgba (pat, 1, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
 
+      _cairo_path_for_main (ctx, comp, x, y, w, h);
+      ctx.set_source (pat);
+      ctx.set_operator (Operator.SOURCE);
+      ctx.clip ();
+      ctx.paint ();
+      ctx.restore ();
+      if (!comp)
+      {
+        ctx.set_operator (Operator.OVER);
+        _cairo_path_for_main (ctx, comp, x, y, w, h);
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+        ctx.set_line_width (3.5);
+        ctx.stroke (); 
+      }
+      /* Propagate Expose */               
+      Bin c = (widget is Bin) ? (Bin) widget : null;
+      if (c != null)
+        c.propagate_expose (c.get_child(), event);
+      return true;
+    }
+
+    private void _cairo_path_for_main (Cairo.Context ctx, bool composited,
+                                       double x, double y, double w, double h)
+    {
+      
+
+      if (composited)
+        Utils.cairo_rounded_rect (ctx, x, y, w, h, BORDER_RADIUS);
+      else
+      {
+        w = container.allocation.width;
+        h = container.allocation.height;
+        x = container.allocation.x;
+        y = container.allocation.y;
+        ctx.rectangle (x, y, w, h);
+      }
+    }
+
+    bool searching_for_matches = true;
+    
+    /* EVENTS HANDLING HERE */
     private void search_add_char (string chr)
     {
       if (searching_for_matches)
@@ -419,36 +434,17 @@ namespace Synapse
           set_action_search (s);
       }
     }
-    private void visual_update_search_for ()
-    {
-      if (searching_for_matches)
-      {
-        action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
-        match_icon.set_pixel_size (ICON_SIZE);
-        match_icon_container_overlayed.swapif (action_icon,
-                                               ContainerOverlayed.Position.MAIN,
-                                               ContainerOverlayed.Position.BOTTOM_RIGHT);
-        results_container.select (0);
-      }
-      else
-      {
-        match_icon.set_pixel_size (ICON_SIZE * 29 / 100);
-        action_icon.set_pixel_size (ICON_SIZE);
-        match_icon_container_overlayed.swapif (match_icon,
-                                               ContainerOverlayed.Position.MAIN,
-                                               ContainerOverlayed.Position.BOTTOM_RIGHT);
-        results_container.select (1);
-      }
-    }
+
     private void hide_and_reset ()
     {
       window.hide ();
       set_list_visible (false);
       flag_selector.selected = 3;
       searching_for_matches = true;
-      visual_update_search_for ();
       reset_search ();
+      visual_update_search_for ();
     }
+    
     protected virtual bool key_press_event (Gdk.EventKey event)
     {
       if (im_context.filter_keypress (event)) return true;
@@ -475,7 +471,7 @@ namespace Synapse
             Match m = null;
             int i = 0;
             get_match_focus (out i, out m);
-            focus_match (i, m);
+            update_match_result_list (get_match_results (), i, m);
             window.queue_draw ();
           }
           else if (get_match_search() != "")
@@ -524,7 +520,7 @@ namespace Synapse
             select_first_last_match (false);
           else
             select_first_last_action (false);
-          break; 
+          break;
         case Gdk.KeySyms.Up:
           bool b = true;
           if (searching_for_matches)
@@ -594,9 +590,26 @@ namespace Synapse
           //debug ("im_context didn't filter...");
           break;
       }
+
       return true;
     }
-
+    private void set_list_visible (bool b)
+    {
+      if (b == list_visible)
+        return;
+      list_visible = b;
+      results_container.visible = b;
+      set_input_mask ();
+      window.queue_draw ();
+    }
+    
+    private string get_description_markup (string s)
+    {
+      // FIXME: i18n
+      return Markup.printf_escaped ("<span size=\"medium\">%s</span>",
+        Utils.replace_home_path_with (s, "Home", " > "));
+    }
+    
     /* UI INTERFACE IMPLEMENTATION */
     public override void show ()
     {
@@ -614,33 +627,36 @@ namespace Synapse
     protected override void set_throbber_visible (bool visible)
     {
       if (visible)
-        throbber.start ();
+        throbber.active = true;
       else
-        throbber.stop ();
+        throbber.active = false;
     }
     protected override void focus_match ( int index, Match? match )
     {
+      string size = "x-large";
       if (match == null)
       {
         /* Show default stuff */
         if (get_match_search () != "")
         {
-          if (searching_for_matches)
-           current_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), LABEL_TEXT_SIZE));
-
+          match_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), size));
+          match_label_description.set_markup (
+            get_description_markup (throbber.active ? "Searching..." : "Match not found.")
+          );
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
-          match_label_description.set_markup (Utils.markup_string_with_search (" ", "", DESCRIPTION_TEXT_SIZE));
         }
         else
         {
-          if (searching_for_matches)
-            current_label.set_markup (
-            Markup.printf_escaped ("<span size=\"%s\">%s</span>", LABEL_TEXT_SIZE,
-                                   "Type to search..."));
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
-          match_label_description.set_markup (Utils.markup_string_with_search ("Powered by Zeitgeist", "", "small"));
+          match_label.set_markup (
+            Markup.printf_escaped ("<span size=\"x-large\">%s</span>",
+                                   "Type to search..."));
+          match_label_description.set_markup (
+            Markup.printf_escaped ("<span size=\"medium\"> </span>" +
+                                   "<span size=\"smaller\">%s</span>",
+                                   "Powered by Zeitgeist"));
         }
       }
       else
@@ -651,29 +667,30 @@ namespace Synapse
         else
           match_icon_thumb.clear ();
 
-        if (searching_for_matches)
-          current_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE));
-        match_label_description.set_markup (Utils.markup_string_with_search (match.description, get_match_search (), DESCRIPTION_TEXT_SIZE));
+        match_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), size));
+        match_label_description.set_markup (get_description_markup (match.description));
       }
       results_match.move_selection_to_index (index);
     }
     protected override void focus_action ( int index, Match? action )
     {
+      string size = "x-large";
       if (action == null)
       {
-        action_icon.hide ();
+        action_icon.set_sensitive (false);
         action_icon.set_icon_name ("system-run", IconSize.DIALOG);
-        action_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), "medium"));
-        if (!searching_for_matches)
-          current_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), LABEL_TEXT_SIZE));
+        if (searching_for_matches)
+          action_label.set_markup (Utils.markup_string_with_search (" ", "", size));
+        else
+          action_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), size));
       }
       else
       {
-        action_icon.show ();
+        action_icon.set_sensitive (true);
         action_icon.set_icon_name (action.icon_name, IconSize.DIALOG);
-        action_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search(), "medium"));
-        if (!searching_for_matches)
-          current_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search (), LABEL_TEXT_SIZE));
+        action_label.set_markup (Utils.markup_string_with_search (action.title,
+                                 searching_for_matches ? 
+                                 "" : get_action_search (), size));
       }
       results_action.move_selection_to_index (index);
     }
