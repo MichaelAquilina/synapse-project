@@ -394,13 +394,14 @@ namespace Synapse
                        data.get (row));
       ctx.restore ();
     }
+    /*
     private Cairo.Surface _render_row_to_surface (int row, Requisition req)
     {
       Cairo.Surface surf = new Cairo.ImageSurface (Cairo.Format.ARGB32, req.width, req.height);
       var ctx = new Cairo.Context (surf);
       renderer.render (ctx, false, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
       return surf;
-    }
+    }*/
   }
   /* Result List stuff */
   public class ResultBox: EventBox
@@ -1190,6 +1191,7 @@ namespace Synapse
   {
     private Gtk.Menu menu;
     private bool entered;
+    public double button_scale {get; set; default = 0.5;}
     public MenuButton ()
     {
       entered = false;
@@ -1257,7 +1259,7 @@ namespace Synapse
       
       Gtk.Style style = this.get_parent ().get_style();
       double r = 0.0, g = 0.0, b = 0.0;
-      double size = 0.5 * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
+      double size = button_scale * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
 
       
       Pattern pat;
@@ -1473,7 +1475,7 @@ namespace Synapse
   
   public class HTextSelector : Label
   {
-    private Pango.Layout layout;
+    private new Pango.Layout layout;
     private const int ARROW_SIZE = 7;
     public string selected_markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>";}
     public string unselected_markup {get; set; default = "<span size=\"small\">%s</span>";}

@@ -195,8 +195,9 @@ namespace Synapse
       
       /* MenuThrobber item */
       pref = new MenuButton ();
+      pref.button_scale = 1.0;
       pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
-      pref.set_size_request (18, 20);
+      pref.set_size_request (10, 10);
       {
         var main_vbox = new VBox (false, 0);
         var hbox = new HBox (false, 0);
@@ -417,8 +418,6 @@ namespace Synapse
     }
     private void visual_update_search_for ()
     {
-      Match m = null;
-      int i = 0;
       if (searching_for_matches)
       {
         action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
