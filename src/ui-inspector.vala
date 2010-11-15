@@ -58,7 +58,7 @@ namespace Synapse
     }
     
     private unowned Widget last_exposed = null;
-    private ulong last_expose_id = 0;
+    private unowned Widget last_exposed_container = null;
   
     private bool check_window_at_pointer ()
     {
@@ -79,9 +79,17 @@ namespace Synapse
           last_exposed.expose_event.disconnect (this.paint_border);
           last_exposed.queue_draw ();
         }
+        if (last_exposed_container != null)
+        {
+          last_exposed_container.expose_event.disconnect (this.paint_border);
+          last_exposed_container.queue_draw ();
+        }
         last_exposed = widget;
-        last_expose_id = widget.expose_event.connect_after (this.paint_border);
+        last_exposed_container = widget.get_parent ();
+        widget.expose_event.connect_after (this.paint_border);
         widget.queue_draw ();
+        last_exposed_container.expose_event.connect_after (this.paint_border);
+        last_exposed_container.queue_draw ();
       }
       return true;
     }
@@ -90,8 +98,17 @@ namespace Synapse
     {
       var cr = Gdk.cairo_create (event.window);
       cr.set_operator (Cairo.Operator.OVER);
-      cr.set_source_rgb (1.0, 0.0, 0.0);
       cr.set_line_width (1.0);
+      if (widget == last_exposed_container)
+      {
+        double[] dashes = {2.0};
+        cr.set_dash (dashes, 0.0);
+        cr.set_source_rgb (0.0, 0.0, 1.0);
+      }
+      else
+      {
+        cr.set_source_rgb (1.0, 0.0, 0.0);
+      }
       cr.translate (0.5, 0.5);
       cr.rectangle (widget.allocation.x, widget.allocation.y,
                     widget.allocation.width-1, widget.allocation.height-1);
