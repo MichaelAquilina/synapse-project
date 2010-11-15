@@ -101,11 +101,27 @@ namespace Synapse
 
         if (valid_cmd != null)
         {
-          // don't allow dangerous commands
-          if (args[0] != "rm")
+          // ignore results that will be returned by DesktopFilePlugin
+          var dfs = DesktopFileService.get_default ();
+          var df_list = dfs.get_desktop_files_for_exec (stripped);
+          DesktopFileInfo? dfi = null;
+          bool has_valid_df_result = false;
+          foreach (var df in df_list)
           {
-            // TODO: add result
-            result.add (new CommandObject (stripped), Query.MATCH_FUZZY);
+            if (!df.is_hidden) has_valid_df_result = true;
+            dfi = df;
+          }
+          // don't allow dangerous commands
+          if (!has_valid_df_result && args[0] != "rm")
+          {
+            var co = new CommandObject (stripped);
+            if (dfi != null)
+            {
+              co.title = dfi.name;
+              co.description = dfi.comment;
+              co.icon_name = dfi.icon_name;
+            }
+            result.add (co, Query.MATCH_FUZZY);
           }
         }
       }

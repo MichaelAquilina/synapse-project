@@ -131,6 +131,7 @@ namespace Synapse
     private Gee.List<DesktopFileInfo> all_desktop_files;
     private Gee.List<DesktopFileInfo> non_hidden_desktop_files;
     private Gee.Map<unowned string, Gee.List<DesktopFileInfo> > mimetype_map;
+    private Gee.Map<string, Gee.List<DesktopFileInfo> > exec_map;
     
     construct
     {
@@ -222,9 +223,34 @@ namespace Synapse
       // create mimetype maps
       mimetype_map =
         new Gee.HashMap<unowned string, Gee.List<DesktopFileInfo> > ();
-        
+      // and exec map
+      exec_map =
+        new Gee.HashMap<string, Gee.List<DesktopFileInfo> > ();
+
+      Regex exec_re;
+      try
+      {
+        exec_re = new Regex ("%[fFuU]");
+      }
+      catch (Error err)
+      {
+        critical ("%s", err.message);
+        return;
+      }
+
       foreach (var dfi in all_desktop_files)
       {
+        var exec = exec_re.replace_literal (dfi.exec, -1, 0, "").strip ();
+        // update exec map
+        Gee.List<DesktopFileInfo>? exec_list = exec_map[exec];
+        if (exec_list == null)
+        {
+          exec_list = new Gee.LinkedList<DesktopFileInfo> ();
+          exec_map[exec] = exec_list;
+        }
+        exec_list.add (dfi);
+
+        // update mimetype map
         if (dfi.mime_types == null) continue;
         
         foreach (unowned string mime_type in dfi.mime_types)
@@ -256,6 +282,11 @@ namespace Synapse
     public Gee.List<DesktopFileInfo> get_desktop_files_for_type (string mime_type)
     {
       return mimetype_map[mime_type] ?? new Gee.ArrayList<DesktopFileInfo> ();
+    }
+    
+    public Gee.List<DesktopFileInfo> get_desktop_files_for_exec (string exec)
+    {
+      return exec_map[exec] ?? new Gee.ArrayList<DesktopFileInfo> ();
     }
   }
 }

@@ -168,11 +168,49 @@ namespace Synapse
       return directories;
     }
     
+    private string? home_dir_uri = null;
+    
+    private string[] get_dir_parents (string dir_uri, bool include_self)
+    {
+      string[] dirs = {};
+      var f = File.new_for_uri (dir_uri);
+      if (include_self) dirs += f.get_uri ();
+
+      while (f.has_parent (null))
+      {
+        f = f.get_parent ();
+        string parent_uri = f.get_uri ();
+        // FIXME: we're doing only home dir subdirs for now
+        if (!parent_uri.has_prefix (home_dir_uri)) break;
+        dirs += parent_uri;
+      }
+
+      return dirs;
+    }
+    
     private async void process_directories (Gee.Collection<string> dirs)
     {
-      foreach (var s in dirs)
+      if (home_dir_uri == null)
       {
-        debug ("processing %s", s);
+        var home = File.new_for_path (Environment.get_home_dir ());
+        home_dir_uri = home.get_uri () + "/";
+      }
+
+      foreach (var dir in dirs)
+      {
+        if (dir in directory_info_map) continue;
+        // FIXME: we're doing only home dir subdirs for now
+        if (!dir.has_prefix (home_dir_uri)) continue;
+
+        string[] directories = get_dir_parents (dir, true);
+        foreach (unowned string dir_uri in directories)
+        {
+          if (dir_uri in directory_info_map) continue;
+
+          var info = new DirectoryInfo (dir_uri);
+          yield info.initialize ();
+          directory_info_map[info.match_obj.uri] = info;
+        }
       }
     }
 
@@ -205,9 +243,9 @@ namespace Synapse
 
       // process results from the zeitgeist plugin
       yield process_directories (directories);
-      
+
       q.check_cancellable ();
- 
+
       var rs = new ResultSet ();
       foreach (var entry in directory_info_map.values)
       {
