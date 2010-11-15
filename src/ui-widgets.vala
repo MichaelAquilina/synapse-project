@@ -30,7 +30,7 @@ namespace Synapse
 {
   public class MatchRenderer : ListView.Renderer
   {
-    private const int ICON_SIZE = 35;
+    private const int ICON_SIZE = 32;
     private const int PADDING = 2;
     private Utils.ColorHelper ch;
     private Label label;
@@ -53,6 +53,7 @@ namespace Synapse
         label.style = s;
         rtl = label.get_default_direction ();
         layout.context_changed ();
+        layout.set_ellipsize (Pango.EllipsizeMode.END);
         calc_requisition ();
       });
     }
@@ -85,11 +86,14 @@ namespace Synapse
       try {
         var icon = GLib.Icon.new_for_string(m.icon_name);
         Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, ICON_SIZE, Gtk.IconLookupFlags.FORCE_SIZE);
-        Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
-        if (icon_pixbuf != null)
+        if (iconinfo != null)
         {
-          Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, PADDING + rtl_spacing, PADDING);
-          ctx.paint ();
+          Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
+          if (icon_pixbuf != null)
+          {
+            Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, PADDING + rtl_spacing, (this.precalc_req.height - ICON_SIZE) / 2);
+            ctx.paint ();
+          }
         }
       } catch (GLib.Error err) { /* do not render icon */ }
       /* Now the label + description part */
