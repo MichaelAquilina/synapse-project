@@ -113,6 +113,16 @@ namespace Synapse
       cr.rectangle (widget.allocation.x, widget.allocation.y,
                     widget.allocation.width-1, widget.allocation.height-1);
       cr.stroke ();
+      
+      Cairo.TextExtents ext;
+      unowned string widget_name = widget.get_type ().name ();
+      cr.text_extents (widget_name, out ext);
+      if (widget.allocation.width >= ext.width && widget.allocation.height >= ext.height)
+      {
+        cr.move_to (widget.allocation.x + widget.allocation.width - ext.width - 1,
+                    widget.allocation.y + ext.height);
+        cr.show_text (widget_name);
+      }
       return false;
     }
   }
