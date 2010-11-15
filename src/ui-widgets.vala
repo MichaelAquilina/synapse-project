@@ -201,11 +201,14 @@ namespace Synapse
     }
     public void set_list (Gee.List<T>? new_data)
     {
+      if (new_data==null || scrollto >= new_data.size)
+      {
+        scrollto = 0;
+        selection_voffset = 0;
+        current_voffset = 0;
+        selected_index = -1;
+      }
       data = new_data;
-      scrollto = 0;
-      selection_voffset = 0;
-      current_voffset = 0;
-      selected_index = -1;
       this.queue_draw ();
     }
     public void add_data (T obj)

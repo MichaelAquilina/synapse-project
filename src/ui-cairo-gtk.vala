@@ -157,7 +157,7 @@ namespace Synapse
       
       /* Throbber */
       throbber = new Throbber ();
-      throbber.set_size_request (20, 20);
+      throbber.set_size_request (18, 18);
 
       /* Match or Action Label */
       main_label = new ShrinkingLabel ();
@@ -170,7 +170,8 @@ namespace Synapse
       {
         var hbox = new HBox (false, 0);
         hbox.pack_start (main_label);
-        hbox.pack_start (throbber, false);
+        hbox.pack_start (throbber, false, false);
+        hbox.pack_start (new Label ("  "), false, false);
         fakeinput.add (hbox);
       }
       
@@ -192,26 +193,26 @@ namespace Synapse
       secondary_label.set_ellipsize (Pango.EllipsizeMode.START);
       secondary_label.xpad = LABEL_INTERNAL_PADDING * 2;
       
-      {
-        var vbox = new VBox (false, 0);
-        vbox.pack_start (new Label(null));
-        vbox.pack_start (flag_selector, false);
-        vbox.pack_start (new HSeparator (), false);
-        vbox.pack_start (fakeinput, false);
-        container_top.pack_start (vbox);
-      }
       /* MenuThrobber item */
       pref = new MenuButton ();
       pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
-      pref.set_size_request (20, 20);
- 
+      pref.set_size_request (18, 20);
       {
+        var main_vbox = new VBox (false, 0);
+        var hbox = new HBox (false, 0);
         var vbox = new VBox (false, 0);
-        vbox.pack_start (new Label(null));
-        vbox.pack_start (pref, false, false);
-        container_top.pack_start (vbox, false);
+        
+        main_vbox.pack_start (new Label(null));
+        main_vbox.pack_start (hbox, false);
+        container_top.pack_start (main_vbox);
+        
+        vbox.pack_start (flag_selector, false);
+        vbox.pack_start (new HSeparator (), false);
+        vbox.pack_start (fakeinput, false);
+        hbox.pack_start (vbox);
+        hbox.pack_start (pref, false, false);
       }
-      
+
       {
         var hbox = new HBox (false, 0);
         secondary_label.set_size_request (ICON_SIZE + ACTION_ICON_DISPLACEMENT, -1);
