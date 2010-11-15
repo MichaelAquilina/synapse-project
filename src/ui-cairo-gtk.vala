@@ -665,7 +665,6 @@ namespace Synapse
       {
         action_icon.hide ();
         action_icon.set_icon_name ("system-run", IconSize.DIALOG);
-        secondary_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), "medium"));
         if (!searching_for_matches)
         {
           main_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), LABEL_TEXT_SIZE));
