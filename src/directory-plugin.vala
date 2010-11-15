@@ -67,20 +67,28 @@ namespace Synapse
       }
 
       private bool initialized = false;
+      
+      private const string ATTRIBUTE_CUSTOM_ICON = "metadata::custom-icon";
 
       public async void initialize ()
       {
-        debug ("getting info for %s", match_obj.uri);
+        //debug ("getting info for %s", match_obj.uri);
         var f = File.new_for_uri (match_obj.uri);
         try
         {
           var fi = yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_ICON + "," +
-                                             FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
+                                             FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME + "," +
+                                             ATTRIBUTE_CUSTOM_ICON,
                                              0, Priority.DEFAULT, null);
           this.name = fi.get_display_name ();
           this.name_folded = this.name.casefold ();
           this.match_obj.title = this.name;
           this.match_obj.icon_name = fi.get_icon ().to_string ();
+          if (fi.has_attribute (ATTRIBUTE_CUSTOM_ICON))
+          {
+            var path_f = File.new_for_uri (fi.get_attribute_string (ATTRIBUTE_CUSTOM_ICON));
+            this.match_obj.icon_name = f.get_path ();
+          }
         }
         catch (Error err)
         {
