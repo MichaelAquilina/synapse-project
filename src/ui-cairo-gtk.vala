@@ -51,10 +51,8 @@ namespace Synapse
     protected ResultBox results_match = null;
     protected ResultBox results_action = null;
     
-    protected Synapse.MenuButton pref = null;
+    protected Synapse.MenuThrobber throbber = null;
     
-    protected Synapse.Throbber throbber = null;
-
     private const int UI_WIDTH = 620; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
     private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
@@ -84,7 +82,7 @@ namespace Synapse
       window.set_decorated (false);
       window.set_resizable (false);
       window.notify["is-active"].connect (()=>{
-        if (!window.is_active && !pref.is_menu_visible ())
+        if (!window.is_active && !throbber.is_menu_visible ())
         {
           hide ();
         }
@@ -157,18 +155,6 @@ namespace Synapse
             (action_icon, ContainerOverlayed.Position.BOTTOM_RIGHT);
       container_top.pack_start (match_icon_container_overlayed, false);
       
-      throbber = new Throbber ();
-      throbber.set_size_request (22, 22);
-      /*{
-        var vbox = new VBox (false, 0);
-        var spacer = new Label (null);
-        spacer.set_size_request (-1, TOP_SPACING);
-        vbox.pack_start (spacer, false);
-        vbox.pack_start (throbber, false);
-        vbox.pack_start (new Label(null));
-        container_top.pack_start (vbox, false, true, 3);
-      }*/
-      
       /* Match or Action Label */
       main_label = new ShrinkingLabel ();
       main_label.xpad = LABEL_INTERNAL_PADDING * 2;
@@ -205,15 +191,15 @@ namespace Synapse
         vbox.pack_start (fakeinput, false);
         container_top.pack_start (vbox);
       }
-      /* Pref item */
-      pref = new MenuButton ();
-      pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
-      pref.set_size_request (20, 20);
+      /* MenuThrobber item */
+      throbber = new MenuThrobber ();
+      throbber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+      throbber.set_size_request (20, 20);
  
       {
         var vbox = new VBox (false, 0);
         vbox.pack_start (new Label(null));
-        vbox.pack_start (pref, false, false);
+        vbox.pack_start (throbber, false, false);
         container_top.pack_start (vbox, false);
       }
       
@@ -618,9 +604,9 @@ namespace Synapse
     protected override void set_throbber_visible (bool visible)
     {
       if (visible)
-        throbber.start ();
+        throbber.active = true;
       else
-        throbber.stop ();
+        throbber.active = false;
     }
     protected override void focus_match ( int index, Match? match )
     {
