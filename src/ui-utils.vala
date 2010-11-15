@@ -332,6 +332,7 @@ namespace Synapse
         {
           gdk_color_to_rgb (col, out this.r, out this.g, out this.b);
         }
+
         public void init_from_rgb (double r, double g, double b)
         {
           this.r = r;

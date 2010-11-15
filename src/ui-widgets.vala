@@ -394,13 +394,14 @@ namespace Synapse
                        data.get (row));
       ctx.restore ();
     }
+    /*
     private Cairo.Surface _render_row_to_surface (int row, Requisition req)
     {
       Cairo.Surface surf = new Cairo.ImageSurface (Cairo.Format.ARGB32, req.width, req.height);
       var ctx = new Cairo.Context (surf);
       renderer.render (ctx, false, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
       return surf;
-    }
+    }*/
   }
   /* Result List stuff */
   public class ResultBox: EventBox
@@ -1473,7 +1474,7 @@ namespace Synapse
   
   public class HTextSelector : Label
   {
-    private Pango.Layout layout;
+    private new Pango.Layout layout;
     private const int ARROW_SIZE = 7;
     public string selected_markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>";}
     public string unselected_markup {get; set; default = "<span size=\"small\">%s</span>";}

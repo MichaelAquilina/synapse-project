@@ -417,8 +417,6 @@ namespace Synapse
     }
     private void visual_update_search_for ()
     {
-      Match m = null;
-      int i = 0;
       if (searching_for_matches)
       {
         action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
