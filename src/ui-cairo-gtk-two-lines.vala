@@ -141,7 +141,6 @@ namespace Synapse
       match_label_description.xpad = 6;
       /* Packing Top Hbox with Match Desctiption into Top VBox*/
       container_top.pack_start (top_hbox);
-      //container_top.pack_start (match_label_description, false);
       
       /* Match Icon packed into Top HBox */
       match_icon_container_overlayed = new ContainerOverlayed();
@@ -606,8 +605,9 @@ namespace Synapse
     private string get_description_markup (string s)
     {
       // FIXME: i18n
-      return Markup.printf_escaped ("<span size=\"medium\">%s</span>",
-        Utils.replace_home_path_with (s, "Home", " > "));
+      return Utils.markup_string_with_search (Utils.replace_home_path_with (s, "Home", " > "),
+                                             get_match_search (),
+                                             "medium");
     }
     
     /* UI INTERFACE IMPLEMENTATION */

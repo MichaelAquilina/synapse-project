@@ -142,7 +142,6 @@ namespace Synapse
       match_icon_container_overlayed = new ContainerOverlayed();
       match_icon_thumb = new NamedIcon();
       match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
-      match_icon_thumb.update_timeout = 100;
       match_icon = new NamedIcon ();
       match_icon.set_alignment (0.0f, 0.5f);
       match_icon.set_pixel_size (ICON_SIZE);
@@ -661,7 +660,10 @@ namespace Synapse
         if (searching_for_matches)
         {
           main_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE));
-          main_label_description.set_markup (Utils.markup_string_with_search (match.description, get_match_search (), DESCRIPTION_TEXT_SIZE));
+          main_label_description.set_markup (
+            Utils.markup_string_with_search (Utils.replace_home_path_with (match.description, "Home", " > "),
+                                             get_match_search (),
+                                             DESCRIPTION_TEXT_SIZE));
         }
         else
         {

@@ -110,6 +110,7 @@ namespace Synapse
       ctx.translate (0, text_displacement);
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
       string s = Markup.printf_escaped (MARKUP, m.title, m.description);
+      layout.set_width (Pango.units_from_double (req.width - PADDING * 3));
       layout.set_markup (s, (int)s.length);
       Pango.cairo_show_layout (ctx, layout);
       ctx.restore ();
@@ -149,7 +150,7 @@ namespace Synapse
     private int selected_index; //for now only single selection mode
     public bool animation_enabled {get; set; default = true;}
     private const int ANIM_TIMEOUT = 40;
-    private const int ANIM_MAX_PIXEL_JUMP = 3;
+    private const int ANIM_MAX_PIXEL_JUMP = 2;
     public int selected {
       get {
         return selected_index;
@@ -473,6 +474,13 @@ namespace Synapse
 
     public void update_matches (Gee.List<Synapse.Match>? rs)
     {
+      if (rs != null)
+      {
+        foreach (Synapse.Match m in rs)
+        {
+          m.description = Utils.replace_home_path_with (m.description, "Home", " > ");
+        }
+      }
       view.set_list (rs);
       if (rs==null || rs.size == 0)
         status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
