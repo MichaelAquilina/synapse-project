@@ -1191,6 +1191,7 @@ namespace Synapse
   {
     private Gtk.Menu menu;
     private bool entered;
+    public double button_scale {get; set; default = 0.5;}
     public MenuButton ()
     {
       entered = false;
@@ -1258,7 +1259,7 @@ namespace Synapse
       
       Gtk.Style style = this.get_parent ().get_style();
       double r = 0.0, g = 0.0, b = 0.0;
-      double size = 0.5 * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
+      double size = button_scale * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
 
       
       Pattern pat;
