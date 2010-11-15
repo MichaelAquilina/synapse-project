@@ -51,7 +51,8 @@ namespace Synapse
     protected ResultBox results_match = null;
     protected ResultBox results_action = null;
     
-    protected Synapse.MenuThrobber throbber = null;
+    protected Synapse.Throbber throbber = null;
+    protected Synapse.MenuButton pref = null;
     
     private const int UI_WIDTH = 620; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -82,7 +83,7 @@ namespace Synapse
       window.set_decorated (false);
       window.set_resizable (false);
       window.notify["is-active"].connect (()=>{
-        if (!window.is_active && !throbber.is_menu_visible ())
+        if (!window.is_active && !pref.is_menu_visible ())
         {
           hide ();
         }
@@ -155,6 +156,10 @@ namespace Synapse
             (action_icon, ContainerOverlayed.Position.BOTTOM_RIGHT);
       container_top.pack_start (match_icon_container_overlayed, false);
       
+      /* Throbber */
+      throbber = new Throbber ();
+      throbber.set_size_request (20, 20);
+
       /* Match or Action Label */
       main_label = new ShrinkingLabel ();
       main_label.xpad = LABEL_INTERNAL_PADDING * 2;
@@ -162,8 +167,13 @@ namespace Synapse
       main_label.set_alignment (0.0f, 1.0f);
       main_label.set_ellipsize (Pango.EllipsizeMode.END);
       var fakeinput = new FakeInput ();
-      fakeinput.add (main_label);
       fakeinput.border_radius = 5;
+      {
+        var hbox = new HBox (false, 0);
+        hbox.pack_start (main_label);
+        hbox.pack_start (throbber, false);
+        fakeinput.add (hbox);
+      }
       
       /* Query flag selector  */
       flag_selector = new HTextSelector();
@@ -192,14 +202,14 @@ namespace Synapse
         container_top.pack_start (vbox);
       }
       /* MenuThrobber item */
-      throbber = new MenuThrobber ();
-      throbber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
-      throbber.set_size_request (20, 20);
+      pref = new MenuButton ();
+      pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+      pref.set_size_request (20, 20);
  
       {
         var vbox = new VBox (false, 0);
         vbox.pack_start (new Label(null));
-        vbox.pack_start (throbber, false, false);
+        vbox.pack_start (pref, false, false);
         container_top.pack_start (vbox, false);
       }
       
