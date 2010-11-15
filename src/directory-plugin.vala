@@ -86,8 +86,8 @@ namespace Synapse
           this.match_obj.icon_name = fi.get_icon ().to_string ();
           if (fi.has_attribute (ATTRIBUTE_CUSTOM_ICON))
           {
-            var path_f = File.new_for_uri (fi.get_attribute_string (ATTRIBUTE_CUSTOM_ICON));
-            this.match_obj.icon_name = f.get_path ();
+            var icon_f = File.new_for_uri (fi.get_attribute_string (ATTRIBUTE_CUSTOM_ICON));
+            this.match_obj.icon_name = icon_f.get_path ();
           }
         }
         catch (Error err)
