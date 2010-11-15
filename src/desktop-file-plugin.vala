@@ -260,6 +260,7 @@ namespace Synapse
       var uri_match = match as UriMatch;
       return_val_if_fail (uri_match != null, null);
       
+      if (uri_match.mime_type == null) return null;
       var dfs = DesktopFileService.get_default ();
 
       var list_for_mimetype = dfs.get_desktop_files_for_type (uri_match.mime_type);
