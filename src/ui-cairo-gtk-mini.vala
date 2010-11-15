@@ -157,16 +157,7 @@ namespace Synapse
       container_top.pack_start (match_icon_container_overlayed, false);
       
       throbber = new Throbber ();
-      throbber.set_size_request (22, 22);
-      {
-        var vbox = new VBox (false, 0);
-        var spacer = new Label (null);
-        spacer.set_size_request (-1, TOP_SPACING);
-        vbox.pack_start (spacer, false);
-        vbox.pack_start (throbber, false);
-        vbox.pack_start (new Label(null));
-        container_top.pack_start (vbox, false, true, 3);
-      }
+      throbber.set_size_request (18, 18);
       
       /* Match or Action Label */
       current_label = new ShrinkingLabel ();
@@ -175,8 +166,14 @@ namespace Synapse
       current_label.set_alignment (0.0f, 1.0f);
       current_label.set_ellipsize (Pango.EllipsizeMode.END);
       var fakeinput = new FakeInput ();
-      fakeinput.add (current_label);
       fakeinput.border_radius = 5;
+      {
+        var hbox = new HBox (false, 0);
+        hbox.pack_start (current_label);
+        hbox.pack_start (throbber, false, false);
+        hbox.pack_start (new Label ("  "), false, false);
+        fakeinput.add (hbox);
+      }
       
       /* Query flag selector  */
       flag_selector = new HTextSelector();
@@ -189,7 +186,8 @@ namespace Synapse
       /* Pref item */
       pref = new MenuButton ();
       pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
-      pref.set_size_request (20, 20);
+      pref.button_scale = 1.0;
+      pref.set_size_request (10, 20);
       {
         var vbox = new VBox (false, 0);
         var spacer = new Label (null);
@@ -206,7 +204,7 @@ namespace Synapse
         var spacer = new Label (null);
         spacer.set_size_request (-1, TOP_SPACING);
         vbox.pack_start (spacer, false);
-        vbox.pack_start (pref, false, false);
+        vbox.pack_start (pref, false);
         container_top.pack_start (vbox, false);
       }
       
