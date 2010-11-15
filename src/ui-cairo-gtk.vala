@@ -421,24 +421,29 @@ namespace Synapse
       int i = 0;
       if (searching_for_matches)
       {
-        action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
+        /* action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
         match_icon.set_pixel_size (ICON_SIZE);
         match_icon_container_overlayed.swapif (action_icon,
                                                ContainerOverlayed.Position.MAIN,
-                                               ContainerOverlayed.Position.BOTTOM_RIGHT);
+                                               ContainerOverlayed.Position.BOTTOM_RIGHT);*/
+        match_icon.glow = true;
+        action_icon.glow = false;
         results_container.select (0);
       }
       else
       {
-        match_icon.set_pixel_size (ICON_SIZE * 29 / 100);
+        /*match_icon.set_pixel_size (ICON_SIZE * 29 / 100);
         action_icon.set_pixel_size (ICON_SIZE);
         match_icon_container_overlayed.swapif (match_icon,
                                                ContainerOverlayed.Position.MAIN,
-                                               ContainerOverlayed.Position.BOTTOM_RIGHT);
+                                               ContainerOverlayed.Position.BOTTOM_RIGHT);*/
+        match_icon.glow = false;
+        action_icon.glow = true;
         results_container.select (1);
       }
       focus_current_action ();
       focus_current_match ();
+      window.queue_draw ();
     }
     private void hide_and_reset ()
     {

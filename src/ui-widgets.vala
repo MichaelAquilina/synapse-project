@@ -925,11 +925,36 @@ namespace Synapse
     private uint tid; //for timer
     public int update_timeout {get; set; default = -1;}
     public bool stop_prev_timeout {get; set; default = false;}
+    public bool glow {get; set; default = false;}
     public NamedIcon ()
     {
       current = "";
       current_size = IconSize.DIALOG;
       tid = 0;
+      this.notify["glow"].connect (this.queue_draw);
+    }
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      if (glow)
+      {
+        var ctx = Gdk.cairo_create (this.window);
+        ctx.set_operator (Cairo.Operator.OVER);
+
+        /* Prepare bg's colors using GtkStyle */
+        double xc = this.allocation.x + this.allocation.width / 2;
+        double yc = this.allocation.y + this.allocation.height / 2;
+        double rad = double.min ( this.allocation.height, this.allocation.width ) / 2.0;
+        Pattern pat = new Pattern.radial (xc, yc, 0, xc, yc, rad);
+        Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
+        ch.add_color_stop_rgba (pat, 0.7, 1.0, ch.StyleType.BASE, StateType.SELECTED);
+        ch.add_color_stop_rgba (pat, 1, 0, ch.StyleType.BASE, StateType.SELECTED);
+        /* Prepare and draw top bg's rect */
+        ctx.rectangle (xc - rad, yc - rad, 2*rad, 2*rad);
+        ctx.set_source (pat);
+        ctx.clip ();
+        ctx.paint ();
+      }
+      return base.expose_event (event);
     }
     public new void clear ()
     {
