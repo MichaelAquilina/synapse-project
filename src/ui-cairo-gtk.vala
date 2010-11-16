@@ -44,6 +44,7 @@ namespace Synapse
 
     protected HTextSelector flag_selector = null;
     protected HBox container_top = null;
+    protected VBox vcontainer_top = null;
     protected VBox container = null;
     
     protected HSelectionContainer results_container = null;
@@ -127,8 +128,6 @@ namespace Synapse
       im_context.set_use_preedit (false);
       im_context.commit.connect (search_add_char);
       im_context.focus_in ();
-      
-      window.key_press_event.connect (key_press_event);
     }
 
     ~SynapseWindow ()
@@ -143,7 +142,7 @@ namespace Synapse
       container.border_width = SHADOW_SIZE;
       window.add (container);
       
-      var vcontainer_top = new VBox (false, 0);
+      vcontainer_top = new VBox (false, 0);
       vcontainer_top.border_width = BORDER_RADIUS;
       
       container_top = new HBox (false, 0);
@@ -303,7 +302,7 @@ namespace Synapse
       if (!comp)
       {
         y = this.container.border_width;
-        h = container_top.allocation.height;
+        h = vcontainer_top.allocation.height;
       }
       ctx.set_operator (Operator.OVER);
       
@@ -346,7 +345,7 @@ namespace Synapse
       {
         // border
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+        ch.set_source_rgba (ctx, 0.6, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
         ctx.set_line_width (1.0);
         ctx.stroke ();
       }
@@ -463,20 +462,18 @@ namespace Synapse
     {
       if (im_context.filter_keypress (event)) return true;
 
-      uint key = event.keyval;
-      switch (key)
+      CommandTypes command = get_command_from_key_event (event);
+
+      switch (command)
       {
-        case Gdk.KeySyms.Return:
-        case Gdk.KeySyms.KP_Enter:
-        case Gdk.KeySyms.ISO_Enter:
+        case CommandTypes.EXECUTE:
           if (execute ())
             hide_and_reset ();
           break;
-        case Gdk.KeySyms.Delete:
-        case Gdk.KeySyms.BackSpace:
+        case CommandTypes.SEARCH_DELETE_CHAR:
           search_delete_char ();
           break;
-        case Gdk.KeySyms.Escape:
+        case CommandTypes.CLEAR_SEARCH_OR_HIDE:
           if (!searching_for_matches)
           {
             set_action_search ("");
@@ -498,7 +495,7 @@ namespace Synapse
             hide_and_reset ();
           }
           break;
-        case Gdk.KeySyms.Left:
+        case CommandTypes.PREV_CATEGORY:
           flag_selector.select_prev ();
           if (!searching_for_matches)
           {
@@ -508,7 +505,7 @@ namespace Synapse
           }
           update_query_flags (this.categories_query[flag_selector.selected]);
           break;
-        case Gdk.KeySyms.Right:
+        case CommandTypes.NEXT_CATEGORY:
           flag_selector.select_next ();
           if (!searching_for_matches)
           {
@@ -518,13 +515,13 @@ namespace Synapse
           }
           update_query_flags (this.categories_query[flag_selector.selected]);
           break;
-        case Gdk.KeySyms.Home:
+        case CommandTypes.FIRST_RESULT:
           if (searching_for_matches)
             select_first_last_match (true);
           else
             select_first_last_action (true);
           break;
-        case Gdk.KeySyms.End:
+        case CommandTypes.LAST_RESULT:
           if (!list_visible)
           {
             set_list_visible (true);
@@ -535,7 +532,7 @@ namespace Synapse
           else
             select_first_last_action (false);
           break; 
-        case Gdk.KeySyms.Up:
+        case CommandTypes.PREV_RESULT:
           bool b = true;
           if (searching_for_matches)
             b = move_selection_match (-1);
@@ -544,7 +541,7 @@ namespace Synapse
           if (!b)
             set_list_visible (false);
           break;
-        case Gdk.KeySyms.Page_Up:
+        case CommandTypes.PREV_PAGE:
           bool b = true;
           if (searching_for_matches)
             b = move_selection_match (-5);
@@ -553,7 +550,7 @@ namespace Synapse
           if (!b)
             set_list_visible (false);
           break;
-        case Gdk.KeySyms.Down:
+        case CommandTypes.NEXT_RESULT:
           if (!list_visible)
           {
             set_list_visible (true);
@@ -565,7 +562,7 @@ namespace Synapse
             move_selection_action (1);
           set_list_visible (true);
           break;
-        case Gdk.KeySyms.Page_Down:
+        case CommandTypes.NEXT_PAGE:
           if (!list_visible)
           {
             set_list_visible (true);
@@ -577,7 +574,7 @@ namespace Synapse
             move_selection_action (5);
           set_list_visible (true);
           break;
-        case Gdk.KeySyms.Tab:
+        case CommandTypes.SWITCH_SEARCH_TYPE:
           if (searching_for_matches && 
                 (
                   get_match_results () == null || get_match_results ().size == 0 ||

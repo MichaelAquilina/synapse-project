@@ -448,20 +448,18 @@ namespace Synapse
     {
       if (im_context.filter_keypress (event)) return true;
 
-      uint key = event.keyval;
-      switch (key)
+      CommandTypes command = get_command_from_key_event (event);
+
+      switch (command)
       {
-        case Gdk.KeySyms.Return:
-        case Gdk.KeySyms.KP_Enter:
-        case Gdk.KeySyms.ISO_Enter:
+        case CommandTypes.EXECUTE:
           if (execute ())
             hide_and_reset ();
           break;
-        case Gdk.KeySyms.Delete:
-        case Gdk.KeySyms.BackSpace:
+        case CommandTypes.SEARCH_DELETE_CHAR:
           search_delete_char ();
           break;
-        case Gdk.KeySyms.Escape:
+        case CommandTypes.CLEAR_SEARCH_OR_HIDE:
           if (!searching_for_matches)
           {
             set_action_search ("");
@@ -483,7 +481,7 @@ namespace Synapse
             hide_and_reset ();
           }
           break;
-        case Gdk.KeySyms.Left:
+        case CommandTypes.PREV_CATEGORY:
           flag_selector.select_prev ();
           if (!searching_for_matches)
           {
@@ -493,7 +491,7 @@ namespace Synapse
           }
           update_query_flags (this.categories_query[flag_selector.selected]);
           break;
-        case Gdk.KeySyms.Right:
+        case CommandTypes.NEXT_CATEGORY:
           flag_selector.select_next ();
           if (!searching_for_matches)
           {
@@ -503,13 +501,13 @@ namespace Synapse
           }
           update_query_flags (this.categories_query[flag_selector.selected]);
           break;
-        case Gdk.KeySyms.Home:
+        case CommandTypes.FIRST_RESULT:
           if (searching_for_matches)
             select_first_last_match (true);
           else
             select_first_last_action (true);
           break;
-        case Gdk.KeySyms.End:
+        case CommandTypes.LAST_RESULT:
           if (!list_visible)
           {
             set_list_visible (true);
@@ -520,7 +518,7 @@ namespace Synapse
           else
             select_first_last_action (false);
           break;
-        case Gdk.KeySyms.Up:
+        case CommandTypes.PREV_RESULT:
           bool b = true;
           if (searching_for_matches)
             b = move_selection_match (-1);
@@ -529,7 +527,7 @@ namespace Synapse
           if (!b)
             set_list_visible (false);
           break;
-        case Gdk.KeySyms.Page_Up:
+        case CommandTypes.PREV_PAGE:
           bool b = true;
           if (searching_for_matches)
             b = move_selection_match (-5);
@@ -538,7 +536,7 @@ namespace Synapse
           if (!b)
             set_list_visible (false);
           break;
-        case Gdk.KeySyms.Down:
+        case CommandTypes.NEXT_RESULT:
           if (!list_visible)
           {
             set_list_visible (true);
@@ -550,7 +548,7 @@ namespace Synapse
             move_selection_action (1);
           set_list_visible (true);
           break;
-        case Gdk.KeySyms.Page_Down:
+        case CommandTypes.NEXT_PAGE:
           if (!list_visible)
           {
             set_list_visible (true);
@@ -562,7 +560,7 @@ namespace Synapse
             move_selection_action (5);
           set_list_visible (true);
           break;
-        case Gdk.KeySyms.Tab:
+        case CommandTypes.SWITCH_SEARCH_TYPE:
           if (searching_for_matches && 
                 (
                   get_match_results () == null || get_match_results ().size == 0 ||
