@@ -304,6 +304,7 @@ namespace Synapse
       if (comp)
       {
         // border
+        ctx.set_operator (Operator.OVER);
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
         ch.set_source_rgba (ctx, 0.6, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
         ctx.set_line_width (1.0);

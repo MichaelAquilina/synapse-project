@@ -137,6 +137,13 @@ namespace Synapse
 
     protected virtual void build_ui ()
     {
+      /* Prepare colors using label */
+      ColorHelper.get_default ().init_from_widget_type (typeof (Label));
+      window.style_set.connect (()=>{
+        ColorHelper.get_default ().init_from_widget_type (typeof (Label));
+        //ColorHelper.get_default ().force_color_helper_style_on_widget (window);
+      });
+
       /* containers holds top hbox and result list */
       container = new VBox (false, 0);
       container.border_width = SHADOW_SIZE;
@@ -247,15 +254,10 @@ namespace Synapse
       results_action = new ResultBox (UI_WIDTH - 2);
       results_container.add (results_match);
       results_container.add (results_action);
-      
-      /* Prepare colors using label */
-      ColorHelper.get_default ().init_from_widget_type (typeof (Label));
-      window.style_set.connect (()=>{
-        ColorHelper.get_default ().init_from_widget_type (typeof (Label));
-        window.queue_draw ();
-      });
-      
+
       container.show_all ();
+      //this doesn't work
+      //ColorHelper.get_default ().force_color_helper_style_on_widget (window);
     }
     
     private void set_list_visible (bool b)
@@ -344,6 +346,7 @@ namespace Synapse
       if (comp)
       {
         // border
+        ctx.set_operator (Operator.OVER);
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
         ch.set_source_rgba (ctx, 0.6, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
         ctx.set_line_width (1.0);

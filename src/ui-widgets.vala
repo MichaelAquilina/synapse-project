@@ -43,7 +43,7 @@ namespace Synapse
     
     public MatchRenderer ()
     {
-      ch = new Utils.ColorHelper ();
+      ch = Utils.ColorHelper.get_default ();
       rtl = Gtk.TextDirection.LTR;
       precalc_req = {400, ICON_SIZE + PADDING * 2};
       label = new Label (null);
@@ -51,7 +51,7 @@ namespace Synapse
       layout.set_ellipsize (Pango.EllipsizeMode.END);
       on_style_set.connect (()=>{
         Gtk.Style s = Gtk.rc_get_style (label);
-        ch.init_from_widget_type (typeof (Gtk.Label));
+        //ch.init_from_widget_type (typeof (Gtk.Label));
         label.style = s;
         rtl = label.get_default_direction ();
         layout.context_changed ();
@@ -191,10 +191,8 @@ namespace Synapse
         this.queue_draw ();
       });
 
-      ch = new Utils.ColorHelper ();
-      ch.init_from_widget_type (typeof (Gtk.Label));
+      ch = Utils.ColorHelper.get_default ();
       this.style_set.connect (()=>{
-        ch.init_from_widget_type (typeof (Gtk.Label));
         this.renderer.on_style_set ();
       });
       this.show.connect (()=>{
@@ -1620,7 +1618,7 @@ namespace Synapse
       h = hmax * 3; //triple h for nice vertical placement
       this.cached_surface = new ImageSurface (Cairo.Format.ARGB32, w, h);
       var ctx = new Cairo.Context (this.cached_surface);
-      // FIXME: Why no-antialias?
+
       Pango.cairo_update_context (ctx, layout.get_context ());
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, StateType.NORMAL);
       ctx.set_operator (Cairo.Operator.OVER);

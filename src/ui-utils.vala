@@ -560,7 +560,7 @@ namespace Synapse
       /* [StyleType, StateType, Mod] */
       private Color[,,] c;
       /* End of static section */
-      public ColorHelper ()
+      private ColorHelper ()
       {
         c = new Color[4,5,4];
         for (int i = 0; i < 4; i++)
@@ -568,10 +568,38 @@ namespace Synapse
             for (int k = 0; k < 4; k++)
               c[i,j,k] = new Color ();
       }
+      protected Gtk.Style current_style = null;
+      public void force_color_helper_style_on_widget (Gtk.Widget w)
+      {
+      	if (current_style != null)
+	      	w.style = current_style;
+      	//w.style_set.disconnect (_style_set_cb);
+      	//w.style_set.connect (_style_set_cb);
+      }
+      private void _style_set_cb (Gtk.Widget widget, Gtk.Style? prev_style)
+      {
+      	if (current_style != null)
+    			widget.set_style (current_style);
+      }
       public void init_from_widget_type (Type widget_type)
       {
-      	Gtk.Widget widget = (Gtk.Widget) Object.new (widget_type);
-      	Gtk.Style s = Gtk.rc_get_style (widget);
+        Gtk.Widget widget = (Gtk.Widget) Object.new (widget_type);
+      	current_style = Gtk.rc_get_style (widget);
+      	_init_from_style (current_style);
+      }
+      
+      public void init_from_panel_or_widget_type (Type widget_type)
+      {
+        Gtk.Settings sett = Gtk.Settings.get_default ();
+        current_style = Gtk.rc_get_style_by_paths (sett, "PanelWidget", "", 0);
+        if (current_style == null)
+        	init_from_widget_type (widget_type);
+        else
+        	_init_from_style (current_style);
+      }
+      
+      public void _init_from_style (Gtk.Style s)
+      {
         for (int j = 0; j < 5; j++)
         {
           c[StyleType.BG,j,0].init_from_gdk_color (s.bg[j]);
