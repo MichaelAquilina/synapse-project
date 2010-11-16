@@ -618,7 +618,7 @@ namespace Synapse
           if (searching_for_matches)
           {
             main_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), LABEL_TEXT_SIZE));
-            main_label_description.set_markup (Utils.markup_string_with_search ("Not Found.", "", DESCRIPTION_TEXT_SIZE));
+            main_label_description.set_markup (Utils.markup_string_with_search (throbber.active ? "Searching.." : "No results.", "", DESCRIPTION_TEXT_SIZE));
           }
           //else -> impossible!
 
