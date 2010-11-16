@@ -406,7 +406,7 @@ namespace Synapse
     }
     public void map_key_to_command (uint keyval, CommandTypes command)
     {
-      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map)
+      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map.entries)
       {
         if (entry.value == command) command_map.unset (entry.key);
       }
@@ -414,7 +414,7 @@ namespace Synapse
     }
     public uint get_key_for_command (CommandTypes command)
     {
-      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map)
+      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map.entries)
       {
         if (entry.value == command) return entry.key;
       }
