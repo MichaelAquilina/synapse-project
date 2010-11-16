@@ -119,9 +119,9 @@ namespace Synapse
     protected virtual void build_ui ()
     {
       /* Prepare colors using label */
-      ColorHelper.get_default ().init_from_panel_or_widget_type (typeof (Label));
+      ColorHelper.get_default ().init_from_widget_type (typeof (Label));
       window.style_set.connect (()=>{
-        ColorHelper.get_default ().init_from_panel_or_widget_type (typeof (Label));
+        ColorHelper.get_default ().init_from_widget_type (typeof (Label));
         //ColorHelper.get_default ().force_color_helper_style_on_widget (window);
       });
 
