@@ -45,6 +45,7 @@ namespace Synapse
 
     protected HTextSelector flag_selector = null;
     protected HBox container_top = null;
+    protected VBox vcontainer_top = null;
     protected VBox container = null;
     
     protected HSelectionContainer results_container = null;
@@ -123,7 +124,7 @@ namespace Synapse
       container.border_width = SHADOW_SIZE;
       window.add (container);
       
-      var vcontainer_top = new VBox (false, 0);
+      vcontainer_top = new VBox (false, 0);
       vcontainer_top.border_width = BORDER_RADIUS;
       
       container_top = new HBox (false, 0);
@@ -283,7 +284,7 @@ namespace Synapse
       if (!comp)
       {
         y = this.container.border_width;
-        h = container_top.allocation.height;
+        h = vcontainer_top.allocation.height;
       }
       ctx.set_operator (Operator.OVER);
       
