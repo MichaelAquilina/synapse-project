@@ -51,25 +51,25 @@ namespace Synapse
   - protected abstract void set_throbber_visible (bool visible);
     This one is to notify the user that search is not yet completed
   */
-  
+  public enum CommandTypes
+  {
+    INVALID_COMMAND,
+    SEARCH_DELETE_CHAR,
+    NEXT_RESULT,
+    PREV_RESULT,
+    NEXT_CATEGORY,
+    PREV_CATEGORY,
+    SWITCH_SEARCH_TYPE,
+    EXECUTE,
+    NEXT_PAGE,
+    PREV_PAGE,
+    FIRST_RESULT,
+    LAST_RESULT,
+    CLEAR_SEARCH_OR_HIDE
+  }
+
   public abstract class UIInterface : Object
   {
-    public enum CommandTypes
-    {
-      INVALID_COMMAND,
-      SEARCH_DELETE_CHAR,
-      NEXT_RESULT,
-      PREV_RESULT,
-      NEXT_CATEGORY,
-      PREV_CATEGORY,
-      SWITCH_SEARCH_TYPE,
-      EXECUTE,
-      NEXT_PAGE,
-      PREV_PAGE,
-      FIRST_RESULT,
-      LAST_RESULT,
-      CLEAR_SEARCH_OR_HIDE
-    }
     private const int PARTIAL_TIMEOUT = 100;
     public DataSink data_sink { get; construct; }
     private enum T 

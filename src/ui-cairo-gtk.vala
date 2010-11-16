@@ -24,7 +24,6 @@ using Gtk;
 using Cairo;
 using Gee;
 using Synapse.Utils;
-using Synapse.UIInterface;
 
 namespace Synapse
 {
