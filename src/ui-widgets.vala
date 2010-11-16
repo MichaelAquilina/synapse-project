@@ -31,7 +31,8 @@ namespace Synapse
   public class MatchRenderer : ListView.Renderer
   {
     private const int ICON_SIZE = 32;
-    private const int PADDING = 2;
+    private const int PADDING = 3;
+    private const int INTERNAL_PADDING = 6;
     private Utils.ColorHelper ch;
     private Label label;
     private Pango.Layout layout;
@@ -83,7 +84,7 @@ namespace Synapse
       ctx.save ();
       int rtl_spacing = 0;
       if (rtl == Gtk.TextDirection.RTL)
-        rtl_spacing = req.width - ICON_SIZE - PADDING * 2;
+        rtl_spacing = req.width - ICON_SIZE - PADDING - PADDING;
       try {
         var icon = GLib.Icon.new_for_string(m.icon_name ?? "");
         if (icon != null)
@@ -103,13 +104,13 @@ namespace Synapse
       /* Now the label + description part */
       if (rtl == Gtk.TextDirection.RTL)
       {
-        ctx.rectangle (PADDING, PADDING, rtl_spacing - PADDING, req.height - PADDING * 2);
+        ctx.rectangle (PADDING, PADDING, rtl_spacing + PADDING - INTERNAL_PADDING, req.height - PADDING * 2);
         ctx.clip ();
         ctx.translate (PADDING, PADDING);
       }
       else
       {
-        ctx.translate (ICON_SIZE + PADDING * 2, PADDING);
+        ctx.translate (ICON_SIZE + PADDING + INTERNAL_PADDING, PADDING);
       }
       ctx.translate (0, text_displacement);
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
