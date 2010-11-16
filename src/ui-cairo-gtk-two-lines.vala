@@ -362,7 +362,7 @@ namespace Synapse
 
       _cairo_path_for_main (ctx, comp, x, y, w, h);
       ctx.set_source (pat);
-      ctx.set_operator (Operator.SOURCE);
+      ctx.set_operator (Operator.OVER);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();

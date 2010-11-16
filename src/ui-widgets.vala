@@ -43,7 +43,7 @@ namespace Synapse
     
     public MatchRenderer ()
     {
-      ch = new Utils.ColorHelper ();
+      ch = Utils.ColorHelper.get_default ();
       rtl = Gtk.TextDirection.LTR;
       precalc_req = {400, ICON_SIZE + PADDING * 2};
       label = new Label (null);
@@ -51,7 +51,7 @@ namespace Synapse
       layout.set_ellipsize (Pango.EllipsizeMode.END);
       on_style_set.connect (()=>{
         Gtk.Style s = Gtk.rc_get_style (label);
-        ch.init_from_widget_type (typeof (Gtk.Label));
+        //ch.init_from_widget_type (typeof (Gtk.Label));
         label.style = s;
         rtl = label.get_default_direction ();
         layout.context_changed ();
@@ -191,10 +191,10 @@ namespace Synapse
         this.queue_draw ();
       });
 
-      ch = new Utils.ColorHelper ();
-      ch.init_from_widget_type (typeof (Gtk.Label));
+      ch = Utils.ColorHelper.get_default ();
+      //ch.init_from_widget_type (typeof (Gtk.Label));
       this.style_set.connect (()=>{
-        ch.init_from_widget_type (typeof (Gtk.Label));
+        //ch.init_from_widget_type (typeof (Gtk.Label));
         this.renderer.on_style_set ();
       });
       this.show.connect (()=>{
