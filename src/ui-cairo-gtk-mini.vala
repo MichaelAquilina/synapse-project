@@ -306,7 +306,7 @@ namespace Synapse
       {
         // border
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+        ch.set_source_rgba (ctx, 0.6, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
         ctx.set_line_width (1.0);
         ctx.stroke ();
       }
