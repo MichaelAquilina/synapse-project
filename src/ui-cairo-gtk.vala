@@ -119,9 +119,10 @@ namespace Synapse
     protected virtual void build_ui ()
     {
       /* Prepare colors using label */
-      ColorHelper.get_default ().init_from_widget_type (typeof (Label));
+      ColorHelper.get_default ().init_from_panel_or_widget_type (typeof (Label));
       window.style_set.connect (()=>{
-        ColorHelper.get_default ().init_from_widget_type (typeof (Label));
+        ColorHelper.get_default ().init_from_panel_or_widget_type (typeof (Label));
+        //ColorHelper.get_default ().force_color_helper_style_on_widget (window);
       });
 
       /* containers holds top hbox and result list */
@@ -236,6 +237,8 @@ namespace Synapse
       results_container.add (results_action);
 
       container.show_all ();
+      //this doesn't work
+      //ColorHelper.get_default ().force_color_helper_style_on_widget (window);
     }
     
     private void set_list_visible (bool b)
@@ -310,7 +313,7 @@ namespace Synapse
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
                                           r, g, b, 0.9, SHADOW_SIZE);
       }
-      ctx.set_operator (Operator.OVER);
+      ctx.set_operator (Operator.SOURCE);
       Pattern pat = new Pattern.linear(0, y, 0, y + h);
       ch.add_color_stop_rgba (pat, 0, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.LIGHTER);
       ch.add_color_stop_rgba (pat, 0.75, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
@@ -324,6 +327,7 @@ namespace Synapse
       if (comp)
       {
         // border
+        ctx.set_operator (Operator.OVER);
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
         ch.set_source_rgba (ctx, 0.6, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
         ctx.set_line_width (1.0);

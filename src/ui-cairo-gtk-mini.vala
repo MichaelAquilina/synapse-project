@@ -290,7 +290,7 @@ namespace Synapse
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
                                           r, g, b, 0.9, SHADOW_SIZE);
       }
-      ctx.set_operator (Operator.OVER);
+      ctx.set_operator (Operator.SOURCE);
       Pattern pat = new Pattern.linear(0, y, 0, y + h);
       ch.add_color_stop_rgba (pat, 0, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.LIGHTER);
       ch.add_color_stop_rgba (pat, 0.75, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
@@ -304,6 +304,7 @@ namespace Synapse
       if (comp)
       {
         // border
+        ctx.set_operator (Operator.OVER);
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
         ch.set_source_rgba (ctx, 0.6, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
         ctx.set_line_width (1.0);
