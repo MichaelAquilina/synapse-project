@@ -560,7 +560,7 @@ namespace Synapse
       /* [StyleType, StateType, Mod] */
       private Color[,,] c;
       /* End of static section */
-      public ColorHelper ()
+      private ColorHelper ()
       {
         c = new Color[4,5,4];
         for (int i = 0; i < 4; i++)
