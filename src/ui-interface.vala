@@ -54,8 +54,22 @@ namespace Synapse
   
   public abstract class UIInterface : Object
   {
-    // FIXME: the partial timeout should be the shortest possible
-    //        to send to the user an "instant" response
+    public enum CommandTypes
+    {
+      INVALID_COMMAND,
+      SEARCH_DELETE_CHAR,
+      NEXT_RESULT,
+      PREV_RESULT,
+      NEXT_CATEGORY,
+      PREV_CATEGORY,
+      SWITCH_SEARCH_TYPE,
+      EXECUTE,
+      NEXT_PAGE,
+      PREV_PAGE,
+      FIRST_RESULT,
+      LAST_RESULT,
+      CLEAR_SEARCH_OR_HIDE
+    }
     private const int PARTIAL_TIMEOUT = 100;
     public DataSink data_sink { get; construct; }
     private enum T 
@@ -70,11 +84,14 @@ namespace Synapse
     private string search[2];
     private Cancellable current_cancellable;
     private bool partial_result_sent;
+    private Gee.Map<uint, CommandTypes> command_map;
     
     private uint tid; //for timer
     
     construct
     {
+      command_map = new Gee.HashMap<uint, CommandTypes> ();
+      init_default_command_map ();
       tid = 0;
       partial_result_sent = false;
       current_cancellable = new Cancellable ();
@@ -367,6 +384,51 @@ namespace Synapse
     private async void _execute (Match match, Match action)
     {
       action.execute (match);
+    }
+    
+    private void init_default_command_map ()
+    {
+      command_map.set (Gdk.KeySyms.Return, CommandTypes.EXECUTE);
+      command_map.set (Gdk.KeySyms.KP_Enter, CommandTypes.EXECUTE);
+      command_map.set (Gdk.KeySyms.ISO_Enter, CommandTypes.EXECUTE);
+      command_map.set (Gdk.KeySyms.Delete, CommandTypes.SEARCH_DELETE_CHAR);
+      command_map.set (Gdk.KeySyms.BackSpace, CommandTypes.SEARCH_DELETE_CHAR);
+      command_map.set (Gdk.KeySyms.Escape, CommandTypes.CLEAR_SEARCH_OR_HIDE);
+      command_map.set (Gdk.KeySyms.Left, CommandTypes.PREV_CATEGORY);
+      command_map.set (Gdk.KeySyms.Right, CommandTypes.NEXT_CATEGORY);
+      command_map.set (Gdk.KeySyms.Up, CommandTypes.PREV_RESULT);
+      command_map.set (Gdk.KeySyms.Down, CommandTypes.NEXT_RESULT);
+      command_map.set (Gdk.KeySyms.Home, CommandTypes.FIRST_RESULT);
+      command_map.set (Gdk.KeySyms.End, CommandTypes.LAST_RESULT);
+      command_map.set (Gdk.KeySyms.Page_Up, CommandTypes.PREV_PAGE);
+      command_map.set (Gdk.KeySyms.Page_Down, CommandTypes.NEXT_PAGE);
+      command_map.set (Gdk.KeySyms.Tab, CommandTypes.SWITCH_SEARCH_TYPE);
+    }
+    public void map_key_to_command (uint keyval, CommandTypes command)
+    {
+      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map)
+      {
+        if (entry.value == command) command_map.unset (entry.key);
+      }
+      command_map.set (keyval, command);
+    }
+    public uint get_key_for_command (CommandTypes command)
+    {
+      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map)
+      {
+        if (entry.value == command) return entry.key;
+      }
+      return 0;
+    }
+    protected CommandTypes get_command_from_key_event (Gdk.EventKey event)
+    {
+      var key = event.keyval;
+      if (command_map.has_key (key))
+      {
+        return command_map.get (key);
+      }
+      else
+        return CommandTypes.INVALID_COMMAND;
     }
   }
 }
