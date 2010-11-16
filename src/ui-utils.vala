@@ -150,6 +150,16 @@ namespace Synapse
       widget.style_set.connect (on_style_set);
       widget.composited_changed.connect (on_composited_change);
     }
+    
+    public static void move_window_to_center (Gtk.Window win)
+    {
+      Gdk.Screen screen = win.get_screen () ?? Gdk.Screen.get_default ();
+      if (screen == null)
+      	return;
+      Gtk.Requisition req = {0, 0};
+      win.size_request (out req);
+      win.move (screen.get_width () / 2 - req.width / 2, screen.get_height () / 2 - req.height / 2);
+    }
 
     public static void gdk_color_to_rgb (Gdk.Color col, out double r, out double g, out double b)
     {

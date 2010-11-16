@@ -81,6 +81,7 @@ namespace Synapse
       });
 
       build_ui ();
+      Utils.move_window_to_center (window);
 
       Utils.ensure_transparent_bg (window);
       window.expose_event.connect (on_expose);
@@ -611,6 +612,12 @@ namespace Synapse
     /* UI INTERFACE IMPLEMENTATION */
     public override void show ()
     {
+      if (!window.visible)
+      {
+        set_list_visible (true);
+        Utils.move_window_to_center (window);
+        set_list_visible (false);
+      }
       window.show ();
       set_input_mask ();
     }
