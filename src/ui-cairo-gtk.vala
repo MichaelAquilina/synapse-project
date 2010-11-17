@@ -67,9 +67,28 @@ namespace Synapse
     private const string LABEL_TEXT_SIZE = "x-large";
     private const string DESCRIPTION_TEXT_SIZE = "medium";
     
-    private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
-    private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
-                                             QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.VIDEO, QueryFlags.INTERNET};
+    private string[] categories =
+    {
+      "Actions",
+      "Audio",
+      "Applications",
+      "All",
+      "Documents",
+      "Images",
+      "Video",
+      "Internet"
+    };
+    private QueryFlags[] categories_query =
+    {
+      QueryFlags.ACTIONS,
+      QueryFlags.AUDIO,
+      QueryFlags.APPLICATIONS,
+      QueryFlags.ALL,
+      QueryFlags.DOCUMENTS,
+      QueryFlags.IMAGES,
+      QueryFlags.VIDEO,
+      QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
+    };
 
     /* STATUS */
     private bool list_visible = true;
@@ -646,7 +665,7 @@ namespace Synapse
             main_label.set_markup (
             Markup.printf_escaped ("<span size=\"%s\">%s</span>", LABEL_TEXT_SIZE,
                                    "Type to search..."));
-            main_label_description.set_markup (Utils.markup_string_with_search ("Powered by Zeitgeist", "", "small"));
+            main_label_description.set_markup (Utils.markup_string_with_search ("", "", "small"));
           }
           //else -> impossible
           match_icon.set_icon_name ("search", IconSize.DIALOG);
