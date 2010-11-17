@@ -2,6 +2,8 @@ synapsedir = $(bindir)
 
 synapse_PROGRAMS = synapse
 
+VAPIDIR = $(top_srcdir)/vapi
+
 synapse_VALAFLAGS = \
 	--pkg dbus-glib-1 \
 	--pkg gtk+-2.0 \
@@ -9,9 +11,10 @@ synapse_VALAFLAGS = \
 	--pkg zeitgeist-1.0 \
 	--pkg gee-1.0 \
 	--pkg gtkhotkey-1.0 \
-	--vapidir $(top_srcdir)/vapi \
-	keysyms.vapi \
-	cancellable-fix.vapi \
+	--vapidir $(VAPIDIR) \
+	$(VAPIDIR)/keysyms.vapi \
+	$(VAPIDIR)/cancellable-fix.vapi \
+	$(VAPIDIR)/config.vapi \
 	$(NULL)
 
 synapse_CFLAGS = $(SYNAPSE_MODULES_CFLAGS)
@@ -34,13 +37,13 @@ synapse_SOURCES = \
 	zeitgeist-plugin.vala \
 	rhythmbox-plugin.vala \
 	test-slow-plugin.vala \
+	synapse-main.vala \
 	ui-cairo-gtk.vala \
 	ui-cairo-gtk-mini.vala \
 	ui-cairo-gtk-two-lines.vala \
 	ui-interface.vala \
 	ui-widgets.vala \
 	ui-utils.vala \
-	ui-cairo-gtk-launcher.vala \
 	ui-settings.vala \
 	ui-inspector.vala \
 	abstract-tile-object.vala \
