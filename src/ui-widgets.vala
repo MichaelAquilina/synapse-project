@@ -482,7 +482,7 @@ namespace Synapse
       status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
       var logo = new Label (null);
       logo.set_alignment (1, 0);
-      logo.set_markup (Markup.printf_escaped ("<i>Synapse</i>"));
+      logo.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
       status_box.pack_start (status, false, false, 10);
       status_box.pack_start (new Label (null), true, false);
       status_box.pack_start (logo, false, false, 10);
@@ -1483,7 +1483,7 @@ namespace Synapse
                    copyright : "Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>",
                    program_name: "Synapse",
                    logo_icon_name : "synapse",
-                   version: "0.1.0");
+                   version: Config.VERSION);
     }
   }
   
