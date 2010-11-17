@@ -630,7 +630,7 @@ namespace Synapse
           match_icon_thumb.clear ();
 
         if (searching_for_matches)
-          current_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE));
+          current_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE, true));
       }
       results_match.move_selection_to_index (index);
     }
@@ -648,7 +648,7 @@ namespace Synapse
         action_icon.show ();
         action_icon.set_icon_name (action.icon_name, IconSize.DIALOG);
         if (!searching_for_matches)
-          current_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search (), LABEL_TEXT_SIZE));
+          current_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search (), LABEL_TEXT_SIZE, true));
       }
       results_action.move_selection_to_index (index);
     }

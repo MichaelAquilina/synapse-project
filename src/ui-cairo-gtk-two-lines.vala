@@ -672,7 +672,7 @@ namespace Synapse
         else
           match_icon_thumb.clear ();
 
-        match_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), size));
+        match_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), size, true));
         match_label_description.set_markup (get_description_markup (match.description));
       }
       results_match.move_selection_to_index (index);

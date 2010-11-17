@@ -612,9 +612,15 @@ namespace Synapse
     protected override void set_throbber_visible (bool visible)
     {
       if (visible)
+      {
         throbber.active = true;
+        throbber.visible = true;
+      }
       else
+      {
         throbber.active = false;
+        throbber.visible = false;
+      }
     }
     protected override void focus_match ( int index, Match? match )
     {
@@ -657,7 +663,7 @@ namespace Synapse
 
         if (searching_for_matches)
         {
-          main_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE));
+          main_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE, true));
           main_label_description.set_markup (
             Utils.markup_string_with_search (Utils.replace_home_path_with (match.description, "Home", " > "),
                                              get_match_search (),
@@ -665,7 +671,7 @@ namespace Synapse
         }
         else
         {
-          secondary_label.set_markup (Utils.markup_string_with_search (match.title, "", DESCRIPTION_TEXT_SIZE));
+          secondary_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), DESCRIPTION_TEXT_SIZE));
         }
       }
       results_match.move_selection_to_index (index);
@@ -692,12 +698,12 @@ namespace Synapse
         action_icon.set_icon_name (action.icon_name, IconSize.DIALOG);
         if (!searching_for_matches)
         {
-          main_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search (), LABEL_TEXT_SIZE));
+          main_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search (), LABEL_TEXT_SIZE, true));
           main_label_description.set_markup (Utils.markup_string_with_search (action.description, get_action_search (), DESCRIPTION_TEXT_SIZE));
         }
         else
         {
-          secondary_label.set_markup (Utils.markup_string_with_search (action.title, "", DESCRIPTION_TEXT_SIZE));
+          secondary_label.set_markup (Utils.markup_string_with_search (action.title, get_action_search(), DESCRIPTION_TEXT_SIZE));
         }
       }
       results_action.move_selection_to_index (index);

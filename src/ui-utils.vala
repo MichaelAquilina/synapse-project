@@ -27,7 +27,7 @@ namespace Synapse
     private static string home_directory = null;
     private static long home_directory_length = 0;
     
-    public static string markup_string_with_search (string text, string pattern, string size = "xx-large")
+    public static string markup_string_with_search (string text, string pattern, string size = "xx-large", bool show_not_found = false)
     {
       if (pattern == "")
       {
@@ -83,7 +83,10 @@ namespace Synapse
       }
       else
       {
-        return Markup.printf_escaped ("<span size=\"%s\">%s</span>", size, text);
+      	if (show_not_found)
+        	return Markup.printf_escaped ("<span size=\"%s\">%s <small><small>(%s)</small></small></span>", size, text, pattern);
+       	else
+       		return Markup.printf_escaped ("<span size=\"%s\">%s</span>", size, text);
       }
     }
     
