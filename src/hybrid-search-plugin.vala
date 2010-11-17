@@ -394,6 +394,12 @@ namespace Synapse
       foreach (var f in files)
       {
         unowned string name = f.get_name ();
+        // ignore common binary files
+        if (name.has_suffix (".o") || name.has_suffix (".lo") ||
+            name.has_suffix (".mo") || name.has_suffix (".gmo"))
+        {
+          continue;
+        }
         var child = directory.get_child (name);
         var file_info = new FileInfo (child.get_uri ());
         di.files[file_info.uri] = file_info;
