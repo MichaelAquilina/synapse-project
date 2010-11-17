@@ -27,7 +27,7 @@ namespace Synapse
     private static string home_directory = null;
     private static long home_directory_length = 0;
     
-    public static string markup_string_with_search (string text, string pattern, string size = "xx-large")
+    public static string markup_string_with_search (string text, string pattern, string size = "xx-large", bool show_not_found = false)
     {
       if (pattern == "")
       {
@@ -83,7 +83,10 @@ namespace Synapse
       }
       else
       {
-        return Markup.printf_escaped ("<span size=\"%s\">%s</span>", size, text);
+      	if (show_not_found)
+        	return Markup.printf_escaped ("<span size=\"%s\">%s <small><small>(%s)</small></small></span>", size, text, pattern);
+       	else
+       		return Markup.printf_escaped ("<span size=\"%s\">%s</span>", size, text);
       }
     }
     
@@ -149,6 +152,16 @@ namespace Synapse
       widget.realize.connect (make_transparent_bg);
       widget.style_set.connect (on_style_set);
       widget.composited_changed.connect (on_composited_change);
+    }
+    
+    public static void move_window_to_center (Gtk.Window win)
+    {
+      Gdk.Screen screen = win.get_screen () ?? Gdk.Screen.get_default ();
+      if (screen == null)
+      	return;
+      Gtk.Requisition req = {0, 0};
+      win.size_request (out req);
+      win.move (screen.get_width () / 2 - req.width / 2, screen.get_height () / 2 - req.height / 2);
     }
 
     public static void gdk_color_to_rgb (Gdk.Color col, out double r, out double g, out double b)

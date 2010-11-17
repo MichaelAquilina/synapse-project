@@ -81,6 +81,7 @@ namespace Synapse
       });
 
       build_ui ();
+      Utils.move_window_to_center (window);
 
       Utils.ensure_transparent_bg (window);
       window.expose_event.connect (on_expose);
@@ -611,6 +612,12 @@ namespace Synapse
     /* UI INTERFACE IMPLEMENTATION */
     public override void show ()
     {
+      if (!window.visible)
+      {
+        set_list_visible (true);
+        Utils.move_window_to_center (window);
+        set_list_visible (false);
+      }
       window.show ();
       set_input_mask ();
     }
@@ -639,7 +646,7 @@ namespace Synapse
         {
           match_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), size));
           match_label_description.set_markup (
-            get_description_markup (throbber.active ? "Searching..." : "Match not found.")
+            get_description_markup (throbber.active ? "Searching.." : "No results.")
           );
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
@@ -665,7 +672,7 @@ namespace Synapse
         else
           match_icon_thumb.clear ();
 
-        match_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), size));
+        match_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), size, true));
         match_label_description.set_markup (get_description_markup (match.description));
       }
       results_match.move_selection_to_index (index);
