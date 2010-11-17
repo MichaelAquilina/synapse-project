@@ -370,9 +370,9 @@ namespace Synapse
           )
          )
       {
-        ctx.rectangle (0, selection_voffset, w, req.height);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.SELECTED);
-        ctx.fill ();
+        Gtk.paint_flat_box (this.style, event.window, StateType.SELECTED,
+                            ShadowType.NONE, event.area, this, "cell_odd",
+                            0, selection_voffset, req.width, req.height);
       }
 
       int rows_to_process = (int)(h / req.height) * 2;
