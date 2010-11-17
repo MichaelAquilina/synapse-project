@@ -34,13 +34,13 @@ synapse_SOURCES = \
 	zeitgeist-plugin.vala \
 	rhythmbox-plugin.vala \
 	test-slow-plugin.vala \
+	synapse-main.vala \
 	ui-cairo-gtk.vala \
 	ui-cairo-gtk-mini.vala \
 	ui-cairo-gtk-two-lines.vala \
 	ui-interface.vala \
 	ui-widgets.vala \
 	ui-utils.vala \
-	ui-cairo-gtk-launcher.vala \
 	ui-settings.vala \
 	ui-inspector.vala \
 	abstract-tile-object.vala \
