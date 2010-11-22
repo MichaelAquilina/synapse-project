@@ -63,10 +63,6 @@ namespace Synapse
     private const int TOP_SPACING = ICON_SIZE / 2;
     private const int LABEL_INTERNAL_PADDING = 4;
     private const string LABEL_TEXT_SIZE = "x-large";
-    
-    private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
-    private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
-                                             QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.VIDEO, QueryFlags.INTERNET};
 
     /* STATUS */
     private bool list_visible = true;

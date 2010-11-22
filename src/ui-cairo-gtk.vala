@@ -67,29 +67,6 @@ namespace Synapse
     private const string LABEL_TEXT_SIZE = "x-large";
     private const string DESCRIPTION_TEXT_SIZE = "medium";
     
-    private string[] categories =
-    {
-      "Actions",
-      "Audio",
-      "Applications",
-      "All",
-      "Documents",
-      "Images",
-      "Video",
-      "Internet"
-    };
-    private QueryFlags[] categories_query =
-    {
-      QueryFlags.ACTIONS,
-      QueryFlags.AUDIO,
-      QueryFlags.APPLICATIONS,
-      QueryFlags.ALL,
-      QueryFlags.DOCUMENTS,
-      QueryFlags.IMAGES,
-      QueryFlags.VIDEO,
-      QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
-    };
-
     /* STATUS */
     private bool list_visible = true;
     private IMContext im_context;
