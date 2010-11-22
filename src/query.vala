@@ -254,7 +254,7 @@ namespace Synapse
         }
       }
 
-      var sorted_results = new Gee.LinkedList<Gee.Map.Entry<Regex, int>> ();
+      var sorted_results = new Gee.ArrayList<Gee.Map.Entry<Regex, int>> ();
       var entries = results.entries;
       // FIXME: why it doesn't work without this?
       sorted_results.set_data ("entries-ref", entries);

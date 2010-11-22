@@ -28,6 +28,20 @@ namespace Synapse
 
   public class DesktopFileInfo: Object
   {
+    // registered environments from http://standards.freedesktop.org/menu-spec/latest
+    [Flags]
+    public enum EnvironmentType
+    {
+      GNOME = 1 << 0,
+      KDE   = 1 << 1,
+      LXDE  = 1 << 2,
+      ROX   = 1 << 3,
+      XFCE  = 1 << 4,
+      OLD   = 1 << 5,
+
+      ALL   = 0x3F
+    }
+    
     public string name { get; construct set; }
     public string comment { get; set; default = ""; }
     public string icon_name { get; construct set; default = ""; }
@@ -48,6 +62,8 @@ namespace Synapse
       if (name_folded == null) name_folded = name.casefold ();
       return name_folded;
     }
+    
+    public EnvironmentType show_in { get; set; default = EnvironmentType.ALL; }
 
     private static const string GROUP = "Desktop Entry";
 
@@ -56,6 +72,25 @@ namespace Synapse
       Object (filename: path);
 
       init_from_keyfile (keyfile);
+    }
+    
+    private EnvironmentType parse_environments (string[] environments)
+    {
+      EnvironmentType result = 0;
+      foreach (unowned string env in environments)
+      {
+        switch (env)
+        {
+          case "GNOME": result |= EnvironmentType.GNOME; break;
+          case "KDE": result |= EnvironmentType.KDE; break;
+          case "LXDE": result |= EnvironmentType.LXDE; break;
+          case "XFCE": result |= EnvironmentType.XFCE; break;
+          case "ROX": result |= EnvironmentType.ROX; break;
+          case "Old": result |= EnvironmentType.OLD; break;
+          default: warn_if_reached (); break;
+        }
+      }
+      return result;
     }
 
     private void init_from_keyfile (KeyFile keyfile)
@@ -104,6 +139,17 @@ namespace Synapse
         {
           needs_terminal = keyfile.get_boolean (GROUP, "Terminal");
         }
+        if (keyfile.has_key (GROUP, "OnlyShowIn"))
+        {
+          show_in = parse_environments (keyfile.get_string_list (GROUP, 
+                                                                 "OnlyShowIn"));
+        }
+        else if (keyfile.has_key (GROUP, "NotShowIn"))
+        {
+          var not_show = parse_environments (keyfile.get_string_list (GROUP,
+                                                                  "NotShowIn"));
+          show_in = EnvironmentType.ALL ^ not_show;
+        }
       }
       catch (Error err)
       {
@@ -127,7 +173,7 @@ namespace Synapse
     private DesktopFileService ()
     {
     }
-    
+
     private Gee.List<DesktopFileInfo> all_desktop_files;
     private Gee.List<DesktopFileInfo> non_hidden_desktop_files;
     private Gee.Map<unowned string, Gee.List<DesktopFileInfo> > mimetype_map;
@@ -152,10 +198,36 @@ namespace Synapse
     
     private async void initialize ()
     {
+      get_environment_type ();
       yield load_all_desktop_files ();
       
       initialized = true;
       initialization_done ();
+    }
+    
+    private DesktopFileInfo.EnvironmentType session_type =
+      DesktopFileInfo.EnvironmentType.GNOME;
+    
+    private void get_environment_type ()
+    {
+      unowned string? session_var = Environment.get_variable ("DESKTOP_SESSION");
+      
+      if (session_var == null) return;
+      
+      string session = session_var.down ();
+      
+      if (session.has_prefix ("kde"))
+        session_type = DesktopFileInfo.EnvironmentType.KDE;
+      else if (session.has_prefix ("gnome"))
+        session_type = DesktopFileInfo.EnvironmentType.GNOME;
+      else if (session.has_prefix ("lx"))
+        session_type = DesktopFileInfo.EnvironmentType.LXDE;
+      else if (session.has_prefix ("xfce"))
+        session_type = DesktopFileInfo.EnvironmentType.XFCE;
+      else if (session.has_prefix ("rox"))
+        session_type = DesktopFileInfo.EnvironmentType.ROX;
+      else
+        warning ("Desktop session type is not recognized, assuming GNOME.");
     }
   
     private async void load_all_desktop_files ()
@@ -177,6 +249,8 @@ namespace Synapse
           foreach (var f in files)
           {
             unowned string name = f.get_name ();
+            // ignore ourselves
+            if (name.has_suffix ("synapse.desktop")) continue;
             if (name.has_suffix (".desktop"))
             {
               yield load_desktop_file (directory.get_child (name));
@@ -208,7 +282,10 @@ namespace Synapse
           if (dfi.is_valid)
           {
             all_desktop_files.add (dfi);
-            if (!dfi.is_hidden) non_hidden_desktop_files.add (dfi);
+            if (!dfi.is_hidden && session_type in dfi.show_in)
+            {
+              non_hidden_desktop_files.add (dfi);
+            }
           }
         }
       }
