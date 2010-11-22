@@ -412,7 +412,7 @@ namespace Synapse
       {
         Gtk.paint_flat_box (this.style, event.window, StateType.SELECTED,
                             ShadowType.NONE, event.area, this, "cell_odd",
-                            0, selection_voffset, req.width, req.height);
+                            this.allocation.x, this.allocation.y + selection_voffset, req.width, req.height);
       }
 
       int rows_to_process = (int)(h / req.height) * 2;

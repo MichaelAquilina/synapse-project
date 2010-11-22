@@ -110,6 +110,12 @@ namespace Synapse
                      description = "", //i18n
                      tclass = typeof (SynapseWindowTwoLines)
                    });
+      themes.set ("Virgilio",
+                   Theme(){
+                     name = "Virgilio", //i18n
+                     description = "", //i18n
+                     tclass = typeof (SynapseWindowVirgilio)
+                   });
 
       // TODO: read from gconf the selected one
 #if UI_MINI

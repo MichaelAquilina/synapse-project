@@ -105,6 +105,7 @@ namespace Synapse
       window.destroy ();
     }
 
+    protected signal void search_string_changed ();
     /* Called when searching_for_matches changes */
     protected signal void searching_for_changed ();
     /* Called when PREV_ or NEXT_ are pressed.
@@ -138,6 +139,7 @@ namespace Synapse
       }
       else
         set_action_search (get_action_search() + chr);
+      search_string_changed ();
     }
     
     protected virtual void search_delete_char ()
@@ -161,6 +163,7 @@ namespace Synapse
         else
           set_action_search (s);
       }
+      search_string_changed ();
     }
 
     protected virtual void hide_and_reset ()
@@ -185,6 +188,7 @@ namespace Synapse
       else if (get_match_search() != "")
       {
         set_match_search("");
+        search_string_changed ();
       }
       else
       {

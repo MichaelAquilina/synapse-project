@@ -70,6 +70,7 @@ namespace Synapse
       });
 
       set_list_visible (false);
+      visual_update_search_for ();
     }
 
     ~SynapseWindowTwoLines ()
