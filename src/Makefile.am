@@ -38,6 +38,7 @@ synapse_SOURCES = \
 	rhythmbox-plugin.vala \
 	test-slow-plugin.vala \
 	synapse-main.vala \
+	ui-cairo-gtk-base.vala \
 	ui-cairo-gtk.vala \
 	ui-cairo-gtk-mini.vala \
 	ui-cairo-gtk-two-lines.vala \
