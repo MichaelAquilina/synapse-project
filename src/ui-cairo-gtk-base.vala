@@ -299,11 +299,17 @@ namespace Synapse
 
       return true;
     }
+    protected virtual void set_input_mask () {}
 
     /* UI INTERFACE IMPLEMENTATION */
     public override void show ()
     {
+      if (window.visible) return;
+      show_list (true);
+      Utils.move_window_to_center (window);
+      show_list (false);
       window.show ();
+      set_input_mask ();
     }
     public override void hide ()
     {

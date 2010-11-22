@@ -70,29 +70,6 @@ namespace Synapse
 
   public abstract class UIInterface : Object
   {
-    protected string[] categories =
-    {
-      "Actions",
-      "Audio",
-      "Applications",
-      "All",
-      "Documents",
-      "Images",
-      "Video",
-      "Internet"
-    };
-    protected QueryFlags[] categories_query =
-    {
-      QueryFlags.ACTIONS,
-      QueryFlags.AUDIO,
-      QueryFlags.APPLICATIONS,
-      QueryFlags.ALL,
-      QueryFlags.DOCUMENTS,
-      QueryFlags.IMAGES,
-      QueryFlags.VIDEO,
-      QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
-    };
-
     private const int PARTIAL_TIMEOUT = 100;
     public DataSink data_sink { get; construct; }
     private enum T 

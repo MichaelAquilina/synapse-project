@@ -228,7 +228,7 @@ namespace Synapse
         container.border_width = 2;
     }
     
-    protected virtual void set_input_mask ()
+    protected override void set_input_mask ()
     {
       Requisition req = {0, 0};
       window.size_request (out req);

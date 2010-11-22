@@ -93,9 +93,9 @@ namespace Synapse
       layout.set_markup (s, (int)s.length);
       int width = 0, height = 0;
       layout.get_pixel_size (out width, out height);
+      this.text_height = height;
       height += cell_hpadding * 2;
       this.precalc_req.height = int.max (height, icon_size + cell_hpadding * 2);
-      this.text_height = height;
     }
     private void draw_icon (Cairo.Context ctx, Match m, Requisition req)
     {
