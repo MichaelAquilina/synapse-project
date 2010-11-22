@@ -144,19 +144,21 @@ namespace Synapse
       search[T.ACTION] = "";
       search_for_matches ();
     }
-    protected void select_first_last_match (bool first)
+    protected bool select_first_last_match (bool first)
     {
-      util_select_first_last (first, T.MATCH);
+      return util_select_first_last (first, T.MATCH);
     }
-    protected void select_first_last_action (bool first)
+    protected bool select_first_last_action (bool first)
     {
-      util_select_first_last (first, T.ACTION);
+      return util_select_first_last (first, T.ACTION);
     }
-    private void util_select_first_last (bool first, T t)
+    private bool util_select_first_last (bool first, T t)
     {
       if (results[t] == null || results[t].size == 0)
-        return;
-      focus_index[t] = first ? 0 : results[t].size - 1;
+        return false;
+      int newpos = first ? 0 : results[t].size - 1;
+      if (newpos == focus_index[t]) return false;
+      focus_index[t] = newpos;
       focus[t] = results[t].get (focus_index[t]);
       if (t == T.MATCH)
       {
@@ -165,6 +167,7 @@ namespace Synapse
       }
       else
         focus_action (focus_index[t], focus[t]);
+      return true;
     }
     protected bool move_selection_action (int delta)
     {

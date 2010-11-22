@@ -27,11 +27,8 @@ using Synapse.Utils;
 
 namespace Synapse
 {
-  public class SynapseWindowMini : UIInterface
+  public class SynapseWindowMini : GtkCairoBase
   {
-    Window window;
-    bool searching_for_matches = true;
-    
     /* Main UI shared components */
     protected NamedIcon match_icon = null;
     protected NamedIcon match_icon_thumb = null;
@@ -41,7 +38,6 @@ namespace Synapse
     protected Label match_label_description = null;
     protected ShrinkingLabel current_label = null;
 
-    protected HTextSelector flag_selector = null;
     protected HBox container_top = null;
     protected VBox container = null;
     
@@ -49,10 +45,6 @@ namespace Synapse
 
     protected ResultBox results_match = null;
     protected ResultBox results_action = null;
-    
-    protected Synapse.MenuButton pref = null;
-    
-    protected Synapse.Throbber throbber = null;
 
     private const int UI_WIDTH = 620; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -66,45 +58,19 @@ namespace Synapse
 
     /* STATUS */
     private bool list_visible = true;
-    private IMContext im_context;
     
     construct
     {
-      window = new Window ();
-      window.skip_taskbar_hint = true;
-      window.skip_pager_hint = true;
-      window.set_position (WindowPosition.CENTER);
-      window.set_decorated (false);
-      window.set_resizable (false);
-      window.notify["is-active"].connect (()=>{
-        if (!window.is_active && !pref.is_menu_visible ())
-        {
-          hide ();
-        }
-      }); 
-      
-      build_ui ();
-      Utils.move_window_to_center (window);
-
-      Utils.ensure_transparent_bg (window);
       window.expose_event.connect (expose_event);
-      on_composited_changed (window);
-      window.composited_changed.connect (on_composited_changed);
-
-      window.key_press_event.connect (key_press_event);
+      
+      this.searching_for_changed.connect (visual_update_search_for);
+        this.show_list.connect ((b)=>{
+        if (list_visible == b) return false;
+        set_list_visible (b);
+        return true;
+      });
 
       set_list_visible (false);
-      
-      /* SEZEN */
-      focus_match (0, null);
-      focus_action (0, null);
-
-      im_context = new IMMulticontext ();
-      im_context.set_use_preedit (false);
-      im_context.commit.connect (search_add_char);
-      im_context.focus_in ();
-      
-      window.key_press_event.connect (key_press_event);
     }
 
     ~SynapseWindowMini ()
@@ -112,7 +78,7 @@ namespace Synapse
       window.destroy ();
     }
 
-    protected virtual void build_ui ()
+    protected override void build_ui ()
     {
       /* containers holds top hbox and result list */
       container = new VBox (false, 0);
@@ -171,20 +137,12 @@ namespace Synapse
         hbox.pack_start (new Label ("  "), false, false);
         fakeinput.add (hbox);
       }
-      
-      /* Query flag selector  */
-      flag_selector = new HTextSelector();
-      foreach (string s in this.categories)
-      {
-        flag_selector.add_text (s);
-      }
-      flag_selector.selected = 3;
-      
-      /* Pref item */
-      pref = new MenuButton ();
-      pref.settings_clicked.connect (()=>{this.show_settings_clicked ();});
-      pref.button_scale = 1.0;
-      pref.set_size_request (10, 20);
+
+      /* Menu item */
+      menu = new MenuButton ();
+      menu.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+      menu.button_scale = 1.0;
+      menu.set_size_request (10, 20);
       {
         var vbox = new VBox (false, 0);
         var spacer = new Label (null);
@@ -201,7 +159,7 @@ namespace Synapse
         var spacer = new Label (null);
         spacer.set_size_request (-1, TOP_SPACING);
         vbox.pack_start (spacer, false);
-        vbox.pack_start (pref, false);
+        vbox.pack_start (menu, false);
         container_top.pack_start (vbox, false);
       }
       
@@ -214,7 +172,12 @@ namespace Synapse
       
       container.show_all ();
     }
-    
+    protected override void clear_search_or_hide_pressed ()
+    {
+      base.clear_search_or_hide_pressed ();
+      if (get_match_search () == "") set_list_visible (false);
+    }
+
     private void set_list_visible (bool b)
     {
       if (b == list_visible)
@@ -225,20 +188,10 @@ namespace Synapse
       window.queue_draw ();
     }
     
-    protected virtual void on_composited_changed (Widget w)
+    protected override void on_composited_changed (Widget w)
     {
-      Gdk.Screen screen = w.get_screen ();
-      bool comp = screen.is_composited ();
-      this.hide_and_reset ();
-      Gdk.Colormap? cm = screen.get_rgba_colormap();
-      if (cm == null)
-      {
-        comp = false;
-        cm = screen.get_rgb_colormap();
-      }
-      debug ("Screen is%s composited.", comp?"": " NOT");
-      w.set_colormap (cm);
-      if (comp)
+      base.on_composited_changed (w);
+      if (w.is_composited ())
         container.border_width = SHADOW_SIZE;
       else
         container.border_width = 1;
@@ -359,38 +312,6 @@ namespace Synapse
       window.input_shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
     }
 
-    private void search_add_char (string chr)
-    {
-      if (searching_for_matches)
-      {
-        set_match_search (get_match_search() + chr);
-        set_action_search ("");
-      }
-      else
-        set_action_search (get_action_search() + chr);
-    }
-    private void search_delete_char ()
-    {
-      string s = "";
-      if (searching_for_matches)
-        s = get_match_search ();
-      else
-        s = get_action_search ();
-      long len = s.length;
-      if (len > 0)
-      {
-        s = s.substring (0, len - 1);
-        if (searching_for_matches)
-        {
-          set_match_search (s);
-          set_action_search ("");
-          if (s == "")
-            set_list_visible (false);
-        }
-        else
-          set_action_search (s);
-      }
-    }
     private void visual_update_search_for ()
     {
       if (searching_for_matches)
@@ -412,188 +333,8 @@ namespace Synapse
         results_container.select (1);
       }
     }
-    private void hide_and_reset ()
-    {
-      window.hide ();
-      set_list_visible (false);
-      flag_selector.selected = 3;
-      searching_for_matches = true;
-      visual_update_search_for ();
-      reset_search ();
-    }
-    protected virtual bool key_press_event (Gdk.EventKey event)
-    {
-      if (im_context.filter_keypress (event)) return true;
-
-      CommandTypes command = get_command_from_key_event (event);
-
-      switch (command)
-      {
-        case CommandTypes.EXECUTE:
-          if (execute ())
-            hide_and_reset ();
-          break;
-        case CommandTypes.SEARCH_DELETE_CHAR:
-          search_delete_char ();
-          break;
-        case CommandTypes.CLEAR_SEARCH_OR_HIDE:
-          if (!searching_for_matches)
-          {
-            set_action_search ("");
-            searching_for_matches = true;
-            visual_update_search_for ();
-            Match m = null;
-            int i = 0;
-            get_match_focus (out i, out m);
-            focus_match (i, m);
-            window.queue_draw ();
-          }
-          else if (get_match_search() != "")
-          {
-            set_match_search("");
-            set_list_visible (false);
-          }
-          else
-          {
-            hide_and_reset ();
-          }
-          break;
-        case CommandTypes.PREV_CATEGORY:
-          flag_selector.select_prev ();
-          if (!searching_for_matches)
-          {
-            searching_for_matches = true;
-            visual_update_search_for ();
-            window.queue_draw ();
-          }
-          update_query_flags (this.categories_query[flag_selector.selected]);
-          break;
-        case CommandTypes.NEXT_CATEGORY:
-          flag_selector.select_next ();
-          if (!searching_for_matches)
-          {
-            searching_for_matches = true;
-            visual_update_search_for ();
-            window.queue_draw ();
-          }
-          update_query_flags (this.categories_query[flag_selector.selected]);
-          break;
-        case CommandTypes.FIRST_RESULT:
-          if (searching_for_matches)
-            select_first_last_match (true);
-          else
-            select_first_last_action (true);
-          break;
-        case CommandTypes.LAST_RESULT:
-          if (!list_visible)
-          {
-            set_list_visible (true);
-            return true;
-          }
-          if (searching_for_matches)
-            select_first_last_match (false);
-          else
-            select_first_last_action (false);
-          break; 
-        case CommandTypes.PREV_RESULT:
-          bool b = true;
-          if (searching_for_matches)
-            b = move_selection_match (-1);
-          else
-            b = move_selection_action (-1);
-          if (!b)
-            set_list_visible (false);
-          break;
-        case CommandTypes.PREV_PAGE:
-          bool b = true;
-          if (searching_for_matches)
-            b = move_selection_match (-5);
-          else
-            b = move_selection_action (-5);
-          if (!b)
-            set_list_visible (false);
-          break;
-        case CommandTypes.NEXT_RESULT:
-          if (!list_visible)
-          {
-            set_list_visible (true);
-            return true;
-          }
-          if (searching_for_matches)
-            move_selection_match (1);
-          else
-            move_selection_action (1);
-          set_list_visible (true);
-          break;
-        case CommandTypes.NEXT_PAGE:
-          if (!list_visible)
-          {
-            set_list_visible (true);
-            return true;
-          }
-          if (searching_for_matches)
-            move_selection_match (5);
-          else
-            move_selection_action (5);
-          set_list_visible (true);
-          break;
-        case CommandTypes.SWITCH_SEARCH_TYPE:
-          if (searching_for_matches && 
-                (
-                  get_match_results () == null || get_match_results ().size == 0 ||
-                  (get_action_search () == "" && (get_action_results () == null || get_action_results ().size == 0))
-                )
-              )
-            return true;
-          searching_for_matches = !searching_for_matches;
-          Match m = null;
-          int i = 0;
-          if (searching_for_matches)
-          {
-            get_match_focus (out i, out m);
-            focus_match (i, m);
-          }
-          else
-          {
-            get_action_focus (out i, out m);
-            focus_action (i, m);
-          }
-          visual_update_search_for ();
-          break;
-        default:
-          //debug ("im_context didn't filter...");
-          break;
-      }
-      return true;
-    }
 
     /* UI INTERFACE IMPLEMENTATION */
-    public override void show ()
-    {
-      if (!window.visible)
-      {
-        set_list_visible (true);
-        Utils.move_window_to_center (window);
-        set_list_visible (false);
-      }
-      window.show ();
-      set_input_mask ();
-    }
-    public override void hide ()
-    {
-      hide_and_reset ();
-    }
-    public override void present_with_time (uint32 timestamp)
-    {
-      window.present_with_time (timestamp);
-    }    
-    protected override void set_throbber_visible (bool visible)
-    {
-      if (visible)
-        throbber.start ();
-      else
-        throbber.stop ();
-    }
     protected override void focus_match ( int index, Match? match )
     {
       if (match == null)

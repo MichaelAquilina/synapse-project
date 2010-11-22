@@ -105,6 +105,14 @@ namespace Synapse
       window.destroy ();
     }
 
+    /* Called when searching_for_matches changes */
+    protected signal void searching_for_changed ();
+    /* Called when PREV_ or NEXT_ are pressed.
+       Return:
+       - true if handled or if list has a different status (visible/not visible)
+       - false otherwise  */
+    protected signal bool show_list (bool visible);
+    /* This method MUST build the UI */
     protected abstract void build_ui ();
 
     protected virtual void on_composited_changed (Widget w)
@@ -147,6 +155,8 @@ namespace Synapse
         {
           set_match_search (s);
           set_action_search ("");
+          if (s == "")
+            show_list (false);
         }
         else
           set_action_search (s);
@@ -158,18 +168,11 @@ namespace Synapse
       window.hide ();
       searching_for_matches = true;
       searching_for_changed ();
+      show_list (false);
       flag_selector.selected = 3;
       reset_search ();
     }
-    
-    /* Called when searching_for_matches changes */
-    protected signal void searching_for_changed ();
-    /* Called when PREV_ or NEXT_ are pressed.
-       Return:
-       - true if handled or if list has a different status (visible/not visible)
-       - false otherwise  */
-    protected signal bool show_list (bool visible);
-    
+
     protected virtual void clear_search_or_hide_pressed ()
     {
       if (!searching_for_matches)
@@ -226,10 +229,12 @@ namespace Synapse
           update_query_flags (this.categories_query[flag_selector.selected]);
           break;
         case CommandTypes.FIRST_RESULT:
+          bool b = true;
           if (searching_for_matches)
-            select_first_last_match (true);
+            b = select_first_last_match (true);
           else
-            select_first_last_action (true);
+            b = select_first_last_action (true);
+          if (!b) show_list (false);
           break;
         case CommandTypes.LAST_RESULT:
           show_list (true);
