@@ -79,15 +79,16 @@ namespace Synapse
       EnvironmentType result = 0;
       foreach (unowned string env in environments)
       {
-        switch (env)
+        string env_up = env.up ();
+        switch (env_up)
         {
           case "GNOME": result |= EnvironmentType.GNOME; break;
           case "KDE": result |= EnvironmentType.KDE; break;
           case "LXDE": result |= EnvironmentType.LXDE; break;
           case "XFCE": result |= EnvironmentType.XFCE; break;
           case "ROX": result |= EnvironmentType.ROX; break;
-          case "Old": result |= EnvironmentType.OLD; break;
-          default: warn_if_reached (); break;
+          case "OLD": result |= EnvironmentType.OLD; break;
+          default: warning ("%s is not understood", env); break;
         }
       }
       return result;
