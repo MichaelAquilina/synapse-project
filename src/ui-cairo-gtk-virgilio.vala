@@ -236,6 +236,16 @@ namespace Synapse
     }
 
     /* UI INTERFACE IMPLEMENTATION */
+    public override void show ()
+    {
+      if (window.visible) return;
+      container_for_actions.hide ();
+      container_for_matches.show ();
+      Utils.move_window_to_center (window);
+      container_for_matches.hide ();
+      window.show ();
+    }
+    
     protected override void focus_match ( int index, Match? match )
     {
       list_view_matches.scroll_to (index);

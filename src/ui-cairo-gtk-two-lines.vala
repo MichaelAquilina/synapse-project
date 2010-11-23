@@ -63,7 +63,7 @@ namespace Synapse
       window.expose_event.connect (expose_event);
       
       this.searching_for_changed.connect (visual_update_search_for);
-        this.show_list.connect ((b)=>{
+      this.show_list.connect ((b)=>{
         if (list_visible == b) return false;
         set_list_visible (b);
         return true;
