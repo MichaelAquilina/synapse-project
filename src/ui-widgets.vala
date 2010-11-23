@@ -35,10 +35,7 @@ namespace Synapse
     public int cell_hpadding {get; set; default = 3;}
     public bool hilight_on_selected {get; set; default = false;}
     public string pattern {get; set; default = "";}
-    public string title_size {get; set; default = "medium";}
-    public string description_size {get; set; default = "small";}
-    
-    private const string markup = "<span size=\"%s\"><b>%s</b></span>\n<span size=\"%s\">%s</span>";
+    public string markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";}
 
     private Utils.ColorHelper ch;
     private Label label;
@@ -71,15 +68,10 @@ namespace Synapse
         calc_requisition ();
         this.request_redraw ();
       });
-      this.notify["title-size"].connect (()=>{
+      this.notify["markup"].connect (()=>{
         calc_requisition ();
         this.request_redraw ();
       });
-      this.notify["description-size"].connect (()=>{
-        calc_requisition ();
-        this.request_redraw ();
-      });
-
     }
     private void layout_changed ()
     {
@@ -97,7 +89,7 @@ namespace Synapse
     }
     private void calc_requisition ()
     {
-      string s = Markup.printf_escaped (markup, title_size, " ", description_size, " ");
+      string s = Markup.printf_escaped (markup, " ", " ");
       layout.set_markup (s, (int)s.length);
       int width = 0, height = 0;
       layout.get_pixel_size (out width, out height);
@@ -137,7 +129,7 @@ namespace Synapse
     private void draw_text (Cairo.Context ctx, Match m, Requisition req, Gtk.StateType state)
     {
       ctx.save ();
-
+      debug ("Render %s - %s", m.title, m.description);
       int width = req.width - cell_hpadding * 4 - icon_size;
 
       if (rtl == Gtk.TextDirection.RTL)
@@ -149,20 +141,12 @@ namespace Synapse
       ctx.clip ();
       
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
-      string s = "";
-      if (!hilight_on_selected || state != Gtk.StateType.SELECTED)
-        s = Markup.printf_escaped (markup, title_size, m.title, description_size, m.description);
-      else
-      {
-        s = "<b>";
-        s += Utils.markup_string_with_search (m.title, pattern, title_size);
-        s += "</b>\n";
-        s += Utils.markup_string_with_search (m.description, pattern, description_size);
-      }
+      //FIXME: charset problem
+      string s = Markup.printf_escaped (markup, m.title, m.description);
       layout.set_width (Pango.SCALE * width);
       layout.set_markup (s, (int)s.length);
       Pango.cairo_show_layout (ctx, layout);
-      
+
       ctx.restore ();
     }
     public override void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj)
@@ -261,6 +245,7 @@ namespace Synapse
     }
     public void set_list (Gee.List<T>? new_data)
     {
+      data = new_data;
       if (new_data==null || scrollto >= new_data.size)
       {
         scrollto = 0;
@@ -268,7 +253,6 @@ namespace Synapse
         current_voffset = 0;
         selected_index = -1;
       }
-      data = new_data;
       this.queue_draw ();
     }
     public void add_data (T obj)

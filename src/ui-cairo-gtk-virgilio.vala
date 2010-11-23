@@ -38,7 +38,7 @@ namespace Synapse
     
     protected Synapse.MenuThrobber menuthrobber = null;
     protected ShrinkingLabel match_search_label = null;
-    private const string MATCH_SEARCH_LABEL_MARKUP = "<span size=\"x-large\">%s</span>";
+    private const string MATCH_SEARCH_LABEL_MARKUP = "<span size=\"x-large\"><b>%s</b></span>";
     
     private const int UI_WIDTH = 550; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -113,9 +113,7 @@ namespace Synapse
       {
         list_view_matches_renderer = new MatchRenderer ();
         list_view_matches_renderer.icon_size = 48;
-        list_view_matches_renderer.hilight_on_selected = true;
-        list_view_matches_renderer.title_size = "x-large";
-        list_view_matches_renderer.description_size = "medium";
+        list_view_matches_renderer.markup = "<span size=\"x-large\"><b>%s</b></span>\n<span size=\"medium\">%s</span>";
         list_view_matches_renderer.set_width_request (100);
         list_view_matches = new ListView<Match> (list_view_matches_renderer);
         list_view_matches.min_visible_rows = 5;
@@ -154,7 +152,6 @@ namespace Synapse
           window.queue_draw ();
         }
       }
-      if (searching_for_matches) list_view_matches_renderer.pattern = s;
     }
     
     private void visual_update_search_for ()
