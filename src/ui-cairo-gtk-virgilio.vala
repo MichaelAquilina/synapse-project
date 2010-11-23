@@ -72,12 +72,27 @@ namespace Synapse
     private const int PADDING = 8; // assinged to container_top's border width
     private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
     private const int BORDER_RADIUS = 8;
+    
+    Gee.List<Match> tts_list;
+    Gee.List<Match> nores_list;
 
     construct
     {
+      var ttsm = new TypeToSearchMatch ();
+      ttsm.set_type_to_search ();
+      tts_list = new Gee.ArrayList<Match> ();
+      tts_list.add (ttsm);
+      
+      var nores = new TypeToSearchMatch ();
+      nores.set_no_results ();
+      nores_list = new Gee.ArrayList<Match> ();
+      nores_list.add (nores);
+      
       window.expose_event.connect (expose_event);
       
       this.searching_for_changed.connect (visual_update_search_for);
+      
+      visual_update_search_for ();
     }
 
     ~SynapseWindowVirgilio ()
@@ -141,7 +156,6 @@ namespace Synapse
       container.pack_start (container_for_matches, false);
       container.pack_start (container_for_actions, false);
       container.show_all ();
-      visual_update_search_for ();
     }
     
     private void update_search_label ()
@@ -149,14 +163,11 @@ namespace Synapse
       string s = searching_for_matches ?
                  get_match_search () :
                  get_action_search ();
-      if (s.length == 0)
+      if (searching_for_matches && get_match_search ().length == 0)
       {
-        if (searching_for_matches)
-          update_match_result_list (null, 0, null);
+        update_match_result_list (null, 0, null);
       }
-      else
-      {
-      }
+      if (list_view_matches_renderer == null) return;
       list_view_matches_renderer.pattern = s;
     }
     
@@ -282,6 +293,7 @@ namespace Synapse
     }
     protected override void update_match_result_list (Gee.List<Match>? matches, int index, Match? match)
     {
+      if (list_view_matches == null) return;
       if (matches != null && matches.size > 0)
       {
         foreach (Synapse.Match m in matches)
@@ -294,20 +306,17 @@ namespace Synapse
       }
       else
       {
-        var list = new Gee.ArrayList<Match> ();
-        var ttsm = new TypeToSearchMatch ();
         if (get_match_search () == "")
         {
-          ttsm.set_type_to_search ();
           list_view_matches.min_visible_rows = 1;
+          list_view_matches.set_list (tts_list);
         }
         else
         {
-          ttsm.set_no_results ();
           list_view_matches.min_visible_rows = 5;
+          list_view_matches.set_list (nores_list);
         }
-        list.add (ttsm);
-        list_view_matches.set_list (list);
+
         list_view_matches.scroll_to (0);
         list_view_matches.selected = -1;
       }
