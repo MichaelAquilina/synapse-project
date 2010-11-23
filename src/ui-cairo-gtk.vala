@@ -362,19 +362,7 @@ namespace Synapse
     }
 
     /* UI INTERFACE IMPLEMENTATION */
-    protected override void set_throbber_visible (bool visible)
-    {
-      if (visible)
-      {
-        throbber.active = true;
-        throbber.visible = true;
-      }
-      else
-      {
-        throbber.active = false;
-        throbber.visible = false;
-      }
-    }
+
     protected override void focus_match ( int index, Match? match )
     {
       if (match == null)

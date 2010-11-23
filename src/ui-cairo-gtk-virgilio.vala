@@ -36,7 +36,7 @@ namespace Synapse
     protected ListView<Match> list_view_matches = null;
     protected MatchRenderer list_view_matches_renderer = null;
     
-    /* UI for match search */
+    protected Synapse.MenuThrobber menuthrobber = null;
     protected ShrinkingLabel match_search_label = null;
     private const string MATCH_SEARCH_LABEL_MARKUP = "<span size=\"x-large\"><b>%s</b></span>";
     
@@ -91,8 +91,15 @@ namespace Synapse
         searchico.pixel_size = 24;
         searchico.set_size_request (24, 24);
         
+        /* Throbber and menu */
+        menuthrobber = new Synapse.MenuThrobber ();
+        menu = (MenuButton) menuthrobber;
+        menuthrobber.set_size_request (24, 24);
+        menuthrobber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+        
         hbox.pack_start (searchico, false);
         hbox.pack_start (match_search_label, true);
+        hbox.pack_start (menuthrobber, false);
         hbox.set_size_request (UI_WIDTH, -1);
 
         container.pack_start (hbox, false);
@@ -238,6 +245,13 @@ namespace Synapse
     }
 
     /* UI INTERFACE IMPLEMENTATION */
+    protected override void set_throbber_visible (bool visible)
+    {
+      if (visible)
+        menuthrobber.active = true;
+      else
+        menuthrobber.active = false;
+    }
     public override void show ()
     {
       if (window.visible) return;
@@ -247,7 +261,7 @@ namespace Synapse
       container_for_matches.hide ();
       window.show ();
     }
-    
+
     protected override void focus_match ( int index, Match? match )
     {
       list_view_matches.scroll_to (index);
