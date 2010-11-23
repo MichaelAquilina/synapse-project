@@ -35,7 +35,10 @@ namespace Synapse
     public int cell_hpadding {get; set; default = 3;}
     public bool hilight_on_selected {get; set; default = false;}
     public string pattern {get; set; default = "";}
-    public string markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";}
+    public string title_size {get; set; default = "medium";}
+    public string description_size {get; set; default = "small";}
+    
+    private const string markup = "<span size=\"%s\"><b>%s</b></span>\n<span size=\"%s\">%s</span>";
 
     private Utils.ColorHelper ch;
     private Label label;
@@ -68,10 +71,15 @@ namespace Synapse
         calc_requisition ();
         this.request_redraw ();
       });
-      this.notify["markup"].connect (()=>{
+      this.notify["title-size"].connect (()=>{
         calc_requisition ();
         this.request_redraw ();
       });
+      this.notify["description-size"].connect (()=>{
+        calc_requisition ();
+        this.request_redraw ();
+      });
+
     }
     private void layout_changed ()
     {
@@ -89,7 +97,7 @@ namespace Synapse
     }
     private void calc_requisition ()
     {
-      string s = Markup.printf_escaped (markup, " ", " ");
+      string s = Markup.printf_escaped (markup, title_size, " ", description_size, " ");
       layout.set_markup (s, (int)s.length);
       int width = 0, height = 0;
       layout.get_pixel_size (out width, out height);
@@ -141,7 +149,16 @@ namespace Synapse
       ctx.clip ();
       
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
-      string s = Markup.printf_escaped (markup, m.title, m.description);
+      string s = "";
+      if (!hilight_on_selected || state != Gtk.StateType.SELECTED)
+        s = Markup.printf_escaped (markup, title_size, m.title, description_size, m.description);
+      else
+      {
+        s = "<b>";
+        s += Utils.markup_string_with_search (m.title, pattern, title_size);
+        s += "</b>\n";
+        s += Utils.markup_string_with_search (m.description, pattern, description_size);
+      }
       layout.set_width (Pango.SCALE * width);
       layout.set_markup (s, (int)s.length);
       Pango.cairo_show_layout (ctx, layout);
