@@ -63,11 +63,6 @@ namespace Synapse
       window.expose_event.connect (expose_event);
       
       this.searching_for_changed.connect (visual_update_search_for);
-      this.show_list.connect ((b)=>{
-        if (list_visible == b) return false;
-        set_list_visible (b);
-        return true;
-      });
 
       set_list_visible (false);
       visual_update_search_for ();
@@ -203,6 +198,12 @@ namespace Synapse
       });
 
       container.show_all ();
+    }
+    protected override bool show_list (bool visible)
+    {
+      if (list_visible == visible) return false;
+      set_list_visible (visible);
+      return true;
     }
     private void visual_update_search_for ()
     {

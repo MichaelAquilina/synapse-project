@@ -112,7 +112,7 @@ namespace Synapse
        Return:
        - true if handled or if list has a different status (visible/not visible)
        - false otherwise  */
-    protected signal bool show_list (bool visible);
+    protected virtual bool show_list (bool visible) {return false;}
     /* This method MUST build the UI */
     protected abstract void build_ui ();
 
