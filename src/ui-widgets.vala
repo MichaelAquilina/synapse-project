@@ -90,7 +90,7 @@ namespace Synapse
     private void calc_requisition ()
     {
       string s = Markup.printf_escaped (markup, " ", " ");
-      layout.set_markup (s, (int)s.length);
+      Utils.pango_layout_set_markup (layout, s);
       int width = 0, height = 0;
       layout.get_pixel_size (out width, out height);
       this.text_height = height;
@@ -129,7 +129,6 @@ namespace Synapse
     private void draw_text (Cairo.Context ctx, Match m, Requisition req, Gtk.StateType state)
     {
       ctx.save ();
-      debug ("Render %s - %s", m.title, m.description);
       int width = req.width - cell_hpadding * 4 - icon_size;
 
       if (rtl == Gtk.TextDirection.RTL)
@@ -141,10 +140,9 @@ namespace Synapse
       ctx.clip ();
       
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
-      //FIXME: charset problem
       string s = Markup.printf_escaped (markup, m.title, m.description);
+      Utils.pango_layout_set_markup (layout, s);
       layout.set_width (Pango.SCALE * width);
-      layout.set_markup (s, (int)s.length);
       Pango.cairo_show_layout (ctx, layout);
 
       ctx.restore ();
@@ -1618,7 +1616,7 @@ namespace Synapse
         txt = texts.get (i);
         if (txt == null) continue;
         s = Markup.printf_escaped (i == _selected ? selected_markup : unselected_markup, txt.text);
-        layout.set_markup (s, (int)s.length);
+        Utils.pango_layout_set_markup (layout, s);
         layout.get_pixel_size (out w, out h);
         txt.width = w;
         txt.height = h;
@@ -1664,7 +1662,7 @@ namespace Synapse
         ctx.save ();
         ctx.translate (txt.offset, (h - txt.height) / 2);
         s = Markup.printf_escaped (i == _selected ? selected_markup : unselected_markup, txt.text);
-        layout.set_markup (s, (int)s.length);
+        Utils.pango_layout_set_markup (layout, s);
         Pango.cairo_show_layout (ctx, layout);
         ctx.restore ();
       }
