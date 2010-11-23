@@ -263,7 +263,9 @@ namespace Synapse
       if (window.visible) return;
       container_for_actions.hide ();
       container_for_matches.show ();
+      list_view_matches.min_visible_rows = 5;
       Utils.move_window_to_center (window);
+      list_view_matches.min_visible_rows = 1;
       window.show ();
     }
 
