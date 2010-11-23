@@ -170,10 +170,10 @@ namespace Synapse
     {
       window.hide ();
       searching_for_matches = true;
-      searching_for_changed ();
       show_list (false);
       flag_selector.selected = 3;
       reset_search ();
+      searching_for_changed ();
     }
 
     protected virtual void clear_search_or_hide_pressed ()

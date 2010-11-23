@@ -121,7 +121,7 @@ namespace Synapse
 #if UI_MINI
       selected_theme = "Mini";
 #else
-      selected_theme = "Default";
+      selected_theme = "Virgilio";
 #endif
     }
     

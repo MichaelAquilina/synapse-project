@@ -159,12 +159,14 @@ namespace Synapse
         container_for_matches.hide ();
         container_for_actions.show ();
       }
+      window.queue_draw ();
       update_search_label ();
     }
     
     protected override void clear_search_or_hide_pressed ()
     {
       base.clear_search_or_hide_pressed ();
+      update_search_label ();
       //if (get_match_search () == "") set_list_visible (false);
     }
     
@@ -257,6 +259,13 @@ namespace Synapse
     }
     protected override void update_match_result_list (Gee.List<Match>? matches, int index, Match? match)
     {
+      if (matches != null)
+      {
+        foreach (Synapse.Match m in matches)
+        {
+          m.description = Utils.replace_home_path_with (m.description, "Home", " > ");
+        }
+      }
       list_view_matches.set_list (matches);
       focus_match ( index, match );
     }
