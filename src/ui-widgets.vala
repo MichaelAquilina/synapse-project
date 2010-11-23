@@ -34,6 +34,7 @@ namespace Synapse
     public int cell_vpadding {get; set; default = 2;}
     public int cell_hpadding {get; set; default = 3;}
     public bool hilight_on_selected {get; set; default = false;}
+    public bool show_pattern_in_hilight {get; set; default = false;}
     public string pattern {get; set; default = "";}
     public string markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";}
 
@@ -140,7 +141,14 @@ namespace Synapse
       ctx.clip ();
       
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
-      string s = Markup.printf_escaped (markup, m.title, m.description);
+      string s = "";
+      if (!this.hilight_on_selected || state != Gtk.StateType.SELECTED)
+        s = Markup.printf_escaped (markup, m.title, m.description);
+      else
+      {
+        s = markup.printf (Utils.markup_string_with_search (m.title, pattern, "", show_pattern_in_hilight),
+                           Utils.markup_string_with_search (m.description, pattern, "", show_pattern_in_hilight));
+      }
       Utils.pango_layout_set_markup (layout, s);
       layout.set_width (Pango.SCALE * width);
       Pango.cairo_show_layout (ctx, layout);
@@ -200,9 +208,9 @@ namespace Synapse
         return selected_index;
       }
       set {
-        if (selected_index == value || value < 0 || data == null || value >= data.size) return;
-        selected_index = value;
         queue_draw ();
+        if (selected_index == value || data == null || value >= data.size) return;
+        selected_index = value;
       }
     }
     public int min_visible_rows {
