@@ -119,9 +119,9 @@ namespace Synapse
     
     private bool save_timeout ()
     {
+      save_timer_id = 0;
       save ();
 
-      save_timer_id = 0;
       return false;
     }
     
