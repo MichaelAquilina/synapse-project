@@ -54,7 +54,7 @@ namespace Synapse
       {
         Object (title: "Define",
                 description: "Look up definition in dictionary",
-                has_thumbnail: false, icon_name: "gnome-dictionary");
+                has_thumbnail: false, icon_name: "accessories-dictionary");
       }
     }
 
@@ -64,7 +64,7 @@ namespace Synapse
         typeof (DictionaryPlugin),
         "Dictionary",
         "Look up definitions of words.",
-        "gnome-dictionary",
+        "accessories-dictionary",
         Environment.find_program_in_path ("gnome-dictionary") != null,
         "Gnome Dictionary is not installed"
       );

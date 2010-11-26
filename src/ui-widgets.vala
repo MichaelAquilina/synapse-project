@@ -370,9 +370,13 @@ namespace Synapse
           )
          )
       {
+        bool had_focus = Gtk.WidgetFlags.HAS_FOCUS in this.get_flags ();
+        // fool theme engine to use proper bg color
+        if (!had_focus) this.set_flags (Gtk.WidgetFlags.HAS_FOCUS);
         Gtk.paint_flat_box (this.style, event.window, StateType.SELECTED,
                             ShadowType.NONE, event.area, this, "cell_odd",
                             0, selection_voffset, req.width, req.height);
+        if (!had_focus) this.unset_flags (Gtk.WidgetFlags.HAS_FOCUS);
       }
 
       int rows_to_process = (int)(h / req.height) * 2;

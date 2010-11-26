@@ -129,12 +129,16 @@ namespace UI.Widgets
     {
       if (this.get_state () == StateType.SELECTED)
       {
+        bool had_focus = Gtk.WidgetFlags.HAS_FOCUS in this.get_flags ();
+        // fool theme engine to use proper bg color
+        if (!had_focus) this.set_flags (Gtk.WidgetFlags.HAS_FOCUS);
         Gtk.paint_flat_box (this.style, event.window, this.get_state (),
                             ShadowType.NONE, event.area, this, "cell_odd",
                             this.allocation.x,
                             this.allocation.y,
                             this.allocation.width,
                             this.allocation.height - (last ? 0 : 1));
+        if (!had_focus) this.unset_flags (Gtk.WidgetFlags.HAS_FOCUS);
       }
 
       if (!last)
