@@ -11,6 +11,7 @@ synapse_VALAFLAGS = \
 	--pkg zeitgeist-1.0 \
 	--pkg gee-1.0 \
 	--pkg gtkhotkey-1.0 \
+	--pkg json-glib-1.0 \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/keysyms.vapi \
 	$(VAPIDIR)/cancellable-fix.vapi \
@@ -20,6 +21,7 @@ synapse_VALAFLAGS = \
 synapse_CFLAGS = $(SYNAPSE_MODULES_CFLAGS)
 synapse_LDADD = $(SYNAPSE_MODULES_LIBS)
 synapse_SOURCES = \
+	configuration.vala \
 	common-actions.vala \
 	data-sink.vala \
 	match.vala \

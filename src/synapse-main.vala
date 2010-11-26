@@ -43,10 +43,12 @@ namespace Synapse
     private DataSink data_sink;
     private GtkHotkey.Info? hotkey;
     private Inspector inspector;
+    private Configuration config;
     
     public UILauncher ()
     {
       ui = null;
+      config = Configuration.get_default ();
       data_sink = new DataSink ();
       settings = new SettingsWindow (data_sink);
       settings.keybinding_changed.connect (this.change_keyboard_shortcut);
