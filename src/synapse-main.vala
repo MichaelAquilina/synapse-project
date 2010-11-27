@@ -38,7 +38,7 @@ namespace Synapse
       }
     };
     
-    private UIInterface ui;
+    private UIInterface? ui;
     private SettingsWindow settings;
     private DataSink data_sink;
     private GtkHotkey.Info? hotkey;
@@ -63,6 +63,12 @@ namespace Synapse
       inspector = new Inspector ();
 #endif
     }
+    
+    ~UILauncher ()
+    {
+      config.save ();
+    }
+    
     private void init_ui (Type t)
     {
       ui = GLib.Object.new (t, "data-sink", data_sink) as UIInterface;

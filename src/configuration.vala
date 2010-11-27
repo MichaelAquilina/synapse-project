@@ -42,6 +42,7 @@ namespace Synapse
     
     ~Configuration ()
     {
+      // useless cause the timer takes a reference on self
       if (save_timer_id != 0) save ();
       instance = null;
     }
@@ -118,6 +119,7 @@ namespace Synapse
       group_obj.set_object_member (key, node.get_object ());
       
       if (save_timer_id != 0) Source.remove (save_timer_id);
+      // on crap, this takes a reference on self
       save_timer_id = Timeout.add (30000, this.save_timeout);
     }
     

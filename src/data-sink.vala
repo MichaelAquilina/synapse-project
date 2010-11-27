@@ -208,6 +208,51 @@ namespace Synapse
       }
     }
     
+    private class DataSinkConfiguration : ConfigObject
+    {
+      // vala keeps array lengths, and therefore doesn't support setting arrays
+      // via automatic public properties
+      private string[] _disabled_plugins = null;
+      public string[] disabled_plugins
+      {
+        get
+        {
+          return _disabled_plugins;
+        }
+        set
+        {
+          _disabled_plugins = value;
+        }
+      }
+      
+      public void set_plugin_enabled (Type t, bool enabled)
+      {
+        if (enabled) enable_plugin (t.name ());
+        else disable_plugin (t.name ());
+      }
+      
+      private void enable_plugin (string name)
+      {
+        if (_disabled_plugins == null) return;
+        if (!(name in _disabled_plugins)) return;
+        
+        string[] cpy = {};
+        foreach (string s in _disabled_plugins)
+        {
+          if (s != name) cpy += s;
+        }
+        _disabled_plugins = (owned) cpy;
+      }
+      
+      private void disable_plugin (string name)
+      {
+        if (_disabled_plugins == null || !(name in _disabled_plugins))
+        {
+          _disabled_plugins += name;
+        }
+      }
+    }
+    
     public DataSink ()
     {
     }
@@ -217,6 +262,7 @@ namespace Synapse
       debug ("DataSink died...");
     }
 
+    private DataSinkConfiguration config;
     private Gee.Set<DataPlugin> plugins;
     private Gee.Set<ActionPlugin> actions;
     private uint query_id;
@@ -231,6 +277,10 @@ namespace Synapse
       plugins = new Gee.HashSet<DataPlugin> ();
       actions = new Gee.HashSet<ActionPlugin> ();
       query_id = 0;
+
+      var cfg = Configuration.get_default ();
+      config = (DataSinkConfiguration)
+        cfg.get_config ("data-sink", "global", typeof (DataSinkConfiguration));
 
       // oh well, yea we need a few singletons
       registry = PluginRegistry.get_default ();
@@ -291,28 +341,43 @@ namespace Synapse
     
     private DataPlugin? create_plugin (Type t)
     {
-      //t.class_ref ();
       return Object.new (t, "data-sink", this, null) as DataPlugin;
     }
 
     private void load_plugins ()
     {
       // FIXME: turn into proper modules
-      register_plugin (create_plugin (typeof (DesktopFilePlugin)));
-      register_plugin (create_plugin (typeof (ZeitgeistPlugin)));
-      register_plugin (create_plugin (typeof (HybridSearchPlugin)));
-      register_plugin (create_plugin (typeof (GnomeSessionPlugin)));
-      register_plugin (create_plugin (typeof (UPowerPlugin)));
-      register_plugin (create_plugin (typeof (CommandPlugin)));
-      register_plugin (create_plugin (typeof (RhythmboxActions)));
-      register_plugin (create_plugin (typeof (DirectoryPlugin)));
+      Type[] plugin_types =
+      {
+        typeof (DesktopFilePlugin),
+        typeof (ZeitgeistPlugin),
+        typeof (HybridSearchPlugin),
+        typeof (GnomeSessionPlugin),
+        typeof (UPowerPlugin),
+        typeof (CommandPlugin),
+        typeof (RhythmboxActions),
+        typeof (DirectoryPlugin),
 #if TEST_PLUGINS
-      register_plugin (create_plugin (typeof (TestSlowPlugin)));
+        typeof (TestSlowPlugin),
 #endif
 
-      register_plugin (create_plugin (typeof (CommonActions)));
-      register_plugin (create_plugin (typeof (DictionaryPlugin)));
-      register_plugin (create_plugin (typeof (DevhelpPlugin)));
+        typeof (CommonActions),
+        typeof (DictionaryPlugin),
+        typeof (DevhelpPlugin)
+      };
+      
+      foreach (Type t in plugin_types)
+      {
+        t.class_ref (); // makes the plugin register itself into PluginRegistry
+        unowned string plugin_name = t.name ();
+        if (config.disabled_plugins != null &&
+            plugin_name in config.disabled_plugins)
+        {
+          continue;
+        }
+        
+        register_plugin (create_plugin (t));
+      }
       
       plugins_loaded = true;
     }
@@ -350,6 +415,10 @@ namespace Synapse
     
     public void set_plugin_enabled (Type plugin_type, bool enabled)
     {
+      // save it into our config object
+      config.set_plugin_enabled (plugin_type, enabled);
+      Configuration.get_default ().set_config ("data-sink", "global", config);
+      
       foreach (var plugin in plugins)
       {
         if (plugin.get_type () == plugin_type)
@@ -368,7 +437,11 @@ namespace Synapse
         }
       }
 
-      warn_if_reached ();
+      // plugin isn't instantiated yet
+      if (enabled)
+      {
+        register_plugin (create_plugin (plugin_type));
+      }
     }
 
     public async Gee.List<Match> search (string query,
