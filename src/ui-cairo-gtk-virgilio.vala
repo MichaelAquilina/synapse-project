@@ -77,7 +77,7 @@ namespace Synapse
     private const int PADDING = 8; // assinged to container_top's border width
     private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
     private const int BORDER_RADIUS = 8;
-    private const int THUMB_SIZE = 172;
+    private const int THUMB_SIZE = 140;
     
     Gee.List<Match> tts_list;
     Gee.List<Match> nores_list;
@@ -200,7 +200,7 @@ namespace Synapse
       string s = searching_for_matches ?
                  get_match_search () :
                  get_action_search ();
-      if (searching_for_matches && (s == "" || s == null))
+      if (s == "" || s == null)
         s = "...";
       search_label.set_markup (Markup.printf_escaped ("<span size=\"medium\"><b>%s </b></span>", s));
     }
@@ -224,6 +224,7 @@ namespace Synapse
         list_view_matches.scroll_mode = ListView.ScrollMode.TOP_FORCED;
         list_view_matches.min_visible_rows = 1;
       }
+      update_search_label ();
       window.queue_draw ();
     }
     
@@ -311,6 +312,7 @@ namespace Synapse
       Utils.move_window_to_center (window);
       list_view_matches.min_visible_rows = 1;
       update_match_result_list (null, 0, null);
+      update_search_label ();
       window.show ();
     }
 
