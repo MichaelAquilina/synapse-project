@@ -46,7 +46,7 @@ namespace Synapse
       public void set_type_to_search ()
       {
         //TODO: i18n
-        title = "Type to search...";
+        title = "";
         description = "";
         icon_name = "search";
       }
@@ -62,6 +62,7 @@ namespace Synapse
     protected VBox container = null;
     protected VBox container_for_matches = null;
     protected VBox container_for_actions = null;
+    protected ShrinkingLabel search_label = null;
     
     protected ListView<Match> list_view_matches = null;
     protected MatchRenderer list_view_matches_renderer = null;
@@ -109,6 +110,9 @@ namespace Synapse
       container_for_actions.set_size_request (UI_WIDTH, -1);
       container_for_matches = new VBox (false, 0);
       container_for_matches.set_size_request (UI_WIDTH, -1);
+      
+      search_label = new ShrinkingLabel ();
+      search_label.set_alignment (0.5f, 0.5f);
 
       /* Building search label */
       {
@@ -120,11 +124,17 @@ namespace Synapse
         menuthrobber.set_size_request (24, 24);
         menuthrobber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
         
+        var left_spacer = new Label (null);
+        left_spacer.set_size_request (24, 24);
+        
+        hbox.pack_start (left_spacer, false);
         hbox.pack_start (flag_selector, true);
         hbox.pack_start (menuthrobber, false);
         hbox.set_size_request (UI_WIDTH, -1);
 
         container.pack_start (hbox, false);
+        container.pack_end (search_label);
+        container.pack_end (new HSeparator (), false);
       }
       
       /* Building Matches part */
@@ -179,7 +189,20 @@ namespace Synapse
       
       visual_update_search_for ();
       
+      search_string_changed.connect (update_search_label);
+      
       update_match_result_list (null, 0, null);
+      update_search_label ();
+    }
+    
+    private void update_search_label ()
+    {
+      string s = searching_for_matches ?
+                 get_match_search () :
+                 get_action_search ();
+      if (searching_for_matches && (s == "" || s == null))
+        s = "Type to search...";
+      search_label.set_markup (Markup.printf_escaped ("<span size=\"medium\"><b>%s </b></span>", s));
     }
     
     private void visual_update_search_for ()
@@ -294,7 +317,8 @@ namespace Synapse
     protected override void focus_match ( int index, Match? match )
     {
       var matches = get_match_results ();
-      if (matches == null || matches.size == 0) return;
+      if (matches == null || matches.size == 0) {list_view_matches_renderer.pattern = ""; return;}
+      list_view_matches_renderer.pattern = get_match_search ();
       list_view_matches.scroll_to (index);
       list_view_matches.selected = index;
       if (match != null && match.has_thumbnail)
@@ -310,7 +334,8 @@ namespace Synapse
     protected override void focus_action ( int index, Match? action )
     {
       var actions = get_action_results ();
-      if (actions == null || actions.size == 0) return;
+      if (actions == null || actions.size == 0) {list_view_actions_renderer.pattern = ""; return;}
+      list_view_actions_renderer.pattern = get_action_search ();
       list_view_actions.scroll_to (index);
       list_view_actions.selected = index;
     }
@@ -325,8 +350,8 @@ namespace Synapse
         }
         list_view_matches.set_list (matches);
         list_view_matches.min_visible_rows = 5;
-        focus_match ( index, match );
         list_view_matches.set_inhibit_focus (false);
+        focus_match ( index, match );
       }
       else
       {
@@ -345,6 +370,7 @@ namespace Synapse
 
         list_view_matches.scroll_to (0);
         list_view_matches.selected = 0;
+        focus_match ( 0, null );
       }
       window.queue_draw ();
     }
