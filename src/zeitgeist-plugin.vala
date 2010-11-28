@@ -316,6 +316,29 @@ namespace Synapse
       Zeitgeist.Event event;
       Zeitgeist.Subject subject;
 
+      var flags_intersect = flags & QueryFlags.LOCAL_CONTENT;
+      if (flags_intersect == QueryFlags.LOCAL_CONTENT) // "All" category
+      {
+        subject = new Zeitgeist.Subject ();
+        subject.set_manifestation (manifestation);
+        event = new Zeitgeist.Event ();
+        event.add_subject (subject);
+        /* ignore some results */
+        // bzr plugin logs these, and we probably don't want to search
+        //   in commit messages
+        subject = new Zeitgeist.Subject ();
+        subject.set_interpretation ("!" + Zeitgeist.NFO_FOLDER);
+        event.add_subject (subject);
+        // according to seif,these results arent wanted (because of App plugin?)
+        subject = new Zeitgeist.Subject ();
+        subject.set_interpretation ("!" + Zeitgeist.NFO_SOFTWARE);
+        event.add_subject (subject);
+
+        templates.add (event);
+
+        return templates; // this is the only template we need
+      }
+
       if (QueryFlags.AUDIO in flags)
       {
         subject = new Zeitgeist.Subject ();

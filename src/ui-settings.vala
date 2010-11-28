@@ -62,11 +62,23 @@ namespace Synapse
       }
     }
     
+    class UIConfig: ConfigObject
+    {
+      public string ui_type { get; set; default = "default"; }
+    }
+
     private struct Theme
     {
       string name;
       string description;
       Type tclass;
+      
+      Theme (string name, string desc, Type obj_type)
+      {
+        this.name = name;
+        this.description = desc;
+        this.tclass = obj_type;
+      }
     }
 
     private string selected_theme;
@@ -74,6 +86,7 @@ namespace Synapse
     private bool autostart;
     private unowned DataSink data_sink;
     private Gtk.ListStore model;
+    private UIConfig config;
 
     public SettingsWindow (DataSink data_sink)
     {
@@ -83,6 +96,10 @@ namespace Synapse
       this.set_size_request (500, 450);
       this.resizable = false;
       this.delete_event.connect (this.hide_on_delete);
+      
+      config = (UIConfig) 
+        Configuration.get_default ().get_config ("ui", "global", typeof (UIConfig));
+
       init_settings ();
       build_ui ();
       
@@ -92,37 +109,12 @@ namespace Synapse
     private void init_themes ()
     {
       themes = new Gee.HashMap<string, Theme?>();
-      themes.set ("Default",
-                   Theme(){
-                     name = "Default", //i18n
-                     description = "", //i18n
-                     tclass = typeof (SynapseWindow)
-                   });
-      themes.set ("Mini",
-                   Theme(){
-                     name = "Mini", //i18n
-                     description = "", //i18n
-                     tclass = typeof (SynapseWindowMini)
-                   });
-      themes.set ("Dual",
-                   Theme(){
-                     name = "Dual", //i18n
-                     description = "", //i18n
-                     tclass = typeof (SynapseWindowTwoLines)
-                   });
-      themes.set ("Virgilio",
-                   Theme(){
-                     name = "Virgilio", //i18n
-                     description = "", //i18n
-                     tclass = typeof (SynapseWindowVirgilio)
-                   });
 
-      // TODO: read from gconf the selected one
-#if UI_MINI
-      selected_theme = "Mini";
-#else
-      selected_theme = "Virgilio";
-#endif
+      themes["default"] = Theme ("Default", "", typeof (SynapseWindow)); //i18n
+      themes["mini"] = Theme ("Mini", "", typeof (SynapseWindowMini)); //i18n
+      themes["dual"] = Theme ("Dual", "", typeof (SynapseWindowTwoLines)); //i18n
+
+      selected_theme = config.ui_type;
     }
     
     private void init_plugin_tiles ()
@@ -352,6 +344,8 @@ namespace Synapse
         TreeIter active_iter;
         cb_themes.get_active_iter (out active_iter);
         theme_list.get (active_iter, 0, out selected_theme);
+        config.ui_type = selected_theme;
+        Configuration.get_default ().set_config ("ui", "global", config);
         theme_selected (get_current_theme ());
       });
       
@@ -359,7 +353,7 @@ namespace Synapse
     }
     public Type get_current_theme ()
     {
-      return themes.get(selected_theme).tclass;
+      return themes[selected_theme].tclass;
     }
 
     public signal void theme_selected (Type theme);
