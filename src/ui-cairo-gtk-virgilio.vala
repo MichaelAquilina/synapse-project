@@ -65,6 +65,7 @@ namespace Synapse
     
     protected ListView<Match> list_view_matches = null;
     protected MatchRenderer list_view_matches_renderer = null;
+    protected NamedIcon thumb_icon = null;
 
     protected ListView<Match> list_view_actions = null;
     protected MatchRenderer list_view_actions_renderer = null;
@@ -75,27 +76,14 @@ namespace Synapse
     private const int PADDING = 8; // assinged to container_top's border width
     private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
     private const int BORDER_RADIUS = 8;
+    private const int THUMB_SIZE = 172;
     
     Gee.List<Match> tts_list;
     Gee.List<Match> nores_list;
 
     construct
     {
-      var ttsm = new TypeToSearchMatch ();
-      ttsm.set_type_to_search ();
-      tts_list = new Gee.ArrayList<Match> ();
-      tts_list.add (ttsm);
-      
-      var nores = new TypeToSearchMatch ();
-      nores.set_no_results ();
-      nores_list = new Gee.ArrayList<Match> ();
-      nores_list.add (nores);
-      
       window.expose_event.connect (expose_event);
-      
-      this.searching_for_changed.connect (visual_update_search_for);
-      
-      visual_update_search_for ();
     }
 
     ~SynapseWindowVirgilio ()
@@ -125,8 +113,6 @@ namespace Synapse
       /* Building search label */
       {
         var hbox = new HBox (false, 0);
-        search_string_changed.connect (update_search_label);
-        search_string_changed ();
         
         /* Throbber and menu */
         menuthrobber = new Synapse.MenuThrobber ();
@@ -149,7 +135,6 @@ namespace Synapse
         list_view_matches_renderer.markup = "<span size=\"x-large\"><b>%s</b></span>\n<span size=\"medium\">%s</span>";
         list_view_matches_renderer.set_width_request (100);
         list_view_matches_renderer.hilight_on_selected = true;
-        list_view_matches_renderer.show_pattern_in_hilight = true;
         list_view_matches = new ListView<Match> (list_view_matches_renderer);
         list_view_matches.min_visible_rows = 5;
         list_view_matches.use_base_background = false;
@@ -164,32 +149,37 @@ namespace Synapse
         list_view_actions_renderer.markup = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";
         list_view_actions_renderer.set_width_request (100);
         list_view_actions_renderer.hilight_on_selected = true;
-        list_view_actions_renderer.show_pattern_in_hilight = true;
         list_view_actions = new ListView<Match> (list_view_actions_renderer);
         list_view_actions.min_visible_rows = 5;
         list_view_actions.use_base_background = false;
         container_for_actions.pack_start (new HSeparator (), false);
-	container_for_actions.pack_start (list_view_actions, false);
+        
+        thumb_icon = new NamedIcon ();
+        thumb_icon.set_pixel_size (THUMB_SIZE);
+        thumb_icon.set_size_request (THUMB_SIZE, THUMB_SIZE);
+        var hbox = new HBox (false, 5);
+        hbox.pack_start (list_view_actions);
+        hbox.pack_start (thumb_icon, false);
+	      container_for_actions.pack_start (hbox, false);
       }
       container.pack_start (container_for_actions, false);
       container.show_all ();
-    }
-    
-    private void update_search_label ()
-    {
-      string s = searching_for_matches ?
-                 get_match_search () :
-                 get_action_search ();
-      if (searching_for_matches && get_match_search ().length == 0)
-      {
-        update_match_result_list (null, 0, null);
-      }
-      if (list_view_matches_renderer == null ||
-          list_view_actions_renderer == null) return;
-      if (searching_for_matches)      
-        list_view_matches_renderer.pattern = s;
-      else
-        list_view_actions_renderer.pattern = s;
+      
+      var ttsm = new TypeToSearchMatch ();
+      ttsm.set_type_to_search ();
+      tts_list = new Gee.ArrayList<Match> ();
+      tts_list.add (ttsm);
+      
+      var nores = new TypeToSearchMatch ();
+      nores.set_no_results ();
+      nores_list = new Gee.ArrayList<Match> ();
+      nores_list.add (nores);
+      
+      this.searching_for_changed.connect (visual_update_search_for);
+      
+      visual_update_search_for ();
+      
+      update_match_result_list (null, 0, null);
     }
     
     private void visual_update_search_for ()
@@ -198,6 +188,7 @@ namespace Synapse
       {
         container_for_actions.hide ();
         list_view_matches.scroll_mode = ListView.ScrollMode.MIDDLE;
+        list_view_matches.set_inhibit_focus (false);
         if (get_match_search () == "")
           list_view_matches.min_visible_rows = 1;
         else
@@ -206,18 +197,11 @@ namespace Synapse
       else
       {
         container_for_actions.show ();
+        list_view_matches.set_inhibit_focus (true);
         list_view_matches.scroll_mode = ListView.ScrollMode.TOP_FORCED;
         list_view_matches.min_visible_rows = 1;
       }
       window.queue_draw ();
-      update_search_label ();
-    }
-    
-    protected override void clear_search_or_hide_pressed ()
-    {
-      base.clear_search_or_hide_pressed ();
-      update_search_label ();
-      //if (get_match_search () == "") set_list_visible (false);
     }
     
     protected override void on_composited_changed (Widget w)
@@ -303,6 +287,7 @@ namespace Synapse
       list_view_matches.min_visible_rows = 5;
       Utils.move_window_to_center (window);
       list_view_matches.min_visible_rows = 1;
+      update_match_result_list (null, 0, null);
       window.show ();
     }
 
@@ -312,6 +297,15 @@ namespace Synapse
       if (matches == null || matches.size == 0) return;
       list_view_matches.scroll_to (index);
       list_view_matches.selected = index;
+      if (match != null && match.has_thumbnail)
+      {
+        thumb_icon.set_icon_name (match.thumbnail_path, IconSize.DIALOG);
+        thumb_icon.show ();
+      }
+      else
+      {
+        thumb_icon.hide ();
+      }
     }
     protected override void focus_action ( int index, Match? action )
     {
@@ -332,6 +326,7 @@ namespace Synapse
         list_view_matches.set_list (matches);
         list_view_matches.min_visible_rows = 5;
         focus_match ( index, match );
+        list_view_matches.set_inhibit_focus (false);
       }
       else
       {
@@ -339,15 +334,17 @@ namespace Synapse
         {
           list_view_matches.min_visible_rows = 1;
           list_view_matches.set_list (tts_list);
+          list_view_matches.set_inhibit_focus (true);
         }
         else
         {
           list_view_matches.min_visible_rows = 5;
           list_view_matches.set_list (nores_list);
+          list_view_matches.set_inhibit_focus (false);
         }
 
         list_view_matches.scroll_to (0);
-        list_view_matches.selected = -1;
+        list_view_matches.selected = 0;
       }
       window.queue_draw ();
     }

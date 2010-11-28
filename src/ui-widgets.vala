@@ -147,7 +147,7 @@ namespace Synapse
       else
       {
         s = markup.printf (Utils.markup_string_with_search (m.title, pattern, "", show_pattern_in_hilight),
-                           Utils.markup_string_with_search (m.description, pattern, "", show_pattern_in_hilight));
+                           Markup.printf_escaped ("%s", m.description));
       }
       Utils.pango_layout_set_markup (layout, s);
       layout.set_width (Pango.SCALE * width);
@@ -201,6 +201,12 @@ namespace Synapse
     public bool use_base_background {get; set; default = true;}
     private int selected_index; //for now only single selection mode
     public bool animation_enabled {get; set; default = true;}
+    private bool inhibit_focus = false;
+    public void set_inhibit_focus (bool b)
+    {
+      inhibit_focus = b;
+      queue_draw ();
+    }
     private const int ANIM_TIMEOUT = 40;
     private const int ANIM_MAX_PIXEL_JUMP = 2;
     public int selected {
@@ -417,7 +423,7 @@ namespace Synapse
       renderer.size_request (out req);
       req.width = (int)w; //use allocation width
       
-      if (selected_index >= 0 && 
+      if (!inhibit_focus && selected_index >= 0 && 
           ( (0 <= selection_voffset <= h) || 
             (0 <= (selection_voffset+req.height) <= h)
           )
@@ -458,7 +464,7 @@ namespace Synapse
       ctx.clip ();
       ctx.translate (0, y);
       renderer.render (ctx, req, 
-                       selected_index == row && y == selection_voffset? 
+                       !inhibit_focus && selected_index == row && y == selection_voffset? 
                        Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, 
                        data.get (row));
       ctx.restore ();
