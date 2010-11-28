@@ -30,34 +30,50 @@ namespace Synapse
 {
   public class MatchRenderer : ListView.Renderer
   {
-    private const int ICON_SIZE = 32;
-    private const int PADDING = 3;
-    private const int INTERNAL_PADDING = 6;
+    public int icon_size {get; set; default = 32;}
+    public int cell_vpadding {get; set; default = 2;}
+    public int cell_hpadding {get; set; default = 3;}
+    public bool hilight_on_selected {get; set; default = false;}
+    public bool show_pattern_in_hilight {get; set; default = false;}
+    public string pattern {get; set; default = "";}
+    public string markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";}
+
     private Utils.ColorHelper ch;
     private Label label;
     private Pango.Layout layout;
-    private const string MARKUP = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";
     private Requisition precalc_req;
     private Gtk.TextDirection rtl;
-    private int text_displacement = 0;
+    private int text_height;
     
     public MatchRenderer ()
     {
       ch = Utils.ColorHelper.get_default ();
+      text_height = 0;
       rtl = Gtk.TextDirection.LTR;
-      precalc_req = {400, ICON_SIZE + PADDING * 2};
+      precalc_req = {400, icon_size + cell_hpadding * 2};
       label = new Label (null);
       layout = label.create_pango_layout (null);
       layout.set_ellipsize (Pango.EllipsizeMode.END);
-      on_style_set.connect (()=>{
-        Gtk.Style s = Gtk.rc_get_style (label);
-        //ch.init_from_widget_type (typeof (Gtk.Label));
-        label.style = s;
-        rtl = label.get_default_direction ();
-        layout.context_changed ();
-        layout.set_ellipsize (Pango.EllipsizeMode.END);
-        calc_requisition ();
-      });
+      on_style_set.connect (layout_changed);
+      this.notify["icon-size"].connect (size_changed);
+      this.notify["cell-vpadding"].connect (size_changed);
+      this.notify["cell-hpadding"].connect (size_changed);
+      this.notify["markup"].connect (size_changed);
+    }
+    private void size_changed ()
+    {
+      calc_requisition ();
+      this.request_redraw ();
+    }
+    private void layout_changed ()
+    {
+      Gtk.Style s = Gtk.rc_get_style (label);
+      label.style = s;
+      rtl = label.get_default_direction ();
+      layout.context_changed ();
+      layout.set_ellipsize (Pango.EllipsizeMode.END);
+      calc_requisition ();
+      this.request_redraw ();
     }
     public void set_width_request (int w)
     {
@@ -65,60 +81,81 @@ namespace Synapse
     }
     private void calc_requisition ()
     {
-      string s = Markup.printf_escaped (MARKUP, " ", " ");
-      layout.set_markup (s, (int)s.length);
+      string s = Markup.printf_escaped (markup, " ", " ");
+      layout.set_markup (s, -1);
       int width = 0, height = 0;
       layout.get_pixel_size (out width, out height);
-      this.precalc_req.height = int.max (height, ICON_SIZE + PADDING * 2);
-      text_displacement = height < ICON_SIZE ? (ICON_SIZE - height) / 2 : 0;
+      this.text_height = height;
+      height += cell_hpadding * 2;
+      this.precalc_req.height = int.max (height, icon_size + cell_hpadding * 2);
     }
-    public override void render (Cairo.Context ctx, bool direct_rendering, Requisition req, Gtk.StateType state, void* obj)
+    private void draw_icon (Cairo.Context ctx, Match m, Requisition req)
     {
-      if (obj == null)
-        return;
-      Match m = (Match) obj;
-      if (direct_rendering)
-        ctx.set_operator (Cairo.Operator.OVER);
-      else
-        ctx.set_operator (Cairo.Operator.SOURCE);
       ctx.save ();
-      int rtl_spacing = 0;
+
       if (rtl == Gtk.TextDirection.RTL)
-        rtl_spacing = req.width - ICON_SIZE - PADDING - PADDING;
+        ctx.translate (req.width - cell_hpadding, (req.height - icon_size) / 2);
+      else
+        ctx.translate (cell_hpadding, (req.height - icon_size) / 2);
+
+      ctx.rectangle (0, 0, icon_size, icon_size);
+      ctx.clip ();
       try {
         var icon = GLib.Icon.new_for_string(m.icon_name ?? "");
         if (icon != null)
         {
-          Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, ICON_SIZE, Gtk.IconLookupFlags.FORCE_SIZE);
+          Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, icon_size, Gtk.IconLookupFlags.FORCE_SIZE);
           if (iconinfo != null)
           {
             Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
             if (icon_pixbuf != null)
             {
-              Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, PADDING + rtl_spacing, (this.precalc_req.height - ICON_SIZE) / 2);
+              Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 0, 0);
               ctx.paint ();
             }
           }
         }
       } catch (GLib.Error err) { /* do not render icon */ }
-      /* Now the label + description part */
+      ctx.restore ();
+    }
+    private void draw_text (Cairo.Context ctx, Match m, Requisition req, Gtk.StateType state)
+    {
+      ctx.save ();
+      int width = req.width - cell_hpadding * 4 - icon_size;
+
       if (rtl == Gtk.TextDirection.RTL)
-      {
-        ctx.rectangle (PADDING, PADDING, rtl_spacing + PADDING - INTERNAL_PADDING, req.height - PADDING * 2);
-        ctx.clip ();
-        ctx.translate (PADDING, PADDING);
-      }
+        ctx.translate (cell_hpadding, (req.height - text_height) / 2);
+      else
+        ctx.translate (icon_size + cell_hpadding * 3, (req.height - text_height) / 2);
+
+      ctx.rectangle (0, 0, width, text_height);
+      ctx.clip ();
+      
+      ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
+      string s = "";
+      if (!this.hilight_on_selected || state != Gtk.StateType.SELECTED)
+        s = Markup.printf_escaped (markup, m.title, m.description);
       else
       {
-        ctx.translate (ICON_SIZE + PADDING + INTERNAL_PADDING, PADDING);
+        s = markup.printf (Utils.markup_string_with_search (m.title, pattern, "", show_pattern_in_hilight),
+                           Markup.printf_escaped ("%s", m.description));
       }
-      ctx.translate (0, text_displacement);
-      ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
-      string s = Markup.printf_escaped (MARKUP, m.title, m.description);
-      layout.set_width (Pango.SCALE * (int)(req.width - ICON_SIZE - PADDING * 3));
-      layout.set_markup (s, (int)s.length);
+      layout.set_markup (s, -1);
+      layout.set_width (Pango.SCALE * width);
       Pango.cairo_show_layout (ctx, layout);
+
       ctx.restore ();
+    }
+    public override void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj)
+    {
+      if (obj == null)
+        return;
+      Match m = (Match) obj;
+
+      ctx.set_operator (Cairo.Operator.OVER);
+
+      draw_text (ctx, m, req, state);
+      draw_icon (ctx, m, req);
     }
     public override void size_request (out Requisition requisition)
     {
@@ -126,12 +163,13 @@ namespace Synapse
       requisition.height = precalc_req.height;
     }
   }
+
   public class ListView<T>: Gtk.Label
   {
     public abstract class Renderer: GLib.Object
     {
       /* Render ojb at state on ctx with req.width and req.height */
-      public abstract void render (Cairo.Context ctx, bool direct_rendering, Requisition req, Gtk.StateType state, void* obj);
+      public abstract void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj);
       public abstract void size_request (out Requisition requisition);
       public signal void request_redraw ();
       public signal void on_style_set ();
@@ -154,6 +192,12 @@ namespace Synapse
     public bool use_base_background {get; set; default = true;}
     private int selected_index; //for now only single selection mode
     public bool animation_enabled {get; set; default = true;}
+    private bool inhibit_focus = false;
+    public void set_inhibit_focus (bool b)
+    {
+      inhibit_focus = b;
+      queue_draw ();
+    }
     private const int ANIM_TIMEOUT = 40;
     private const int ANIM_MAX_PIXEL_JUMP = 2;
     public int selected {
@@ -161,9 +205,9 @@ namespace Synapse
         return selected_index;
       }
       set {
-        if (selected_index == value || value < 0 || data == null || value >= data.size) return;
-        selected_index = value;
         queue_draw ();
+        if (selected_index == value || data == null || value >= data.size) return;
+        selected_index = value;
       }
     }
     public int min_visible_rows {
@@ -201,9 +245,11 @@ namespace Synapse
       this.realize.connect (()=>{
         scroll_to (scrollto);
       });
+      this.notify["scroll-mode"].connect (()=>{scroll_to (scrollto);});
     }
     public void set_list (Gee.List<T>? new_data)
     {
+      data = new_data;
       if (new_data==null || scrollto >= new_data.size)
       {
         scrollto = 0;
@@ -211,7 +257,6 @@ namespace Synapse
         current_voffset = 0;
         selected_index = -1;
       }
-      data = new_data;
       this.queue_draw ();
     }
     public void add_data (T obj)
@@ -289,6 +334,9 @@ namespace Synapse
       switch (scroll_mode)
       {
         //TODO: other layouts -> TOP, TOP_FORCED, etc
+        case ScrollMode.TOP_FORCED:
+          target = (int) (-scrollto * req.height);
+          break;
         case ScrollMode.MIDDLE:
           target = (int) (this.allocation.height / 2 - req.height / 2 - scrollto * req.height);
           if (target > 0)
@@ -306,7 +354,9 @@ namespace Synapse
           break;
       }
       if (selected_index >= 0)
+      {
         selection_target = target + req.height * selected_index;
+      }
       else
         selection_target = 0;
       if (!animation_enabled)
@@ -364,7 +414,7 @@ namespace Synapse
       renderer.size_request (out req);
       req.width = (int)w; //use allocation width
       
-      if (selected_index >= 0 && 
+      if (!inhibit_focus && selected_index >= 0 && 
           ( (0 <= selection_voffset <= h) || 
             (0 <= (selection_voffset+req.height) <= h)
           )
@@ -375,7 +425,7 @@ namespace Synapse
         if (!had_focus) this.set_flags (Gtk.WidgetFlags.HAS_FOCUS);
         Gtk.paint_flat_box (this.style, event.window, StateType.SELECTED,
                             ShadowType.NONE, event.area, this, "cell_odd",
-                            0, selection_voffset, req.width, req.height);
+                            this.allocation.x, this.allocation.y + selection_voffset, req.width, req.height);
         if (!had_focus) this.unset_flags (Gtk.WidgetFlags.HAS_FOCUS);
       }
 
@@ -404,20 +454,12 @@ namespace Synapse
       ctx.rectangle (0, double.max (0, y), req.width, double.min (req.height, h - y));
       ctx.clip ();
       ctx.translate (0, y);
-      renderer.render (ctx, true, req, 
-                       selected_index == row && y == selection_voffset? 
+      renderer.render (ctx, req, 
+                       !inhibit_focus && selected_index == row && y == selection_voffset? 
                        Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, 
                        data.get (row));
       ctx.restore ();
     }
-    /*
-    private Cairo.Surface _render_row_to_surface (int row, Requisition req)
-    {
-      Cairo.Surface surf = new Cairo.ImageSurface (Cairo.Format.ARGB32, req.width, req.height);
-      var ctx = new Cairo.Context (surf);
-      renderer.render (ctx, false, req, selected_index == row ? Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, data.get (row));
-      return surf;
-    }*/
   }
   /* Result List stuff */
   public class ResultBox: EventBox
@@ -1589,7 +1631,7 @@ namespace Synapse
         txt = texts.get (i);
         if (txt == null) continue;
         s = Markup.printf_escaped (i == _selected ? selected_markup : unselected_markup, txt.text);
-        layout.set_markup (s, (int)s.length);
+        layout.set_markup (s, -1);
         layout.get_pixel_size (out w, out h);
         txt.width = w;
         txt.height = h;
@@ -1635,7 +1677,7 @@ namespace Synapse
         ctx.save ();
         ctx.translate (txt.offset, (h - txt.height) / 2);
         s = Markup.printf_escaped (i == _selected ? selected_markup : unselected_markup, txt.text);
-        layout.set_markup (s, (int)s.length);
+        layout.set_markup (s, -1);
         Pango.cairo_show_layout (ctx, layout);
         ctx.restore ();
       }

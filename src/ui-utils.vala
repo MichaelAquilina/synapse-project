@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
  *
  * Authored by Michal Hruby <michal.mhr@gmail.com>
+ *						 Alberto Aldegheri <albyrock87+dev@gmail.com>
  *
  */
 
@@ -29,14 +30,17 @@ namespace Synapse
     
     public static string markup_string_with_search (string text, string pattern, string size = "xx-large", bool show_not_found = false)
     {
+    	string _size = size;
+    	if (size != "")
+    		_size = " size=\"%s\"".printf (size);
       if (pattern == "")
       {
-        return Markup.printf_escaped ("<span size=\"%s\">%s</span>", size, text);
+        return "<span%s>%s</span>".printf (_size, Markup.escape_text(text));
       }
       // if no text found, use pattern
       if (text == "")
       {
-        return Markup.printf_escaped ("<span size=\"%s\">%s<b> </b></span>", size, pattern);
+        return "<span%s>%s</span>".printf (_size, Markup.escape_text(pattern));
       }
 
       var matchers = Query.get_matchers_for_query (
@@ -79,14 +83,14 @@ namespace Synapse
       }
       if (highlighted != null)
       {
-        return "<span size=\"%s\">%s</span>".printf (size, highlighted);
+        return "<span%s>%s</span>".printf (_size, highlighted);
       }
       else
       {
       	if (show_not_found)
-        	return Markup.printf_escaped ("<span size=\"%s\">%s <small><small>(%s)</small></small></span>", size, text, pattern);
+      		return "<span%s>%s <small><small>(%s)</small></small></span>".printf (_size, Markup.escape_text(text), Markup.escape_text(pattern));
        	else
-       		return Markup.printf_escaped ("<span size=\"%s\">%s</span>", size, text);
+       		return "<span%s>%s</span>".printf (_size, Markup.escape_text(text));
       }
     }
     

@@ -27,9 +27,8 @@ using Synapse.Utils;
 
 namespace Synapse
 {
-  public class SynapseWindowTwoLines : UIInterface
+  public class SynapseWindowTwoLines : GtkCairoBase
   {
-    Window window;
     /* Main UI shared components */
     protected NamedIcon match_icon = null;
     protected NamedIcon match_icon_thumb = null;
@@ -37,7 +36,6 @@ namespace Synapse
     protected Label match_label_description = null;
     protected NamedIcon action_icon = null;
     protected ShrinkingLabel action_label = null;
-    protected HTextSelector flag_selector = null;
     protected HBox top_hbox = null;
     protected FakeInput fake_input_match = null;
     protected FakeInput fake_input_action = null;
@@ -48,7 +46,7 @@ namespace Synapse
     protected ResultBox results_match = null;
     protected ResultBox results_action = null;
     protected HSelectionContainer results_container = null;
-    protected Synapse.MenuThrobber throbber = null;
+    protected MenuThrobber menuthrobber = null;
 
     private const int UI_WIDTH = 600; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -57,51 +55,17 @@ namespace Synapse
     private const int ICON_SIZE = 172;
     private const int ACTION_ICON_SIZE = 48;
     
-    private string[] categories = {"Actions", "Audio", "Applications", "All", "Documents", "Images", "Video", "Internet"};
-    private QueryFlags[] categories_query = {QueryFlags.ACTIONS, QueryFlags.AUDIO, QueryFlags.APPLICATIONS, QueryFlags.ALL,
-                                             QueryFlags.DOCUMENTS, QueryFlags.IMAGES, QueryFlags.VIDEO, QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE};
-
     /* STATUS */
     private bool list_visible = true;
-    private IMContext im_context;
     
     construct
     {
-      window = new Window ();
-      window.skip_taskbar_hint = true;
-      window.skip_pager_hint = true;
-      window.set_position (WindowPosition.CENTER);
-      window.set_decorated (false);
-      window.set_resizable (false);
-      window.notify["is-active"].connect (()=>{
-        if (!window.is_active && !throbber.is_menu_visible ())
-        {
-          hide ();
-        }
-      });
-
-      build_ui ();
-      Utils.move_window_to_center (window);
-
-      Utils.ensure_transparent_bg (window);
-      window.expose_event.connect (on_expose);
-      on_composited_changed (window);
-      window.composited_changed.connect (on_composited_changed);
-
-      window.key_press_event.connect (key_press_event);
+      window.expose_event.connect (expose_event);
+      
+      this.searching_for_changed.connect (visual_update_search_for);
 
       set_list_visible (false);
-      
-      /* SEZEN */
-      focus_match (0, null);
-      focus_action (0, null);
-
-      im_context = new IMMulticontext ();
-      im_context.set_use_preedit (false);
-      im_context.commit.connect (search_add_char);
-      im_context.focus_in ();
-      
-      window.key_press_event.connect (key_press_event);
+      visual_update_search_for ();
     }
 
     ~SynapseWindowTwoLines ()
@@ -109,7 +73,7 @@ namespace Synapse
       window.destroy ();
     }
 
-    protected virtual void build_ui ()
+    protected override void build_ui ()
     {
       container = new VBox (false, 0);
       window.add (container);
@@ -170,12 +134,13 @@ namespace Synapse
       flag_selector.selected = 3;
 
       /* Throbber and menu */
-      throbber = new Synapse.MenuThrobber ();
-      throbber.set_size_request (ACTION_ICON_SIZE, 22);
-      throbber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+      menuthrobber = new Synapse.MenuThrobber ();
+      menu = (MenuButton) menuthrobber;
+      menuthrobber.set_size_request (ACTION_ICON_SIZE, 22);
+      menuthrobber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       /* HBox for titles and action icon */
       var right_hbox = new HBox (false, 0);
-      /* HBox for throbber and flag_selector */
+      /* HBox for menuthrobber and flag_selector */
       var topright_hbox = new HBox (false, 0);
       
       {
@@ -184,7 +149,7 @@ namespace Synapse
         vbox.pack_start (new Gtk.HSeparator (), false);
         topright_hbox.pack_start (vbox);
       }
-      topright_hbox.pack_start (throbber, false);
+      topright_hbox.pack_start (menuthrobber, false);
 
       top_right_vbox.pack_start (top_spacer, true);
       top_right_vbox.pack_start (topright_hbox, false);
@@ -234,6 +199,12 @@ namespace Synapse
 
       container.show_all ();
     }
+    protected override bool show_list (bool visible)
+    {
+      if (list_visible == visible) return false;
+      set_list_visible (visible);
+      return true;
+    }
     private void visual_update_search_for ()
     {
       if (searching_for_matches)
@@ -249,26 +220,17 @@ namespace Synapse
         results_container.select (1);
       }
     }
-    protected virtual void on_composited_changed (Widget w)
+
+    protected override void on_composited_changed (Widget w)
     {
-      Gdk.Screen screen = w.get_screen ();
-      bool comp = screen.is_composited ();
-      Gdk.Colormap? cm = screen.get_rgba_colormap();
-      if (cm == null)
-      {
-        comp = false;
-        cm = screen.get_rgb_colormap();
-      }
-      debug ("Screen is%s composited.", comp?"": " NOT");
-      w.set_colormap (cm);
-      if (comp)
+      base.on_composited_changed (w);
+      if (w.is_composited ())
         container.border_width = SHADOW_SIZE;
       else
         container.border_width = 2;
-      this.hide_and_reset ();
     }
     
-    protected virtual void set_input_mask ()
+    protected override void set_input_mask ()
     {
       Requisition req = {0, 0};
       window.size_request (out req);
@@ -312,7 +274,7 @@ namespace Synapse
       window.input_shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
     }
     
-    protected virtual bool on_expose (Widget widget, Gdk.EventExpose event) {
+    protected virtual bool expose_event (Widget widget, Gdk.EventExpose event) {
       bool comp = widget.is_composited ();
       var ctx = Gdk.cairo_create (widget.window);
       ctx.set_operator (Operator.CLEAR);
@@ -398,198 +360,11 @@ namespace Synapse
         ctx.rectangle (x, y, w, h);
       }
     }
-
-    bool searching_for_matches = true;
     
-    /* EVENTS HANDLING HERE */
-    private void search_add_char (string chr)
+    protected override void clear_search_or_hide_pressed ()
     {
-      if (searching_for_matches)
-      {
-        set_match_search (get_match_search() + chr);
-        set_action_search ("");
-      }
-      else
-        set_action_search (get_action_search() + chr);
-    }
-    private void search_delete_char ()
-    {
-      string s = "";
-      if (searching_for_matches)
-        s = get_match_search ();
-      else
-        s = get_action_search ();
-      long len = s.length;
-      if (len > 0)
-      {
-        s = s.substring (0, len - 1);
-        if (searching_for_matches)
-        {
-          set_match_search (s);
-          set_action_search ("");
-          if (s == "")
-            set_list_visible (false);
-        }
-        else
-          set_action_search (s);
-      }
-    }
-
-    private void hide_and_reset ()
-    {
-      window.hide ();
-      set_list_visible (false);
-      flag_selector.selected = 3;
-      searching_for_matches = true;
-      reset_search ();
-      visual_update_search_for ();
-    }
-    
-    protected virtual bool key_press_event (Gdk.EventKey event)
-    {
-      if (im_context.filter_keypress (event)) return true;
-
-      CommandTypes command = get_command_from_key_event (event);
-
-      switch (command)
-      {
-        case CommandTypes.EXECUTE:
-          if (execute ())
-            hide_and_reset ();
-          break;
-        case CommandTypes.SEARCH_DELETE_CHAR:
-          search_delete_char ();
-          break;
-        case CommandTypes.CLEAR_SEARCH_OR_HIDE:
-          if (!searching_for_matches)
-          {
-            set_action_search ("");
-            searching_for_matches = true;
-            visual_update_search_for ();
-            Match m = null;
-            int i = 0;
-            get_match_focus (out i, out m);
-            update_match_result_list (get_match_results (), i, m);
-            window.queue_draw ();
-          }
-          else if (get_match_search() != "")
-          {
-            set_match_search("");
-            set_list_visible (false);
-          }
-          else
-          {
-            hide_and_reset ();
-          }
-          break;
-        case CommandTypes.PREV_CATEGORY:
-          flag_selector.select_prev ();
-          if (!searching_for_matches)
-          {
-            searching_for_matches = true;
-            visual_update_search_for ();
-            window.queue_draw ();
-          }
-          update_query_flags (this.categories_query[flag_selector.selected]);
-          break;
-        case CommandTypes.NEXT_CATEGORY:
-          flag_selector.select_next ();
-          if (!searching_for_matches)
-          {
-            searching_for_matches = true;
-            visual_update_search_for ();
-            window.queue_draw ();
-          }
-          update_query_flags (this.categories_query[flag_selector.selected]);
-          break;
-        case CommandTypes.FIRST_RESULT:
-          if (searching_for_matches)
-            select_first_last_match (true);
-          else
-            select_first_last_action (true);
-          break;
-        case CommandTypes.LAST_RESULT:
-          if (!list_visible)
-          {
-            set_list_visible (true);
-            return true;
-          }
-          if (searching_for_matches)
-            select_first_last_match (false);
-          else
-            select_first_last_action (false);
-          break;
-        case CommandTypes.PREV_RESULT:
-          bool b = true;
-          if (searching_for_matches)
-            b = move_selection_match (-1);
-          else
-            b = move_selection_action (-1);
-          if (!b)
-            set_list_visible (false);
-          break;
-        case CommandTypes.PREV_PAGE:
-          bool b = true;
-          if (searching_for_matches)
-            b = move_selection_match (-5);
-          else
-            b = move_selection_action (-5);
-          if (!b)
-            set_list_visible (false);
-          break;
-        case CommandTypes.NEXT_RESULT:
-          if (!list_visible)
-          {
-            set_list_visible (true);
-            return true;
-          }
-          if (searching_for_matches)
-            move_selection_match (1);
-          else
-            move_selection_action (1);
-          set_list_visible (true);
-          break;
-        case CommandTypes.NEXT_PAGE:
-          if (!list_visible)
-          {
-            set_list_visible (true);
-            return true;
-          }
-          if (searching_for_matches)
-            move_selection_match (5);
-          else
-            move_selection_action (5);
-          set_list_visible (true);
-          break;
-        case CommandTypes.SWITCH_SEARCH_TYPE:
-          if (searching_for_matches && 
-                (
-                  get_match_results () == null || get_match_results ().size == 0 ||
-                  (get_action_search () == "" && (get_action_results () == null || get_action_results ().size == 0))
-                )
-              )
-            return true;
-          searching_for_matches = !searching_for_matches;
-          Match m = null;
-          int i = 0;
-          if (searching_for_matches)
-          {
-            get_match_focus (out i, out m);
-            focus_match (i, m);
-          }
-          else
-          {
-            get_action_focus (out i, out m);
-            focus_action (i, m);
-          }
-          visual_update_search_for ();
-          break;
-        default:
-          //debug ("im_context didn't filter...");
-          break;
-      }
-
-      return true;
+      base.clear_search_or_hide_pressed ();
+      if (get_match_search () == "") set_list_visible (false);
     }
     private void set_list_visible (bool b)
     {
@@ -608,33 +383,14 @@ namespace Synapse
                                              get_match_search (),
                                              "medium");
     }
-    
+
     /* UI INTERFACE IMPLEMENTATION */
-    public override void show ()
-    {
-      if (!window.visible)
-      {
-        set_list_visible (true);
-        Utils.move_window_to_center (window);
-        set_list_visible (false);
-      }
-      window.show ();
-      set_input_mask ();
-    }
-    public override void hide ()
-    {
-      hide_and_reset ();
-    }
-    public override void present_with_time (uint32 timestamp)
-    {
-      window.present_with_time (timestamp);
-    }    
     protected override void set_throbber_visible (bool visible)
     {
       if (visible)
-        throbber.active = true;
+        menuthrobber.active = true;
       else
-        throbber.active = false;
+        menuthrobber.active = false;
     }
     protected override void focus_match ( int index, Match? match )
     {
