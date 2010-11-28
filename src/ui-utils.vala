@@ -94,16 +94,6 @@ namespace Synapse
       }
     }
     
-    public static void pango_layout_set_markup (Pango.Layout layout, string markup)
-    {
-      /* DO NOT USE layout.set_markup () IS BUGGED!! */
-      var attr_list = new Pango.AttrList ();
-      string text = "";
-      Pango.parse_markup (markup, -1, 0, out attr_list, out text, 0);
-      layout.set_attributes (attr_list);
-      layout.set_text (text, -1);
-    }
-    
     public static string replace_home_path_with (string path, string replace,
                                                  string delimiter)
     {

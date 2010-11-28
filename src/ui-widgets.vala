@@ -91,7 +91,7 @@ namespace Synapse
     private void calc_requisition ()
     {
       string s = Markup.printf_escaped (markup, " ", " ");
-      Utils.pango_layout_set_markup (layout, s);
+      layout.set_markup (s, -1);
       int width = 0, height = 0;
       layout.get_pixel_size (out width, out height);
       this.text_height = height;
@@ -149,7 +149,7 @@ namespace Synapse
         s = markup.printf (Utils.markup_string_with_search (m.title, pattern, "", show_pattern_in_hilight),
                            Markup.printf_escaped ("%s", m.description));
       }
-      Utils.pango_layout_set_markup (layout, s);
+      layout.set_markup (s, -1);
       layout.set_width (Pango.SCALE * width);
       Pango.cairo_show_layout (ctx, layout);
 
@@ -1640,7 +1640,7 @@ namespace Synapse
         txt = texts.get (i);
         if (txt == null) continue;
         s = Markup.printf_escaped (i == _selected ? selected_markup : unselected_markup, txt.text);
-        Utils.pango_layout_set_markup (layout, s);
+        layout.set_markup (s, -1);
         layout.get_pixel_size (out w, out h);
         txt.width = w;
         txt.height = h;
@@ -1686,7 +1686,7 @@ namespace Synapse
         ctx.save ();
         ctx.translate (txt.offset, (h - txt.height) / 2);
         s = Markup.printf_escaped (i == _selected ? selected_markup : unselected_markup, txt.text);
-        Utils.pango_layout_set_markup (layout, s);
+        layout.set_markup (s, -1);
         Pango.cairo_show_layout (ctx, layout);
         ctx.restore ();
       }
