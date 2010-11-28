@@ -54,25 +54,16 @@ namespace Synapse
       label = new Label (null);
       layout = label.create_pango_layout (null);
       layout.set_ellipsize (Pango.EllipsizeMode.END);
-      on_style_set.connect (()=>{
-        layout_changed ();
-      });
-      this.notify["icon-size"].connect (()=>{
-        calc_requisition ();
-        this.request_redraw ();
-      });
-      this.notify["cell-vpadding"].connect (()=>{
-        calc_requisition ();
-        this.request_redraw ();
-      });
-      this.notify["cell-hpadding"].connect (()=>{
-        calc_requisition ();
-        this.request_redraw ();
-      });
-      this.notify["markup"].connect (()=>{
-        calc_requisition ();
-        this.request_redraw ();
-      });
+      on_style_set.connect (layout_changed);
+      this.notify["icon-size"].connect (size_changed);
+      this.notify["cell-vpadding"].connect (size_changed);
+      this.notify["cell-hpadding"].connect (size_changed);
+      this.notify["markup"].connect (size_changed);
+    }
+    private void size_changed ()
+    {
+      calc_requisition ();
+      this.request_redraw ();
     }
     private void layout_changed ()
     {
