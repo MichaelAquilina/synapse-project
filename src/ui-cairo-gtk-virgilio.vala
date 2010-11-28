@@ -46,7 +46,7 @@ namespace Synapse
       public void set_type_to_search ()
       {
         //TODO: i18n
-        title = "";
+        title = "Type to search";
         description = "";
         icon_name = "search";
       }
@@ -201,7 +201,7 @@ namespace Synapse
                  get_match_search () :
                  get_action_search ();
       if (searching_for_matches && (s == "" || s == null))
-        s = "Type to search...";
+        s = "...";
       search_label.set_markup (Markup.printf_escaped ("<span size=\"medium\"><b>%s </b></span>", s));
     }
     
