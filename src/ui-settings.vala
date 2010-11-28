@@ -113,6 +113,7 @@ namespace Synapse
       themes["default"] = Theme ("Default", "", typeof (SynapseWindow)); //i18n
       themes["mini"] = Theme ("Mini", "", typeof (SynapseWindowMini)); //i18n
       themes["dual"] = Theme ("Dual", "", typeof (SynapseWindowTwoLines)); //i18n
+      themes["virgilio"] = Theme ("Virgilio", "", typeof (SynapseWindowVirgilio)); //i18n
 
       selected_theme = config.ui_type;
     }

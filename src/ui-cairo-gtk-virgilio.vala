@@ -65,6 +65,9 @@ namespace Synapse
     
     protected ListView<Match> list_view_matches = null;
     protected MatchRenderer list_view_matches_renderer = null;
+
+    protected ListView<Match> list_view_actions = null;
+    protected MatchRenderer list_view_actions_renderer = null;
     
     protected Synapse.MenuThrobber menuthrobber = null;
 
@@ -154,6 +157,20 @@ namespace Synapse
       }
 
       container.pack_start (container_for_matches, false);
+
+      {
+        list_view_actions_renderer = new MatchRenderer ();
+        list_view_actions_renderer.icon_size = 24;
+        list_view_actions_renderer.markup = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";
+        list_view_actions_renderer.set_width_request (100);
+        list_view_actions_renderer.hilight_on_selected = true;
+        list_view_actions_renderer.show_pattern_in_hilight = true;
+        list_view_actions = new ListView<Match> (list_view_actions_renderer);
+        list_view_actions.min_visible_rows = 5;
+        list_view_actions.use_base_background = false;
+        container_for_actions.pack_start (new HSeparator (), false);
+	container_for_actions.pack_start (list_view_actions, false);
+      }
       container.pack_start (container_for_actions, false);
       container.show_all ();
     }
@@ -167,8 +184,12 @@ namespace Synapse
       {
         update_match_result_list (null, 0, null);
       }
-      if (list_view_matches_renderer == null) return;
-      list_view_matches_renderer.pattern = s;
+      if (list_view_matches_renderer == null ||
+          list_view_actions_renderer == null) return;
+      if (searching_for_matches)      
+        list_view_matches_renderer.pattern = s;
+      else
+        list_view_actions_renderer.pattern = s;
     }
     
     private void visual_update_search_for ()
@@ -176,12 +197,17 @@ namespace Synapse
       if (searching_for_matches)
       {
         container_for_actions.hide ();
-        container_for_matches.show ();
+        list_view_matches.scroll_mode = ListView.ScrollMode.MIDDLE;
+        if (get_match_search () == "")
+          list_view_matches.min_visible_rows = 1;
+        else
+          list_view_matches.min_visible_rows = 5;
       }
       else
       {
-        container_for_matches.hide ();
         container_for_actions.show ();
+        list_view_matches.scroll_mode = ListView.ScrollMode.TOP_FORCED;
+        list_view_matches.min_visible_rows = 1;
       }
       window.queue_draw ();
       update_search_label ();
@@ -289,7 +315,10 @@ namespace Synapse
     }
     protected override void focus_action ( int index, Match? action )
     {
-      
+      var actions = get_action_results ();
+      if (actions == null || actions.size == 0) return;
+      list_view_actions.scroll_to (index);
+      list_view_actions.selected = index;
     }
     protected override void update_match_result_list (Gee.List<Match>? matches, int index, Match? match)
     {
@@ -324,8 +353,27 @@ namespace Synapse
     }
     protected override void update_action_result_list (Gee.List<Match>? actions, int index, Match? action)
     {
-      //results_action.update_matches (actions);
-      focus_action ( index, action );
+      if (list_view_actions == null) return;
+      if (actions != null && actions.size > 0)
+      {
+        list_view_actions.set_list (actions);
+        focus_action ( index, action );
+      }
+      else
+      {
+        if (get_action_search () == "")
+        {
+          list_view_actions.set_list (tts_list);
+        }
+        else
+        {
+          list_view_actions.set_list (nores_list);
+        }
+
+        list_view_actions.scroll_to (0);
+        list_view_actions.selected = -1;
+      }
+      window.queue_draw ();
     }
   }
 }

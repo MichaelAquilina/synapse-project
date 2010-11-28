@@ -248,6 +248,7 @@ namespace Synapse
       this.realize.connect (()=>{
         scroll_to (scrollto);
       });
+      this.notify["scroll-mode"].connect (()=>{scroll_to (scrollto);});
     }
     public void set_list (Gee.List<T>? new_data)
     {
@@ -336,6 +337,9 @@ namespace Synapse
       switch (scroll_mode)
       {
         //TODO: other layouts -> TOP, TOP_FORCED, etc
+        case ScrollMode.TOP_FORCED:
+          target = (int) (-scrollto * req.height);
+          break;
         case ScrollMode.MIDDLE:
           target = (int) (this.allocation.height / 2 - req.height / 2 - scrollto * req.height);
           if (target > 0)
@@ -353,7 +357,9 @@ namespace Synapse
           break;
       }
       if (selected_index >= 0)
+      {
         selection_target = target + req.height * selected_index;
+      }
       else
         selection_target = 0;
       if (!animation_enabled)
