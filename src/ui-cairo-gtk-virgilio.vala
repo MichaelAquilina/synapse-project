@@ -102,7 +102,7 @@ namespace Synapse
       });
 
       /* Build the UI */
-      container = new VBox (false, 5);
+      container = new VBox (false, 4);
       container.border_width = BORDER_RADIUS;
       window.add (container);
       
@@ -142,6 +142,7 @@ namespace Synapse
       {
         list_view_matches_renderer = new MatchRenderer ();
         list_view_matches_renderer.icon_size = 48;
+        list_view_matches_renderer.cell_vpadding = 1;
         list_view_matches_renderer.markup = "<span size=\"x-large\"><b>%s</b></span>\n<span size=\"medium\">%s</span>";
         list_view_matches_renderer.set_width_request (100);
         list_view_matches_renderer.hilight_on_selected = true;
@@ -155,21 +156,23 @@ namespace Synapse
 
       {
         list_view_actions_renderer = new MatchRenderer ();
-        list_view_actions_renderer.icon_size = 24;
+        list_view_actions_renderer.icon_size = 36;
+        list_view_actions_renderer.cell_vpadding = 1;
         list_view_actions_renderer.markup = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";
         list_view_actions_renderer.set_width_request (100);
         list_view_actions_renderer.hilight_on_selected = true;
         list_view_actions = new ListView<Match> (list_view_actions_renderer);
         list_view_actions.min_visible_rows = 5;
         list_view_actions.use_base_background = false;
-        container_for_actions.pack_start (new HSeparator (), false);
-        
+
         thumb_icon = new NamedIcon ();
         thumb_icon.set_pixel_size (THUMB_SIZE);
         thumb_icon.set_size_request (THUMB_SIZE, THUMB_SIZE);
         var hbox = new HBox (false, 5);
         hbox.pack_start (list_view_actions);
         hbox.pack_start (thumb_icon, false);
+
+        container_for_actions.pack_start (new HSeparator (), false);
 	      container_for_actions.pack_start (hbox, false);
       }
       container.pack_start (container_for_actions, false);
