@@ -339,7 +339,8 @@ namespace Synapse
     protected override void focus_action ( int index, Match? action )
     {
       var actions = get_action_results ();
-      if (actions == null || actions.size == 0) {list_view_actions_renderer.pattern = ""; return;}
+      if (actions == null || actions.size == 0) {list_view_actions_renderer.pattern = ""; list_view_matches_renderer.action = null; return;}
+      list_view_matches_renderer.action = action;
       list_view_actions_renderer.pattern = get_action_search ();
       list_view_actions.scroll_to (index);
       list_view_actions.selected = index;

@@ -36,6 +36,7 @@ namespace Synapse
     public bool hilight_on_selected {get; set; default = false;}
     public bool show_pattern_in_hilight {get; set; default = false;}
     public string pattern {get; set; default = "";}
+    public Match action {get; set; default = null;}
     public string markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";}
 
     private Utils.ColorHelper ch;
@@ -94,17 +95,37 @@ namespace Synapse
       ctx.save ();
 
       if (rtl == Gtk.TextDirection.RTL)
-        ctx.translate (req.width - cell_hpadding, (req.height - icon_size) / 2);
+        ctx.translate (req.width - cell_hpadding - icon_size, (req.height - icon_size) / 2);
       else
         ctx.translate (cell_hpadding, (req.height - icon_size) / 2);
 
-      ctx.rectangle (0, 0, icon_size, icon_size);
+      draw_icon_in_position (ctx, m.icon_name, icon_size);
+      ctx.restore ();
+    }
+    private void draw_action (Cairo.Context ctx, Requisition req)
+    {
+      if (action == null) return;
+      ctx.save ();
+      
+      int action_icon_size = icon_size * 4 / 5;
+
+      if (rtl == Gtk.TextDirection.RTL)
+        ctx.translate (cell_hpadding, (req.height - action_icon_size) / 2);
+      else
+        ctx.translate (req.width - cell_hpadding - action_icon_size, (req.height - action_icon_size) / 2);
+
+      draw_icon_in_position (ctx, action.icon_name, action_icon_size);
+      ctx.restore ();
+    }
+    private void draw_icon_in_position (Cairo.Context ctx, string? name, int pixel_size)
+    {
+      ctx.rectangle (0, 0, pixel_size, pixel_size);
       ctx.clip ();
       try {
-        var icon = GLib.Icon.new_for_string(m.icon_name ?? "");
+        var icon = GLib.Icon.new_for_string(name ?? "");
         if (icon != null)
         {
-          Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, icon_size, Gtk.IconLookupFlags.FORCE_SIZE);
+          Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, pixel_size, Gtk.IconLookupFlags.FORCE_SIZE);
           if (iconinfo != null)
           {
             Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
@@ -116,7 +137,6 @@ namespace Synapse
           }
         }
       } catch (GLib.Error err) { /* do not render icon */ }
-      ctx.restore ();
     }
     private void draw_text (Cairo.Context ctx, Match m, Requisition req, Gtk.StateType state)
     {
@@ -156,6 +176,8 @@ namespace Synapse
 
       draw_text (ctx, m, req, state);
       draw_icon (ctx, m, req);
+      if (state == Gtk.StateType.SELECTED)
+        draw_action (ctx, req);
     }
     public override void size_request (out Requisition requisition)
     {
