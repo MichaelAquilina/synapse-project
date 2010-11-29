@@ -288,7 +288,7 @@ namespace Synapse
       {
         //draw shadow
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
-                                          r, g, b, 2.9, SHADOW_SIZE);
+                                          r, g, b, 0.9, SHADOW_SIZE);
       }
       else
       {
