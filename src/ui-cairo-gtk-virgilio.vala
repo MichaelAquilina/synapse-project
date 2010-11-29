@@ -237,7 +237,7 @@ namespace Synapse
         container_for_actions.hide ();
         list_view_matches.scroll_mode = ListView.ScrollMode.MIDDLE;
         list_view_matches.set_inhibit_focus (false);
-        if (get_match_search () == "")
+        if (is_in_initial_status ())
           list_view_matches.min_visible_rows = 1;
         else
           list_view_matches.min_visible_rows = 5;
