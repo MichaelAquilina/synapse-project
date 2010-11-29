@@ -409,7 +409,7 @@ namespace Synapse
         {
           list_view_matches.min_visible_rows = 5;
           list_view_matches.set_list (nores_list);
-          list_view_matches.set_inhibit_focus (false);
+          list_view_matches.set_inhibit_focus (true);
           list_view_matches_renderer.action = null;
         }
 
