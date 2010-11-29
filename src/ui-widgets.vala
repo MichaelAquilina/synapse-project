@@ -1546,7 +1546,9 @@ namespace Synapse
     public SynapseAboutDialog ()
     {
       string[] devs = {"Michal Hruby <michal.mhr@gmail.com>", "Alberto Aldegheri <albyrock87+dev@gmail.com>"};
-      GLib.Object (artists : devs,
+      string[] artists = devs;
+      artists += "Ian Cylkowski <designbyizo@gmail.com>";
+      GLib.Object (artists : artists,
                    authors : devs,
                    copyright : "Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>",
                    program_name: "Synapse",
