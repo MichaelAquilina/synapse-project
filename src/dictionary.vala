@@ -57,17 +57,23 @@ namespace Synapse
                 has_thumbnail: false, icon_name: "accessories-dictionary");
       }
     }
-
-    static construct
+    
+    static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (DictionaryPlugin),
         "Dictionary",
         "Look up definitions of words.",
         "accessories-dictionary",
+        register_plugin,
         Environment.find_program_in_path ("gnome-dictionary") != null,
         "Gnome Dictionary is not installed"
       );
+    }
+
+    static construct
+    {
+      register_plugin ();
     }
 
     private Define action;

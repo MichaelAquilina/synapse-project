@@ -175,6 +175,7 @@ namespace Synapse
     {
     }
 
+    private Gee.List<FileMonitor> directory_monitors;
     private Gee.List<DesktopFileInfo> all_desktop_files;
     private Gee.List<DesktopFileInfo> non_hidden_desktop_files;
     private Gee.Map<unowned string, Gee.List<DesktopFileInfo> > mimetype_map;
@@ -184,6 +185,7 @@ namespace Synapse
     {
       instance = this;
       
+      directory_monitors = new Gee.ArrayList<FileMonitor> ();
       all_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
       non_hidden_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
 
@@ -236,6 +238,8 @@ namespace Synapse
       string[] data_dirs = Environment.get_system_data_dirs ();
       data_dirs += Environment.get_user_data_dir ();
 
+      Gee.Set<File> desktop_file_dirs = new Gee.HashSet<File> ();
+
       foreach (unowned string data_dir in data_dirs)
       {
         string dir_path = Path.build_filename (data_dir, "applications", null);
@@ -244,6 +248,7 @@ namespace Synapse
           // FIXME: monitor the directories for changes
           var directory = File.new_for_path (dir_path);
           if (!directory.query_exists ()) continue; // FIXME: async
+          desktop_file_dirs.add (directory);
           var enumerator = yield directory.enumerate_children_async (
             FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
           var files = yield enumerator.next_files_async (1024, 0);
@@ -264,7 +269,44 @@ namespace Synapse
         }
       }
       
-      create_indexes ();
+      create_indices ();
+      
+      directory_monitors = new Gee.ArrayList<FileMonitor> ();
+      foreach (File d in desktop_file_dirs)
+      {
+        FileMonitor monitor = d.monitor_directory (0, null);
+        monitor.changed.connect (this.desktop_file_directory_changed);
+        directory_monitors.add (monitor);
+      }
+    }
+    
+    private uint timer_id = 0;
+
+    public signal void reload_started ();
+    public signal void reload_done ();
+
+    private void desktop_file_directory_changed ()
+    {
+      reload_started ();
+      if (timer_id != 0)
+      {
+        Source.remove (timer_id);
+      }
+      
+      timer_id = Timeout.add (5000, () =>
+      {
+        timer_id = 0;
+        reload_desktop_files ();
+        return false;
+      });
+    }
+    
+    private async void reload_desktop_files ()
+    {
+      debug ("Reloading desktop files...");
+      yield load_all_desktop_files ();
+
+      reload_done ();
     }
 
     private async void load_desktop_file (File file)
@@ -296,7 +338,7 @@ namespace Synapse
       }
     }
     
-    private void create_indexes ()
+    private void create_indices ()
     {
       // create mimetype maps
       mimetype_map =
@@ -323,7 +365,7 @@ namespace Synapse
         Gee.List<DesktopFileInfo>? exec_list = exec_map[exec];
         if (exec_list == null)
         {
-          exec_list = new Gee.LinkedList<DesktopFileInfo> ();
+          exec_list = new Gee.ArrayList<DesktopFileInfo> ();
           exec_map[exec] = exec_list;
         }
         exec_list.add (dfi);
@@ -336,7 +378,7 @@ namespace Synapse
           Gee.List<DesktopFileInfo>? list = mimetype_map[mime_type];
           if (list == null)
           {
-            list = new Gee.LinkedList<DesktopFileInfo> ();
+            list = new Gee.ArrayList<DesktopFileInfo> ();
             mimetype_map[mime_type] = list;
           }
           list.add (dfi);

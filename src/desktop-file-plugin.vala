@@ -65,14 +65,20 @@ namespace Synapse
       }
     }
 
-    static construct
+    static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (DesktopFilePlugin),
         "Applications",
         "Search applications on your computer.",
-        "system-run"
+        "system-run",
+        register_plugin
       );
+    }
+    
+    static construct
+    {
+      register_plugin ();
     }
     
     protected override bool handles_unknown ()
@@ -91,6 +97,15 @@ namespace Synapse
     {
       desktop_files = new Gee.ArrayList<DesktopFileMatch> ();
       mimetype_map = new Gee.HashMap<string, OpenWithAction> ();
+
+      var dfs = DesktopFileService.get_default ();
+      dfs.reload_started.connect (() => {
+        loading_in_progress = true;
+      });
+      dfs.reload_done.connect (() => {
+        mimetype_map.clear ();
+        load_all_desktop_files ();
+      });
 
       load_all_desktop_files ();
     }
@@ -249,10 +264,10 @@ namespace Synapse
           warning ("%s", err.message);
         }
       }
-   }
+    }
     
     private Gee.Map<string, Gee.List<OpenWithAction> > mimetype_map;
-    
+
     public override ResultSet? find_for_match (Query query, Match match)
     {
       if (match.match_type != MatchType.GENERIC_URI) return null;

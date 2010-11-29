@@ -48,14 +48,20 @@ namespace Synapse
       }
     }
     
-    static construct
+    static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (CommandPlugin),
         "Commands",
         "Allow execution of arbitrary commands.",
-        "system-run"
+        "system-run",
+        register_plugin
       );
+    }
+    
+    static construct
+    {
+      register_plugin ();
     }
 
     private Gee.Set<string> past_commands;
@@ -63,6 +69,7 @@ namespace Synapse
 
     construct
     {
+      // TODO: load from configuration
       past_commands = new Gee.HashSet<string> ();
       try
       {

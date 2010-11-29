@@ -180,16 +180,22 @@ namespace Synapse
         this.path = path;
       }
     }
-
-    static construct
+    
+    static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (HybridSearchPlugin),
         "Hybrid search",
         "Tries to improve results returned by Zeitgeist plugin by looking " +
         "for similar files on the filesystem.",
-        "search"
+        "search",
+        register_plugin
       );
+    }
+
+    static construct
+    {
+      register_plugin ();
     }
 
     construct

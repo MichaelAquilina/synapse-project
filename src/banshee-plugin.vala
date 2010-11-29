@@ -53,16 +53,22 @@ namespace Synapse
   
   public class BansheeActions: ActionPlugin
   {
-    static construct
+    static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (BansheeActions),
         "Banshee",
         "Allows you to control Banshee and add items to playlist.",
         "banshee",
+        register_plugin,
         Environment.find_program_in_path ("banshee") != null,
         "Banshee is not installed"
       );
+    }
+
+    static construct
+    {
+      register_plugin ();
     }
 
     private abstract class BansheeAction: Object, Match

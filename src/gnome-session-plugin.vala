@@ -143,17 +143,23 @@ namespace Synapse
         }
       }
     }
-
-    static construct
+    
+    static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (GnomeSessionPlugin),
         "Gnome session plugin",
         "Allows you to log out from your session, restart and shutdown your computer.",
         "gnome-session-logout",
+        register_plugin,
         DBusNameCache.get_default ().name_has_owner (GnomeSessionManager.UNIQUE_NAME),
         "Gnome Session Manager wan't found"
       );
+    }
+
+    static construct
+    {
+      register_plugin ();
     }
 
     private bool session_manager_available = false;
