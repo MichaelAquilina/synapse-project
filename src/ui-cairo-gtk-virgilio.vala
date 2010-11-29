@@ -46,8 +46,8 @@ namespace Synapse
       public void set_type_to_search ()
       {
         //TODO: i18n
-        title = "Type to search";
-        description = "";
+        title = TYPE_TO_SEARCH;
+        description = DOWN_TO_SEE_RECENT;
         icon_name = "search";
       }
       public void set_no_results ()

@@ -220,8 +220,6 @@ namespace Synapse
     protected void set_match_search (string pattern)
     {
       search_with_empty = false;
-      if (search[T.MATCH] == pattern)
-        return;
       search[T.MATCH] = pattern;
       search_for_matches ();
     }

@@ -386,8 +386,8 @@ namespace Synapse
           {
             main_label.set_markup (
             Markup.printf_escaped ("<span size=\"%s\">%s</span>", LABEL_TEXT_SIZE,
-                                   "Type to search..."));
-            main_label_description.set_markup (Utils.markup_string_with_search ("", "", "small"));
+                                   TYPE_TO_SEARCH));
+            main_label_description.set_markup (Utils.markup_string_with_search (DOWN_TO_SEE_RECENT, "", "small"));
           }
           //else -> impossible
           match_icon.set_icon_name ("search", IconSize.DIALOG);
