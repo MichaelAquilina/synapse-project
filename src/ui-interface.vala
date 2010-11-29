@@ -381,12 +381,16 @@ namespace Synapse
     {
       if (focus[T.MATCH] == null || focus[T.ACTION] == null)
         return false;
-      _execute (focus[T.MATCH], focus[T.ACTION]);
+      var match = focus[T.MATCH];
+      var action = focus[T.ACTION];
+      /* Async execute to avoid freezes when executing a dbus action */
+      Timeout.add (30, ()=>{ return _execute (match, action);});
       return true;
     }
-    private async void _execute (Match match, Match action)
+    private bool _execute (Match match, Match action)
     {
       action.execute (match);
+      return false;
     }
     
     private void init_default_command_map ()

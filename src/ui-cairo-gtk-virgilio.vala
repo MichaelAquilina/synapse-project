@@ -63,6 +63,10 @@ namespace Synapse
     protected VBox container_for_matches = null;
     protected VBox container_for_actions = null;
     protected ShrinkingLabel search_label = null;
+    protected Label actions_status_label = null;
+    protected Label matches_status_label = null;
+    protected HSelectionContainer status_selector = null;
+    protected Label codename_label = null;
     
     protected ListView<Match> list_view_matches = null;
     protected MatchRenderer list_view_matches_renderer = null;
@@ -77,7 +81,7 @@ namespace Synapse
     private const int PADDING = 8; // assinged to container_top's border width
     private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
     private const int BORDER_RADIUS = 8;
-    private const int THUMB_SIZE = 172;
+    private const int THUMB_SIZE = 140;
     
     Gee.List<Match> tts_list;
     Gee.List<Match> nores_list;
@@ -102,7 +106,7 @@ namespace Synapse
       });
 
       /* Build the UI */
-      container = new VBox (false, 5);
+      container = new VBox (false, 4);
       container.border_width = BORDER_RADIUS;
       window.add (container);
       
@@ -113,6 +117,21 @@ namespace Synapse
       
       search_label = new ShrinkingLabel ();
       search_label.set_alignment (0.5f, 0.5f);
+      search_label.set_ellipsize (Pango.EllipsizeMode.START);
+      
+      codename_label = new Label (null);
+      codename_label.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
+      codename_label.set_alignment (1.0f, 0.5f);
+      
+      actions_status_label = new Label (null);
+      matches_status_label = new Label (null);
+      actions_status_label.set_alignment (0.0f, 0.5f);
+      matches_status_label.set_alignment (0.0f, 0.5f);
+      
+      status_selector = new HSelectionContainer (null, 0);
+      status_selector.add (matches_status_label);
+      status_selector.add (actions_status_label);
+      status_selector.set_separator_visible (false);
 
       /* Building search label */
       {
@@ -133,7 +152,11 @@ namespace Synapse
         hbox.set_size_request (UI_WIDTH, -1);
 
         container.pack_start (hbox, false);
-        container.pack_end (search_label);
+        hbox = new HBox (true, 5);
+        hbox.pack_start (status_selector, true, false);
+        hbox.pack_start (search_label);
+        hbox.pack_start (codename_label, true, false);
+        container.pack_end (hbox);
         container.pack_end (new HSeparator (), false);
       }
       
@@ -142,6 +165,7 @@ namespace Synapse
       {
         list_view_matches_renderer = new MatchRenderer ();
         list_view_matches_renderer.icon_size = 48;
+        list_view_matches_renderer.cell_vpadding = 1;
         list_view_matches_renderer.markup = "<span size=\"x-large\"><b>%s</b></span>\n<span size=\"medium\">%s</span>";
         list_view_matches_renderer.set_width_request (100);
         list_view_matches_renderer.hilight_on_selected = true;
@@ -155,21 +179,23 @@ namespace Synapse
 
       {
         list_view_actions_renderer = new MatchRenderer ();
-        list_view_actions_renderer.icon_size = 24;
+        list_view_actions_renderer.icon_size = 36;
+        list_view_actions_renderer.cell_vpadding = 1;
         list_view_actions_renderer.markup = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";
         list_view_actions_renderer.set_width_request (100);
         list_view_actions_renderer.hilight_on_selected = true;
         list_view_actions = new ListView<Match> (list_view_actions_renderer);
         list_view_actions.min_visible_rows = 5;
         list_view_actions.use_base_background = false;
-        container_for_actions.pack_start (new HSeparator (), false);
-        
+
         thumb_icon = new NamedIcon ();
         thumb_icon.set_pixel_size (THUMB_SIZE);
         thumb_icon.set_size_request (THUMB_SIZE, THUMB_SIZE);
         var hbox = new HBox (false, 5);
         hbox.pack_start (list_view_actions);
         hbox.pack_start (thumb_icon, false);
+
+        container_for_actions.pack_start (new HSeparator (), false);
 	      container_for_actions.pack_start (hbox, false);
       }
       container.pack_start (container_for_actions, false);
@@ -200,7 +226,7 @@ namespace Synapse
       string s = searching_for_matches ?
                  get_match_search () :
                  get_action_search ();
-      if (searching_for_matches && (s == "" || s == null))
+      if (s == "" || s == null)
         s = "...";
       search_label.set_markup (Markup.printf_escaped ("<span size=\"medium\"><b>%s </b></span>", s));
     }
@@ -224,6 +250,8 @@ namespace Synapse
         list_view_matches.scroll_mode = ListView.ScrollMode.TOP_FORCED;
         list_view_matches.min_visible_rows = 1;
       }
+      status_selector.select (searching_for_matches ? 0 : 1);
+      update_search_label ();
       window.queue_draw ();
     }
     
@@ -260,7 +288,7 @@ namespace Synapse
       {
         //draw shadow
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
-                                          r, g, b, 2.9, SHADOW_SIZE);
+                                          r, g, b, 0.9, SHADOW_SIZE);
       }
       else
       {
@@ -270,7 +298,7 @@ namespace Synapse
       ctx.set_operator (Operator.SOURCE);
       Pattern pat = new Pattern.linear(0, y, 0, y + h);
       ch.add_color_stop_rgba (pat, 0, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.LIGHTER);
-      ch.add_color_stop_rgba (pat, 0.75, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
+      ch.add_color_stop_rgba (pat, 0.85, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
       ch.add_color_stop_rgba (pat, 1, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
       Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
       ctx.set_source (pat);
@@ -311,6 +339,7 @@ namespace Synapse
       Utils.move_window_to_center (window);
       list_view_matches.min_visible_rows = 1;
       update_match_result_list (null, 0, null);
+      update_search_label ();
       window.show ();
     }
 
@@ -334,7 +363,8 @@ namespace Synapse
     protected override void focus_action ( int index, Match? action )
     {
       var actions = get_action_results ();
-      if (actions == null || actions.size == 0) {list_view_actions_renderer.pattern = ""; return;}
+      if (actions == null || actions.size == 0) {list_view_actions_renderer.pattern = ""; list_view_matches_renderer.action = null; return;}
+      list_view_matches_renderer.action = action;
       list_view_actions_renderer.pattern = get_action_search ();
       list_view_actions.scroll_to (index);
       list_view_actions.selected = index;
@@ -351,10 +381,12 @@ namespace Synapse
         list_view_matches.set_list (matches);
         list_view_matches.min_visible_rows = 5;
         list_view_matches.set_inhibit_focus (false);
+        matches_status_label.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", matches.size));
         focus_match ( index, match );
       }
       else
       {
+        matches_status_label.set_markup ("");
         if (get_match_search () == "")
         {
           list_view_matches.min_visible_rows = 1;
@@ -380,10 +412,12 @@ namespace Synapse
       if (actions != null && actions.size > 0)
       {
         list_view_actions.set_list (actions);
+        actions_status_label.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", actions.size));
         focus_action ( index, action );
       }
       else
       {
+        actions_status_label.set_markup ("");
         if (get_action_search () == "")
         {
           list_view_actions.set_list (tts_list);

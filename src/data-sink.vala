@@ -231,6 +231,17 @@ namespace Synapse
         else disable_plugin (t.name ());
       }
       
+      public bool is_plugin_enabled (Type t)
+      {
+        if (_disabled_plugins == null) return true;
+        unowned string plugin_name = t.name ();
+        foreach (string s in _disabled_plugins)
+        {
+          if (s == plugin_name) return false;
+        }
+        return true;
+      }
+      
       private void enable_plugin (string name)
       {
         if (_disabled_plugins == null) return;
@@ -339,6 +350,19 @@ namespace Synapse
       }
     }
     
+    private void update_has_unknown_handlers ()
+    {
+      has_unknown_handlers = false;
+      foreach (var action in actions)
+      {
+        if (action.enabled && action.handles_unknown ())
+        {
+          has_unknown_handlers = true;
+          return;
+        }
+      }
+    }
+    
     private DataPlugin? create_plugin (Type t)
     {
       return Object.new (t, "data-sink", this, null) as DataPlugin;
@@ -365,18 +389,12 @@ namespace Synapse
         typeof (DictionaryPlugin),
         typeof (DevhelpPlugin)
       };
-      
+
       foreach (Type t in plugin_types)
       {
         t.class_ref (); // makes the plugin register itself into PluginRegistry
-        unowned string plugin_name = t.name ();
-        if (config.disabled_plugins != null &&
-            plugin_name in config.disabled_plugins)
-        {
-          continue;
-        }
-        
-        register_plugin (create_plugin (t));
+        if (config.is_plugin_enabled (t))
+          register_plugin (create_plugin (t));
       }
       
       plugins_loaded = true;
@@ -433,6 +451,7 @@ namespace Synapse
         if (action.get_type () == plugin_type)
         {
           action.enabled = enabled;
+          update_has_unknown_handlers ();
           return;
         }
       }
