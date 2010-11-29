@@ -38,6 +38,7 @@ synapse_SOURCES = \
 	upower-plugin.vala \
 	zeitgeist-plugin.vala \
 	rhythmbox-plugin.vala \
+	banshee-plugin.vala \
 	test-slow-plugin.vala \
 	synapse-main.vala \
 	ui-cairo-gtk-base.vala \
