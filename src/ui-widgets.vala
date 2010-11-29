@@ -107,7 +107,7 @@ namespace Synapse
       if (action == null) return;
       ctx.save ();
       
-      int action_icon_size = icon_size * 4 / 5;
+      int action_icon_size = icon_size;
 
       if (rtl == Gtk.TextDirection.RTL)
         ctx.translate (cell_hpadding, (req.height - action_icon_size) / 2);
