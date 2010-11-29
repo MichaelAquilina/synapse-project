@@ -314,12 +314,12 @@ namespace Synapse
     {
       Gee.Set<string> uris = new Gee.HashSet<string> ();
       
-      int rs_size = results.size ();
-      int result_index = 0;
+      uint events_size = events.size ();
+      uint event_index = 0;
 
       foreach (var event in events)
       {
-        result_index++;
+        event_index++;
         if (event.num_subjects () <= 0) continue;
         var subject = event.get_subject (0);
         unowned string uri = subject.get_uri ();
@@ -372,8 +372,8 @@ namespace Synapse
                                            thumbnail_path,
                                            icon);
 
-          int relevancy = (int) ((rs_size - result_index) / 
-            (float) rs_size * Query.MATCH_SCORE_MAX);
+          int relevancy = (int) ((events_size - event_index) / 
+            (float) events_size * Query.MATCH_SCORE_MAX);
           results.add (match_obj, relevancy);
         }
       }
@@ -526,7 +526,7 @@ namespace Synapse
         {
           // special case empty searches
           int64 start_ts = Zeitgeist.Timestamp.now () - Zeitgeist.Timestamp.WEEK;
-          rs = yield zg_log.find_events (new Zeitgeist.TimeRange (start_ts, int64.max),
+          rs = yield zg_log.find_events (new Zeitgeist.TimeRange (start_ts, int64.MAX),
                                          (owned) templates,
                                          Zeitgeist.StorageState.ANY,
                                          q.max_results,
