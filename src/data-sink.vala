@@ -119,7 +119,7 @@ namespace Synapse
     SEARCH_CANCELLED,
     UNKNOWN_ERROR
   }
-  
+
   public abstract class DataPlugin : Object
   {
     public unowned DataSink data_sink { get; construct; }
@@ -153,22 +153,27 @@ namespace Synapse
   {
     public class PluginRegistry : Object
     {
+      [CCode (has_target = false)]
+      public delegate void PluginRegisterFunc ();
+  
       public class PluginInfo
       {
         public Type plugin_type;
         public string title;
         public string description;
         public string icon_name;
+        public PluginRegisterFunc register_func;
         public bool runnable;
         public string runnable_error;
         public PluginInfo (Type type, string title, string desc,
-                           string icon_name, bool runnable,
-                           string runnable_error)
+                           string icon_name, PluginRegisterFunc reg_func,
+                           bool runnable, string runnable_error)
         {
           this.plugin_type = type;
           this.title = title;
           this.description = desc;
           this.icon_name = icon_name;
+          this.register_func = reg_func;
           this.runnable = runnable;
           this.runnable_error = runnable_error;
         }
@@ -198,17 +203,40 @@ namespace Synapse
                                    string title,
                                    string description,
                                    string icon_name,
+                                   PluginRegisterFunc reg_func,
                                    bool runnable = true,
                                    string runnable_error = "")
       {
+        // FIXME: how about a frickin Type -> PluginInfo map?!
+        int index = -1;
+        for (int i=0; i < plugins.size; i++)
+        {
+          if (plugins[i].plugin_type == plugin_type)
+          {
+            index = i;
+            break;
+          }
+        }
+        if (index >= 0) plugins.remove_at (index);
+        
         var p = new PluginInfo (plugin_type, title, description, icon_name,
-                                runnable, runnable_error);
+                                reg_func, runnable, runnable_error);
         plugins.add (p);
       }
       
       public Gee.List<PluginInfo> get_plugins ()
       {
         return plugins.read_only_view;
+      }
+      
+      public PluginInfo? get_plugin_info_for_type (Type plugin_type)
+      {
+        foreach (PluginInfo pi in plugins)
+        {
+          if (pi.plugin_type == plugin_type) return pi;
+        }
+        
+        return null;
       }
     }
     
@@ -319,6 +347,7 @@ namespace Synapse
       });
       
       desktop_file_service = DesktopFileService.get_default ();
+      desktop_file_service.reload_done.connect (this.check_plugins);
       ulong sid2 = desktop_file_service.initialization_done.connect (() =>
       {
         initialized_components++;
@@ -333,6 +362,20 @@ namespace Synapse
       SignalHandler.disconnect (desktop_file_service, sid2);
 
       Idle.add (() => { this.load_plugins (); return false; });
+    }
+    
+    private void check_plugins ()
+    {
+      PluginRegistry.PluginRegisterFunc[] reg_funcs = {};
+      foreach (var pi in registry.get_plugins ())
+      {
+        reg_funcs += pi.register_func;
+      }
+
+      foreach (PluginRegistry.PluginRegisterFunc func in reg_funcs)
+      {
+        func ();
+      }
     }
 
     private bool has_unknown_handlers = false;
@@ -402,10 +445,12 @@ namespace Synapse
       foreach (Type t in plugin_types)
       {
         t.class_ref (); // makes the plugin register itself into PluginRegistry
-        if (config.is_plugin_enabled (t))
+        PluginRegistry.PluginInfo? info = registry.get_plugin_info_for_type (t);
+        bool skip = info != null && info.runnable == false;
+        if (config.is_plugin_enabled (t) && !skip)
           register_plugin (create_plugin (t));
       }
-      
+
       plugins_loaded = true;
     }
     

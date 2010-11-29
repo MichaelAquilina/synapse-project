@@ -57,17 +57,23 @@ namespace Synapse
                 has_thumbnail: false, icon_name: "devhelp");
       }
     }
-
-    static construct
+    
+    static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (DevhelpPlugin),
         "Devhelp",
         "Search documentation using Devhelp.",
         "devhelp",
+        register_plugin,
         Environment.find_program_in_path ("devhelp") != null,
         "Devhelp is not installed"
       );
+    }
+
+    static construct
+    {
+      register_plugin ();
     }
 
     private Search action;

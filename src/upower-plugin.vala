@@ -171,14 +171,20 @@ namespace Synapse
       }
     }
 
-    static construct
+    static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (UPowerPlugin),
         "UPower",
         "Allows you to suspend & hibernate your computer.",
-        "system-suspend"
+        "system-suspend",
+        register_plugin
       );
+    }
+
+    static construct
+    {
+      register_plugin ();
     }
 
     private Gee.List<UPowerAction> actions;

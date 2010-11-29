@@ -51,16 +51,22 @@ namespace Synapse
   
   public class RhythmboxActions: ActionPlugin
   {
-    static construct
+    static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (RhythmboxActions),
         "Rhythmbox",
         "Allows you to control Rhythmbox and add items to playlist.",
         "rhythmbox",
+        register_plugin,
         Environment.find_program_in_path ("rhythmbox") != null,
         "Rhythmbox is not installed"
       );
+    }
+    
+    static construct
+    {
+      register_plugin ();
     }
 
     private abstract class RhythmboxAction: Object, Match

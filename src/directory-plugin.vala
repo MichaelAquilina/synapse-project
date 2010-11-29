@@ -98,15 +98,21 @@ namespace Synapse
         initialized = true;
       }
     }
-
-    static construct
+    
+    static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (DirectoryPlugin),
         "Directory search",
         "Allows opening of commonly used directories.",
-        "folder"
+        "folder",
+        register_plugin
       );
+    }
+
+    static construct
+    {
+      register_plugin ();
     }
     
     private Gee.Map<unowned string, DirectoryInfo> directory_info_map;

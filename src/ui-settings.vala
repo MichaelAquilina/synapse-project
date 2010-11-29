@@ -60,6 +60,23 @@ namespace Synapse
           sub_description_text = "Enabled"; // i18n!
         }
       }
+      
+      public void refresh ()
+      {
+        DataSink.PluginRegistry.PluginInfo info;
+        var registry = DataSink.PluginRegistry.get_default ();
+        info = registry.get_plugin_info_for_type (pi.plugin_type);
+        
+        if (pi.runnable != info.runnable)
+        {
+          pi.runnable = info.runnable;
+          pi.runnable_error = info.runnable_error;
+          this.show_action_button = info.runnable;
+          if (!info.runnable && this.enabled) this.enabled = false;
+
+          update_state (this.enabled);
+        }
+      }
     }
     
     class UIConfig: ConfigObject
@@ -104,6 +121,7 @@ namespace Synapse
       build_ui ();
       
       this.tile_view.map.connect (this.init_plugin_tiles);
+      this.tile_view.visibility_notify_event.connect (() => { this.refresh_tiles (); return false; });
     }
 
     private void init_themes ()
@@ -144,6 +162,15 @@ namespace Synapse
           pto.update_state (!tile_obj.enabled);
           data_sink.set_plugin_enabled (pto.pi.plugin_type, tile_obj.enabled);
         });
+      }
+    }
+    
+    private void refresh_tiles ()
+    {
+      GLib.List<unowned UI.Widgets.AbstractTileObject> tiles = tile_view.get_tiles ();
+      foreach (unowned UI.Widgets.AbstractTileObject pti in tiles)
+      {
+        (pti as PluginTileObject).refresh ();
       }
     }
     

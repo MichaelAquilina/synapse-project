@@ -231,7 +231,7 @@ namespace Synapse
     {
       var plugin = data_sink.get_plugin("SynapseZeitgeistPlugin");
       handle_empty = plugin != null && plugin.enabled;
-      DOWN_TO_SEE_RECENT = handle_empty ? "Press down to see recent" : "";
+      DOWN_TO_SEE_RECENT = handle_empty ? "Press down key to browse recent activities" : "";
       handle_empty_updated ();
     }
     protected virtual void handle_empty_updated () {}
