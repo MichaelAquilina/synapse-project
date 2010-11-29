@@ -387,7 +387,7 @@ namespace Synapse
             main_label.set_markup (
             Markup.printf_escaped ("<span size=\"%s\">%s</span>", LABEL_TEXT_SIZE,
                                    TYPE_TO_SEARCH));
-            main_label_description.set_markup (Utils.markup_string_with_search (DOWN_TO_SEE_RECENT, "", "small"));
+            main_label_description.set_markup (Utils.markup_string_with_search (DOWN_TO_SEE_RECENT, "", DESCRIPTION_TEXT_SIZE));
           }
           //else -> impossible
           match_icon.set_icon_name ("search", IconSize.DIALOG);
@@ -416,6 +416,13 @@ namespace Synapse
         }
       }
       results_match.move_selection_to_index (index);
+    }
+    protected override void handle_empty_updated ()
+    {
+      if (main_label_description != null && searching_for_matches && is_in_initial_status ())
+        main_label_description.set_markup (
+            Markup.printf_escaped ("<span size=\"%s\">%s</span>", DESCRIPTION_TEXT_SIZE,
+                                   DOWN_TO_SEE_RECENT));
     }
     protected override void focus_action ( int index, Match? action )
     {

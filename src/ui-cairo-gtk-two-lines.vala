@@ -432,6 +432,13 @@ namespace Synapse
       }
       results_match.move_selection_to_index (index);
     }
+    protected override void handle_empty_updated ()
+    {
+      if (match_label_description != null && is_in_initial_status ())
+        match_label_description.set_markup (
+            Markup.printf_escaped ("<span size=\"medium\">%s</span>",
+                                   DOWN_TO_SEE_RECENT));
+    }
     protected override void focus_action ( int index, Match? action )
     {
       string size = "x-large";

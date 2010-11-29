@@ -47,7 +47,7 @@ namespace Synapse
       {
         //TODO: i18n
         title = TYPE_TO_SEARCH;
-        description = DOWN_TO_SEE_RECENT;
+        description = "";
         icon_name = "search";
       }
       public void set_no_results ()
@@ -71,6 +71,8 @@ namespace Synapse
     protected ListView<Match> list_view_matches = null;
     protected MatchRenderer list_view_matches_renderer = null;
     protected NamedIcon thumb_icon = null;
+    
+    private TypeToSearchMatch tts;
 
     protected ListView<Match> list_view_actions = null;
     protected MatchRenderer list_view_actions_renderer = null;
@@ -201,10 +203,11 @@ namespace Synapse
       container.pack_start (container_for_actions, false);
       container.show_all ();
       
-      var ttsm = new TypeToSearchMatch ();
-      ttsm.set_type_to_search ();
+      tts = new TypeToSearchMatch ();
+      tts.set_type_to_search ();
+      tts.description = DOWN_TO_SEE_RECENT;
       tts_list = new Gee.ArrayList<Match> ();
-      tts_list.add (ttsm);
+      tts_list.add (tts);
       
       var nores = new TypeToSearchMatch ();
       nores.set_no_results ();
@@ -218,6 +221,16 @@ namespace Synapse
       search_string_changed.connect (update_search_label);
       
       reset_search ();
+    }
+    
+    protected override void handle_empty_updated ()
+    {
+      tts = new TypeToSearchMatch ();
+      tts.set_type_to_search ();
+      tts.description = DOWN_TO_SEE_RECENT;
+      tts_list = new Gee.ArrayList<Match> ();
+      tts_list.add (tts);
+      if (list_view_matches != null && is_in_initial_status ()) list_view_matches.set_list (tts_list);
     }
     
     private void update_search_label ()
@@ -386,7 +399,7 @@ namespace Synapse
       else
       {
         matches_status_label.set_markup ("");
-        if (get_match_search ()=="")
+        if (get_match_search () == "" && matches == null)
         {
           list_view_matches.min_visible_rows = 1;
           list_view_matches.set_list (tts_list);
@@ -397,6 +410,7 @@ namespace Synapse
           list_view_matches.min_visible_rows = 5;
           list_view_matches.set_list (nores_list);
           list_view_matches.set_inhibit_focus (false);
+          list_view_matches_renderer.action = null;
         }
 
         list_view_matches.scroll_to (0);
