@@ -208,6 +208,11 @@ namespace Synapse
       return search[T.MATCH].length == 0;
     }
     
+    protected bool is_in_initial_status ()
+    {
+      return search[T.MATCH].length == 0 && (results[T.MATCH] == null || results[T.MATCH].size == 0);
+    }
+    
     protected string get_match_search () {return search[T.MATCH];}
     protected void set_match_search (string pattern)
     {
@@ -235,12 +240,17 @@ namespace Synapse
 
     protected ResultSet last_result_set;
     
-    private void search_for_matches ()
+    protected void search_for_empty ()
+    {
+      search_for_matches (true);
+    }
+    
+    private void search_for_matches (bool search_with_empty = false)
     {
       current_cancellable.cancel ();
       current_cancellable = new Cancellable ();
 
-      if (search[T.MATCH] == "")
+      if (!search_with_empty && search[T.MATCH] == "")
       {
         reset_search (true, false);
         return;

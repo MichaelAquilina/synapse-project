@@ -264,6 +264,12 @@ namespace Synapse
           if (!b) show_list (false);
           break;
         case CommandTypes.NEXT_RESULT:
+          if (is_in_initial_status ())
+          {
+            show_list (true);
+            search_for_empty ();
+            return true;
+          }
           if (show_list (true)) return true;
           if (searching_for_matches)
             move_selection_match (1);
