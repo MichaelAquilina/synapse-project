@@ -480,6 +480,7 @@ namespace Synapse
         yield;
       }
       var q = Query (query_id++, query, flags);
+      string query_stripped = query.strip ();
 
       var cancellables = new GLib.List<Cancellable> ();
 
@@ -543,7 +544,7 @@ namespace Synapse
         throw new SearchError.SEARCH_CANCELLED ("Cancelled");
       }
       
-      if (has_unknown_handlers && 
+      if (has_unknown_handlers && query_stripped != "" &&
         (QueryFlags.UNCATEGORIZED in flags || QueryFlags.ACTIONS in flags))
       {
         current_result_set.add (new DefaultMatch (query), 0);
