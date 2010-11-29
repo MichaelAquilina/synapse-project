@@ -63,6 +63,10 @@ namespace Synapse
     protected VBox container_for_matches = null;
     protected VBox container_for_actions = null;
     protected ShrinkingLabel search_label = null;
+    protected Label actions_status_label = null;
+    protected Label matches_status_label = null;
+    protected HSelectionContainer status_selector = null;
+    protected Label codename_label = null;
     
     protected ListView<Match> list_view_matches = null;
     protected MatchRenderer list_view_matches_renderer = null;
@@ -113,6 +117,18 @@ namespace Synapse
       
       search_label = new ShrinkingLabel ();
       search_label.set_alignment (0.5f, 0.5f);
+      search_label.set_ellipsize (Pango.EllipsizeMode.START);
+      
+      codename_label = new Label (null);
+      codename_label.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
+      
+      actions_status_label = new Label (null);
+      matches_status_label = new Label (null);
+      
+      status_selector = new HSelectionContainer (null, 0);
+      status_selector.add (matches_status_label);
+      status_selector.add (actions_status_label);
+      status_selector.set_separator_visible (false);
 
       /* Building search label */
       {
@@ -133,7 +149,11 @@ namespace Synapse
         hbox.set_size_request (UI_WIDTH, -1);
 
         container.pack_start (hbox, false);
-        container.pack_end (search_label);
+        hbox = new HBox (false, 5);
+        hbox.pack_start (status_selector, false);
+        hbox.pack_start (search_label);
+        hbox.pack_start (codename_label, false);
+        container.pack_end (hbox);
         container.pack_end (new HSeparator (), false);
       }
       
@@ -227,6 +247,7 @@ namespace Synapse
         list_view_matches.scroll_mode = ListView.ScrollMode.TOP_FORCED;
         list_view_matches.min_visible_rows = 1;
       }
+      status_selector.select (searching_for_matches ? 0 : 1);
       update_search_label ();
       window.queue_draw ();
     }
@@ -357,10 +378,12 @@ namespace Synapse
         list_view_matches.set_list (matches);
         list_view_matches.min_visible_rows = 5;
         list_view_matches.set_inhibit_focus (false);
+        matches_status_label.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", matches.size));
         focus_match ( index, match );
       }
       else
       {
+        matches_status_label.set_markup ("");
         if (get_match_search () == "")
         {
           list_view_matches.min_visible_rows = 1;
@@ -386,10 +409,12 @@ namespace Synapse
       if (actions != null && actions.size > 0)
       {
         list_view_actions.set_list (actions);
+        actions_status_label.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", actions.size));
         focus_action ( index, action );
       }
       else
       {
+        actions_status_label.set_markup ("");
         if (get_action_search () == "")
         {
           list_view_actions.set_list (tts_list);
