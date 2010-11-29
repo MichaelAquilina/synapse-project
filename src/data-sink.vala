@@ -350,6 +350,19 @@ namespace Synapse
       }
     }
     
+    private void update_has_unknown_handlers ()
+    {
+      has_unknown_handlers = false;
+      foreach (var action in actions)
+      {
+        if (action.enabled && action.handles_unknown ())
+        {
+          has_unknown_handlers = true;
+          return;
+        }
+      }
+    }
+    
     private DataPlugin? create_plugin (Type t)
     {
       return Object.new (t, "data-sink", this, null) as DataPlugin;
@@ -438,6 +451,7 @@ namespace Synapse
         if (action.get_type () == plugin_type)
         {
           action.enabled = enabled;
+          update_has_unknown_handlers ();
           return;
         }
       }
