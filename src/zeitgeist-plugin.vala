@@ -307,6 +307,78 @@ namespace Synapse
       }
     }
 
+    private async void process_recent_results (Zeitgeist.ResultSet events,
+                                               Cancellable cancellable,
+                                               ResultSet results,
+                                               bool local_only)
+    {
+      Gee.Set<string> uris = new Gee.HashSet<string> ();
+      
+      int rs_size = results.size ();
+      int result_index = 0;
+
+      foreach (var event in events)
+      {
+        result_index++;
+        if (event.num_subjects () <= 0) continue;
+        var subject = event.get_subject (0);
+        unowned string uri = subject.get_uri ();
+        if (!(uri in uris))
+        {
+          int relevancy_penalty = Match.URI_PENALTY;
+          string? thumbnail_path = null;
+          string? icon = null;
+          uris.add (uri);
+          var f = File.new_for_uri (uri);
+          if (f.is_native ())
+          {
+            try
+            {
+              // will throw error if it doesn't exist
+              var fi = yield f.query_info_async (interesting_attributes,
+                                                 0, 0,
+                                                 cancellable);
+
+              icon = fi.get_icon ().to_string ();
+              if (fi.has_attribute (FILE_ATTRIBUTE_THUMBNAIL_PATH))
+              {
+                thumbnail_path =
+                  fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH);
+              }
+            }
+            catch (Error err)
+            {
+              if (cancellable.is_cancelled ()) return;
+              else continue; // file doesn't exist
+            }
+          }
+          else if (local_only)
+          {
+            continue;
+          }
+          else
+          {
+            relevancy_penalty += 5;
+            if (f.get_uri_scheme () == "data") continue;
+            unowned string mimetype = subject.get_mimetype ();
+            if (mimetype != null && mimetype != "")
+            {
+              icon = g_content_type_get_icon (mimetype).to_string ();
+            }
+          }
+          // TODO: implement a special interface in MatchObject that will give
+          //  more details about the item (ie last accessed info in this case)
+          var match_obj = new MatchObject (event,
+                                           thumbnail_path,
+                                           icon);
+
+          int relevancy = (int) ((rs_size - result_index) / 
+            (float) rs_size * Query.MATCH_SCORE_MAX);
+          results.add (match_obj, relevancy);
+        }
+      }
+    }
+
     private GenericArray<Zeitgeist.Event> create_templates (QueryFlags flags)
     {
       var templates = new GenericArray<Zeitgeist.Event> ();
@@ -426,6 +498,11 @@ namespace Synapse
 
       return templates;
     }
+    
+    public override bool handles_empty_query ()
+    {
+      return true;
+    }
 
     public override async ResultSet? search (Query q) throws SearchError
     {
@@ -441,22 +518,42 @@ namespace Synapse
         templates.add (event_templates[i]);
       }
 
-      var search_query = q.query_string.strip ();
-      if (!search_query.has_suffix ("*")) search_query += "*";
       try
       {
-        var rs = yield zg_index.search (search_query,
-                                        new Zeitgeist.TimeRange (int64.MIN, int64.MAX),
-                                        (owned) templates,
-                                        0,
-                                        q.max_results,
-                                        Zeitgeist.ResultType.MOST_RECENT_SUBJECTS,
-                                        q.cancellable);
-
-        if (!q.is_cancelled ())
+        Zeitgeist.ResultSet rs;
+        bool only_local = !(QueryFlags.INCLUDE_REMOTE in q.query_type);
+        if (q.query_string == "")
         {
-          yield process_results (q.query_string, rs, q.cancellable, result,
-                                 !(QueryFlags.INCLUDE_REMOTE in q.query_type));
+          // special case empty searches
+          int64 start_ts = Zeitgeist.Timestamp.now () - Zeitgeist.Timestamp.WEEK;
+          rs = yield zg_log.find_events (new Zeitgeist.TimeRange (start_ts, int64.max),
+                                         (owned) templates,
+                                         Zeitgeist.StorageState.ANY,
+                                         q.max_results,
+                                         Zeitgeist.ResultType.MOST_RECENT_SUBJECTS,
+                                         q.cancellable);
+
+          if (!q.is_cancelled ())
+          {
+            yield process_recent_results (rs, q.cancellable, result, only_local);
+          }
+        }
+        else
+        {
+          var search_query = q.query_string.strip ();
+          if (!search_query.has_suffix ("*")) search_query += "*";
+          rs = yield zg_index.search (search_query,
+                                          new Zeitgeist.TimeRange (int64.MIN, int64.MAX),
+                                          (owned) templates,
+                                          0,
+                                          q.max_results,
+                                          Zeitgeist.ResultType.MOST_RECENT_SUBJECTS,
+                                          q.cancellable);
+          if (!q.is_cancelled ())
+          {
+            yield process_results (q.query_string, rs, q.cancellable, result,
+                                   only_local);
+          }
         }
       }
       catch (Error err)
@@ -464,7 +561,7 @@ namespace Synapse
         if (!q.is_cancelled ())
         {
           // we don't care about message about being cancelled
-          warning ("Search in Zeitgeist's index failed: %s", err.message);
+          warning ("Zeitgeist search failed: %s", err.message);
         }
       }
 

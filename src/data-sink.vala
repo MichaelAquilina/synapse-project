@@ -129,6 +129,10 @@ namespace Synapse
 
     // weirdish kind of signal cause DataSink will be emitting it for the plugin
     public signal void search_done (ResultSet rs, uint query_id);
+    public virtual bool handles_empty_query ()
+    {
+      return false;
+    }
   }
   
   public abstract class ActionPlugin : DataPlugin
@@ -487,7 +491,9 @@ namespace Synapse
 
       foreach (var data_plugin in plugins)
       {
-        if (!data_plugin.enabled)
+        bool skip = !data_plugin.enabled ||
+          (query == "" && !data_plugin.handles_empty_query ());
+        if (skip)
         {
           search_size--;
           continue;
@@ -525,7 +531,7 @@ namespace Synapse
       {
         CancellableFix.connect (cancellable, () =>
         {
-          foreach (var c in cancellables) c.cancel();
+          foreach (var c in cancellables) c.cancel ();
         });
       }
 
