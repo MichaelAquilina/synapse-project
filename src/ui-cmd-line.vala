@@ -23,16 +23,34 @@ MainLoop loop;
 
 int main (string[] argv)
 {
+  loop = new MainLoop ();
+  var sink = new Synapse.DataSink ();
   if (argv.length <= 1)
   {
-    print ("Enter search string as command line argument!\n");
+    print ("Searching for recent uris...\n");
+    sink.search ("", Synapse.QueryFlags.LOCAL_CONTENT, null, null, (obj, res) =>
+    {
+      try
+      {
+        var rs = sink.search.end (res);
+        foreach (var match in rs)
+        {
+          print (">> %s\n", match.title);
+          var actions = sink.find_actions_for_match (match, null);
+          if (actions.size > 0) print ("  > %s\n", actions[0].title);
+        }
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
+      loop.quit ();
+    });
   }
   else
   {
-    loop = new MainLoop ();
-    var sink = new Synapse.DataSink ();
     string query = argv[1];
-    debug (@"Searching for $query");
+    debug (@"Searching for \"$query\"...");
     sink.search (query, Synapse.QueryFlags.LOCAL_CONTENT, null, null, (obj, res) =>
     {
       try
@@ -51,9 +69,9 @@ int main (string[] argv)
       }
       loop.quit ();
     });
-
-    loop.run ();
   }
+
+  loop.run ();
 
   return 0;
 }

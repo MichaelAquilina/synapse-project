@@ -94,8 +94,12 @@ namespace Synapse
           }
         }
         
-        var stripped = q.query_string.strip ();
+        string stripped = q.query_string.strip ();
         if (stripped == "") return null;
+        if (stripped.has_prefix ("~/"))
+        {
+          stripped = stripped.replace ("~", Environment.get_home_dir ());
+        }
         string[] args = split_regex.split (stripped);
         string? valid_cmd = Environment.find_program_in_path (args[0]);
 

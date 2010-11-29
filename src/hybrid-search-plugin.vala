@@ -199,6 +199,8 @@ namespace Synapse
 
       analyze_recent_documents ();
     }
+    
+    private bool connected_to_zg = false;
 
     protected override void constructed ()
     {
@@ -208,6 +210,7 @@ namespace Synapse
       return_if_fail (zg_plugin != null);
 
       zg_plugin.search_done.connect (this.zg_plugin_search_done);
+      connected_to_zg = true;
     }
 
     private const string RECENT_XML_NAME = ".recently-used.xbel";
@@ -451,7 +454,7 @@ namespace Synapse
     }
 
     private async ResultSet get_extra_results (Query q,
-                                               ResultSet original_rs,
+                                               ResultSet? original_rs,
                                                Gee.Collection<string>? dirs)
       throws SearchError
     {
@@ -495,7 +498,7 @@ namespace Synapse
             FileInfo fi = entry.value;
             if (matcher.key.match (fi.parse_name))
             {
-              if (!original_rs.contains_uri (fi.uri))
+              if (original_rs == null || !original_rs.contains_uri (fi.uri))
               {
                 if (!fi.is_initialized ())
                 {
@@ -531,12 +534,14 @@ namespace Synapse
       if (directories.size == 0) q.check_cancellable ();
 
       print ("%s found %d extra uris (ZG returned %d)\n",
-        this.get_type ().name (), results.size, original_rs.size);
+        this.get_type ().name (), results.size,
+        original_rs == null ? 0 : original_rs.size);
 
       return results;
     }
 
     private string? current_query = null;
+
     public override async ResultSet? search (Query q) throws SearchError
     {
       var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
@@ -580,7 +585,14 @@ namespace Synapse
         SignalHandler.block (this, sig_id); // is this thread-safe?
         Idle.add (search.callback); // FIXME: this could cause issues
       });
-      yield;
+
+      if (connected_to_zg &&
+          data_sink.get_plugin ("SynapseZeitgeistPlugin").enabled)
+      {
+        // wait for results from ZeitgeistPlugin
+        yield;
+      }
+
       SignalHandler.disconnect (this, sig_id);
       q.cancellable.disconnect (canc_sig_id);
 

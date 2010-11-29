@@ -115,6 +115,8 @@ namespace Synapse
     {
       directory_info_map = new Gee.HashMap<unowned string, DirectoryInfo> ();
     }
+    
+    private bool connected_to_zg = false;
 
     protected override void constructed ()
     {
@@ -124,6 +126,7 @@ namespace Synapse
       return_if_fail (zg_plugin != null);
 
       zg_plugin.search_done.connect (this.zg_plugin_search_done);
+      connected_to_zg = true;
     }
     
     private bool xdg_indexed = false;
@@ -196,8 +199,10 @@ namespace Synapse
       return dirs;
     }
     
-    private async void process_directories (Gee.Collection<string> dirs)
+    private async void process_directories (Gee.Collection<string>? dirs)
     {
+      if (dirs == null) return;
+      
       if (home_dir_uri == null)
       {
         var home = File.new_for_path (Environment.get_home_dir ());
@@ -242,7 +247,14 @@ namespace Synapse
         SignalHandler.block (this, sig_id); // is this thread-safe?
         Idle.add (search.callback);
       });
-      yield;
+
+      if (connected_to_zg &&
+          data_sink.get_plugin ("SynapseZeitgeistPlugin").enabled)
+      {
+        // wait for results from ZeitgeistPlugin
+        yield;
+      }
+
       SignalHandler.disconnect (this, sig_id);
       q.cancellable.disconnect (canc_sig_id);
 
