@@ -338,6 +338,8 @@ namespace Synapse
     private bool has_unknown_handlers = false;
     private bool plugins_loaded = false;
 
+    public signal void plugin_registered (DataPlugin plugin);
+
     protected void register_plugin (DataPlugin plugin)
     {
       if (plugin is ActionPlugin)
@@ -352,6 +354,8 @@ namespace Synapse
       {
         plugins.add (plugin);
       }
+      
+      plugin_registered (plugin);
     }
     
     private void update_has_unknown_handlers ()
