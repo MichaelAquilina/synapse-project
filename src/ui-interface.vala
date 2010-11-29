@@ -86,6 +86,10 @@ namespace Synapse
     private bool partial_result_sent;
     private Gee.Map<uint, CommandTypes> command_map;
     private bool search_with_empty;
+    private bool handle_empty;
+    
+    protected const string TYPE_TO_SEARCH = "Type to search...";
+    protected string DOWN_TO_SEE_RECENT = "";
     
     private uint tid; //for timer
     
@@ -98,6 +102,23 @@ namespace Synapse
       partial_result_sent = false;
       current_cancellable = new Cancellable ();
       reset_search (false);
+      
+      /* Handle ZG plugin to set the handle_empty property*/
+      var plugin = data_sink.get_plugin("SynapseZeitgeistPlugin");
+      if (plugin != null)
+      {
+        plugin_registered_handler (plugin);
+      }
+      data_sink.plugin_registered.connect (plugin_registered_handler);
+      update_handle_empty ();
+    }
+    private void plugin_registered_handler (DataPlugin plugin)
+    {
+      if (plugin.get_type () == typeof (ZeitgeistPlugin))
+      {
+        plugin.notify["enabled"].connect (update_handle_empty);
+        update_handle_empty ();
+      }
     }
     /* UI must do the following things */
     public abstract void show ();
@@ -206,6 +227,15 @@ namespace Synapse
       }
     }
     
+    private void update_handle_empty ()
+    {
+      var plugin = data_sink.get_plugin("SynapseZeitgeistPlugin");
+      handle_empty = plugin != null && plugin.enabled;
+      DOWN_TO_SEE_RECENT = handle_empty ? "Press down to see recent" : "";
+      handle_empty_updated ();
+    }
+    protected virtual void handle_empty_updated () {}
+    
     protected bool is_search_empty ()
     {
       return search[T.MATCH].length == 0;
@@ -214,6 +244,11 @@ namespace Synapse
     protected bool is_in_initial_status ()
     {
       return search[T.MATCH].length == 0 && (results[T.MATCH] == null || results[T.MATCH].size == 0);
+    }
+    
+    protected bool can_handle_empty ()
+    {
+      return handle_empty;
     }
     
     protected string get_match_search () {return search[T.MATCH];}

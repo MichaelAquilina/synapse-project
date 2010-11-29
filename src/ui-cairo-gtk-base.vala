@@ -53,9 +53,7 @@ namespace Synapse
     };
     
     // TODO: i18n
-    protected const string TYPE_TO_SEARCH = "Type to search...";
-    protected const string DOWN_TO_SEE_RECENT = "Press down to see recent";
-    
+
     protected Window window = null;
     protected MenuButton menu = null;
     protected Synapse.Throbber throbber = null;
@@ -190,7 +188,7 @@ namespace Synapse
         focus_current_match ();
       }
       else if (get_match_search() != "" ||
-               (get_match_results () != null && get_match_results ().size > 0))
+               get_match_results () != null)
       {
         set_match_search("");
         search_string_changed ();
@@ -269,7 +267,7 @@ namespace Synapse
           if (!b) show_list (false);
           break;
         case CommandTypes.NEXT_RESULT:
-          if (is_in_initial_status ())
+          if (can_handle_empty () && is_in_initial_status ())
           {
             show_list (true);
             search_for_empty ();
