@@ -121,9 +121,12 @@ namespace Synapse
       
       codename_label = new Label (null);
       codename_label.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
+      codename_label.set_alignment (1.0f, 0.5f);
       
       actions_status_label = new Label (null);
       matches_status_label = new Label (null);
+      actions_status_label.set_alignment (0.0f, 0.5f);
+      matches_status_label.set_alignment (0.0f, 0.5f);
       
       status_selector = new HSelectionContainer (null, 0);
       status_selector.add (matches_status_label);
@@ -149,10 +152,10 @@ namespace Synapse
         hbox.set_size_request (UI_WIDTH, -1);
 
         container.pack_start (hbox, false);
-        hbox = new HBox (false, 5);
-        hbox.pack_start (status_selector, false);
+        hbox = new HBox (true, 5);
+        hbox.pack_start (status_selector, true, false);
         hbox.pack_start (search_label);
-        hbox.pack_start (codename_label, false);
+        hbox.pack_start (codename_label, true, false);
         container.pack_end (hbox);
         container.pack_end (new HSeparator (), false);
       }
