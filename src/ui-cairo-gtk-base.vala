@@ -52,6 +52,10 @@ namespace Synapse
       QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
     };
     
+    // TODO: i18n
+    protected const string TYPE_TO_SEARCH = "Type to search...";
+    protected const string DOWN_TO_SEE_RECENT = "Press down to see recent";
+    
     protected Window window = null;
     protected MenuButton menu = null;
     protected Synapse.Throbber throbber = null;
@@ -185,7 +189,8 @@ namespace Synapse
         searching_for_changed ();
         focus_current_match ();
       }
-      else if (get_match_search() != "")
+      else if (get_match_search() != "" ||
+               (get_match_results () != null && get_match_results ().size > 0))
       {
         set_match_search("");
         search_string_changed ();

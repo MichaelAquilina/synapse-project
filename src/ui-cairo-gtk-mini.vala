@@ -355,7 +355,7 @@ namespace Synapse
           if (searching_for_matches)
             current_label.set_markup (
             Markup.printf_escaped ("<span size=\"%s\">%s</span>", LABEL_TEXT_SIZE,
-                                   "Type to search..."));
+                                   TYPE_TO_SEARCH));
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
         }

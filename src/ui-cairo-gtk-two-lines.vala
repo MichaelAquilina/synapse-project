@@ -413,11 +413,10 @@ namespace Synapse
           match_icon_thumb.clear ();
           match_label.set_markup (
             Markup.printf_escaped ("<span size=\"x-large\">%s</span>",
-                                   "Type to search..."));
+                                   TYPE_TO_SEARCH));
           match_label_description.set_markup (
-            Markup.printf_escaped ("<span size=\"medium\"> </span>" +
-                                   "<span size=\"smaller\">%s</span>",
-                                   "Powered by Zeitgeist"));
+            Markup.printf_escaped ("<span size=\"medium\">%s</span>",
+                                   DOWN_TO_SEE_RECENT));
         }
       }
       else
