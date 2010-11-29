@@ -12,6 +12,7 @@ synapse_VALAFLAGS = \
 	--pkg gee-1.0 \
 	--pkg gtkhotkey-1.0 \
 	--pkg json-glib-1.0 \
+	--pkg unique-1.0 \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/keysyms.vapi \
 	$(VAPIDIR)/cancellable-fix.vapi \

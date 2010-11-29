@@ -167,8 +167,33 @@ namespace Synapse
         context.parse (ref argv);
 
         Gtk.init (ref argv);
-        var launcher = new UILauncher ();
-        launcher.run ();
+        
+        var app = new Unique.App ("org.gnome.Synapse", null);
+        if (app.is_running)
+        {
+          debug ("Synapse is already running, activating...");
+          app.send_message (Unique.Command.ACTIVATE, null);
+        }
+        else
+        {
+          var launcher = new UILauncher ();
+          app.message_received.connect ((cmd, data, event_time) =>
+          {
+            if (cmd == Unique.Command.ACTIVATE)
+            {
+              if (launcher.ui != null)
+              {
+                launcher.ui.show ();
+                launcher.ui.present_with_time (event_time);
+              }
+                                                  
+              return Unique.Response.OK;
+            }
+
+            return Unique.Response.PASSTHROUGH;
+          });
+          launcher.run ();
+        }
       }
       catch (Error err)
       {
