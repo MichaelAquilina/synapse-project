@@ -384,6 +384,7 @@ namespace Synapse
         typeof (UPowerPlugin),
         typeof (CommandPlugin),
         typeof (RhythmboxActions),
+        typeof (BansheeActions),
         typeof (DirectoryPlugin),
 #if TEST_PLUGINS
         typeof (TestSlowPlugin),

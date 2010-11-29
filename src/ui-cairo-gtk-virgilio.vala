@@ -217,8 +217,7 @@ namespace Synapse
       
       search_string_changed.connect (update_search_label);
       
-      update_match_result_list (null, 0, null);
-      update_search_label ();
+      reset_search ();
     }
     
     private void update_search_label ()
@@ -387,7 +386,7 @@ namespace Synapse
       else
       {
         matches_status_label.set_markup ("");
-        if (get_match_search () == "")
+        if (get_match_search ()=="")
         {
           list_view_matches.min_visible_rows = 1;
           list_view_matches.set_list (tts_list);
