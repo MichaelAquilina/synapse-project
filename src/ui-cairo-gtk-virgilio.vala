@@ -362,7 +362,9 @@ namespace Synapse
       list_view_matches_renderer.pattern = get_match_search ();
       list_view_matches.scroll_to (index);
       list_view_matches.selected = index;
-      if (match != null && match.has_thumbnail)
+      if (searching_for_matches)
+        matches_status_label.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", index + 1, matches.size));
+      if (match.has_thumbnail)
       {
         thumb_icon.set_icon_name (match.thumbnail_path, IconSize.DIALOG);
         thumb_icon.show ();
@@ -380,6 +382,9 @@ namespace Synapse
       list_view_actions_renderer.pattern = get_action_search ();
       list_view_actions.scroll_to (index);
       list_view_actions.selected = index;
+      if (!searching_for_matches)
+        actions_status_label.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", index + 1, actions.size));
+
     }
     protected override void update_match_result_list (Gee.List<Match>? matches, int index, Match? match)
     {
