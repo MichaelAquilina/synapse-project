@@ -85,12 +85,14 @@ namespace Synapse
     private Cancellable current_cancellable;
     private bool partial_result_sent;
     private Gee.Map<uint, CommandTypes> command_map;
+    private bool search_with_empty;
     
     private uint tid; //for timer
     
     construct
     {
       command_map = new Gee.HashMap<uint, CommandTypes> ();
+      search_with_empty = false;
       init_default_command_map ();
       tid = 0;
       partial_result_sent = false;
@@ -189,6 +191,7 @@ namespace Synapse
       }
       current_cancellable.cancel ();
       partial_result_sent = false;
+      search_with_empty = false;
       focus_index = {0, 0};
       focus = {null, null};
       results = {null, null};
@@ -216,6 +219,7 @@ namespace Synapse
     protected string get_match_search () {return search[T.MATCH];}
     protected void set_match_search (string pattern)
     {
+      search_with_empty = false;
       if (search[T.MATCH] == pattern)
         return;
       search[T.MATCH] = pattern;
@@ -242,10 +246,11 @@ namespace Synapse
     
     protected void search_for_empty ()
     {
-      search_for_matches (true);
+      search_with_empty = true;
+      search_for_matches ();
     }
     
-    private void search_for_matches (bool search_with_empty = false)
+    private void search_for_matches ()
     {
       current_cancellable.cancel ();
       current_cancellable = new Cancellable ();
