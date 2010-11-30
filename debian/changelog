@@ -2,6 +2,7 @@ synapse (0.2.0+bzr-2) UNRELEASED; urgency=low
 
   * debian/control:
    - Set zeitgeist and zeitgeist-fts-extension as Recommends.
+   - Bump libgtk2.0-dev and libglib2.0-dev requierement.
 
  -- Julien Lavergne <gilir@ubuntu.com>  Tue, 30 Nov 2010 21:55:53 +0100
 
