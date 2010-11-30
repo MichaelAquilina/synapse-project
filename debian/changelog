@@ -4,6 +4,7 @@ synapse (0.2.0+bzr-2) UNRELEASED; urgency=low
    - Set zeitgeist and zeitgeist-fts-extension as Recommends.
    - Bump libgtk2.0-dev and libglib2.0-dev requierement.
    - Update Vcs-*.
+   - Build-depends on pkg-config.
 
  -- Julien Lavergne <gilir@ubuntu.com>  Tue, 30 Nov 2010 21:55:53 +0100
 

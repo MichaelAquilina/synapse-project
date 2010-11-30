@@ -4,6 +4,7 @@ Priority: optional
 Maintainer: Michal Hruby <michal.mhr@gmail.com>
 Build-Depends: debhelper (>= 7.0.50~),
  intltool,
+ pkg-config,
  valac (>= 0.9.7~),
  libzeitgeist-dev,
  libdbus-glib-1-dev,
