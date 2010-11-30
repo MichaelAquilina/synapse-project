@@ -1,7 +1,7 @@
 Source: synapse
 Section: utils
 Priority: optional
-Maintainer: Siegfried-Angel Gevatter Pujals <rainct@ubuntu.com>
+Maintainer: Michal Hruby <michal.mhr@gmail.com>
 Build-Depends: debhelper (>= 7.0.50~),
  intltool,
  valac (>= 0.9.7~),

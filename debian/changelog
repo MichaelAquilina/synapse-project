@@ -1,5 +1,5 @@
-synapse (0+bzr20101107-1) experimental; urgency=low
+synapse (0.2.0+bzr-1) experimental; urgency=low
 
   * Initial release.
 
- -- Siegfried-Angel Gevatter Pujals <rainct@ubuntu.com>  Fri, 10 Sep 2010 14:31:29 +0200
+ -- Michal Hruby <michal.mhr@gmail.com>  Fri, 10 Sep 2010 14:31:29 +0200
