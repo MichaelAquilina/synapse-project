@@ -1,4 +1,4 @@
-AC_INIT([synapse], [0.1.1])
+AC_INIT([synapse], [0.2.0])
 AC_DEFINE(RELEASE_NAME, "Acetylcholine", "Codename of this release")
 
 #AC_CONFIG_MACRO_DIR([m4])
