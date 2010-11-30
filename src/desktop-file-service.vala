@@ -304,6 +304,8 @@ namespace Synapse
     private async void reload_desktop_files ()
     {
       debug ("Reloading desktop files...");
+      all_desktop_files.clear ();
+      non_hidden_desktop_files.clear ();
       yield load_all_desktop_files ();
 
       reload_done ();
