@@ -367,12 +367,22 @@ namespace Synapse
     {
       if (match == null)
       {
-        if (get_match_search () != "")
+        if (!is_in_initial_status ())
         {
           if (searching_for_matches)
           {
-            main_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), LABEL_TEXT_SIZE));
-            main_label_description.set_markup (Utils.markup_string_with_search (throbber.active ? "Searching.." : "No results.", "", DESCRIPTION_TEXT_SIZE));
+            if (is_searching_for_recent ())
+            {
+              main_label.set_markup (
+              Markup.printf_escaped ("<span size=\"%s\">%s</span>", LABEL_TEXT_SIZE,
+                                     TYPE_TO_SEARCH));
+              main_label_description.set_markup (Utils.markup_string_with_search (throbber.active ? SEARCHING : NO_RECENT_ACTIVITIES, "", DESCRIPTION_TEXT_SIZE));
+            }
+            else
+            {
+              main_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), LABEL_TEXT_SIZE));
+              main_label_description.set_markup (Utils.markup_string_with_search (throbber.active ? SEARCHING : NO_RESULTS, "", DESCRIPTION_TEXT_SIZE));
+            }
           }
           //else -> impossible!
 
@@ -433,7 +443,7 @@ namespace Synapse
         if (!searching_for_matches)
         {
           main_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), LABEL_TEXT_SIZE));
-          main_label_description.set_markup (Utils.markup_string_with_search ("Not Found.", "", DESCRIPTION_TEXT_SIZE));
+          main_label_description.set_markup (Utils.markup_string_with_search (NO_RESULTS, "", DESCRIPTION_TEXT_SIZE));
         }
         else
         {

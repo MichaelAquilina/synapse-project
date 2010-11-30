@@ -45,15 +45,13 @@ namespace Synapse
       }
       public void set_type_to_search ()
       {
-        //TODO: i18n
         title = TYPE_TO_SEARCH;
         description = "";
         icon_name = "search";
       }
       public void set_no_results ()
       {
-        //TODO: i18n
-        title = "No results.";
+        title = NO_RESULTS;
         description = "";
         icon_name = "missing-image";
       }
