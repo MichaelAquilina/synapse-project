@@ -1,3 +1,10 @@
+synapse (0.2.0+bzr-2) UNRELEASED; urgency=low
+
+  * debian/control:
+   - Set zeitgeist and zeitgeist-fts-extension as Recommends.
+
+ -- Julien Lavergne <gilir@ubuntu.com>  Tue, 30 Nov 2010 21:55:53 +0100
+
 synapse (0.2.0+bzr-1) experimental; urgency=low
 
   * Initial release.
