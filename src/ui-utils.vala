@@ -158,14 +158,27 @@ namespace Synapse
       widget.composited_changed.connect (on_composited_change);
     }
     
+    private static Gdk.Rectangle get_current_monitor_geometry (Gdk.Screen screen) 
+    {
+    	var display = screen.get_display ();
+    	int x = 0, y = 0;
+    	Gdk.Screen screen_for_pointer = null;
+    	display.get_pointer (out screen_for_pointer, out x, out y, null);
+    	
+    	Gdk.Rectangle rect = {0, 0};
+    	screen_for_pointer.get_monitor_geometry (screen_for_pointer.get_monitor_at_point (x, y), out rect);
+    	
+    	return rect;
+    }
     public static void move_window_to_center (Gtk.Window win)
     {
       Gdk.Screen screen = win.get_screen () ?? Gdk.Screen.get_default ();
       if (screen == null)
       	return;
+      var rect = get_current_monitor_geometry (screen);
       Gtk.Requisition req = {0, 0};
       win.size_request (out req);
-      win.move (screen.get_width () / 2 - req.width / 2, screen.get_height () / 2 - req.height / 2);
+      win.move (rect.x + (rect.width - req.width) / 2, rect.y + (rect.height - req.height) / 2);
     }
 
     public static void gdk_color_to_rgb (Gdk.Color col, out double r, out double g, out double b)
