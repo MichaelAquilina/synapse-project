@@ -88,6 +88,10 @@ namespace Synapse
     private bool search_with_empty;
     private bool handle_empty;
     
+    //TODO : i18n
+    protected const string SEARCHING = "Searching...";
+    protected const string NO_RESULTS = "No results found.";
+    protected const string NO_RECENT_ACTIVITIES = "No recent activities found.";
     protected const string TYPE_TO_SEARCH = "Type to search...";
     protected string DOWN_TO_SEE_RECENT = "";
     
@@ -241,9 +245,14 @@ namespace Synapse
       return search[T.MATCH].length == 0;
     }
     
+    protected bool is_searching_for_recent ()
+    {
+      return search_with_empty;
+    }
+    
     protected bool is_in_initial_status ()
     {
-      return search[T.MATCH].length == 0 && (results[T.MATCH] == null || results[T.MATCH].size == 0);
+      return (!search_with_empty) && search[T.MATCH].length == 0 && (results[T.MATCH] == null || results[T.MATCH].size == 0);
     }
     
     protected bool can_handle_empty ()

@@ -398,12 +398,24 @@ namespace Synapse
       if (match == null)
       {
         /* Show default stuff */
-        if (get_match_search () != "")
+        if (!is_in_initial_status ())
         {
-          match_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), size));
-          match_label_description.set_markup (
-            get_description_markup (throbber.active ? "Searching.." : "No results.")
-          );
+          if (is_searching_for_recent ())
+          {
+            match_label.set_markup (
+            Markup.printf_escaped ("<span size=\"x-large\">%s</span>",
+                                   TYPE_TO_SEARCH));
+            match_label_description.set_markup (
+              get_description_markup (throbber.active ? SEARCHING : NO_RECENT_ACTIVITIES)
+            );
+          }
+          else
+          {
+            match_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), size));
+            match_label_description.set_markup (
+              get_description_markup (throbber.active ? SEARCHING : NO_RESULTS)
+            );
+          }
           match_icon.set_icon_name ("search", IconSize.DIALOG);
           match_icon_thumb.clear ();
         }
