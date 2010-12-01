@@ -361,7 +361,7 @@ namespace Synapse
       list_view_matches.scroll_to (index);
       list_view_matches.selected = index;
       if (searching_for_matches)
-        matches_status_label.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", index + 1, matches.size));
+        matches_status_label.set_markup (Markup.printf_escaped ("<b>%d / %d</b>", index + 1, matches.size));
       if (match.has_thumbnail)
       {
         thumb_icon.set_icon_name (match.thumbnail_path, IconSize.DIALOG);
@@ -381,7 +381,7 @@ namespace Synapse
       list_view_actions.scroll_to (index);
       list_view_actions.selected = index;
       if (!searching_for_matches)
-        actions_status_label.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", index + 1, actions.size));
+        actions_status_label.set_markup (Markup.printf_escaped ("<b>%d / %d</b>", index + 1, actions.size));
 
     }
     protected override void update_match_result_list (Gee.List<Match>? matches, int index, Match? match)
@@ -391,12 +391,12 @@ namespace Synapse
       {
         foreach (Synapse.Match m in matches)
         {
-          m.description = Utils.replace_home_path_with (m.description, "Home", " > ");
+          m.description = Utils.replace_home_path_with (m.description, _("Home"), " > ");
         }
         list_view_matches.set_list (matches);
         list_view_matches.min_visible_rows = 5;
         list_view_matches.set_inhibit_focus (false);
-        matches_status_label.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", matches.size));
+        matches_status_label.set_markup (Markup.printf_escaped ("<b>1 / %d</b>", matches.size));
         focus_match ( index, match );
       }
       else
@@ -428,7 +428,7 @@ namespace Synapse
       if (actions != null && actions.size > 0)
       {
         list_view_actions.set_list (actions);
-        actions_status_label.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", actions.size));
+        actions_status_label.set_markup (Markup.printf_escaped ("<b>1 / %d</b>", actions.size));
         focus_action ( index, action );
       }
       else

@@ -547,7 +547,7 @@ namespace Synapse
       vbox.pack_start (status_box, false);
       status = new Label (null);
       status.set_alignment (0, 0);
-      status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
+      status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
       var logo = new Label (null);
       logo.set_alignment (1, 0);
       logo.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
@@ -562,21 +562,21 @@ namespace Synapse
       {
         foreach (Synapse.Match m in rs)
         {
-          m.description = Utils.replace_home_path_with (m.description, "Home", " > ");
+          m.description = Utils.replace_home_path_with (m.description, _("Home"), " > ");
         }
       }
       view.set_list (rs);
       if (rs==null || rs.size == 0)
-        status.set_markup (Markup.printf_escaped ("<b>%s</b>", "No results."));
+        status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
       else
-        status.set_markup (Markup.printf_escaped ("<b>1 of %d</b>", view.get_list_size ()));
+        status.set_markup (Markup.printf_escaped ("<b>1 / %d</b>", view.get_list_size ()));
     }
     public void move_selection_to_index (int i)
     {
       if (view.get_list_size () == 0) return;
       view.scroll_to (i);
       view.selected = i;
-      status.set_markup (Markup.printf_escaped ("<b>%d of %d</b>", i + 1, view.get_list_size ()));
+      status.set_markup (Markup.printf_escaped ("<b>%d / %d</b>", i + 1, view.get_list_size ()));
     }
   }
 
@@ -1280,11 +1280,11 @@ namespace Synapse
       menu = new Gtk.Menu ();
       Gtk.MenuItem item = null;
       
-      item = new Gtk.MenuItem.with_label ("Settings"); //TODO: i18n
+      item = new Gtk.MenuItem.with_label (_("Settings"));
       item.activate.connect (()=> {settings_clicked ();});
       menu.append (item);
       
-      item = new Gtk.MenuItem.with_label ("About"); //TODO: i18n
+      item = new Gtk.MenuItem.with_label (_("About"));
       item.activate.connect (()=> 
       {
         var about = new SynapseAboutDialog ();
@@ -1296,7 +1296,7 @@ namespace Synapse
       item = new Gtk.SeparatorMenuItem ();
       menu.append (item);
       
-      item = new Gtk.MenuItem.with_label ("Quit"); //TODO: i18n
+      item = new Gtk.MenuItem.with_label (_("Quit"));
       item.activate.connect (Gtk.main_quit);
       menu.append (item);
       

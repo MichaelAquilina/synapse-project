@@ -31,14 +31,14 @@ namespace Synapse
   {
     protected string[] categories =
     {
-      "Actions",
-      "Audio",
-      "Applications",
-      "All",
-      "Documents",
-      "Images",
-      "Video",
-      "Internet"
+      _("Actions"),
+      _("Audio"),
+      _("Applications"),
+      _("All"),
+      _("Documents"),
+      _("Images"),
+      _("Video"),
+      _("Internet")
     };
     protected QueryFlags[] categories_query =
     {
@@ -51,8 +51,6 @@ namespace Synapse
       QueryFlags.VIDEO,
       QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
     };
-    
-    // TODO: i18n
 
     protected Window window = null;
     protected MenuButton menu = null;

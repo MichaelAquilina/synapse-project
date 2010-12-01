@@ -89,10 +89,10 @@ namespace Synapse
     private bool handle_empty;
     
     //TODO : i18n
-    protected const string SEARCHING = "Searching...";
-    protected const string NO_RESULTS = "No results found.";
-    protected const string NO_RECENT_ACTIVITIES = "No recent activities found.";
-    protected const string TYPE_TO_SEARCH = "Type to search...";
+    protected const string SEARCHING = _("Searching...");
+    protected const string NO_RESULTS = _("No results found.");
+    protected const string NO_RECENT_ACTIVITIES = _("No recent activities found.");
+    protected const string TYPE_TO_SEARCH = _("Type to search...");
     protected string DOWN_TO_SEE_RECENT = "";
     
     private uint tid; //for timer
@@ -235,7 +235,7 @@ namespace Synapse
     {
       var plugin = data_sink.get_plugin("SynapseZeitgeistPlugin");
       handle_empty = plugin != null && plugin.enabled;
-      DOWN_TO_SEE_RECENT = handle_empty ? "...or press down key to browse recent activities" : "";
+      DOWN_TO_SEE_RECENT = handle_empty ? _("...or press down key to browse recent activities") : "";
       handle_empty_updated ();
     }
     protected virtual void handle_empty_updated () {}

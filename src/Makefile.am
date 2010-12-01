@@ -19,7 +19,7 @@ synapse_VALAFLAGS = \
 	$(VAPIDIR)/config.vapi \
 	$(NULL)
 
-synapse_CFLAGS = $(SYNAPSE_MODULES_CFLAGS)
+synapse_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h
 synapse_LDADD = $(SYNAPSE_MODULES_LIBS)
 synapse_SOURCES = \
 	configuration.vala \

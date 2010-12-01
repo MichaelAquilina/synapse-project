@@ -41,10 +41,10 @@ namespace Synapse
 
       construct
       {
-        sub_description_title = "Status"; // FIXME: i18n
+        sub_description_title = _("Status");
 
-        add_button_tooltip = "Enable this plugin"; // FIXME: i18n
-        remove_button_tooltip = "Disable this plugin"; // FIXME: i18n
+        add_button_tooltip = _("Enable this plugin");
+        remove_button_tooltip = _("Disable this plugin");
       }
 
       public void update_state (bool enabled)
@@ -53,11 +53,11 @@ namespace Synapse
 
         if (!this.enabled)
         {
-          sub_description_text = pi.runnable ? "Disabled" : pi.runnable_error; // i18n!
+          sub_description_text = pi.runnable ? _("Disabled") : pi.runnable_error;
         }
         else
         {
-          sub_description_text = "Enabled"; // i18n!
+          sub_description_text = _("Enabled");
         }
       }
       
@@ -107,7 +107,7 @@ namespace Synapse
 
     public SettingsWindow (DataSink data_sink)
     {
-      this.title = "Synapse - Settings"; //TODO: i18n
+      this.title = _("Synapse - Settings");
       this.data_sink = data_sink;
       this.set_position (WindowPosition.CENTER);
       this.set_size_request (500, 450);
@@ -128,10 +128,10 @@ namespace Synapse
     {
       themes = new Gee.HashMap<string, Theme?>();
 
-      themes["default"] = Theme ("Default", "", typeof (SynapseWindow)); //i18n
-      themes["mini"] = Theme ("Mini", "", typeof (SynapseWindowMini)); //i18n
-      themes["dual"] = Theme ("Dual", "", typeof (SynapseWindowTwoLines)); //i18n
-      themes["virgilio"] = Theme ("Virgilio", "", typeof (SynapseWindowVirgilio)); //i18n
+      themes["default"] = Theme (_("Default"), "", typeof (SynapseWindow));
+      themes["mini"] = Theme (_("Mini"), "", typeof (SynapseWindowMini));
+      themes["dual"] = Theme (_("Dual"), "", typeof (SynapseWindowTwoLines));
+      themes["virgilio"] = Theme (_("Virgilio"), "", typeof (SynapseWindowVirgilio));
 
       selected_theme = config.ui_type;
     }
@@ -256,7 +256,7 @@ namespace Synapse
       var shortcut_frame = new Frame (null);
       shortcut_frame.set_shadow_type (Gtk.ShadowType.NONE);
       var shortcut_frame_label = new Label (null);
-      shortcut_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", "Shortcuts"));
+      shortcut_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", _("Shortcuts")));
       shortcut_frame.set_label_widget (shortcut_frame_label);
       align = new Alignment (0.5f, 0.5f, 1.0f, 1.0f);
       align.set_padding (0, 0, 10, 0);
@@ -274,7 +274,7 @@ namespace Synapse
       Gtk.CellRenderer ren;
       Gtk.TreeViewColumn col;
       ren = new CellRendererText ();
-      col = new TreeViewColumn.with_attributes ("Action", ren, "text", 0); // FIXME: i18n
+      col = new TreeViewColumn.with_attributes (_("Action"), ren, "text", 0);
       treeview.append_column (col);
 
       ren = new CellRendererAccel ();
@@ -291,20 +291,20 @@ namespace Synapse
       {
         this.set_keybinding ("");
       });
-      col = new TreeViewColumn.with_attributes ("Shortcut", ren, "text",1);
+      col = new TreeViewColumn.with_attributes (_("Shortcut"), ren, "text",1);
       treeview.append_column (col);
 
       // add the actual item
       Gtk.TreeIter iter;
       model.append (out iter);
-      model.set (iter, 0, "Activate");
+      model.set (iter, 0, _("Activate"));
       
       /* Add info */
       
       var info_box = new HBox (false, 12);
       var info_image = new Image.from_stock (STOCK_INFO, IconSize.DND);
       info_box.pack_start (info_image, false, true);
-      var info_label = new Label ("To edit a shortcut, double click it and press a new one.");
+      var info_label = new Label (_("To edit a shortcut, double click it and press a new one."));
       info_box.pack_start (info_label);
       info_box.show_all ();
 
@@ -341,7 +341,7 @@ namespace Synapse
         Gtk.TreeIter iter;
         if (model.get_iter_first (out iter))
         {
-          model.set (iter, 1, key != "" ? key : "Disabled");
+          model.set (iter, 1, key != "" ? key : _("Disabled"));
         }
       }
       if (emit) keybinding_changed (key);
