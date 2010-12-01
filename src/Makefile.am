@@ -25,8 +25,10 @@ synapse_SOURCES = \
 	configuration.vala \
 	common-actions.vala \
 	data-sink.vala \
+	plugin.vala \
 	match.vala \
 	query.vala \
+	result-set.vala \
 	dbus-service.vala \
 	desktop-file-service.vala \
 	command-plugin.vala \
@@ -35,6 +37,7 @@ synapse_SOURCES = \
 	devhelp-search.vala \
 	directory-plugin.vala \
 	hybrid-search-plugin.vala \
+	locate-plugin.vala \
 	gnome-session-plugin.vala \
 	upower-plugin.vala \
 	zeitgeist-plugin.vala \
