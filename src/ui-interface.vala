@@ -89,10 +89,10 @@ namespace Synapse
     private bool handle_empty;
     
     //TODO : i18n
-    protected const string SEARCHING = _("Searching...");
-    protected const string NO_RESULTS = _("No results found.");
-    protected const string NO_RECENT_ACTIVITIES = _("No recent activities found.");
-    protected const string TYPE_TO_SEARCH = _("Type to search...");
+    protected string SEARCHING = _("Searching...");
+    protected string NO_RESULTS = _("No results found.");
+    protected string NO_RECENT_ACTIVITIES = _("No recent activities found.");
+    protected string TYPE_TO_SEARCH = _("Type to search...");
     protected string DOWN_TO_SEE_RECENT = "";
     
     private uint tid; //for timer
