@@ -25,8 +25,10 @@ synapse_SOURCES = \
 	configuration.vala \
 	common-actions.vala \
 	data-sink.vala \
+	plugin.vala \
 	match.vala \
 	query.vala \
+	result-set.vala \
 	dbus-service.vala \
 	desktop-file-service.vala \
 	command-plugin.vala \
