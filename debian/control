@@ -3,7 +3,7 @@ Section: utils
 Priority: optional
 Maintainer: Michal Hruby <michal.mhr@gmail.com>
 Build-Depends: debhelper (>= 7.0.50~),
- intltool,
+ intltool (>= 0.35),
  pkg-config,
  valac (>= 0.9.7~),
  libzeitgeist-dev,
