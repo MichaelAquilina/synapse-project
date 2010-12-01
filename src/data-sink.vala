@@ -305,6 +305,7 @@ namespace Synapse
         typeof (DesktopFilePlugin),
         typeof (ZeitgeistPlugin),
         typeof (HybridSearchPlugin),
+        //typeof (LocatePlugin),
         typeof (GnomeSessionPlugin),
         typeof (UPowerPlugin),
         typeof (CommandPlugin),

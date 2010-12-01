@@ -37,6 +37,7 @@ synapse_SOURCES = \
 	devhelp-search.vala \
 	directory-plugin.vala \
 	hybrid-search-plugin.vala \
+	locate-plugin.vala \
 	gnome-session-plugin.vala \
 	upower-plugin.vala \
 	zeitgeist-plugin.vala \
