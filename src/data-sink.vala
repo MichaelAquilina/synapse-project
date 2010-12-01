@@ -223,7 +223,7 @@ namespace Synapse
           initialize_caches.callback ();
         }
       });
-      
+
       desktop_file_service = DesktopFileService.get_default ();
       desktop_file_service.reload_done.connect (this.check_plugins);
       ulong sid2 = desktop_file_service.initialization_done.connect (() =>
@@ -234,7 +234,7 @@ namespace Synapse
           initialize_caches.callback ();
         }
       });
-      
+
       yield;
       SignalHandler.disconnect (dbus_name_cache, sid1);
       SignalHandler.disconnect (desktop_file_service, sid2);

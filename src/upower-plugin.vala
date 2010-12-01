@@ -178,7 +178,9 @@ namespace Synapse
         "UPower",
         "Allows you to suspend & hibernate your computer.",
         "system-suspend",
-        register_plugin
+        register_plugin,
+        DBusNameCache.get_default ().service_is_available (UPowerObject.UNIQUE_NAME),
+        "UPower wasn't found"
       );
     }
 
