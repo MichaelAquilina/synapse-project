@@ -70,7 +70,7 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (DesktopFilePlugin),
         "Applications",
-        "Search applications on your computer.",
+        _ ("Search applications on your computer."),
         "system-run",
         register_plugin
       );
@@ -241,9 +241,9 @@ namespace Synapse
 
       private void init_with_info (DesktopFileInfo info)
       {
-        this.title = "Open with %s".printf (info.name);
+        this.title = _ ("Open with %s").printf (info.name);
         this.icon_name = info.icon_name;
-        this.description = "Opens current selection using %s".printf (info.name);
+        this.description = _ ("Opens current selection using %s").printf (info.name);
         this.desktop_info = info;
       }
       

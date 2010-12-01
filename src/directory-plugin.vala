@@ -104,7 +104,7 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (DirectoryPlugin),
         "Directory search",
-        "Allows opening of commonly used directories.",
+        _ ("Allows opening of commonly used directories."),
         "folder",
         register_plugin
       );

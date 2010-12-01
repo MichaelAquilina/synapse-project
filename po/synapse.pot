@@ -1,0 +1,446 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-02 00:58+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../data/synapse.desktop.in.h:1
+msgid "Search everything you do."
+msgstr ""
+
+#: ../data/synapse.desktop.in.h:2
+msgid "Synapse"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-base.c:1076
+msgid "Actions"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-base.c:1078
+msgid "Audio"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-base.c:1080
+msgid "Applications"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-base.c:1082
+msgid "All"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-base.c:1084
+msgid "Documents"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-base.c:1086
+msgid "Images"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-base.c:1088
+msgid "Video"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-base.c:1090
+msgid "Internet"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-virgilio.c:1111 ../src/ui-cairo-gtk-virgilio.c:1166
+#: ../src/ui-widgets.c:2700
+#, c-format
+msgid "<b>%d of %d</b>"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-virgilio.c:1221 ../src/ui-widgets.c:2645
+msgid "Home"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-virgilio.c:1233 ../src/ui-cairo-gtk-virgilio.c:1291
+#: ../src/ui-widgets.c:2677
+#, c-format
+msgid "<b>1 of %d</b>"
+msgstr ""
+
+#: ../src/ui-interface.c:711
+msgid "...or press down key to browse recent activities"
+msgstr ""
+
+#: ../src/ui-interface.c:1481
+msgid "Searching..."
+msgstr ""
+
+#: ../src/ui-interface.c:1486
+msgid "No results found."
+msgstr ""
+
+#: ../src/ui-interface.c:1491
+msgid "No recent activities found."
+msgstr ""
+
+#: ../src/ui-interface.c:1496
+msgid "Type to search..."
+msgstr ""
+
+#: ../src/ui-settings.c:469
+msgid "Synapse - Settings"
+msgstr ""
+
+#: ../src/ui-settings.c:523
+msgid "Default"
+msgstr ""
+
+#: ../src/ui-settings.c:529
+msgid "Mini"
+msgstr ""
+
+#: ../src/ui-settings.c:535
+msgid "Dual"
+msgstr ""
+
+#: ../src/ui-settings.c:541
+msgid "Virgilio"
+msgstr ""
+
+#: ../src/ui-settings.c:941
+msgid "General"
+msgstr ""
+
+#: ../src/ui-settings.c:946
+msgid "Plugins"
+msgstr ""
+
+#: ../src/ui-settings.c:956
+msgid "Behavior & Look"
+msgstr ""
+
+#: ../src/ui-settings.c:972
+msgid "Theme:"
+msgstr ""
+
+#: ../src/ui-settings.c:981
+msgid "Startup on login"
+msgstr ""
+
+#: ../src/ui-settings.c:994
+msgid "Shortcuts"
+msgstr ""
+
+#: ../src/ui-settings.c:1029
+msgid "Action"
+msgstr ""
+
+#: ../src/ui-settings.c:1043
+msgid "Shortcut"
+msgstr ""
+
+#: ../src/ui-settings.c:1051
+msgid "Activate"
+msgstr ""
+
+#: ../src/ui-settings.c:1058
+msgid "To edit a shortcut, double click it and press a new one."
+msgstr ""
+
+#: ../src/ui-settings.c:1129 ../src/ui-settings.c:1407
+msgid "Disabled"
+msgstr ""
+
+#: ../src/ui-settings.c:1415
+msgid "Enabled"
+msgstr ""
+
+#: ../src/ui-settings.c:1499
+msgid "Status"
+msgstr ""
+
+#: ../src/ui-settings.c:1501
+msgid "Enable this plugin"
+msgstr ""
+
+#: ../src/ui-settings.c:1503
+msgid "Disable this plugin"
+msgstr ""
+
+#: ../src/ui-widgets.c:2594 ../src/ui-widgets.c:2667
+msgid "No results."
+msgstr ""
+
+#: ../src/ui-widgets.c:4744
+msgid "Settings"
+msgstr ""
+
+#: ../src/ui-widgets.c:4751
+msgid "About"
+msgstr ""
+
+#: ../src/ui-widgets.c:4763
+msgid "Quit"
+msgstr ""
+
+#: ../src/banshee-plugin.c:2886
+msgid "Allows you to control Banshee and add items to playlist."
+msgstr ""
+
+#: ../src/banshee-plugin.c:2889
+msgid "Banshee is not installed"
+msgstr ""
+
+#: ../src/banshee-plugin.c:3914 ../src/rhythmbox-plugin.c:3679
+msgid "Play"
+msgstr ""
+
+#: ../src/banshee-plugin.c:3915
+msgid "Start playback in Banshee"
+msgstr ""
+
+#: ../src/banshee-plugin.c:4015 ../src/rhythmbox-plugin.c:3780
+msgid "Pause"
+msgstr ""
+
+#: ../src/banshee-plugin.c:4016
+msgid "Pause playback in Banshee"
+msgstr ""
+
+#: ../src/banshee-plugin.c:4106 ../src/rhythmbox-plugin.c:3834
+msgid "Next"
+msgstr ""
+
+#: ../src/banshee-plugin.c:4107
+msgid "Plays the next song in Banshee's playlist"
+msgstr ""
+
+#: ../src/banshee-plugin.c:4197 ../src/rhythmbox-plugin.c:3925
+msgid "Previous"
+msgstr ""
+
+#: ../src/banshee-plugin.c:4198
+msgid "Plays the previous song in Banshee's playlist"
+msgstr ""
+
+#: ../src/banshee-plugin.c:4288
+msgid "Enqueue in Banshee"
+msgstr ""
+
+#: ../src/banshee-plugin.c:4289
+msgid "Add the song to Banshee playlist"
+msgstr ""
+
+#: ../src/banshee-plugin.c:4442
+msgid "Play in Banshee"
+msgstr ""
+
+#: ../src/banshee-plugin.c:4443 ../src/rhythmbox-plugin.c:4220
+msgid "Clears the current playlist and plays the song"
+msgstr ""
+
+#: ../src/command-plugin.c:407
+msgid "Allow execution of arbitrary commands."
+msgstr ""
+
+#: ../src/command-plugin.c:799
+msgid "Run command"
+msgstr ""
+
+#: ../src/common-actions.c:958
+msgid "Run"
+msgstr ""
+
+#: ../src/common-actions.c:959
+msgid "Run an application, action or script"
+msgstr ""
+
+#: ../src/common-actions.c:1107
+msgid "Run in Terminal"
+msgstr ""
+
+#: ../src/common-actions.c:1108
+msgid "Run application or command in terminal"
+msgstr ""
+
+#: ../src/common-actions.c:1261
+msgid "Open"
+msgstr ""
+
+#: ../src/common-actions.c:1262
+msgid "Open using default application"
+msgstr ""
+
+#: ../src/common-actions.c:1396
+msgid "Open folder"
+msgstr ""
+
+#: ../src/common-actions.c:1397
+msgid "Open folder containing this file"
+msgstr ""
+
+#: ../src/desktop-file-plugin.c:538
+msgid "Search applications on your computer."
+msgstr ""
+
+#: ../src/desktop-file-plugin.c:1741
+#, c-format
+msgid "Open with %s"
+msgstr ""
+
+#: ../src/desktop-file-plugin.c:1749
+#, c-format
+msgid "Opens current selection using %s"
+msgstr ""
+
+#: ../src/devhelp-search.c:325
+msgid "Search documentation using Devhelp."
+msgstr ""
+
+#: ../src/devhelp-search.c:328
+msgid "Devhelp is not installed"
+msgstr ""
+
+#: ../src/devhelp-search.c:548
+msgid "Search in Devhelp"
+msgstr ""
+
+#: ../src/devhelp-search.c:549
+msgid "Search documentation for this symbol"
+msgstr ""
+
+#: ../src/dictionary.c:323
+msgid "Look up definitions of words."
+msgstr ""
+
+#: ../src/dictionary.c:326
+msgid "Gnome Dictionary is not installed"
+msgstr ""
+
+#: ../src/dictionary.c:511
+msgid "Define"
+msgstr ""
+
+#: ../src/dictionary.c:512
+msgid "Look up definition in dictionary"
+msgstr ""
+
+#: ../src/directory-plugin.c:555
+msgid "Allows opening of commonly used directories."
+msgstr ""
+
+#: ../src/gnome-session-plugin.c:1726
+msgid ""
+"Allows you to log out from your session, restart and shutdown your computer."
+msgstr ""
+
+#: ../src/gnome-session-plugin.c:1731
+msgid "Gnome Session Manager wan't found"
+msgstr ""
+
+#: ../src/gnome-session-plugin.c:1981
+msgid "Shut Down"
+msgstr ""
+
+#: ../src/gnome-session-plugin.c:1982
+msgid "Turn your computer off"
+msgstr ""
+
+#: ../src/gnome-session-plugin.c:2300
+msgid "Restart"
+msgstr ""
+
+#: ../src/gnome-session-plugin.c:2301
+msgid "Restart your computer"
+msgstr ""
+
+#: ../src/gnome-session-plugin.c:2619
+msgid "Log Out"
+msgstr ""
+
+#: ../src/gnome-session-plugin.c:2620
+msgid "Close your session and return to the login screen"
+msgstr ""
+
+#: ../src/hybrid-search-plugin.c:855
+msgid ""
+"Tries to improve results returned by Zeitgeist plugin by looking for similar "
+"files on the filesystem."
+msgstr ""
+
+#: ../src/locate-plugin.c:544
+msgid "Runs locate command to find files on the filesystem."
+msgstr ""
+
+#: ../src/rhythmbox-plugin.c:2651
+msgid "Allows you to control Rhythmbox and add items to playlist."
+msgstr ""
+
+#: ../src/rhythmbox-plugin.c:2654
+msgid "Rhythmbox is not installed"
+msgstr ""
+
+#: ../src/rhythmbox-plugin.c:3680
+msgid "Start playback in Rhythmbox"
+msgstr ""
+
+#: ../src/rhythmbox-plugin.c:3781
+msgid "Pause playback in Rhythmbox"
+msgstr ""
+
+#: ../src/rhythmbox-plugin.c:3835
+msgid "Plays the next song in Rhythmbox's playlist"
+msgstr ""
+
+#: ../src/rhythmbox-plugin.c:3926
+msgid "Plays the previous song in Rhythmbox's playlist"
+msgstr ""
+
+#: ../src/rhythmbox-plugin.c:4029
+msgid "Enqueue in Rhythmbox"
+msgstr ""
+
+#: ../src/rhythmbox-plugin.c:4030
+msgid "Add the song to Rhythmbox playlist"
+msgstr ""
+
+#: ../src/rhythmbox-plugin.c:4219
+msgid "Play in Rhythmbox"
+msgstr ""
+
+#: ../src/upower-plugin.c:1856
+msgid "Allows you to suspend & hibernate your computer."
+msgstr ""
+
+#: ../src/upower-plugin.c:1860
+msgid "UPower wasn't found"
+msgstr ""
+
+#: ../src/upower-plugin.c:2373
+msgid "Suspend"
+msgstr ""
+
+#: ../src/upower-plugin.c:2374
+msgid "Put your computer into suspend mode"
+msgstr ""
+
+#: ../src/upower-plugin.c:2600
+msgid "Hibernate"
+msgstr ""
+
+#: ../src/upower-plugin.c:2601
+msgid "Put your computer into hibernation mode"
+msgstr ""
+
+#: ../src/zeitgeist-plugin.c:602
+msgid "Search various items logged by Zeitgeist."
+msgstr ""
+
+#: ../src/zeitgeist-plugin.c:606
+msgid "Zeitgeist is not installed"
+msgstr ""

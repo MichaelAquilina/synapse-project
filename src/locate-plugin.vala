@@ -185,7 +185,7 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (LocatePlugin),
         "Locate",
-        "Runs locate command to find files on the filesystem.",
+        _ ("Runs locate command to find files on the filesystem."),
         "search",
         register_plugin
       );

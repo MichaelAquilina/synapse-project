@@ -1,2 +1,20 @@
 data/synapse.desktop.in
+src/ui-cairo-gtk-base.c
+src/ui-cairo-gtk-virgilio.c
+src/ui-interface.c
+src/ui-settings.c
+src/ui-widgets.c
+src/banshee-plugin.c
+src/command-plugin.c
+src/common-actions.c
+src/desktop-file-plugin.c
+src/devhelp-search.c
+src/dictionary.c
+src/directory-plugin.c
+src/gnome-session-plugin.c
+src/hybrid-search-plugin.c
+src/locate-plugin.c
+src/rhythmbox-plugin.c
+src/upower-plugin.c
+src/zeitgeist-plugin.c
 

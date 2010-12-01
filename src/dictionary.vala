@@ -52,8 +52,8 @@ namespace Synapse
       
       public Define ()
       {
-        Object (title: "Define",
-                description: "Look up definition in dictionary",
+        Object (title: _ ("Define"),
+                description: _ ("Look up definition in dictionary"),
                 has_thumbnail: false, icon_name: "accessories-dictionary");
       }
     }
@@ -63,11 +63,11 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (DictionaryPlugin),
         "Dictionary",
-        "Look up definitions of words.",
+        _ ("Look up definitions of words."),
         "accessories-dictionary",
         register_plugin,
         Environment.find_program_in_path ("gnome-dictionary") != null,
-        "Gnome Dictionary is not installed"
+        _ ("Gnome Dictionary is not installed")
       );
     }
 

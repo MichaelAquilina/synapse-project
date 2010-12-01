@@ -48,8 +48,8 @@ namespace Synapse
 
       public ShutDownAction ()
       {
-        Object (match_type: MatchType.ACTION, title: "Shut Down",
-                description: "Turn your computer off",
+        Object (match_type: MatchType.ACTION, title: _ ("Shut Down"),
+                description: _ ("Turn your computer off"),
                 icon_name: "system-shutdown", has_thumbnail: false);
       }
       
@@ -84,8 +84,8 @@ namespace Synapse
 
       public RebootAction ()
       {
-        Object (match_type: MatchType.ACTION, title: "Restart",
-                description: "Restart your computer",
+        Object (match_type: MatchType.ACTION, title: _ ("Restart"),
+                description: _ ("Restart your computer"),
                 icon_name: "gnome-session-reboot", has_thumbnail: false);
       }
       
@@ -120,8 +120,8 @@ namespace Synapse
 
       public LogOutAction ()
       {
-        Object (match_type: MatchType.ACTION, title: "Log Out",
-                description: "Close your session and return to the login screen",
+        Object (match_type: MatchType.ACTION, title: _ ("Log Out"),
+                description: _ ("Close your session and return to the login screen"),
                 icon_name: "gnome-session-logout", has_thumbnail: false);
       }
       
@@ -149,11 +149,11 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (GnomeSessionPlugin),
         "Gnome session plugin",
-        "Allows you to log out from your session, restart and shutdown your computer.",
+        _ ("Allows you to log out from your session, restart and shutdown your computer."),
         "gnome-session-logout",
         register_plugin,
         DBusNameCache.get_default ().name_has_owner (GnomeSessionManager.UNIQUE_NAME),
-        "Gnome Session Manager wan't found"
+        _ ("Gnome Session Manager wan't found")
       );
     }
 
