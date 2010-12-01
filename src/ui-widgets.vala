@@ -569,14 +569,14 @@ namespace Synapse
       if (rs==null || rs.size == 0)
         status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
       else
-        status.set_markup (Markup.printf_escaped ("<b>1 / %d</b>", view.get_list_size ()));
+        status.set_markup (Markup.printf_escaped (_("<b>1 of %d</b>"), view.get_list_size ()));
     }
     public void move_selection_to_index (int i)
     {
       if (view.get_list_size () == 0) return;
       view.scroll_to (i);
       view.selected = i;
-      status.set_markup (Markup.printf_escaped ("<b>%d / %d</b>", i + 1, view.get_list_size ()));
+      status.set_markup (Markup.printf_escaped (_("<b>%d of %d</b>"), i + 1, view.get_list_size ()));
     }
   }
 
