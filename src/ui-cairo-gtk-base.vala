@@ -63,6 +63,7 @@ namespace Synapse
     construct
     {
       window = new Window ();
+      window.set_name ("synapse");
       window.skip_taskbar_hint = true;
       window.skip_pager_hint = true;
       window.set_position (WindowPosition.CENTER);
