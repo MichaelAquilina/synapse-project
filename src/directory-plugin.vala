@@ -146,6 +146,7 @@ namespace Synapse
            dir = dir + 1)
       {
         var path = Environment.get_user_special_dir (dir);
+        if (path == null) continue;
         var f = File.new_for_path (path);
         var uri = f.get_uri ();
         if (uri in directory_info_map) continue;
@@ -211,8 +212,17 @@ namespace Synapse
       
       if (home_dir_uri == null)
       {
-        var home = File.new_for_path (Environment.get_home_dir ());
-        home_dir_uri = home.get_uri () + "/";
+        var home_dir = Environment.get_home_dir ();
+        if (home_dir != null)
+        {
+          var home = File.new_for_path (home_dir);
+          home_dir_uri = home.get_uri () + "/";
+        }
+        else
+        {
+          warning ("Home directory is not set!");
+          home_dir_uri = "file:///home/";
+        }
       }
 
       foreach (var dir in dirs)
