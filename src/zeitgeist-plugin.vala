@@ -23,6 +23,7 @@ namespace Synapse
 {
   public class ZeitgeistPlugin: DataPlugin
   {
+    private const string UNIQUE_NAME = "org.gnome.zeitgeist.Engine";
     private class MatchObject: Object, Match, UriMatch
     {
       // for Match interface
@@ -104,7 +105,9 @@ namespace Synapse
         "Zeitgeist",
         "Search various items logged by Zeitgeist.",
         "zeitgeist",
-        register_plugin
+        register_plugin,
+        DBusNameCache.get_default ().name_is_activatable (UNIQUE_NAME),
+        "Zeitgeist is not installed"
       );
     }
 

@@ -31,14 +31,14 @@ namespace Synapse
   {
     protected string[] categories =
     {
-      "Actions",
-      "Audio",
-      "Applications",
-      "All",
-      "Documents",
-      "Images",
-      "Video",
-      "Internet"
+      _("Actions"),
+      _("Audio"),
+      _("Applications"),
+      _("All"),
+      _("Documents"),
+      _("Images"),
+      _("Video"),
+      _("Internet")
     };
     protected QueryFlags[] categories_query =
     {
@@ -51,8 +51,6 @@ namespace Synapse
       QueryFlags.VIDEO,
       QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
     };
-    
-    // TODO: i18n
 
     protected Window window = null;
     protected MenuButton menu = null;
@@ -65,6 +63,7 @@ namespace Synapse
     construct
     {
       window = new Window ();
+      window.set_name ("synapse");
       window.skip_taskbar_hint = true;
       window.skip_pager_hint = true;
       window.set_position (WindowPosition.CENTER);
@@ -201,8 +200,26 @@ namespace Synapse
     
     protected virtual bool key_press_event (Gdk.EventKey event)
     {
+      /* Check for text input */
       if (im_context.filter_keypress (event)) return true;
 
+      /* Check for Paste command Ctrl+V */
+      if ((event.state & Gdk.ModifierType.CONTROL_MASK) != 0 && 
+          (Gdk.keyval_to_lower (event.keyval) == (uint)'v'))
+      {
+        var display = window.get_display ();
+        var clipboard = Clipboard.get_for_display (display, Gdk.SELECTION_CLIPBOARD);
+        // Get text from clipboard
+        string text = clipboard.wait_for_text ();
+        if (searching_for_matches)
+          set_match_search (get_match_search () + text);
+        else
+          set_action_search (get_action_search () + text);
+        search_string_changed ();
+        return true;
+      }
+
+      /* Check for commands */
       CommandTypes command = get_command_from_key_event (event);
 
       switch (command)

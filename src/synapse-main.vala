@@ -104,6 +104,11 @@ namespace Synapse
       catch (Error err)
       {
         warning ("%s", err.message);
+        var d = new MessageDialog (settings.visible ? settings : null, 0, MessageType.ERROR, 
+                                     ButtonsType.CLOSE,
+                                     "%s", err.message);
+        d.run ();
+        d.destroy ();
       }/* */
     }
     

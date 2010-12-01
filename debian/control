@@ -22,7 +22,7 @@ Standards-Version: 3.9.1
 Package: synapse
 Architecture: any
 Depends: ${shlibs:Depends},
- ${misc:Depends},
+         ${misc:Depends},
 Recommends: zeitgeist (>= 0.5.0~) | zeitgeist-core (>= 0.5.0~),
             zeitgeist-fts-extension
 Description: semantic file launcher

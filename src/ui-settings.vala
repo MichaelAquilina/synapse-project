@@ -37,14 +37,16 @@ namespace Synapse
                      icon: info.icon_name,
                      pi: info,
                      show_action_button: info.runnable);
+        add_button_stock = Gtk.STOCK_YES;
+        remove_button_stock = Gtk.STOCK_NO;
       }
 
       construct
       {
-        sub_description_title = "Status"; // FIXME: i18n
+        sub_description_title = _("Status");
 
-        add_button_tooltip = "Enable this plugin"; // FIXME: i18n
-        remove_button_tooltip = "Disable this plugin"; // FIXME: i18n
+        add_button_tooltip = _("Enable this plugin");
+        remove_button_tooltip = _("Disable this plugin");
       }
 
       public void update_state (bool enabled)
@@ -53,11 +55,11 @@ namespace Synapse
 
         if (!this.enabled)
         {
-          sub_description_text = pi.runnable ? "Disabled" : pi.runnable_error; // i18n!
+          sub_description_text = pi.runnable ? _("Disabled") : pi.runnable_error;
         }
         else
         {
-          sub_description_text = "Enabled"; // i18n!
+          sub_description_text = _("Enabled");
         }
       }
       
@@ -107,7 +109,7 @@ namespace Synapse
 
     public SettingsWindow (DataSink data_sink)
     {
-      this.title = "Synapse - Settings"; //TODO: i18n
+      this.title = _("Synapse - Settings");
       this.data_sink = data_sink;
       this.set_position (WindowPosition.CENTER);
       this.set_size_request (500, 450);
@@ -128,10 +130,10 @@ namespace Synapse
     {
       themes = new Gee.HashMap<string, Theme?>();
 
-      themes["default"] = Theme ("Default", "", typeof (SynapseWindow)); //i18n
-      themes["mini"] = Theme ("Mini", "", typeof (SynapseWindowMini)); //i18n
-      themes["dual"] = Theme ("Dual", "", typeof (SynapseWindowTwoLines)); //i18n
-      themes["virgilio"] = Theme ("Virgilio", "", typeof (SynapseWindowVirgilio)); //i18n
+      themes["default"] = Theme (_("Default"), "", typeof (SynapseWindow));
+      themes["mini"] = Theme (_("Mini"), "", typeof (SynapseWindowMini));
+      themes["dual"] = Theme (_("Dual"), "", typeof (SynapseWindowTwoLines));
+      themes["virgilio"] = Theme (_("Virgilio"), "", typeof (SynapseWindowVirgilio));
 
       selected_theme = config.ui_type;
     }
@@ -220,32 +222,32 @@ namespace Synapse
       var plugin_tab = new VBox (false, 6);
       plugin_tab.border_width = 5;
       main_vbox.pack_start (tabs);
-      tabs.append_page (general_tab, new Label ("General"));
-      tabs.append_page (plugin_tab, new Label ("Plugins"));
+      tabs.append_page (general_tab, new Label (_("General")));
+      tabs.append_page (plugin_tab, new Label (_("Plugins")));
       
       /* General Tab */
       var theme_frame = new Frame (null);
       theme_frame.set_shadow_type (Gtk.ShadowType.NONE);
       var theme_frame_label = new Label (null);
-      theme_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", "Behavior & Look"));
+      theme_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", _("Behavior & Look")));
       theme_frame.set_label_widget (theme_frame_label);
 
       var behavior_vbox = new VBox (false, 4);
       var align = new Alignment (0.5f, 0.5f, 1.0f, 1.0f);
-      align.set_padding (0, 0, 10, 0);
+      align.set_padding (3, 12, 10, 0);
       align.add (behavior_vbox);
       theme_frame.add (align);
       
       /* Select theme combobox row */
       var row = new HBox (false, 5);
       behavior_vbox.pack_start (row, false);
-      var select_theme_label = new Label ("Select Theme:");
+      var select_theme_label = new Label (_("Theme:"));
       select_theme_label.xalign = 0.0f;
-      row.pack_start (select_theme_label, true, true);
+      row.pack_start (select_theme_label, false, false);
       row.pack_start (build_theme_combo (), false, false);
 
       /* Autostart checkbox */
-      var autostart = new CheckButton.with_label ("Startup on login");
+      var autostart = new CheckButton.with_label (_("Startup on login"));
       autostart.active = autostart_exists ();
       autostart.toggled.connect (this.autostart_toggled);
       behavior_vbox.pack_start (autostart, false);
@@ -256,17 +258,21 @@ namespace Synapse
       var shortcut_frame = new Frame (null);
       shortcut_frame.set_shadow_type (Gtk.ShadowType.NONE);
       var shortcut_frame_label = new Label (null);
-      shortcut_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", "Shortcuts"));
+      shortcut_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", _("Shortcuts")));
       shortcut_frame.set_label_widget (shortcut_frame_label);
       align = new Alignment (0.5f, 0.5f, 1.0f, 1.0f);
-      align.set_padding (0, 0, 10, 0);
-      
-      var tree_vbox = new VBox (false, 4);
+      align.set_padding (3, 0, 10, 0);
+
+      var shortcut_scroll = new Gtk.ScrolledWindow (null, null);    
+      shortcut_scroll.set_shadow_type (ShadowType.IN);
+      shortcut_scroll.set_policy (PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
+      var tree_vbox = new VBox (false, 6);
       Gtk.TreeView treeview = new Gtk.TreeView ();
-      tree_vbox.pack_start (treeview, false);
+      tree_vbox.pack_start (shortcut_scroll);
+      shortcut_scroll.add (treeview);
       align.add (tree_vbox);
       shortcut_frame.add (align);
-      general_tab.pack_start (shortcut_frame, false, false);
+      general_tab.pack_start (shortcut_frame, true, true);
       
       model = new Gtk.ListStore (2, typeof (string), typeof (string));
       treeview.set_model (model);
@@ -274,7 +280,7 @@ namespace Synapse
       Gtk.CellRenderer ren;
       Gtk.TreeViewColumn col;
       ren = new CellRendererText ();
-      col = new TreeViewColumn.with_attributes ("Action", ren, "text", 0); // FIXME: i18n
+      col = new TreeViewColumn.with_attributes (_("Action"), ren, "text", 0);
       treeview.append_column (col);
 
       ren = new CellRendererAccel ();
@@ -291,21 +297,21 @@ namespace Synapse
       {
         this.set_keybinding ("");
       });
-      col = new TreeViewColumn.with_attributes ("Shortcut", ren, "text",1);
+      col = new TreeViewColumn.with_attributes (_("Shortcut"), ren, "text",1);
       treeview.append_column (col);
 
       // add the actual item
       Gtk.TreeIter iter;
       model.append (out iter);
-      model.set (iter, 0, "Activate");
+      model.set (iter, 0, _("Activate"));
       
       /* Add info */
       
-      var info_box = new HBox (false, 12);
-      var info_image = new Image.from_stock (STOCK_INFO, IconSize.DND);
+      var info_box = new HBox (false, 6);
+      var info_image = new Image.from_stock (STOCK_INFO, IconSize.MENU);
       info_box.pack_start (info_image, false, true);
-      var info_label = new Label ("To edit a shortcut, double click it and press a new one.");
-      info_box.pack_start (info_label);
+      var info_label = new Label (_("To edit a shortcut, double click it and press a new one."));
+      info_box.pack_start (info_label, false, false);
       info_box.show_all ();
 
       tree_vbox.pack_start (info_box, false);
@@ -314,6 +320,7 @@ namespace Synapse
       var scroll = new Gtk.ScrolledWindow (null, null);
       scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
       tile_view = new UI.Widgets.TileView ();
+      tile_view.icon_size = 32;
       tile_view.show_all ();
       scroll.add_with_viewport (tile_view);
       scroll.show ();
@@ -341,7 +348,7 @@ namespace Synapse
         Gtk.TreeIter iter;
         if (model.get_iter_first (out iter))
         {
-          model.set (iter, 1, key != "" ? key : "Disabled");
+          model.set (iter, 1, key != "" ? key : _("Disabled"));
         }
       }
       if (emit) keybinding_changed (key);

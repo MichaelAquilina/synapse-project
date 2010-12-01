@@ -45,6 +45,8 @@ namespace Synapse
     private DBus.Connection connection;
     private FreeDesktopDBus proxy;
     private Gee.Set<string> owned_names;
+    private Gee.Set<string> activatable_names;
+    private Gee.Set<string> system_activatable_names;
     
     public bool initialized { get; private set; default = false; }
 
@@ -63,7 +65,9 @@ namespace Synapse
     {
       instance = this;
       owned_names = new Gee.HashSet<string> ();
-      
+      activatable_names = new Gee.HashSet<string> ();
+      system_activatable_names = new Gee.HashSet<string> ();
+
       initialize ();
     }
     
@@ -94,10 +98,21 @@ namespace Synapse
       return name in owned_names;
     }
     
+    public bool name_is_activatable (string name)
+    {
+      return name in activatable_names;
+    }
+    
+    public bool service_is_available (string name)
+    {
+      return name in system_activatable_names;
+    }
+    
     public signal void initialization_done ();
     
     private async void initialize ()
     {
+      string[] names;
       try
       {
         connection = DBus.Bus.get (DBus.BusType.SESSION);
@@ -107,16 +122,41 @@ namespace Synapse
                                  FreeDesktopDBus.INTERFACE_NAME);
 
         proxy.name_owner_changed.connect (this.name_owner_changed);
-        string[] names = yield proxy.list_names ();
+        names = yield proxy.list_names ();
         foreach (unowned string name in names)
         {
           if (name.has_prefix (":")) continue;
           owned_names.add (name);
         }
+        
+        names = yield proxy.list_activatable_names ();
+        foreach (unowned string session_act in names)
+        {
+          activatable_names.add (session_act);
+        }
       }
       catch (Error err)
       {
         warning ("%s", err.message);
+      }
+
+      try
+      {
+        connection = DBus.Bus.get (DBus.BusType.SYSTEM);
+        proxy = (FreeDesktopDBus)
+          connection.get_object (FreeDesktopDBus.UNIQUE_NAME,
+                                 FreeDesktopDBus.OBJECT_PATH,
+                                 FreeDesktopDBus.INTERFACE_NAME);
+
+        names = yield proxy.list_activatable_names ();
+        foreach (unowned string system_act in names)
+        {
+          system_activatable_names.add (system_act);
+        }
+      }
+      catch (Error sys_err)
+      {
+        warning ("%s", sys_err.message);
       }
       
       initialized = true;
