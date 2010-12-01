@@ -22,6 +22,8 @@ Architecture: any
 Depends: ${shlibs:Depends},
  ${misc:Depends},
  zeitgeist (>= 0.5.0~) | zeitgeist-core (>= 0.5.0~),
+ libjson-glib-1.0-0 (>= 0.10.0),
+ libgee2 (>= 0.5.2)
 Description: semantic file launcher
  Synapse is a graphical launcher enabling you to start applications and also
  to quickly find and access relevant documents and files (by making use of the
