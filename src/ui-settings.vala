@@ -242,9 +242,8 @@ namespace Synapse
       var row = new HBox (false, 5);
       behavior_vbox.pack_start (row, false);
       var select_theme_label = new Label (_("Theme:"));
-      select_theme_label.xalign = 0.0f;
       row.pack_start (select_theme_label, false, false);
-      row.pack_start (build_theme_combo (), false, false);
+      row.pack_end (build_theme_combo (), false, false);
 
       /* Autostart checkbox */
       var autostart = new CheckButton.with_label (_("Startup on login"));
