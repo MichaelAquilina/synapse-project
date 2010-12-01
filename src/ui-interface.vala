@@ -88,15 +88,22 @@ namespace Synapse
     private bool search_with_empty;
     private bool handle_empty;
     
-    //TODO : i18n
-    protected string SEARCHING = _("Searching...");
-    protected string NO_RESULTS = _("No results found.");
-    protected string NO_RECENT_ACTIVITIES = _("No recent activities found.");
-    protected string TYPE_TO_SEARCH = _("Type to search...");
-    protected string DOWN_TO_SEE_RECENT = "";
+    protected static string SEARCHING;
+    protected static string NO_RESULTS;
+    protected static string NO_RECENT_ACTIVITIES;
+    protected static string TYPE_TO_SEARCH;
+    protected static string DOWN_TO_SEE_RECENT;
     
     private uint tid; //for timer
     
+    static construct
+    {
+      SEARCHING = _("Searching...");
+      NO_RESULTS = _("No results found.");
+      NO_RECENT_ACTIVITIES = _("No recent activities found.");
+      TYPE_TO_SEARCH = _("Type to search...");
+      DOWN_TO_SEE_RECENT = "";
+    }
     construct
     {
       command_map = new Gee.HashMap<uint, CommandTypes> ();
