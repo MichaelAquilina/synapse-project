@@ -30,6 +30,8 @@ fi
 
 AC_PROG_INSTALL
 AC_PROG_CC
+AM_PROG_CC_C_O
+AC_PROG_LIBTOOL
 AC_STDC_HEADERS
 
 dnl ==============================================
@@ -73,6 +75,7 @@ AC_CONFIG_FILES([
 Makefile
 data/Makefile
 src/Makefile
+src/tile-view/Makefile
 po/Makefile.in
 ])
 

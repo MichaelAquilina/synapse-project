@@ -1,6 +1,6 @@
-synapsedir = $(bindir)
+SUBDIRS = tile-view
 
-synapse_PROGRAMS = synapse
+bin_PROGRAMS = synapse
 
 VAPIDIR = $(top_srcdir)/vapi
 
@@ -10,17 +10,28 @@ synapse_VALAFLAGS = \
 	--pkg gio-unix-2.0 \
 	--pkg zeitgeist-1.0 \
 	--pkg gee-1.0 \
-	--pkg gtkhotkey-1.0 \
 	--pkg json-glib-1.0 \
 	--pkg unique-1.0 \
+	--vapidir $(srcdir)/tile-view \
+	--pkg tile-view \
 	--vapidir $(VAPIDIR) \
+	--pkg gtkhotkey-1.0 \
 	$(VAPIDIR)/keysyms.vapi \
 	$(VAPIDIR)/cancellable-fix.vapi \
 	$(VAPIDIR)/config.vapi \
 	$(NULL)
 
-synapse_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h
-synapse_LDADD = $(SYNAPSE_MODULES_LIBS)
+synapse_CFLAGS = \
+	$(SYNAPSE_MODULES_CFLAGS) \
+	-include config.h \
+	-I$(top_srcdir)/src/tile-view \
+	$(NULL)
+
+synapse_LDADD = \
+	$(SYNAPSE_MODULES_LIBS) \
+	tile-view/libtileview.la \
+	$(NULL)
+
 synapse_SOURCES = \
 	configuration.vala \
 	common-actions.vala \
@@ -55,9 +66,5 @@ synapse_SOURCES = \
 	ui-utils.vala \
 	ui-settings.vala \
 	ui-inspector.vala \
-	abstract-tile-object.vala \
-	tile.vala \
-	tile-view.vala \
-	wrap-label.vala \
 	$(NULL)
 
