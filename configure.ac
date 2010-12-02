@@ -75,6 +75,8 @@ AC_CONFIG_FILES([
 Makefile
 data/Makefile
 src/Makefile
+src/core/Makefile
+src/plugins/Makefile
 src/tile-view/Makefile
 po/Makefile.in
 ])

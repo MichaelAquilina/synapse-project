@@ -1,4 +1,4 @@
-SUBDIRS = tile-view
+SUBDIRS = core plugins tile-view
 
 bin_PROGRAMS = synapse
 
@@ -12,6 +12,10 @@ synapse_VALAFLAGS = \
 	--pkg gee-1.0 \
 	--pkg json-glib-1.0 \
 	--pkg unique-1.0 \
+	--vapidir $(srcdir)/core \
+	--pkg synapse-core \
+	--vapidir $(srcdir)/plugins \
+	--pkg plugins \
 	--vapidir $(srcdir)/tile-view \
 	--pkg tile-view \
 	--vapidir $(VAPIDIR) \
@@ -24,37 +28,19 @@ synapse_VALAFLAGS = \
 synapse_CFLAGS = \
 	$(SYNAPSE_MODULES_CFLAGS) \
 	-include config.h \
+	-I$(top_srcdir)/src/core \
+	-I$(top_srcdir)/src/plugins \
 	-I$(top_srcdir)/src/tile-view \
 	$(NULL)
 
 synapse_LDADD = \
 	$(SYNAPSE_MODULES_LIBS) \
+	core/libsynapsecore.la \
+	plugins/libplugins.la \
 	tile-view/libtileview.la \
 	$(NULL)
 
 synapse_SOURCES = \
-	configuration.vala \
-	common-actions.vala \
-	data-sink.vala \
-	plugin.vala \
-	match.vala \
-	query.vala \
-	result-set.vala \
-	dbus-service.vala \
-	desktop-file-service.vala \
-	command-plugin.vala \
-	desktop-file-plugin.vala \
-	dictionary.vala \
-	devhelp-search.vala \
-	directory-plugin.vala \
-	hybrid-search-plugin.vala \
-	locate-plugin.vala \
-	gnome-session-plugin.vala \
-	upower-plugin.vala \
-	zeitgeist-plugin.vala \
-	rhythmbox-plugin.vala \
-	banshee-plugin.vala \
-	test-slow-plugin.vala \
 	synapse-main.vala \
 	ui-cairo-gtk-base.vala \
 	ui-cairo-gtk.vala \

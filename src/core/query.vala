@@ -98,7 +98,7 @@ namespace Synapse
     public static Gee.List<Gee.Map.Entry<Regex, int>>
     get_matchers_for_query (string query,
                             MatcherFlags match_flags = 0,
-                            RegexCompileFlags flags = RegexCompileFlags.OPTIMIZE)
+                            RegexCompileFlags flags = GLib.RegexCompileFlags.OPTIMIZE)
     {
       /* create a couple of regexes and try to help with matching
        * match with these regular expressions (with descending score):

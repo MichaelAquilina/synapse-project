@@ -50,6 +50,7 @@ namespace Synapse
       ui = null;
       config = Configuration.get_default ();
       data_sink = new DataSink ();
+      register_plugins ();
       settings = new SettingsWindow (data_sink);
       settings.keybinding_changed.connect (this.change_keyboard_shortcut);
       
@@ -76,6 +77,34 @@ namespace Synapse
         settings.show ();
       });
     }
+    
+    private void register_plugins ()
+    {
+      // while we don't install proper plugin .so files, we'll do it this way
+      Type[] plugin_types =
+      {
+        typeof (DesktopFilePlugin),
+        typeof (ZeitgeistPlugin),
+        typeof (HybridSearchPlugin),
+        //typeof (LocatePlugin),
+        typeof (GnomeSessionPlugin),
+        typeof (UPowerPlugin),
+        typeof (CommandPlugin),
+        typeof (RhythmboxActions),
+        typeof (BansheeActions),
+        typeof (DirectoryPlugin),
+#if TEST_PLUGINS
+        typeof (TestSlowPlugin),
+#endif
+        typeof (DictionaryPlugin),
+        typeof (DevhelpPlugin)
+      };
+      foreach (Type t in plugin_types)
+      {
+        data_sink.register_static_plugin (t);
+      }
+    }
+    
     private void bind_keyboard_shortcut ()
     {
       var registry = GtkHotkey.Registry.get_default ();

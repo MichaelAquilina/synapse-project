@@ -192,11 +192,13 @@ namespace Synapse
     private DBusNameCache dbus_name_cache;
     private DesktopFileService desktop_file_service;
     private PluginRegistry registry;
+    private Type[] plugin_types;
 
     construct
     {
       plugins = new Gee.HashSet<DataPlugin> ();
       actions = new Gee.HashSet<ActionPlugin> ();
+      plugin_types = {};
       query_id = 0;
 
       var cfg = Configuration.get_default ();
@@ -205,8 +207,9 @@ namespace Synapse
 
       // oh well, yea we need a few singletons
       registry = PluginRegistry.get_default ();
-      
+
       initialize_caches ();
+      register_static_plugin (typeof (CommonActions));
     }
     
     private async void initialize_caches ()
@@ -299,28 +302,7 @@ namespace Synapse
 
     private void load_plugins ()
     {
-      // FIXME: turn into proper modules
-      Type[] plugin_types =
-      {
-        typeof (DesktopFilePlugin),
-        typeof (ZeitgeistPlugin),
-        typeof (HybridSearchPlugin),
-        //typeof (LocatePlugin),
-        typeof (GnomeSessionPlugin),
-        typeof (UPowerPlugin),
-        typeof (CommandPlugin),
-        typeof (RhythmboxActions),
-        typeof (BansheeActions),
-        typeof (DirectoryPlugin),
-#if TEST_PLUGINS
-        typeof (TestSlowPlugin),
-#endif
-
-        typeof (CommonActions),
-        typeof (DictionaryPlugin),
-        typeof (DevhelpPlugin)
-      };
-
+      // FIXME: fetch and load modules
       foreach (Type t in plugin_types)
       {
         t.class_ref (); // makes the plugin register itself into PluginRegistry
@@ -331,6 +313,14 @@ namespace Synapse
       }
 
       plugins_loaded = true;
+    }
+    
+    /* This needs to be called right after instantiation,
+     * if plugins_loaded == true, it won't have any effect. */
+    public void register_static_plugin (Type plugin_type)
+    {
+      if (plugin_type in plugin_types) return;
+      plugin_types += plugin_type;
     }
     
     public unowned DataPlugin? get_plugin (string name)
