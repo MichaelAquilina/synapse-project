@@ -138,7 +138,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlayerEngine) conn.get_object (BansheePlayerEngine.UNIQUE_NAME,
-                                                              BansheePlayerEngine.OBJECT_PATH);
+                                                              BansheePlayerEngine.OBJECT_PATH,
+                                                              BansheePlayerEngine.INTERFACE_NAME);
           player.play ();
         } catch (DBus.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
@@ -164,7 +165,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlayerEngine) conn.get_object (BansheePlayerEngine.UNIQUE_NAME,
-                                                              BansheePlayerEngine.OBJECT_PATH);
+                                                              BansheePlayerEngine.OBJECT_PATH,
+                                                              BansheePlayerEngine.INTERFACE_NAME);
           player.pause ();
         } catch (DBus.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
@@ -186,7 +188,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlaybackController) conn.get_object (BansheePlaybackController.UNIQUE_NAME,
-                                                                    BansheePlaybackController.OBJECT_PATH);
+                                                                    BansheePlaybackController.OBJECT_PATH,
+                                                                    BansheePlaybackController.INTERFACE_NAME);
           player.next (false);
         } catch (DBus.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
@@ -208,7 +211,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlaybackController) conn.get_object (BansheePlaybackController.UNIQUE_NAME,
-                                                                    BansheePlaybackController.OBJECT_PATH);
+                                                                    BansheePlaybackController.OBJECT_PATH,
+                                                                    BansheePlaybackController.INTERFACE_NAME);
           player.previous (false);
         } catch (DBus.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
@@ -236,7 +240,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlayQueue) conn.get_object (BansheePlayQueue.UNIQUE_NAME,
-                                                           BansheePlayQueue.OBJECT_PATH);
+                                                           BansheePlayQueue.OBJECT_PATH,
+                                                           BansheePlayQueue.INTERFACE_NAME);
           player.enqueue_uri (uri.uri, false);
         } catch (DBus.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
@@ -278,7 +283,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlayerEngine) conn.get_object (BansheePlayerEngine.UNIQUE_NAME,
-                                                              BansheePlayerEngine.OBJECT_PATH);
+                                                              BansheePlayerEngine.OBJECT_PATH,
+                                                              BansheePlayerEngine.INTERFACE_NAME);
           player.open (uri.uri);
           player.play ();
         } catch (DBus.Error e) {

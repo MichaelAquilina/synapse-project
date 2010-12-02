@@ -134,10 +134,24 @@ namespace Synapse
       public override void do_action ()
       {
         try {
+         bool player_opened = DBusNameCache.get_default ().name_has_owner (
+                                                          RhythmboxPlayer.UNIQUE_NAME);
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Player");
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
           player.play_pause (true);
+          if (!player_opened)
+          {
+            Timeout.add (500, ()=>{
+              if (!player.get_playing ())
+              {
+                player.play_pause (true);
+                return true;
+              }
+              return false;
+            });
+          }
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
@@ -178,8 +192,9 @@ namespace Synapse
       {
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Player");
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
           player.next ();
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
@@ -200,8 +215,9 @@ namespace Synapse
       {
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Player");
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
           player.previous ();
           player.previous ();
         } catch (DBus.Error e) {
@@ -228,10 +244,12 @@ namespace Synapse
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var shell = (RhythmboxShell) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Shell");
-          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Player");
+          var shell = (RhythmboxShell) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
           shell.add_to_queue (uri.uri);
           if (!player.get_playing())
             player.play_pause (true);
