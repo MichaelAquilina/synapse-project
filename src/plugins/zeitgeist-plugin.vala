@@ -103,7 +103,7 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (ZeitgeistPlugin),
         "Zeitgeist",
-        _ ("Search various items logged by Zeitgeist."),
+        _ ("Search recently-used items logged by Zeitgeist."),
         "zeitgeist",
         register_plugin,
         DBusNameCache.get_default ().name_is_activatable (UNIQUE_NAME),
