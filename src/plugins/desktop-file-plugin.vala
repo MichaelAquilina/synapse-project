@@ -44,6 +44,8 @@ namespace Synapse
         if (title_folded == null) title_folded = title.casefold ();
         return title_folded;
       }
+      
+      public string? title_unaccented { get; set; default = null; }
 
       public string exec { get; set; }
 
@@ -62,6 +64,7 @@ namespace Synapse
         this.exec = info.exec;
         this.needs_terminal = info.needs_terminal;
         this.title_folded = info.get_name_folded ();
+        this.title_unaccented = Utils.remove_accents (this.title_folded);
       }
     }
 
@@ -142,6 +145,10 @@ namespace Synapse
         {
           results.add (dfi, Query.MATCH_PREFIX);
         }
+        else if (dfi.title_unaccented != null && dfi.title_unaccented.has_prefix (query))
+        {
+          results.add (dfi, Query.MATCH_PREFIX - Query.MATCH_PENALTY_SMALL);
+        }
         else if (dfi.exec.has_prefix (q.query_string))
         {
           results.add (dfi, 60);
@@ -157,6 +164,7 @@ namespace Synapse
       foreach (var dfi in desktop_files)
       {
         unowned string folded_title = dfi.get_title_folded ();
+        unowned string unaccented_title = dfi.title_unaccented;
         bool matched = false;
         // FIXME: we need to do much smarter relevancy computation in fuzzy re
         // "sysmon" matching "System Monitor" is very good as opposed to
@@ -166,6 +174,12 @@ namespace Synapse
           if (matcher.key.match (folded_title))
           {
             results.add (dfi, matcher.value);
+            matched = true;
+            break;
+          }
+          else if (unaccented_title != null && matcher.key.match (unaccented_title))
+          {
+            results.add (dfi, matcher.value - Query.MATCH_PENALTY_SMALL);
             matched = true;
             break;
           }

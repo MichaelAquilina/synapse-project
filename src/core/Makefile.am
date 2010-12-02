@@ -25,6 +25,7 @@ libsynapsecore_la_VALASOURCES = \
 	plugin.vala \
 	query.vala \
 	result-set.vala \
+	utils.vala \
 	$(NULL)
 libsynapsecore_la_SOURCES = \
 	synapse-core.vala.stamp \

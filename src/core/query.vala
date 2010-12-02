@@ -94,6 +94,10 @@ namespace Synapse
     public const int MATCH_SUBSTRING = 75;
     public const int MATCH_FIRST_LETTERS = 70;
     public const int MATCH_FUZZY = 50;
+    
+    public const int MATCH_PENALTY_SMALL = 5;
+    public const int MATCH_PENALTY_MEDIUM = 10;
+    public const int MATCH_PENALTY_LARGE = 20;
 
     public static Gee.List<Gee.Map.Entry<Regex, int>>
     get_matchers_for_query (string query,

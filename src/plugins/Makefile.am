@@ -22,7 +22,7 @@ libplugins_la_CFLAGS = \
 	-include config.h \
         -I$(top_srcdir)/src/core \
 	$(NULL)
-libplugins_la_LIBADD = $(SYNAPSE_MODULES_LIBS)
+libplugins_la_LIBADD = $(SYNAPSE_MODULES_LIBS) ../core/libsynapsecore.la
 libplugins_la_VALASOURCES = \
 	banshee-plugin.vala \
 	command-plugin.vala \
