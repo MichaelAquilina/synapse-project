@@ -134,8 +134,7 @@ namespace Synapse
       public override void do_action ()
       {
         try {
-         bool player_opened = DBusNameCache.get_default ().name_has_owner (
-                                                          RhythmboxPlayer.UNIQUE_NAME);
+          bool player_opened = DBusNameCache.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH,
@@ -143,8 +142,11 @@ namespace Synapse
           player.play_pause (true);
           if (!player_opened)
           {
+            /* Try to play 10 times = 5 seconds waiting for RB to start */
+            int i = 0;
             Timeout.add (500, ()=>{
-              if (!player.get_playing ())
+              ++i;
+              if (i <= 10 && !player.get_playing ())
               {
                 player.play_pause (true);
                 return true;
