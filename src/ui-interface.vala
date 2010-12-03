@@ -134,7 +134,7 @@ namespace Synapse.Gui
     /* UI must do the following things */
     public abstract void show ();
     public abstract void hide ();
-    public abstract void present_with_time (uint32 timestamp);
+    public abstract void show_hide_with_time (uint32 timestamp);
     public signal void show_settings_clicked ();
 
     protected abstract void focus_match ( int index, Match? match );

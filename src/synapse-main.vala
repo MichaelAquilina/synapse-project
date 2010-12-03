@@ -128,8 +128,7 @@ namespace Synapse
         hotkey.activated.connect ((event_time) =>
         {
           if (this.ui == null) return;
-          this.ui.show ();
-          this.ui.present_with_time (event_time);
+          this.ui.show_hide_with_time (event_time);
         });
       }
       catch (Error err)
@@ -171,8 +170,7 @@ namespace Synapse
           hotkey.activated.connect ((event_time) =>
           {
             if (this.ui == null) return;
-            this.ui.show ();
-            this.ui.present_with_time (event_time);
+            this.ui.show_hide_with_time (event_time);
           });
         }
       }
@@ -219,8 +217,7 @@ namespace Synapse
             {
               if (launcher.ui != null)
               {
-                launcher.ui.show ();
-                launcher.ui.present_with_time (event_time);
+                launcher.ui.show_hide_with_time (event_time);
               }
                                                   
               return Unique.Response.OK;

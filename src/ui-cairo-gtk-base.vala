@@ -57,7 +57,7 @@ namespace Synapse.Gui
     protected Throbber throbber = null;
     protected HTextSelector flag_selector = null;
     protected bool searching_for_matches = true;
-
+    
     protected IMContext im_context;
     
     construct
@@ -70,10 +70,7 @@ namespace Synapse.Gui
       window.set_decorated (false);
       window.set_resizable (false);
       window.notify["is-active"].connect (()=>{
-        if (!window.is_active && (menu == null || !menu.is_menu_visible ()))
-        {
-          hide_and_reset ();
-        }
+        Idle.add (check_focus);
       });
       
       /* Query flag selector  */
@@ -104,6 +101,15 @@ namespace Synapse.Gui
     ~GtkCairoBase ()
     {
       window.destroy ();
+    }
+    
+    private bool check_focus ()
+    {
+      if (!window.is_active && (menu == null || !menu.is_menu_visible ()))
+      {
+        hide_and_reset ();
+      }
+      return false;
     }
 
     protected signal void search_string_changed ();
@@ -345,8 +351,14 @@ namespace Synapse.Gui
     {
       hide_and_reset ();
     }
-    public override void present_with_time (uint32 timestamp)
+    public override void show_hide_with_time (uint32 timestamp)
     {
+      if (window.visible)
+      {
+        hide ();
+        return;
+      }
+      show ();
       window.present_with_time (timestamp);
     }    
     protected override void set_throbber_visible (bool visible)
