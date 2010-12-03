@@ -22,7 +22,7 @@
 
 using Gee;
 
-namespace Synapse
+namespace Synapse.Gui
 {
   /* The target of this abstract class, is to separate model/control from view. */
   /* Each IU must implement this abstract class by translating user input into actions for this class. */

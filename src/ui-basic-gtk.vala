@@ -21,7 +21,7 @@
 
 using Gtk;
 
-namespace Synapse
+namespace Synapse.Gui
 {
   public class SynapseWindow: Window
   {

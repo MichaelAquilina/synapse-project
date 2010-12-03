@@ -23,9 +23,9 @@
 using Gtk;
 using Cairo;
 using Gee;
-using Synapse.Utils;
+using Synapse.Gui.Utils;
 
-namespace Synapse
+namespace Synapse.Gui
 {
   public class SynapseWindowTwoLines : GtkCairoBase
   {
@@ -134,7 +134,7 @@ namespace Synapse
       flag_selector.selected = 3;
 
       /* Throbber and menu */
-      menuthrobber = new Synapse.MenuThrobber ();
+      menuthrobber = new MenuThrobber ();
       menu = (MenuButton) menuthrobber;
       menuthrobber.set_size_request (ACTION_ICON_SIZE, 22);
       menuthrobber.settings_clicked.connect (()=>{this.show_settings_clicked ();});

@@ -22,9 +22,9 @@
 using Gtk;
 using Cairo;
 using Gee;
-using Synapse.Utils;
+using Synapse.Gui.Utils;
 
-namespace Synapse
+namespace Synapse.Gui
 {
   public class SynapseWindowVirgilio : GtkCairoBase
   {
@@ -75,7 +75,7 @@ namespace Synapse
     protected ListView<Match> list_view_actions = null;
     protected MatchRenderer list_view_actions_renderer = null;
     
-    protected Synapse.MenuThrobber menuthrobber = null;
+    protected MenuThrobber menuthrobber = null;
 
     private const int UI_WIDTH = 550; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
@@ -138,7 +138,7 @@ namespace Synapse
         var hbox = new HBox (false, 0);
         
         /* Throbber and menu */
-        menuthrobber = new Synapse.MenuThrobber ();
+        menuthrobber = new MenuThrobber ();
         menu = (MenuButton) menuthrobber;
         menuthrobber.set_size_request (24, 24);
         menuthrobber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
@@ -389,7 +389,7 @@ namespace Synapse
       if (list_view_matches == null) return;
       if (matches != null && matches.size > 0)
       {
-        foreach (Synapse.Match m in matches)
+        foreach (Match m in matches)
         {
           m.description = Utils.replace_home_path_with (m.description, _("Home"), " > ");
         }

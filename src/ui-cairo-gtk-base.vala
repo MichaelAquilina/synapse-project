@@ -23,9 +23,9 @@
 using Gtk;
 using Cairo;
 using Gee;
-using Synapse.Utils;
+using Synapse.Gui.Utils;
 
-namespace Synapse
+namespace Synapse.Gui
 {
   public abstract class GtkCairoBase : UIInterface
   {
@@ -54,7 +54,7 @@ namespace Synapse
 
     protected Window window = null;
     protected MenuButton menu = null;
-    protected Synapse.Throbber throbber = null;
+    protected Throbber throbber = null;
     protected HTextSelector flag_selector = null;
     protected bool searching_for_matches = true;
 

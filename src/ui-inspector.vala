@@ -21,7 +21,7 @@
 
 using Gtk;
 
-namespace Synapse
+namespace UI
 {
   public class Inspector
   {

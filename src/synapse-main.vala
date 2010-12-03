@@ -21,6 +21,8 @@
  */
 
 using Gtk;
+using Synapse.Gui;
+using UI;
 
 namespace Synapse
 {

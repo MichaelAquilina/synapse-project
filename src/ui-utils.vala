@@ -20,7 +20,7 @@
  *
  */
 
-namespace Synapse
+namespace Synapse.Gui
 {
   namespace Utils
   {

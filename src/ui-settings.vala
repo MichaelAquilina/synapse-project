@@ -23,7 +23,7 @@
 using Gtk;
 using Gee;
 
-namespace Synapse
+namespace Synapse.Gui
 {
   public class SettingsWindow : Gtk.Window
   {
