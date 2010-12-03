@@ -62,13 +62,15 @@ namespace Synapse.Gui
     
     construct
     {
-      window = new Window ();
+      window = new Window (Gtk.WindowType.TOPLEVEL);
       window.set_name ("synapse");
       window.skip_taskbar_hint = true;
       window.skip_pager_hint = true;
       window.set_position (WindowPosition.CENTER);
       window.set_decorated (false);
       window.set_resizable (false);
+      window.set_type_hint (Gdk.WindowTypeHint.SPLASHSCREEN);
+      window.set_keep_above (true);
       window.notify["is-active"].connect (()=>{
         Idle.add (check_focus);
       });
@@ -345,6 +347,7 @@ namespace Synapse.Gui
       Utils.move_window_to_center (window);
       show_list (false);
       window.show ();
+      window.get_window ().raise ();
       set_input_mask ();
     }
     public override void hide ()
