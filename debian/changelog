@@ -5,6 +5,7 @@ synapse (0.2.0+bzr-2) UNRELEASED; urgency=low
    - Bump libgtk2.0-dev, libglib2.0-dev and intltool requierement.
    - Update Vcs-*.
    - Build-depends on pkg-config.
+   - Build-depends on libappindicator-dev.
   * debian/docs:
    - Add upstream documentation.
   * debian/watch
