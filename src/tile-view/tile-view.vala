@@ -182,6 +182,7 @@ namespace UI.Widgets
         if (alloc.y + alloc.height > va.y + va.height)
         {
           delta = alloc.y + alloc.height - (va.y + va.height);
+          delta += this.style.ythickness * 2;
         }
         else if (alloc.y < va.y)
         {

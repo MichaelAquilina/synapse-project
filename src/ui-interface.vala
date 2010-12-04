@@ -22,7 +22,7 @@
 
 using Gee;
 
-namespace Synapse
+namespace Synapse.Gui
 {
   /* The target of this abstract class, is to separate model/control from view. */
   /* Each IU must implement this abstract class by translating user input into actions for this class. */
@@ -134,7 +134,7 @@ namespace Synapse
     /* UI must do the following things */
     public abstract void show ();
     public abstract void hide ();
-    public abstract void present_with_time (uint32 timestamp);
+    public abstract void show_hide_with_time (uint32 timestamp);
     public signal void show_settings_clicked ();
 
     protected abstract void focus_match ( int index, Match? match );

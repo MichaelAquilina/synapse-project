@@ -23,7 +23,7 @@
 using Gtk;
 using Gee;
 
-namespace Synapse
+namespace Synapse.Gui
 {
   public class SettingsWindow : Gtk.Window
   {
@@ -36,9 +36,9 @@ namespace Synapse
                      description: info.description,
                      icon: info.icon_name,
                      pi: info,
-                     show_action_button: info.runnable);
-        add_button_stock = Gtk.STOCK_YES;
-        remove_button_stock = Gtk.STOCK_NO;
+                     show_action_button: info.runnable,
+                     add_button_stock: Gtk.STOCK_YES,
+                     remove_button_stock: Gtk.STOCK_NO);
       }
 
       construct
@@ -318,9 +318,10 @@ namespace Synapse
       /* Plugin Tab */
       var scroll = new Gtk.ScrolledWindow (null, null);
       scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+      scroll.set_shadow_type (Gtk.ShadowType.IN);
       tile_view = new UI.Widgets.TileView ();
       tile_view.icon_size = 32;
-      tile_view.show_all ();
+      tile_view.show ();
       scroll.add_with_viewport (tile_view);
       scroll.show ();
 

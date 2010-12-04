@@ -59,8 +59,8 @@ namespace Synapse
     {
       public SuspendAction ()
       {
-        Object (match_type: MatchType.ACTION, title: "Suspend",
-                description: "Put your computer into suspend mode",
+        Object (match_type: MatchType.ACTION, title: _ ("Suspend"),
+                description: _ ("Put your computer into suspend mode"),
                 icon_name: "system-suspend", has_thumbnail: false);
       }
 
@@ -117,8 +117,8 @@ namespace Synapse
     {
       public HibernateAction ()
       {
-        Object (match_type: MatchType.ACTION, title: "Hibernate",
-                description: "Put your computer into hibernation mode",
+        Object (match_type: MatchType.ACTION, title: _ ("Hibernate"),
+                description: _ ("Put your computer into hibernation mode"),
                 icon_name: "system-hibernate", has_thumbnail: false);
       }
 
@@ -176,11 +176,11 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (UPowerPlugin),
         "UPower",
-        "Allows you to suspend & hibernate your computer.",
+        _ ("Allows you to suspend & hibernate your computer."),
         "system-suspend",
         register_plugin,
         DBusNameCache.get_default ().service_is_available (UPowerObject.UNIQUE_NAME),
-        "UPower wasn't found"
+        _ ("UPower wasn't found")
       );
     }
 

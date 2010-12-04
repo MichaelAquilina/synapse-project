@@ -40,7 +40,7 @@ namespace Synapse
       
       public CommandObject (string cmd)
       {
-        Object (title: cmd, description: "Run command", icon_name: "unknown",
+        Object (title: cmd, description: _ ("Run command"), icon_name: "unknown",
                 match_type: MatchType.APPLICATION,
                 needs_terminal: cmd.has_prefix ("sudo "));
 
@@ -53,7 +53,7 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (CommandPlugin),
         "Commands",
-        "Allow execution of arbitrary commands.",
+        _ ("Allow execution of arbitrary commands."),
         "system-run",
         register_plugin
       );

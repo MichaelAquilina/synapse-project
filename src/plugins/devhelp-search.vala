@@ -21,9 +21,9 @@
 
 namespace Synapse
 {
-  public class DictionaryPlugin: ActionPlugin
+  public class DevhelpPlugin: ActionPlugin
   {
-    private class Define: Object, Match
+    private class Search: Object, Match
     {
       // from Match interface
       public string title { get; construct set; }
@@ -40,8 +40,8 @@ namespace Synapse
         try
         {
           AppInfo ai = AppInfo.create_from_commandline (
-            "gnome-dictionary \"%s\"".printf (match.title),
-            "gnome-dictionary", 0);
+            "devhelp -s \"%s\"".printf (match.title),
+            "devhelp", 0);
           ai.launch (null, new Gdk.AppLaunchContext ());
         }
         catch (Error err)
@@ -50,24 +50,24 @@ namespace Synapse
         }
       }
       
-      public Define ()
+      public Search ()
       {
-        Object (title: "Define",
-                description: "Look up definition in dictionary",
-                has_thumbnail: false, icon_name: "accessories-dictionary");
+        Object (title: _ ("Search in Devhelp"),
+                description: _ ("Search documentation for this symbol"),
+                has_thumbnail: false, icon_name: "devhelp");
       }
     }
     
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
-        typeof (DictionaryPlugin),
-        "Dictionary",
-        "Look up definitions of words.",
-        "accessories-dictionary",
+        typeof (DevhelpPlugin),
+        "Devhelp",
+        _ ("Search documentation using Devhelp."),
+        "devhelp",
         register_plugin,
-        Environment.find_program_in_path ("gnome-dictionary") != null,
-        "Gnome Dictionary is not installed"
+        Environment.find_program_in_path ("devhelp") != null,
+        _ ("Devhelp is not installed")
       );
     }
 
@@ -76,24 +76,36 @@ namespace Synapse
       register_plugin ();
     }
 
-    private Define action;
-    private bool has_dictionary;
+    private Search action;
+    private bool has_devhelp;
 
     construct
     {
-      action = new Define ();
-      has_dictionary =
-        Environment.find_program_in_path ("gnome-dictionary") != null;
+      action = new Search ();
+      has_devhelp =
+        Environment.find_program_in_path ("devhelp") != null;
+
+      try
+      {        
+        symbol_re = new Regex ("^([a-z]+_)|([A-Z]+[a-z]+[A-Z])",
+                               RegexCompileFlags.OPTIMIZE);
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
     }
     
     public override bool handles_unknown ()
     {
-      return has_dictionary;
+      return has_devhelp;
     }
+    
+    private Regex symbol_re;
 
     public override ResultSet? find_for_match (Query query, Match match)
     {
-      if (!has_dictionary || match.match_type != MatchType.UNKNOWN)
+      if (!has_devhelp || match.match_type != MatchType.UNKNOWN)
       {
         return null;
       }
@@ -103,7 +115,9 @@ namespace Synapse
 
       if (query_empty)
       {
-        results.add (action, action.default_relevancy);
+        int relevancy = action.default_relevancy;
+        if (symbol_re.match (match.title)) relevancy += 5;
+        results.add (action, relevancy);
       }
       else
       {

@@ -58,11 +58,11 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (BansheeActions),
         "Banshee",
-        "Allows you to control Banshee and add items to playlist.",
+        _ ("Allows you to control Banshee and add items to playlist."),
         "banshee",
         register_plugin,
         Environment.find_program_in_path ("banshee") != null,
-        "Banshee is not installed"
+        _ ("Banshee is not installed")
       );
     }
 
@@ -127,8 +127,8 @@ namespace Synapse
     {
       public Play ()
       {
-        Object (title: "Play", //fixme i18n
-                description: "Start playback in Banshee",
+        Object (title: _ ("Play"),
+                description: _ ("Start playback in Banshee"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -138,7 +138,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlayerEngine) conn.get_object (BansheePlayerEngine.UNIQUE_NAME,
-                                                              BansheePlayerEngine.OBJECT_PATH);
+                                                              BansheePlayerEngine.OBJECT_PATH,
+                                                              BansheePlayerEngine.INTERFACE_NAME);
           player.play ();
         } catch (DBus.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
@@ -154,8 +155,8 @@ namespace Synapse
     {
       public Pause ()
       {
-        Object (title: "Pause", //fixme i18n
-                description: "Pause playback in Banshee",
+        Object (title: _ ("Pause"),
+                description: _ ("Pause playback in Banshee"),
                 icon_name: "media-playback-pause", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -164,7 +165,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlayerEngine) conn.get_object (BansheePlayerEngine.UNIQUE_NAME,
-                                                              BansheePlayerEngine.OBJECT_PATH);
+                                                              BansheePlayerEngine.OBJECT_PATH,
+                                                              BansheePlayerEngine.INTERFACE_NAME);
           player.pause ();
         } catch (DBus.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
@@ -175,8 +177,8 @@ namespace Synapse
     {
       public Next ()
       {
-        Object (title: "Next", //fixme i18n
-                description: "Plays the next song in Banshee's playlist",
+        Object (title: _ ("Next"),
+                description: _ ("Plays the next song in Banshee's playlist"),
                 icon_name: "media-skip-forward", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -186,7 +188,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlaybackController) conn.get_object (BansheePlaybackController.UNIQUE_NAME,
-                                                                    BansheePlaybackController.OBJECT_PATH);
+                                                                    BansheePlaybackController.OBJECT_PATH,
+                                                                    BansheePlaybackController.INTERFACE_NAME);
           player.next (false);
         } catch (DBus.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
@@ -197,8 +200,8 @@ namespace Synapse
     {
       public Previous ()
       {
-        Object (title: "Previous", //fixme i18n
-                description: "Plays the previous song in Banshee's playlist",
+        Object (title: _ ("Previous"),
+                description: _ ("Plays the previous song in Banshee's playlist"),
                 icon_name: "media-skip-backward", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -208,7 +211,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlaybackController) conn.get_object (BansheePlaybackController.UNIQUE_NAME,
-                                                                    BansheePlaybackController.OBJECT_PATH);
+                                                                    BansheePlaybackController.OBJECT_PATH,
+                                                                    BansheePlaybackController.INTERFACE_NAME);
           player.previous (false);
         } catch (DBus.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
@@ -220,8 +224,8 @@ namespace Synapse
     {
       public AddToPlaylist ()
       {
-        Object (title: "Enqueue in Banshee", // FIXME: i18n
-                description: "Add the song to Banshee playlist",
+        Object (title: _ ("Enqueue in Banshee"),
+                description: _ ("Add the song to Banshee playlist"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: 70);
@@ -236,7 +240,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlayQueue) conn.get_object (BansheePlayQueue.UNIQUE_NAME,
-                                                           BansheePlayQueue.OBJECT_PATH);
+                                                           BansheePlayQueue.OBJECT_PATH,
+                                                           BansheePlayQueue.INTERFACE_NAME);
           player.enqueue_uri (uri.uri, false);
         } catch (DBus.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
@@ -262,8 +267,8 @@ namespace Synapse
     {
       public PlayNow ()
       {
-        Object (title: "Play in Banshee", // FIXME: i18n
-                description: "Clears the current playlist and plays the song",
+        Object (title: _ ("Play in Banshee"),
+                description: _ ("Clears the current playlist and plays the song"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: 75);
@@ -278,7 +283,8 @@ namespace Synapse
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (BansheePlayerEngine) conn.get_object (BansheePlayerEngine.UNIQUE_NAME,
-                                                              BansheePlayerEngine.OBJECT_PATH);
+                                                              BansheePlayerEngine.OBJECT_PATH,
+                                                              BansheePlayerEngine.INTERFACE_NAME);
           player.open (uri.uri);
           player.play ();
         } catch (DBus.Error e) {

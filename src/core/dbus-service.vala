@@ -82,7 +82,7 @@ namespace Synapse
                                      string new_owner)
     {
       if (name.has_prefix (":")) return;
-      
+
       if (old_owner == "")
       {
         owned_names.add (name);
@@ -142,13 +142,13 @@ namespace Synapse
 
       try
       {
-        connection = DBus.Bus.get (DBus.BusType.SYSTEM);
-        proxy = (FreeDesktopDBus)
-          connection.get_object (FreeDesktopDBus.UNIQUE_NAME,
-                                 FreeDesktopDBus.OBJECT_PATH,
-                                 FreeDesktopDBus.INTERFACE_NAME);
+        var sys_connection = DBus.Bus.get (DBus.BusType.SYSTEM);
+        var sys_proxy = (FreeDesktopDBus)
+          sys_connection.get_object (FreeDesktopDBus.UNIQUE_NAME,
+                                     FreeDesktopDBus.OBJECT_PATH,
+                                     FreeDesktopDBus.INTERFACE_NAME);
 
-        names = yield proxy.list_activatable_names ();
+        names = yield sys_proxy.list_activatable_names ();
         foreach (unowned string system_act in names)
         {
           system_activatable_names.add (system_act);

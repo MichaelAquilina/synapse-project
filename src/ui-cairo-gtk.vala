@@ -23,9 +23,9 @@
 using Gtk;
 using Cairo;
 using Gee;
-using Synapse.Utils;
+using Synapse.Gui.Utils;
 
-namespace Synapse
+namespace Synapse.Gui
 {
   public class SynapseWindow : GtkCairoBase
   {

@@ -24,9 +24,7 @@ using Gtk;
 using Cairo;
 using Gee;
 
-public static extern void gtk_style_get_style_property (Style style, Type widget_type, string property_name, out Value val);
-
-namespace Synapse
+namespace Synapse.Gui
 {
   public class MatchRenderer : ListView.Renderer
   {

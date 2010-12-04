@@ -56,11 +56,11 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (RhythmboxActions),
         "Rhythmbox",
-        "Allows you to control Rhythmbox and add items to playlist.",
+        _ ("Allows you to control Rhythmbox and add items to playlist."),
         "rhythmbox",
         register_plugin,
         Environment.find_program_in_path ("rhythmbox") != null,
-        "Rhythmbox is not installed"
+        _ ("Rhythmbox is not installed")
       );
     }
     
@@ -125,8 +125,8 @@ namespace Synapse
     {
       public Play ()
       {
-        Object (title: "Play", //fixme i18n
-                description: "Start playback in Rhythmbox",
+        Object (title: _ ("Play"),
+                description: _ ("Start playback in Rhythmbox"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -134,10 +134,26 @@ namespace Synapse
       public override void do_action ()
       {
         try {
+          bool player_opened = DBusNameCache.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Player");
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
           player.play_pause (true);
+          if (!player_opened)
+          {
+            /* Try to play 10 times = 5 seconds waiting for RB to start */
+            int i = 0;
+            Timeout.add (500, ()=>{
+              ++i;
+              if (i <= 10 && !player.get_playing ())
+              {
+                player.play_pause (true);
+                return true;
+              }
+              return false;
+            });
+          }
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
@@ -152,8 +168,8 @@ namespace Synapse
     {
       public Pause ()
       {
-        Object (title: "Pause", //fixme i18n
-                description: "Pause playback in Rhythmbox",
+        Object (title: _ ("Pause"),
+                description: _ ("Pause playback in Rhythmbox"),
                 icon_name: "media-playback-pause", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -168,8 +184,8 @@ namespace Synapse
     {
       public Next ()
       {
-        Object (title: "Next", //fixme i18n
-                description: "Plays the next song in Rhythmbox's playlist",
+        Object (title: _ ("Next"),
+                description: _ ("Plays the next song in Rhythmbox's playlist"),
                 icon_name: "media-skip-forward", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -178,8 +194,9 @@ namespace Synapse
       {
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Player");
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
           player.next ();
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
@@ -190,8 +207,8 @@ namespace Synapse
     {
       public Previous ()
       {
-        Object (title: "Previous", //fixme i18n
-                description: "Plays the previous song in Rhythmbox's playlist",
+        Object (title: _ ("Previous"),
+                description: _ ("Plays the previous song in Rhythmbox's playlist"),
                 icon_name: "media-skip-backward", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -200,8 +217,9 @@ namespace Synapse
       {
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Player");
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
           player.previous ();
           player.previous ();
         } catch (DBus.Error e) {
@@ -214,8 +232,8 @@ namespace Synapse
     {
       public AddToPlaylist ()
       {
-        Object (title: "Enqueue in Rhythmbox", // FIXME: i18n
-                description: "Add the song to Rhythmbox playlist",
+        Object (title: _ ("Enqueue in Rhythmbox"),
+                description: _ ("Add the song to Rhythmbox playlist"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: 70);
@@ -228,10 +246,12 @@ namespace Synapse
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var shell = (RhythmboxShell) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Shell");
-          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Player");
+          var shell = (RhythmboxShell) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
           shell.add_to_queue (uri.uri);
           if (!player.get_playing())
             player.play_pause (true);
@@ -259,8 +279,8 @@ namespace Synapse
     {
       public PlayNow ()
       {
-        Object (title: "Play in Rhythmbox", // FIXME: i18n
-                description: "Clears the current playlist and plays the song",
+        Object (title: _ ("Play in Rhythmbox"),
+                description: _ ("Clears the current playlist and plays the song"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: 75);

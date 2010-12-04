@@ -21,6 +21,8 @@
  */
 
 using Gtk;
+using Synapse.Gui;
+using UI;
 
 namespace Synapse
 {
@@ -42,14 +44,17 @@ namespace Synapse
     private SettingsWindow settings;
     private DataSink data_sink;
     private GtkHotkey.Info? hotkey;
-    private Inspector inspector;
     private Configuration config;
+#if HAVE_INDICATOR
+    private AppIndicator.Indicator indicator;
+#endif
     
     public UILauncher ()
     {
       ui = null;
       config = Configuration.get_default ();
       data_sink = new DataSink ();
+      register_plugins ();
       settings = new SettingsWindow (data_sink);
       settings.keybinding_changed.connect (this.change_keyboard_shortcut);
       
@@ -59,9 +64,7 @@ namespace Synapse
       if (!is_startup) ui.show ();
       
       settings.theme_selected.connect (init_ui);
-#if ENABLE_INSPECTOR
-      inspector = new Inspector ();
-#endif
+      init_indicator ();
     }
     
     ~UILauncher ()
@@ -76,6 +79,67 @@ namespace Synapse
         settings.show ();
       });
     }
+    
+    private void init_indicator ()
+    {
+#if HAVE_INDICATOR
+      indicator = new AppIndicator.Indicator (
+        "synapse", "synapse", AppIndicator.Category.APPLICATION_STATUS);
+
+      var indicator_menu = new Menu ();
+      var activate_item = new MenuItem.with_label (_ ("Activate"));
+      activate_item.activate.connect (() =>
+      {
+        show_ui (Gtk.get_current_event_time ());
+      });
+      indicator_menu.append (activate_item);
+      var settings_item = new ImageMenuItem.from_stock (Gtk.STOCK_PREFERENCES, null);
+      settings_item.activate.connect (() => { settings.show (); });
+      indicator_menu.append (settings_item);
+      indicator_menu.append (new SeparatorMenuItem ());
+      var quit_item = new ImageMenuItem.from_stock (Gtk.STOCK_QUIT, null);
+      quit_item.activate.connect (Gtk.main_quit);
+      indicator_menu.append (quit_item);
+      indicator_menu.show_all ();
+      
+      indicator.set_menu (indicator_menu);
+      indicator.set_status (AppIndicator.Status.ACTIVE);
+#endif
+    }
+    
+    private void register_plugins ()
+    {
+      // while we don't install proper plugin .so files, we'll do it this way
+      Type[] plugin_types =
+      {
+        typeof (DesktopFilePlugin),
+        typeof (ZeitgeistPlugin),
+        typeof (HybridSearchPlugin),
+        //typeof (LocatePlugin),
+        typeof (GnomeSessionPlugin),
+        typeof (UPowerPlugin),
+        typeof (CommandPlugin),
+        typeof (RhythmboxActions),
+        typeof (BansheeActions),
+        typeof (DirectoryPlugin),
+#if TEST_PLUGINS
+        typeof (TestSlowPlugin),
+#endif
+        typeof (DictionaryPlugin),
+        typeof (DevhelpPlugin)
+      };
+      foreach (Type t in plugin_types)
+      {
+        data_sink.register_static_plugin (t);
+      }
+    }
+    
+    protected void show_ui (uint32 event_time)
+    {
+      if (this.ui == null) return;
+      this.ui.show_hide_with_time (event_time);
+    }
+    
     private void bind_keyboard_shortcut ()
     {
       var registry = GtkHotkey.Registry.get_default ();
@@ -94,12 +158,7 @@ namespace Synapse
         debug ("Binding activation to %s", hotkey.signature);
         settings.set_keybinding (hotkey.signature, false);
         hotkey.bind ();
-        hotkey.activated.connect ((event_time) =>
-        {
-          if (this.ui == null) return;
-          this.ui.show ();
-          this.ui.present_with_time (event_time);
-        });
+        hotkey.activated.connect ((event_time) => { this.show_ui (event_time); });
       }
       catch (Error err)
       {
@@ -137,12 +196,7 @@ namespace Synapse
                                        key, null);
           registry.store_hotkey (hotkey);
           hotkey.bind ();
-          hotkey.activated.connect ((event_time) =>
-          {
-            if (this.ui == null) return;
-            this.ui.show ();
-            this.ui.present_with_time (event_time);
-          });
+          hotkey.activated.connect ((event_time) => { this.show_ui (event_time); });
         }
       }
       catch (Error err)
@@ -186,12 +240,8 @@ namespace Synapse
           {
             if (cmd == Unique.Command.ACTIVATE)
             {
-              if (launcher.ui != null)
-              {
-                launcher.ui.show ();
-                launcher.ui.present_with_time (event_time);
-              }
-                                                  
+              launcher.show_ui (event_time);
+
               return Unique.Response.OK;
             }
 

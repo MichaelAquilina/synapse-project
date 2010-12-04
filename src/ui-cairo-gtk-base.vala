@@ -23,9 +23,9 @@
 using Gtk;
 using Cairo;
 using Gee;
-using Synapse.Utils;
+using Synapse.Gui.Utils;
 
-namespace Synapse
+namespace Synapse.Gui
 {
   public abstract class GtkCairoBase : UIInterface
   {
@@ -54,26 +54,25 @@ namespace Synapse
 
     protected Window window = null;
     protected MenuButton menu = null;
-    protected Synapse.Throbber throbber = null;
+    protected Throbber throbber = null;
     protected HTextSelector flag_selector = null;
     protected bool searching_for_matches = true;
-
+    
     protected IMContext im_context;
     
     construct
     {
-      window = new Window ();
+      window = new Window (Gtk.WindowType.TOPLEVEL);
       window.set_name ("synapse");
       window.skip_taskbar_hint = true;
       window.skip_pager_hint = true;
       window.set_position (WindowPosition.CENTER);
       window.set_decorated (false);
       window.set_resizable (false);
+      window.set_type_hint (Gdk.WindowTypeHint.SPLASHSCREEN);
+      window.set_keep_above (true);
       window.notify["is-active"].connect (()=>{
-        if (!window.is_active && (menu == null || !menu.is_menu_visible ()))
-        {
-          hide_and_reset ();
-        }
+        Idle.add (check_focus);
       });
       
       /* Query flag selector  */
@@ -104,6 +103,15 @@ namespace Synapse
     ~GtkCairoBase ()
     {
       window.destroy ();
+    }
+    
+    private bool check_focus ()
+    {
+      if (!window.is_active && (menu == null || !menu.is_menu_visible ()))
+      {
+        hide_and_reset ();
+      }
+      return false;
     }
 
     protected signal void search_string_changed ();
@@ -339,14 +347,21 @@ namespace Synapse
       Utils.move_window_to_center (window);
       show_list (false);
       window.show ();
+      window.get_window ().raise ();
       set_input_mask ();
     }
     public override void hide ()
     {
       hide_and_reset ();
     }
-    public override void present_with_time (uint32 timestamp)
+    public override void show_hide_with_time (uint32 timestamp)
     {
+      if (window.visible)
+      {
+        hide ();
+        return;
+      }
+      show ();
       window.present_with_time (timestamp);
     }    
     protected override void set_throbber_visible (bool visible)
