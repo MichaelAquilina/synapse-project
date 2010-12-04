@@ -40,6 +40,12 @@ synapse_LDADD = \
 	tile-view/libtileview.la \
 	$(NULL)
 
+if HAVE_INDICATOR
+synapse_VALAFLAGS += --pkg appindicator-0.1 -D HAVE_INDICATOR
+synapse_CFLAGS += $(APP_INDICATOR_CFLAGS)
+synapse_LDADD += $(APP_INDICATOR_LIBS)
+endif
+
 synapse_SOURCES = \
 	synapse-main.vala \
 	ui-cairo-gtk-base.vala \

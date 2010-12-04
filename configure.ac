@@ -63,6 +63,27 @@ PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   zeitgeist-1.0 >= $MIN_ZEITGEIST_VERSION \
   )
 
+APPINDICATOR_REQUIRED=0.0.7
+
+AC_ARG_ENABLE(indicator,
+              AS_HELP_STRING([--enable-indicator[=@<:@no/auto/yes@:>@]],[Build support for application indicators ]),
+              [enable_indicator=$enableval],
+              [enable_indicator="auto"])
+
+if test "x$enable_indicator" = "xauto" ; then
+	PKG_CHECK_EXISTS([appindicator-0.1 >= $APPINDICATOR_REQUIRED],
+	                 enable_indicator="yes",
+	                 enable_indicator="no")
+fi
+
+if test "x$enable_indicator" = "xyes" ; then
+	PKG_CHECK_EXISTS([appindicator-0.1 >= $APPINDICATOR_REQUIRED],,
+	                 AC_MSG_ERROR([appindicator-0.1 is not installed]))
+	PKG_CHECK_MODULES(APP_INDICATOR, appindicator-0.1 >= $APPINDICATOR_REQUIRED)
+	AC_DEFINE(HAVE_INDICATOR, 1, [Have AppIndicator])
+fi
+AM_CONDITIONAL(HAVE_INDICATOR, test "x$enable_indicator" = "xyes")
+
 dnl Expansions
 dnl AS_AC_EXPAND([PKGDATADIR], [$datadir/$PACKAGE_NAME])
 dnl AS_AC_EXPAND([DATADIR], [$datadir])
