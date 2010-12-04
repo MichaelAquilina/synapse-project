@@ -17,3 +17,4 @@ src/plugins/locate-plugin.c
 src/plugins/rhythmbox-plugin.c
 src/plugins/upower-plugin.c
 src/plugins/zeitgeist-plugin.c
+
