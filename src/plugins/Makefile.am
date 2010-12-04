@@ -31,6 +31,7 @@ libplugins_la_VALASOURCES = \
 	dictionary.vala \
 	directory-plugin.vala \
 	gnome-session-plugin.vala \
+	gnome-screensaver-plugin.vala \
 	hybrid-search-plugin.vala \
 	locate-plugin.vala \
 	rhythmbox-plugin.vala \
