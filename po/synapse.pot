@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-02 11:59+0100\n"
+"POT-Creation-Date: 2010-12-05 00:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,50 +24,50 @@ msgstr ""
 msgid "Synapse"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1013
+#: ../src/ui-cairo-gtk-base.c:1048
 msgid "Actions"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1015
+#: ../src/ui-cairo-gtk-base.c:1050
 msgid "Audio"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1017
+#: ../src/ui-cairo-gtk-base.c:1052
 msgid "Applications"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1019
+#: ../src/ui-cairo-gtk-base.c:1054
 msgid "All"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1021
+#: ../src/ui-cairo-gtk-base.c:1056
 msgid "Documents"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1023
+#: ../src/ui-cairo-gtk-base.c:1058
 msgid "Images"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1025
+#: ../src/ui-cairo-gtk-base.c:1060
 msgid "Video"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1027
+#: ../src/ui-cairo-gtk-base.c:1062
 msgid "Internet"
 msgstr ""
 
 #: ../src/ui-cairo-gtk-virgilio.c:1036 ../src/ui-cairo-gtk-virgilio.c:1091
-#: ../src/ui-widgets.c:2661
+#: ../src/ui-widgets.c:2660
 #, c-format
 msgid "<b>%d of %d</b>"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-virgilio.c:1146 ../src/ui-widgets.c:2606
+#: ../src/ui-cairo-gtk-virgilio.c:1146 ../src/ui-widgets.c:2605
 msgid "Home"
 msgstr ""
 
 #: ../src/ui-cairo-gtk-virgilio.c:1158 ../src/ui-cairo-gtk-virgilio.c:1216
-#: ../src/ui-widgets.c:2638
+#: ../src/ui-widgets.c:2637
 #, c-format
 msgid "<b>1 of %d</b>"
 msgstr ""
@@ -112,79 +112,79 @@ msgstr ""
 msgid "Virgilio"
 msgstr ""
 
-#: ../src/ui-settings.c:797
+#: ../src/ui-settings.c:800
 msgid "General"
 msgstr ""
 
-#: ../src/ui-settings.c:802
+#: ../src/ui-settings.c:805
 msgid "Plugins"
 msgstr ""
 
-#: ../src/ui-settings.c:812
+#: ../src/ui-settings.c:815
 msgid "Behavior & Look"
 msgstr ""
 
-#: ../src/ui-settings.c:828
+#: ../src/ui-settings.c:831
 msgid "Theme:"
 msgstr ""
 
-#: ../src/ui-settings.c:836
+#: ../src/ui-settings.c:839
 msgid "Startup on login"
 msgstr ""
 
-#: ../src/ui-settings.c:849
+#: ../src/ui-settings.c:852
 msgid "Shortcuts"
 msgstr ""
 
-#: ../src/ui-settings.c:884
+#: ../src/ui-settings.c:887
 msgid "Action"
 msgstr ""
 
-#: ../src/ui-settings.c:898
+#: ../src/ui-settings.c:901
 msgid "Shortcut"
 msgstr ""
 
-#: ../src/ui-settings.c:906
+#: ../src/ui-settings.c:909
 msgid "Activate"
 msgstr ""
 
-#: ../src/ui-settings.c:913
-msgid "To edit a shortcut, double click it and press a new one."
+#: ../src/ui-settings.c:916
+msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr ""
 
-#: ../src/ui-settings.c:984 ../src/ui-settings.c:1262
+#: ../src/ui-settings.c:990 ../src/ui-settings.c:1268
 msgid "Disabled"
 msgstr ""
 
-#: ../src/ui-settings.c:1270
+#: ../src/ui-settings.c:1276
 msgid "Enabled"
 msgstr ""
 
-#: ../src/ui-settings.c:1354
+#: ../src/ui-settings.c:1360
 msgid "Status"
 msgstr ""
 
-#: ../src/ui-settings.c:1356
+#: ../src/ui-settings.c:1362
 msgid "Enable this plugin"
 msgstr ""
 
-#: ../src/ui-settings.c:1358
+#: ../src/ui-settings.c:1364
 msgid "Disable this plugin"
 msgstr ""
 
-#: ../src/ui-widgets.c:2555 ../src/ui-widgets.c:2628
+#: ../src/ui-widgets.c:2554 ../src/ui-widgets.c:2627
 msgid "No results."
 msgstr ""
 
-#: ../src/ui-widgets.c:4705
+#: ../src/ui-widgets.c:4704
 msgid "Settings"
 msgstr ""
 
-#: ../src/ui-widgets.c:4712
+#: ../src/ui-widgets.c:4711
 msgid "About"
 msgstr ""
 
-#: ../src/ui-widgets.c:4724
+#: ../src/ui-widgets.c:4723
 msgid "Quit"
 msgstr ""
 
@@ -221,14 +221,14 @@ msgid "Open folder containing this file"
 msgstr ""
 
 #: ../src/plugins/banshee-plugin.c:2676
-msgid "Allows you to control Banshee and add items to playlist."
+msgid "Control Banshee and add items to playlists."
 msgstr ""
 
 #: ../src/plugins/banshee-plugin.c:2679
 msgid "Banshee is not installed"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3704 ../src/plugins/rhythmbox-plugin.c:3469
+#: ../src/plugins/banshee-plugin.c:3704 ../src/plugins/rhythmbox-plugin.c:3489
 msgid "Play"
 msgstr ""
 
@@ -236,7 +236,7 @@ msgstr ""
 msgid "Start playback in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3805 ../src/plugins/rhythmbox-plugin.c:3570
+#: ../src/plugins/banshee-plugin.c:3805 ../src/plugins/rhythmbox-plugin.c:3687
 msgid "Pause"
 msgstr ""
 
@@ -244,7 +244,7 @@ msgstr ""
 msgid "Pause playback in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3896 ../src/plugins/rhythmbox-plugin.c:3624
+#: ../src/plugins/banshee-plugin.c:3896 ../src/plugins/rhythmbox-plugin.c:3741
 msgid "Next"
 msgstr ""
 
@@ -252,7 +252,7 @@ msgstr ""
 msgid "Plays the next song in Banshee's playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3987 ../src/plugins/rhythmbox-plugin.c:3715
+#: ../src/plugins/banshee-plugin.c:3987 ../src/plugins/rhythmbox-plugin.c:3832
 msgid "Previous"
 msgstr ""
 
@@ -272,28 +272,28 @@ msgstr ""
 msgid "Play in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4233 ../src/plugins/rhythmbox-plugin.c:4010
+#: ../src/plugins/banshee-plugin.c:4233 ../src/plugins/rhythmbox-plugin.c:4127
 msgid "Clears the current playlist and plays the song"
 msgstr ""
 
 #: ../src/plugins/command-plugin.c:210
-msgid "Allow execution of arbitrary commands."
+msgid "Find and execute arbitrary commands."
 msgstr ""
 
 #: ../src/plugins/command-plugin.c:602
 msgid "Run command"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:280
-msgid "Search applications on your computer."
+#: ../src/plugins/desktop-file-plugin.c:284
+msgid "Search for and run applications on your computer."
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1483
+#: ../src/plugins/desktop-file-plugin.c:1561
 #, c-format
 msgid "Open with %s"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1491
+#: ../src/plugins/desktop-file-plugin.c:1569
 #, c-format
 msgid "Opens current selection using %s"
 msgstr ""
@@ -331,45 +331,44 @@ msgid "Look up definition in dictionary"
 msgstr ""
 
 #: ../src/plugins/directory-plugin.c:371
-msgid "Allows opening of commonly used directories."
+msgid "Open commonly used directories."
 msgstr ""
 
 #: ../src/plugins/gnome-session-plugin.c:1561
-msgid ""
-"Allows you to log out from your session, restart and shutdown your computer."
+msgid "Log out from your session, restart or shutdown your computer."
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1566
+#: ../src/plugins/gnome-session-plugin.c:1565
 msgid "Gnome Session Manager wan't found"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1816
+#: ../src/plugins/gnome-session-plugin.c:1815
 msgid "Shut Down"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1817
+#: ../src/plugins/gnome-session-plugin.c:1816
 msgid "Turn your computer off"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2135
+#: ../src/plugins/gnome-session-plugin.c:2134
 msgid "Restart"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2136
+#: ../src/plugins/gnome-session-plugin.c:2135
 msgid "Restart your computer"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2454
+#: ../src/plugins/gnome-session-plugin.c:2453
 msgid "Log Out"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2455
+#: ../src/plugins/gnome-session-plugin.c:2454
 msgid "Close your session and return to the login screen"
 msgstr ""
 
 #: ../src/plugins/hybrid-search-plugin.c:659
 msgid ""
-"Tries to improve results returned by Zeitgeist plugin by looking for similar "
+"Improve results returned by the Zeitgeist plugin by looking for similar "
 "files on the filesystem."
 msgstr ""
 
@@ -377,44 +376,44 @@ msgstr ""
 msgid "Runs locate command to find files on the filesystem."
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:2441
-msgid "Allows you to control Rhythmbox and add items to playlist."
+#: ../src/plugins/rhythmbox-plugin.c:2461
+msgid "Control Rhythmbox and add items to playlists."
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:2444
+#: ../src/plugins/rhythmbox-plugin.c:2464
 msgid "Rhythmbox is not installed"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3470
+#: ../src/plugins/rhythmbox-plugin.c:3490
 msgid "Start playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3571
+#: ../src/plugins/rhythmbox-plugin.c:3688
 msgid "Pause playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3625
+#: ../src/plugins/rhythmbox-plugin.c:3742
 msgid "Plays the next song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3716
+#: ../src/plugins/rhythmbox-plugin.c:3833
 msgid "Plays the previous song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3819
+#: ../src/plugins/rhythmbox-plugin.c:3936
 msgid "Enqueue in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3820
+#: ../src/plugins/rhythmbox-plugin.c:3937
 msgid "Add the song to Rhythmbox playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:4009
+#: ../src/plugins/rhythmbox-plugin.c:4126
 msgid "Play in Rhythmbox"
 msgstr ""
 
 #: ../src/plugins/upower-plugin.c:1691
-msgid "Allows you to suspend & hibernate your computer."
+msgid "Suspend or hibernate your computer."
 msgstr ""
 
 #: ../src/plugins/upower-plugin.c:1695

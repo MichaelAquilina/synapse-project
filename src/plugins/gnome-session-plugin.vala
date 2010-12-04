@@ -148,8 +148,8 @@ namespace Synapse
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (GnomeSessionPlugin),
-        "Gnome session plugin",
-        _ ("Allows you to log out from your session, restart and shutdown your computer."),
+        "GNOME Session",
+        _ ("Log out from your session, restart or shutdown your computer."),
         "gnome-session-logout",
         register_plugin,
         DBusNameCache.get_default ().name_has_owner (GnomeSessionManager.UNIQUE_NAME),

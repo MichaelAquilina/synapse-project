@@ -176,7 +176,7 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (UPowerPlugin),
         "UPower",
-        _ ("Allows you to suspend & hibernate your computer."),
+        _ ("Suspend or hibernate your computer."),
         "system-suspend",
         register_plugin,
         DBusNameCache.get_default ().service_is_available (UPowerObject.UNIQUE_NAME),

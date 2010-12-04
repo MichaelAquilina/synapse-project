@@ -56,7 +56,7 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (RhythmboxActions),
         "Rhythmbox",
-        _ ("Allows you to control Rhythmbox and add items to playlist."),
+        _ ("Control Rhythmbox and add items to playlists."),
         "rhythmbox",
         register_plugin,
         Environment.find_program_in_path ("rhythmbox") != null,

@@ -33,7 +33,7 @@ namespace Synapse
     {
       {
         "startup", 's', 0, OptionArg.NONE,
-        out is_startup, "Startup mode (don't show the UI immediately)", ""
+        out is_startup, "Startup mode (hide the UI until activated).", ""
       },
       {
         null
@@ -219,7 +219,7 @@ namespace Synapse
 
     public static int main (string[] argv)
     {
-      var context = new OptionContext (" - Awn Applet Activation Options");
+      var context = new OptionContext (" - Synapse");
       context.add_main_entries (options, null);
       context.add_group (Gtk.get_option_group (false));
       try

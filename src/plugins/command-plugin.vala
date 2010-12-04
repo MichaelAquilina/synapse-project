@@ -52,8 +52,8 @@ namespace Synapse
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (CommandPlugin),
-        "Commands",
-        _ ("Allow execution of arbitrary commands."),
+        "Command Search",
+        _ ("Find and execute arbitrary commands."),
         "system-run",
         register_plugin
       );
