@@ -61,7 +61,7 @@ namespace Synapse
       bind_keyboard_shortcut ();
       
       init_ui (settings.get_current_theme ());
-      if (!is_startup) ui.show ();
+      if (!is_startup) this.show_ui (Gtk.get_current_event_time ());
       
       settings.theme_selected.connect (init_ui);
       init_indicator ();

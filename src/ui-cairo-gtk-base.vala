@@ -109,7 +109,7 @@ namespace Synapse.Gui
     {
       if (!window.is_active && (menu == null || !menu.is_menu_visible ()))
       {
-        hide_and_reset ();
+        hide ();
       }
       return false;
     }
@@ -202,7 +202,7 @@ namespace Synapse.Gui
       }
       else
       {
-        hide_and_reset ();
+        hide ();
       }
     }
     
@@ -234,7 +234,7 @@ namespace Synapse.Gui
       {
         case CommandTypes.EXECUTE:
           if (execute ())
-            hide_and_reset ();
+            hide ();
           break;
         case CommandTypes.SEARCH_DELETE_CHAR:
           search_delete_char ();
@@ -347,7 +347,6 @@ namespace Synapse.Gui
       Utils.move_window_to_center (window);
       show_list (false);
       window.show ();
-      window.get_window ().raise ();
       set_input_mask ();
     }
     public override void hide ()
@@ -363,6 +362,8 @@ namespace Synapse.Gui
       }
       show ();
       window.present_with_time (timestamp);
+      window.get_window ().raise ();
+      window.get_window ().focus (timestamp);
     }    
     protected override void set_throbber_visible (bool visible)
     {
