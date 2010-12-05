@@ -7,6 +7,7 @@ VAPIDIR = $(top_srcdir)/vapi
 synapse_VALAFLAGS = \
 	--pkg dbus-glib-1 \
 	--pkg gtk+-2.0 \
+	--pkg gio-2.0 \
 	--pkg gio-unix-2.0 \
 	--pkg zeitgeist-1.0 \
 	--pkg gee-1.0 \
@@ -44,6 +45,12 @@ if HAVE_INDICATOR
 synapse_VALAFLAGS += --pkg appindicator-0.1 -D HAVE_INDICATOR
 synapse_CFLAGS += $(APP_INDICATOR_CFLAGS)
 synapse_LDADD += $(APP_INDICATOR_LIBS)
+endif
+
+if HAVE_ZEITGEIST
+synapse_VALAFLAGS += --pkg zeitgeist-1.0 -D HAVE_ZEITGEIST
+synapse_CFLAGS += $(ZEITGEIST_CFLAGS)
+synapse_LDADD += $(ZEITGEIST_LIBS)
 endif
 
 synapse_SOURCES = \

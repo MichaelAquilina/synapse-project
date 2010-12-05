@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -12,8 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by Alberto Aldegheri <albyrock87+dev@gmail.com>
  *
@@ -109,7 +108,7 @@ namespace Synapse.Gui
     {
       if (!window.is_active && (menu == null || !menu.is_menu_visible ()))
       {
-        hide_and_reset ();
+        hide ();
       }
       return false;
     }
@@ -202,7 +201,7 @@ namespace Synapse.Gui
       }
       else
       {
-        hide_and_reset ();
+        hide ();
       }
     }
     
@@ -234,7 +233,7 @@ namespace Synapse.Gui
       {
         case CommandTypes.EXECUTE:
           if (execute ())
-            hide_and_reset ();
+            hide ();
           break;
         case CommandTypes.SEARCH_DELETE_CHAR:
           search_delete_char ();
@@ -347,7 +346,6 @@ namespace Synapse.Gui
       Utils.move_window_to_center (window);
       show_list (false);
       window.show ();
-      window.get_window ().raise ();
       set_input_mask ();
     }
     public override void hide ()
@@ -363,6 +361,8 @@ namespace Synapse.Gui
       }
       show ();
       window.present_with_time (timestamp);
+      window.get_window ().raise ();
+      window.get_window ().focus (timestamp);
     }    
     protected override void set_throbber_visible (bool visible)
     {

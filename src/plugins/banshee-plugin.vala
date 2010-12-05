@@ -58,7 +58,7 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (BansheeActions),
         "Banshee",
-        _ ("Allows you to control Banshee and add items to playlist."),
+        _ ("Control Banshee and add items to playlists."),
         "banshee",
         register_plugin,
         Environment.find_program_in_path ("banshee") != null,

@@ -20,7 +20,7 @@ libplugins_la_VALAFLAGS = \
 libplugins_la_CFLAGS = \
 	$(SYNAPSE_MODULES_CFLAGS) \
 	-include config.h \
-        -I$(top_srcdir)/src/core \
+	-I$(top_srcdir)/src/core \
 	$(NULL)
 libplugins_la_LIBADD = $(SYNAPSE_MODULES_LIBS) ../core/libsynapsecore.la
 libplugins_la_VALASOURCES = \
@@ -31,6 +31,7 @@ libplugins_la_VALASOURCES = \
 	dictionary.vala \
 	directory-plugin.vala \
 	gnome-session-plugin.vala \
+	gnome-screensaver-plugin.vala \
 	hybrid-search-plugin.vala \
 	locate-plugin.vala \
 	rhythmbox-plugin.vala \
@@ -38,6 +39,13 @@ libplugins_la_VALASOURCES = \
 	upower-plugin.vala \
 	zeitgeist-plugin.vala \
 	$(NULL)
+
+if HAVE_ZEITGEIST
+libplugins_la_VALAFLAGS += --pkg zeitgeist-1.0 -D HAVE_ZEITGEIST
+libplugins_la_CFLAGS += $(ZEITGEIST_CFLAGS)
+libplugins_la_LIBADD += $(ZEITGEIST_LIBS)
+endif
+
 libplugins_la_SOURCES = \
 	plugins.vala.stamp \
 	$(libplugins_la_VALASOURCES:.vala=.c) \

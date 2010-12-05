@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -12,8 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by Alberto Aldegheri <albyrock87+dev@gmail.com>
  *             Michal Hruby <michal.mhr@gmail.com>
@@ -117,7 +116,7 @@ namespace Synapse.Gui
       this.delete_event.connect (this.hide_on_delete);
       
       config = (UIConfig) 
-        Configuration.get_default ().get_config ("ui", "global", typeof (UIConfig));
+        ConfigService.get_default ().get_config ("ui", "global", typeof (UIConfig));
 
       init_settings ();
       build_ui ();
@@ -212,15 +211,15 @@ namespace Synapse.Gui
 
     private void build_ui ()
     {
-      var main_vbox = new VBox (false, 6);
-      main_vbox.border_width = 4;
+      var main_vbox = new VBox (false, 12);
+      main_vbox.border_width = 12;
       this.add (main_vbox);
       
       var tabs = new Gtk.Notebook ();
       var general_tab = new VBox (false, 6);
-      general_tab.border_width = 5;
+      general_tab.border_width = 12;
       var plugin_tab = new VBox (false, 6);
-      plugin_tab.border_width = 5;
+      plugin_tab.border_width = 12;
       main_vbox.pack_start (tabs);
       tabs.append_page (general_tab, new Label (_("General")));
       tabs.append_page (plugin_tab, new Label (_("Plugins")));
@@ -232,14 +231,14 @@ namespace Synapse.Gui
       theme_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", _("Behavior & Look")));
       theme_frame.set_label_widget (theme_frame_label);
 
-      var behavior_vbox = new VBox (false, 4);
+      var behavior_vbox = new VBox (false, 6);
       var align = new Alignment (0.5f, 0.5f, 1.0f, 1.0f);
-      align.set_padding (3, 12, 10, 0);
+      align.set_padding (6, 12, 12, 12);
       align.add (behavior_vbox);
       theme_frame.add (align);
       
       /* Select theme combobox row */
-      var row = new HBox (false, 5);
+      var row = new HBox (false, 6);
       behavior_vbox.pack_start (row, false);
       var select_theme_label = new Label (_("Theme:"));
       row.pack_start (select_theme_label, false, false);
@@ -253,14 +252,14 @@ namespace Synapse.Gui
 
       general_tab.pack_start (theme_frame, false);
 
-      /* keybinding treeview */
+      /* Keybinding treeview */
       var shortcut_frame = new Frame (null);
       shortcut_frame.set_shadow_type (Gtk.ShadowType.NONE);
       var shortcut_frame_label = new Label (null);
       shortcut_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", _("Shortcuts")));
       shortcut_frame.set_label_widget (shortcut_frame_label);
       align = new Alignment (0.5f, 0.5f, 1.0f, 1.0f);
-      align.set_padding (3, 0, 10, 0);
+      align.set_padding (6, 12, 12, 12);
 
       var shortcut_scroll = new Gtk.ScrolledWindow (null, null);    
       shortcut_scroll.set_shadow_type (ShadowType.IN);
@@ -309,7 +308,9 @@ namespace Synapse.Gui
       var info_box = new HBox (false, 6);
       var info_image = new Image.from_stock (STOCK_INFO, IconSize.MENU);
       info_box.pack_start (info_image, false, true);
-      var info_label = new Label (_("To edit a shortcut, double click it and press a new one."));
+      var info_label = new Label (Markup.printf_escaped ("<span size=\"small\">%s</span>",
+            _("Click the shortcut you wish to change and press the new shortcut.")));
+      info_label.set_use_markup(true);
       info_box.pack_start (info_label, false, false);
       info_box.show_all ();
 
@@ -380,7 +381,7 @@ namespace Synapse.Gui
         cb_themes.get_active_iter (out active_iter);
         theme_list.get (active_iter, 0, out selected_theme);
         config.ui_type = selected_theme;
-        Configuration.get_default ().set_config ("ui", "global", config);
+        ConfigService.get_default ().set_config ("ui", "global", config);
         theme_selected (get_current_theme ());
       });
       

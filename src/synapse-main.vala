@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -12,8 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by Alberto Aldegheri <albyrock87+dev@gmail.com>
  *             Michal Hruby <michal.mhr@gmail.com>
@@ -33,7 +32,7 @@ namespace Synapse
     {
       {
         "startup", 's', 0, OptionArg.NONE,
-        out is_startup, "Startup mode (don't show the UI immediately)", ""
+        out is_startup, "Startup mode (hide the UI until activated).", ""
       },
       {
         null
@@ -44,7 +43,7 @@ namespace Synapse
     private SettingsWindow settings;
     private DataSink data_sink;
     private GtkHotkey.Info? hotkey;
-    private Configuration config;
+    private ConfigService config;
 #if HAVE_INDICATOR
     private AppIndicator.Indicator indicator;
 #endif
@@ -52,7 +51,7 @@ namespace Synapse
     public UILauncher ()
     {
       ui = null;
-      config = Configuration.get_default ();
+      config = ConfigService.get_default ();
       data_sink = new DataSink ();
       register_plugins ();
       settings = new SettingsWindow (data_sink);
@@ -61,7 +60,7 @@ namespace Synapse
       bind_keyboard_shortcut ();
       
       init_ui (settings.get_current_theme ());
-      if (!is_startup) ui.show ();
+      if (!is_startup) this.show_ui (Gtk.get_current_event_time ());
       
       settings.theme_selected.connect (init_ui);
       init_indicator ();
@@ -87,7 +86,8 @@ namespace Synapse
         "synapse", "synapse", AppIndicator.Category.APPLICATION_STATUS);
 
       var indicator_menu = new Menu ();
-      var activate_item = new MenuItem.with_label (_ ("Activate"));
+      var activate_item = new ImageMenuItem.with_label (_ ("Activate"));
+      activate_item.set_image (new Gtk.Image.from_stock (Gtk.STOCK_EXECUTE, Gtk.IconSize.MENU));
       activate_item.activate.connect (() =>
       {
         show_ui (Gtk.get_current_event_time ());
@@ -117,6 +117,7 @@ namespace Synapse
         typeof (HybridSearchPlugin),
         //typeof (LocatePlugin),
         typeof (GnomeSessionPlugin),
+        typeof (GnomeScreenSaverPlugin),
         typeof (UPowerPlugin),
         typeof (CommandPlugin),
         typeof (RhythmboxActions),
@@ -218,7 +219,7 @@ namespace Synapse
 
     public static int main (string[] argv)
     {
-      var context = new OptionContext (" - Awn Applet Activation Options");
+      var context = new OptionContext (" - Synapse");
       context.add_main_entries (options, null);
       context.add_group (Gtk.get_option_group (false));
       try

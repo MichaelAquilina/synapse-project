@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -12,11 +12,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by Alberto Aldegheri <albyrock87+dev@gmail.com>
- * 
  *
  */
 
@@ -1278,11 +1276,11 @@ namespace Synapse.Gui
       menu = new Gtk.Menu ();
       Gtk.MenuItem item = null;
       
-      item = new Gtk.MenuItem.with_label (_("Settings"));
+      item = new Gtk.ImageMenuItem.from_stock (Gtk.STOCK_PREFERENCES, null);
       item.activate.connect (()=> {settings_clicked ();});
       menu.append (item);
       
-      item = new Gtk.MenuItem.with_label (_("About"));
+      item = new ImageMenuItem.from_stock (Gtk.STOCK_ABOUT, null);
       item.activate.connect (()=> 
       {
         var about = new SynapseAboutDialog ();
@@ -1294,7 +1292,7 @@ namespace Synapse.Gui
       item = new Gtk.SeparatorMenuItem ();
       menu.append (item);
       
-      item = new Gtk.MenuItem.with_label (_("Quit"));
+      item = new ImageMenuItem.from_stock (Gtk.STOCK_QUIT, null);
       item.activate.connect (Gtk.main_quit);
       menu.append (item);
       

@@ -8,7 +8,7 @@ AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.11])
 
 dnl ==============================================
-dnl translation support
+dnl Translation support
 dnl ==============================================
 
 GETTEXT_PACKAGE=synapse
@@ -35,7 +35,7 @@ AC_PROG_LIBTOOL
 AC_STDC_HEADERS
 
 dnl ==============================================
-dnl Check for vala
+dnl Check for Vala
 dnl ==============================================
 AM_PROG_VALAC([0.9.7])
 
@@ -46,9 +46,10 @@ dnl Check that we meet the dependencies
 dnl ==============================================
 MIN_GLIB_VERSION=2.22.0
 MIN_GTK_VERSION=2.20.0
-MIN_ZEITGEIST_VERSION=0.2.8
+MIN_ZEITGEIST_VERSION=0.2.14
 MIN_GEE_VERSION=0.5.2
 MIN_JSON_VERSION=0.10.0
+APPINDICATOR_REQUIRED=0.0.7
 
 PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   glib-2.0 >= $MIN_GLIB_VERSION \
@@ -60,15 +61,30 @@ PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   dbus-glib-1 \
   json-glib-1.0 >= $MIN_JSON_VERSION \
   unique-1.0 \
-  zeitgeist-1.0 >= $MIN_ZEITGEIST_VERSION \
   )
 
-APPINDICATOR_REQUIRED=0.0.7
 
 AC_ARG_ENABLE(indicator,
               AS_HELP_STRING([--enable-indicator[=@<:@no/auto/yes@:>@]],[Build support for application indicators ]),
               [enable_indicator=$enableval],
               [enable_indicator="auto"])
+
+AC_ARG_ENABLE(zeitgeist,
+             AS_HELP_STRING([--enable-zeitgeist[=@<:@no/yes@:>@]],[Build with zeitgeist support]),
+             [enable_zeitgeist=$enableval],
+             [enable_zeitgeist="yes"])
+
+dnl ==============================================
+dnl Check that we meet the optional dependencies
+dnl ==============================================
+
+if test "x$enable_zeitgeist" = "xyes" ; then
+	PKG_CHECK_EXISTS([zeitgeist-1.0 >= $MIN_ZEITGEIST_VERSION],,
+	                 AC_MSG_ERROR([zeitgeist-1.0 is not installed]))
+	PKG_CHECK_MODULES(ZEITGEIST, zeitgeist-1.0 >= $MIN_ZEITGEIST_VERSION)
+	AC_DEFINE(HAVE_ZEITGEIST, 1, [Have Zeitgeist])
+fi
+AM_CONDITIONAL(HAVE_ZEITGEIST, test "x$enable_zeitgeist" = "xyes")
 
 if test "x$enable_indicator" = "xauto" ; then
 	PKG_CHECK_EXISTS([appindicator-0.1 >= $APPINDICATOR_REQUIRED],
@@ -111,5 +127,9 @@ ${PACKAGE}-${VERSION}
 
   Build Environment
     Install Prefix:     ${prefix}
+
+  Optional dependencies
+    AppIndicator:       ${enable_indicator}
+    Zeitgeist:          ${enable_zeitgeist}
 
 EOF

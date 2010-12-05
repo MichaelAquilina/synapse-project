@@ -185,8 +185,8 @@ namespace Synapse
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (HybridSearchPlugin),
-        "Hybrid search",
-        _ ("Tries to improve results returned by Zeitgeist plugin by looking " +
+        "Hybrid Search",
+        _ ("Improve results returned by the Zeitgeist plugin by looking " +
         "for similar files on the filesystem."),
         "search",
         register_plugin
