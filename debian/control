@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 7.0.50~),
  intltool (>= 0.35),
  pkg-config,
  valac (>= 0.9.7~),
- libzeitgeist-dev,
+ libzeitgeist-dev (>= 0.2.14),
  libdbus-glib-1-dev,
  libgtk2.0-dev (>= 2.20.0),
  libglib2.0-dev (>= 2.22.0),
@@ -25,8 +25,9 @@ Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
 #Hard-code version for Lucid, ${shlibs:Depends} doesn't work for libs in the PPA
-         libjson-glib-1.0-0 (>= 0.10.0),	
-         libgee2 (>= 0.5.2)
+         libjson-glib-1.0-0 (>= 0.10.0),
+         libgee2 (>= 0.5.2),
+         libzeitgeist-1.0-0 (>= 0.2.14)
 Recommends: zeitgeist (>= 0.5.0~) | zeitgeist-core (>= 0.5.0~),
             zeitgeist-fts-extension
 Description: semantic file launcher
