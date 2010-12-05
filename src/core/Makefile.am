@@ -17,7 +17,7 @@ libsynapsecore_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h
 libsynapsecore_la_LIBADD = $(SYNAPSE_MODULES_LIBS)
 libsynapsecore_la_VALASOURCES = \
 	common-actions.vala \
-	configuration.vala \
+	config-service.vala \
 	data-sink.vala \
 	dbus-service.vala \
 	desktop-file-service.vala \

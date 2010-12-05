@@ -29,7 +29,7 @@ namespace Synapse
   public class ConfigService : GLib.Object
   {
     // singleton that can be easily destroyed
-    private static unowned Configuration? instance;
+    private static unowned ConfigService? instance;
     public static ConfigService get_default ()
     {
       return instance ?? new ConfigService ();
