@@ -153,7 +153,7 @@ namespace Synapse
         "gnome-session-logout",
         register_plugin,
         DBusNameCache.get_default ().name_has_owner (GnomeSessionManager.UNIQUE_NAME),
-        _ ("Gnome Session Manager wan't found")
+        _ ("Gnome Session Manager wasn't found")
       );
     }
 
