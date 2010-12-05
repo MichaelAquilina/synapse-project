@@ -1,5 +1,24 @@
-synapse (0+bzr20101107-1) experimental; urgency=low
+synapse (0.2.0+bzr-2) UNRELEASED; urgency=low
+
+  * debian/control:
+   - Set zeitgeist and zeitgeist-fts-extension as Recommends.
+   - Bump libgtk2.0-dev, libglib2.0-dev and intltool requierement.
+   - Update Vcs-*.
+   - Build-depends on pkg-config.
+   - Build-depends on libappindicator-dev.
+  * debian/docs:
+   - Add upstream documentation.
+  * debian/watch
+   - Add a watch file.
+  * debian/copyright
+   - Update copyright holders and licenses.
+  * debian/rules:
+   - Pass --enable-indicator=auto to configure.
+
+ -- Julien Lavergne <gilir@ubuntu.com>  Tue, 30 Nov 2010 21:55:53 +0100
+
+synapse (0.2.0+bzr-1) experimental; urgency=low
 
   * Initial release.
 
- -- Siegfried-Angel Gevatter Pujals <rainct@ubuntu.com>  Fri, 10 Sep 2010 14:31:29 +0200
+ -- Michal Hruby <michal.mhr@gmail.com>  Fri, 10 Sep 2010 14:31:29 +0200

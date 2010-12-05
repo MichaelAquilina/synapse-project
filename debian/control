@@ -1,29 +1,34 @@
 Source: synapse
 Section: utils
 Priority: optional
-Maintainer: Siegfried-Angel Gevatter Pujals <rainct@ubuntu.com>
+Maintainer: Michal Hruby <michal.mhr@gmail.com>
 Build-Depends: debhelper (>= 7.0.50~),
- intltool,
+ intltool (>= 0.35),
+ pkg-config,
  valac (>= 0.9.7~),
  libzeitgeist-dev,
  libdbus-glib-1-dev,
- libgtk2.0-dev,
+ libgtk2.0-dev (>= 2.20.0),
+ libglib2.0-dev (>= 2.22.0),
  libgee-dev (>= 0.5.2),
  libjson-glib-dev (>= 0.10.0),
  libunique-dev,
- libgtkhotkey-dev
-Vcs-Bzr: bzr+ssh://bazaar.launchpad.net/~zeitgeist-packagers/sezen/debian-sezen2
-Vcs-Browser: https://code.launchpad.net/~zeitgeist-packagers/sezen/debian-sezen2
+ libgtkhotkey-dev,
+ libappindicator-dev (>= 0.0.7)
+Vcs-Bzr: http://bazaar.launchpad.net/~synapse-core/synapse-project/trunk/
+Vcs-Browser: http://bazaar.launchpad.net/~synapse-core/synapse-project/trunk/files
 Homepage: https://launchpad.net/synapse-project
 Standards-Version: 3.9.1
 
 Package: synapse
 Architecture: any
 Depends: ${shlibs:Depends},
- ${misc:Depends},
- zeitgeist (>= 0.5.0~) | zeitgeist-core (>= 0.5.0~),
- libjson-glib-1.0-0 (>= 0.10.0),
- libgee2 (>= 0.5.2)
+         ${misc:Depends},
+#Hard-code version for Lucid, ${shlibs:Depends} doesn't work for libs in the PPA
+         libjson-glib-1.0-0 (>= 0.10.0),	
+         libgee2 (>= 0.5.2)
+Recommends: zeitgeist (>= 0.5.0~) | zeitgeist-core (>= 0.5.0~),
+            zeitgeist-fts-extension
 Description: semantic file launcher
  Synapse is a graphical launcher enabling you to start applications and also
  to quickly find and access relevant documents and files (by making use of the
