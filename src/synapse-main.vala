@@ -86,7 +86,8 @@ namespace Synapse
         "synapse", "synapse", AppIndicator.Category.APPLICATION_STATUS);
 
       var indicator_menu = new Menu ();
-      var activate_item = new MenuItem.with_label (_ ("Activate"));
+      var activate_item = new ImageMenuItem.with_label (_ ("Activate"));
+      activate_item.set_image (new Gtk.Image.from_stock (Gtk.STOCK_EXECUTE, Gtk.IconSize.MENU));
       activate_item.activate.connect (() =>
       {
         show_ui (Gtk.get_current_event_time ());
