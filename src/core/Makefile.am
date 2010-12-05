@@ -24,6 +24,7 @@ libsynapsecore_la_VALASOURCES = \
 	match.vala \
 	plugin.vala \
 	query.vala \
+	relevancy-service.vala \
 	result-set.vala \
 	utils.vala \
 	$(NULL)
@@ -31,6 +32,12 @@ libsynapsecore_la_SOURCES = \
 	synapse-core.vala.stamp \
 	$(libsynapsecore_la_VALASOURCES:.vala=.c) \
 	$(NULL)
+
+if HAVE_ZEITGEIST
+libsynapsecore_la_VALAFLAGS += --pkg zeitgeist-1.0 -D HAVE_ZEITGEIST
+libsynapsecore_la_CFLAGS += $(ZEITGEIST_CFLAGS)
+libsynapsecore_la_LIBADD += $(ZEITGEIST_LIBS)
+endif
 
 synapse-core.vapi synapse-core.vala.stamp: $(libsynapsecore_la_VALASOURCES)
 	$(AM_V_GEN)$(VALAC) $(libsynapsecore_la_VALAFLAGS) -C -H synapse-core.h --library synapse-core $^

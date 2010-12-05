@@ -67,6 +67,8 @@ namespace Synapse
           try
           {
             app.launch (null, new Gdk.AppLaunchContext ());
+            
+            RelevancyService.get_default ().application_launched (app);
           }
           catch (Error err)
           {

@@ -191,6 +191,7 @@ namespace Synapse
     private DBusNameCache dbus_name_cache;
     private DesktopFileService desktop_file_service;
     private PluginRegistry registry;
+    private RelevancyService relevancy_service;
     private Type[] plugin_types;
 
     construct
@@ -206,6 +207,7 @@ namespace Synapse
 
       // oh well, yea we need a few singletons
       registry = PluginRegistry.get_default ();
+      relevancy_service = RelevancyService.get_default ();
 
       initialize_caches ();
       register_static_plugin (typeof (CommonActions));

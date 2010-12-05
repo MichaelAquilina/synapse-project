@@ -47,6 +47,12 @@ synapse_CFLAGS += $(APP_INDICATOR_CFLAGS)
 synapse_LDADD += $(APP_INDICATOR_LIBS)
 endif
 
+if HAVE_ZEITGEIST
+synapse_VALAFLAGS += --pkg zeitgeist-1.0 -D HAVE_ZEITGEIST
+synapse_CFLAGS += $(ZEITGEIST_CFLAGS)
+synapse_LDADD += $(ZEITGEIST_LIBS)
+endif
+
 synapse_SOURCES = \
 	synapse-main.vala \
 	ui-cairo-gtk-base.vala \
