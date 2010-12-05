@@ -231,7 +231,44 @@ namespace Synapse
       else
         warning ("Desktop session type is not recognized, assuming GNOME.");
     }
-  
+    
+    private async void process_directory (File directory,
+                                          Gee.Set<File> monitored_dirs)
+    {
+      try
+      {
+        bool exists = yield Utils.query_exists_async (directory);
+        if (!exists) return;
+        monitored_dirs.add (directory);
+        var enumerator = yield directory.enumerate_children_async (
+          FILE_ATTRIBUTE_STANDARD_NAME + "," + FILE_ATTRIBUTE_STANDARD_TYPE,
+          0, 0);
+        var files = yield enumerator.next_files_async (1024, 0);
+        foreach (var f in files)
+        {
+          unowned string name = f.get_name ();
+          if (f.get_file_type () == FileType.DIRECTORY)
+          {
+            // FIXME: this could cause too many open files error, or?
+            yield process_directory (directory.get_child (name), monitored_dirs);
+          }
+          else
+          {
+            // ignore ourselves
+            if (name.has_suffix ("synapse.desktop")) continue;
+            if (name.has_suffix (".desktop"))
+            {
+              yield load_desktop_file (directory.get_child (name));
+            }
+          }
+        }
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
+    }
+
     private async void load_all_desktop_files ()
     {
       string[] data_dirs = Environment.get_system_data_dirs ();
@@ -242,34 +279,12 @@ namespace Synapse
       foreach (unowned string data_dir in data_dirs)
       {
         string dir_path = Path.build_filename (data_dir, "applications", null);
-        try
-        {
-          // FIXME: monitor the directories for changes
-          var directory = File.new_for_path (dir_path);
-          if (!directory.query_exists ()) continue; // FIXME: async
-          desktop_file_dirs.add (directory);
-          var enumerator = yield directory.enumerate_children_async (
-            FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
-          var files = yield enumerator.next_files_async (1024, 0);
-          foreach (var f in files)
-          {
-            unowned string name = f.get_name ();
-            // ignore ourselves
-            if (name.has_suffix ("synapse.desktop")) continue;
-            if (name.has_suffix (".desktop"))
-            {
-              yield load_desktop_file (directory.get_child (name));
-            }
-          }
-        }
-        catch (Error err)
-        {
-          warning ("%s", err.message);
-        }
+        var directory = File.new_for_path (dir_path);
+        yield process_directory (directory, desktop_file_dirs);
       }
-      
+
       create_indices ();
-      
+
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
       foreach (File d in desktop_file_dirs)
       {

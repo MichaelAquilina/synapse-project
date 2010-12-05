@@ -7,6 +7,7 @@ VAPIDIR = $(top_srcdir)/vapi
 synapse_VALAFLAGS = \
 	--pkg dbus-glib-1 \
 	--pkg gtk+-2.0 \
+	--pkg gio-2.0 \
 	--pkg gio-unix-2.0 \
 	--pkg zeitgeist-1.0 \
 	--pkg gee-1.0 \
