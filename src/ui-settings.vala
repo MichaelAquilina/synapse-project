@@ -83,6 +83,7 @@ namespace Synapse.Gui
     class UIConfig: ConfigObject
     {
       public string ui_type { get; set; default = "default"; }
+      public bool show_indicator { get; set; default = true; }
     }
 
     private struct Theme
@@ -105,6 +106,8 @@ namespace Synapse.Gui
     private unowned DataSink data_sink;
     private Gtk.ListStore model;
     private UIConfig config;
+    
+    public bool indicator_active { get { return config.show_indicator; } }
 
     public SettingsWindow (DataSink data_sink)
     {
@@ -114,8 +117,8 @@ namespace Synapse.Gui
       this.set_size_request (500, 450);
       this.resizable = false;
       this.delete_event.connect (this.hide_on_delete);
-      
-      config = (UIConfig) 
+
+      config = (UIConfig)
         ConfigService.get_default ().get_config ("ui", "global", typeof (UIConfig));
 
       init_settings ();
@@ -208,7 +211,7 @@ namespace Synapse.Gui
       res += keyname;
       return res;
     }
-
+    
     private void build_ui ()
     {
       var main_vbox = new VBox (false, 12);
@@ -249,6 +252,17 @@ namespace Synapse.Gui
       autostart.active = autostart_exists ();
       autostart.toggled.connect (this.autostart_toggled);
       behavior_vbox.pack_start (autostart, false);
+      
+      /* Notification icon */
+      var notification = new CheckButton.with_label (_("Show notification icon"));
+      notification.active = config.show_indicator;
+      notification.toggled.connect ((tb) =>
+      {
+        config.show_indicator = tb.get_active ();
+        ConfigService.get_default ().set_config ("ui", "global", config);
+        this.notify_property ("indicator-active");
+      });
+      behavior_vbox.pack_start (notification, false);
 
       general_tab.pack_start (theme_frame, false);
 

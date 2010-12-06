@@ -48,7 +48,7 @@ namespace AppIndicator {
 		public virtual signal void new_icon ();
 		public virtual signal void new_status (string status);
 	}
-	[CCode (cprefix = "APP_INDICATOR_CATEGORY_", cheader_filename = "libappindicator/app-indicator-enum-types.h,libappindicator/app-indicator.h")]
+	[CCode (cname = "AppIndicatorCategory", cprefix = "APP_INDICATOR_CATEGORY_", cheader_filename = "libappindicator/app-indicator-enum-types.h,libappindicator/app-indicator.h")]
 	public enum Category {
 		APPLICATION_STATUS,
 		COMMUNICATIONS,
@@ -56,7 +56,7 @@ namespace AppIndicator {
 		HARDWARE,
 		OTHER
 	}
-	[CCode (cprefix = "APP_INDICATOR_STATUS_", cheader_filename = "libappindicator/app-indicator-enum-types.h,libappindicator/app-indicator.h")]
+	[CCode (cname = "AppIndicatorStatus", cprefix = "APP_INDICATOR_STATUS_", cheader_filename = "libappindicator/app-indicator-enum-types.h,libappindicator/app-indicator.h")]
 	public enum Status {
 		PASSIVE,
 		ACTIVE,

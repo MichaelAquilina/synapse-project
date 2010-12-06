@@ -103,7 +103,13 @@ namespace Synapse
       indicator_menu.show_all ();
       
       indicator.set_menu (indicator_menu);
-      indicator.set_status (AppIndicator.Status.ACTIVE);
+      if (settings.indicator_active) indicator.set_status (AppIndicator.Status.ACTIVE);
+
+      settings.notify["indicator-active"].connect (() =>
+      {
+        indicator.set_status (settings.indicator_active ?
+          AppIndicator.Status.ACTIVE : AppIndicator.Status.PASSIVE);
+      });
 #endif
     }
     
