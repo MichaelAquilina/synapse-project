@@ -70,6 +70,7 @@ namespace Synapse.Gui
       window.set_resizable (false);
       window.set_type_hint (Gdk.WindowTypeHint.DIALOG);
       window.set_keep_above (true);
+      window.window_state_event.connect (on_window_state_event);
       window.notify["is-active"].connect (()=>{
         Idle.add (check_focus);
       });
@@ -102,6 +103,20 @@ namespace Synapse.Gui
     ~GtkCairoBase ()
     {
       window.destroy ();
+    }
+    
+    private bool on_window_state_event (Widget w, Gdk.EventWindowState event)
+    {
+      /* For whatever reason, keep above is gone.  We don't want that. */
+      if ((event.new_window_state & Gdk.WindowState.ABOVE) == 0)
+      {
+        window.set_keep_above (true);
+      }
+      /* Make sure to skip taskbar, just in case. */
+      window.set_skip_taskbar_hint (true);
+      window.set_skip_pager_hint (true);
+
+      return true;
     }
     
     private bool check_focus ()
