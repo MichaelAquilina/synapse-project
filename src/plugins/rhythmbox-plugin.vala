@@ -59,7 +59,7 @@ namespace Synapse
         _ ("Control Rhythmbox and add items to playlists."),
         "rhythmbox",
         register_plugin,
-        Environment.find_program_in_path ("rhythmbox") != null,
+        DBusNameCache.get_default ().name_is_activatable (RhythmboxPlayer.UNIQUE_NAME),
         _ ("Rhythmbox is not installed")
       );
     }
@@ -293,10 +293,12 @@ namespace Synapse
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var shell = (RhythmboxShell) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Shell");
-          var player = (RhythmboxPlayer) conn.get_object ("org.gnome.Rhythmbox",
-                                                      "/org/gnome/Rhythmbox/Player");
+          var shell = (RhythmboxShell) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
+          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
+                                                          RhythmboxPlayer.OBJECT_PATH,
+                                                          RhythmboxPlayer.INTERFACE_NAME);
           shell.clear_queue ();
           shell.add_to_queue (uri.uri);
           player.next ();
