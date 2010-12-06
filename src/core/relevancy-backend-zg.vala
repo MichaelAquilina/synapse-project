@@ -127,8 +127,9 @@ namespace Synapse
       }
       else if (app_info is DesktopAppInfo)
       {
-        var basename = Path.get_basename ((app_info as DesktopAppInfo).get_filename ());
-        app_uri = "application://" + basename;
+        string? filename = (app_info as DesktopAppInfo).get_filename ();
+        if (filename == null) return;
+        app_uri = "application://" + Path.get_basename (filename);
       }
 
       push_app_launch (app_uri, app_info.get_display_name ());
