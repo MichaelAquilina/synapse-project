@@ -112,11 +112,8 @@ namespace Synapse.Gui
       {
         window.set_keep_above (true);
       }
-      /* Make sure to skip taskbar, just in case. */
-      window.set_skip_taskbar_hint (true);
-      window.set_skip_pager_hint (true);
 
-      return true;
+      return false;
     }
     
     private bool check_focus ()
