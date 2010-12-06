@@ -25,6 +25,7 @@ libsynapsecore_la_VALASOURCES = \
 	plugin.vala \
 	query.vala \
 	relevancy-service.vala \
+	relevancy-backend-zg.vala \
 	result-set.vala \
 	utils.vala \
 	$(NULL)

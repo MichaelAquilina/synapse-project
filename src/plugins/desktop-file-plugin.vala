@@ -46,6 +46,7 @@ namespace Synapse
       }
       
       public string? title_unaccented { get; set; default = null; }
+      public string? desktop_id { get; set; default = null; }
 
       public string exec { get; set; }
 
@@ -65,6 +66,7 @@ namespace Synapse
         this.needs_terminal = info.needs_terminal;
         this.title_folded = info.get_name_folded ();
         this.title_unaccented = Utils.remove_accents (this.title_folded);
+        this.desktop_id = "application://" + Path.get_basename (this.filename);
       }
     }
 
@@ -133,25 +135,34 @@ namespace Synapse
       loading_in_progress = false;
       load_complete ();
     }
+    
+    private int compute_relevancy (DesktopFileMatch dfm, int base_relevancy)
+    {
+      var rs = RelevancyService.get_default ();
+      float popularity = rs.get_application_popularity (dfm.desktop_id);
+      
+      int bump = (int) (popularity * Query.MATCH_SCORE_MAX);
+      return int.min (base_relevancy + bump, Query.MATCH_SCORE_MAX);
+    }
 
     private void simple_search (Query q, ResultSet results)
     {
       // search method used for 1 letter searches
       unowned string query = q.query_string_folded;
 
-      foreach (var dfi in desktop_files)
+      foreach (var dfm in desktop_files)
       {
-        if (dfi.get_title_folded ().has_prefix (query))
+        if (dfm.get_title_folded ().has_prefix (query))
         {
-          results.add (dfi, Query.MATCH_PREFIX);
+          results.add (dfm, compute_relevancy (dfm, Query.MATCH_PREFIX));
         }
-        else if (dfi.title_unaccented != null && dfi.title_unaccented.has_prefix (query))
+        else if (dfm.title_unaccented != null && dfm.title_unaccented.has_prefix (query))
         {
-          results.add (dfi, Query.MATCH_PREFIX - Query.MATCH_PENALTY_SMALL);
+          results.add (dfm, compute_relevancy (dfm, Query.MATCH_PREFIX - Query.MATCH_PENALTY_SMALL));
         }
-        else if (dfi.exec.has_prefix (q.query_string))
+        else if (dfm.exec.has_prefix (q.query_string))
         {
-          results.add (dfi, 60);
+          results.add (dfm, compute_relevancy (dfm, Query.MATCH_FIRST_LETTERS - Query.MATCH_PENALTY_MEDIUM));
         }
       }
     }
@@ -161,10 +172,10 @@ namespace Synapse
       // try to match against global matchers and if those fail, try also exec
       var matchers = Query.get_matchers_for_query (q.query_string_folded);
 
-      foreach (var dfi in desktop_files)
+      foreach (var dfm in desktop_files)
       {
-        unowned string folded_title = dfi.get_title_folded ();
-        unowned string unaccented_title = dfi.title_unaccented;
+        unowned string folded_title = dfm.get_title_folded ();
+        unowned string unaccented_title = dfm.title_unaccented;
         bool matched = false;
         // FIXME: we need to do much smarter relevancy computation in fuzzy re
         // "sysmon" matching "System Monitor" is very good as opposed to
@@ -173,20 +184,21 @@ namespace Synapse
         {
           if (matcher.key.match (folded_title))
           {
-            results.add (dfi, matcher.value);
+            results.add (dfm, compute_relevancy (dfm, matcher.value));
             matched = true;
             break;
           }
           else if (unaccented_title != null && matcher.key.match (unaccented_title))
           {
-            results.add (dfi, matcher.value - Query.MATCH_PENALTY_SMALL);
+            results.add (dfm, compute_relevancy (dfm, matcher.value - Query.MATCH_PENALTY_SMALL));
             matched = true;
             break;
           }
         }
-        if (!matched && dfi.exec.has_prefix (q.query_string))
+        if (!matched && dfm.exec.has_prefix (q.query_string))
         {
-          results.add (dfi, dfi.exec == q.query_string ? 85 : 65);
+          results.add (dfm, compute_relevancy (dfm, dfm.exec == q.query_string ?
+            Query.MATCH_WORD_PREFIX : Query.MATCH_FIRST_LETTERS - Query.MATCH_PENALTY_SMALL));
         }
       }
     }

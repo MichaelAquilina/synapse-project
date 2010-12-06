@@ -20,6 +20,14 @@
 
 namespace Synapse
 {
+  public interface RelevancyBackend: Object
+  {
+    public abstract float get_application_popularity (string desktop_id);
+    public abstract float get_uri_popularity (string uri);
+
+    public abstract void application_launched (AppInfo app_info);
+  }
+
   public class RelevancyService : GLib.Object
   {
     // singleton that can be easily destroyed
@@ -50,7 +58,7 @@ namespace Synapse
     private void initialize_relevancy_backend ()
     {
 #if HAVE_ZEITGEIST
-      backend = new ZeitgeistBackend ();
+      backend = new ZeitgeistRelevancyBackend ();
 #endif
     }
     
@@ -71,76 +79,6 @@ namespace Synapse
       return_if_fail (backend != null);
       backend.application_launched (app_info);
     }
-    
-    private abstract class RelevancyBackend: Object
-    {
-      public abstract float get_application_popularity (string desktop_id);
-      public abstract float get_uri_popularity (string uri);
-
-      public abstract void application_launched (AppInfo app_info);
-    }
-
-#if HAVE_ZEITGEIST
-    private class ZeitgeistBackend: RelevancyBackend
-    {
-      Zeitgeist.Log zg_log;
-      
-      construct
-      {
-        zg_log = new Zeitgeist.Log ();
-      }
-      
-      public override float get_application_popularity (string desktop_id)
-      {
-        return 0.0f;
-      }
-      
-      public override float get_uri_popularity (string uri)
-      {
-        return 0.0f;
-      }
-      
-      public override void application_launched (AppInfo app_info)
-      {
-        // detect if the Zeitgeist GIO module is installed
-        Type zg_gio_module = Type.from_name ("GAppLaunchHandlerZeitgeist");
-        if (zg_gio_module != 0 || !app_info.should_show ()) return;
-
-        string app_uri = null;
-        if (app_info.get_id () != null)
-        {
-          app_uri = "application://" + app_info.get_id ();
-        }
-        else if (app_info is DesktopAppInfo)
-        {
-          var basename = Path.get_basename ((app_info as DesktopAppInfo).get_filename ());
-          app_uri = "application://" + basename;
-        }
-
-        push_app_launch (app_uri, app_info.get_display_name ());
-      }
-
-      private void push_app_launch (string app_uri, string? display_name)
-      {
-        //debug ("pushing launch event: %s [%s]", app_uri, display_name);
-        var event = new Zeitgeist.Event ();
-        var subject = new Zeitgeist.Subject ();
-
-        event.set_actor ("application://synapse.desktop");
-        event.set_interpretation (Zeitgeist.ZG_ACCESS_EVENT);
-        event.set_manifestation (Zeitgeist.ZG_USER_ACTIVITY);
-        event.add_subject (subject);
-
-        subject.set_uri (app_uri);
-        subject.set_interpretation (Zeitgeist.NFO_SOFTWARE);
-        subject.set_manifestation (Zeitgeist.NFO_SOFTWARE_ITEM);
-        subject.set_mimetype ("application/x-desktop");
-        subject.set_text (display_name);
-
-        zg_log.insert_events_no_reply (event, null);
-      }
-    }
-#endif
   }
 }
 

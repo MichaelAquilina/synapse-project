@@ -201,6 +201,7 @@ namespace Synapse
     private async void initialize ()
     {
       get_environment_type ();
+      DesktopAppInfo.set_desktop_env (session_type_str);
       yield load_all_desktop_files ();
       
       initialized = true;
@@ -209,27 +210,45 @@ namespace Synapse
     
     private DesktopFileInfo.EnvironmentType session_type =
       DesktopFileInfo.EnvironmentType.GNOME;
+    private string session_type_str = "GNOME";
     
     private void get_environment_type ()
     {
       unowned string? session_var = Environment.get_variable ("DESKTOP_SESSION");
       
       if (session_var == null) return;
-      
+
       string session = session_var.down ();
-      
+
       if (session.has_prefix ("kde"))
+      {
         session_type = DesktopFileInfo.EnvironmentType.KDE;
+        session_type_str = "KDE";
+      }
       else if (session.has_prefix ("gnome"))
+      {
         session_type = DesktopFileInfo.EnvironmentType.GNOME;
+        session_type_str = "GNOME";
+      }
       else if (session.has_prefix ("lx"))
+      {
         session_type = DesktopFileInfo.EnvironmentType.LXDE;
+        session_type_str = "XFCE"; // FIXME: does GDesktopApp understand LXDE?
+      }
       else if (session.has_prefix ("xfce"))
+      {
         session_type = DesktopFileInfo.EnvironmentType.XFCE;
+        session_type_str = "XFCE";
+      }
       else if (session.has_prefix ("rox"))
+      {
         session_type = DesktopFileInfo.EnvironmentType.ROX;
+        session_type_str = "ROX";
+      }
       else
+      {
         warning ("Desktop session type is not recognized, assuming GNOME.");
+      }
     }
     
     private async void process_directory (File directory,
