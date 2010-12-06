@@ -68,7 +68,7 @@ namespace Synapse.Gui
       window.set_position (WindowPosition.CENTER);
       window.set_decorated (false);
       window.set_resizable (false);
-      window.set_type_hint (Gdk.WindowTypeHint.DOCK);
+      window.set_type_hint (Gdk.WindowTypeHint.DIALOG);
       window.set_keep_above (true);
       window.notify["is-active"].connect (()=>{
         Idle.add (check_focus);
