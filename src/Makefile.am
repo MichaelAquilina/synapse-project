@@ -13,11 +13,11 @@ synapse_VALAFLAGS = \
 	--pkg gee-1.0 \
 	--pkg json-glib-1.0 \
 	--pkg unique-1.0 \
-	--vapidir $(srcdir)/core \
+	--vapidir $(top_srcdir)/src/core \
 	--pkg synapse-core \
-	--vapidir $(srcdir)/plugins \
+	--vapidir $(top_srcdir)/src/plugins \
 	--pkg plugins \
-	--vapidir $(srcdir)/tile-view \
+	--vapidir $(top_srcdir)/src/tile-view \
 	--pkg tile-view \
 	--vapidir $(VAPIDIR) \
 	--pkg gtkhotkey-1.0 \

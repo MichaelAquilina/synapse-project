@@ -207,6 +207,7 @@ namespace Synapse
     {
       // we only search for applications
       if (!(QueryFlags.APPLICATIONS in q.query_type)) return null;
+      if (q.query_string.strip () == "") return null;
 
       if (loading_in_progress)
       {

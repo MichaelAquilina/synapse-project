@@ -24,7 +24,7 @@ namespace Synapse
   public class ZeitgeistPlugin: DataPlugin
   {
     private const string UNIQUE_NAME = "org.gnome.zeitgeist.Engine";
-    private class MatchObject: Object, Match, UriMatch
+    private class MatchObject: Object, Match, UriMatch, ApplicationMatch
     {
       // for Match interface
       public string title { get; construct set; }
@@ -33,7 +33,12 @@ namespace Synapse
       public bool has_thumbnail { get; construct set; default = false; }
       public string thumbnail_path { get; construct set; }
       public MatchType match_type { get; construct set; }
-      
+
+      // for ApplicationMatch
+      public AppInfo? app_info { get; set; }
+      public bool needs_terminal { get; set; }
+      public string? filename { get; construct set; }
+
       // for UriMatch
       public string uri { get; set; }
       public QueryFlags file_type { get; set; }
@@ -41,14 +46,16 @@ namespace Synapse
 
       public MatchObject (Zeitgeist.Event event,
                           string? thumbnail_path,
-                          string? icon)
+                          string? icon,
+                          bool is_application = false)
       {
         Object (match_type: MatchType.GENERIC_URI,
                 has_thumbnail: thumbnail_path != null,
                 icon_name: icon ?? "",
                 thumbnail_path: thumbnail_path ?? "");
 
-        init_from_event (event);
+        if (!is_application) init_from_event (event);
+        else init_from_app_event (event);
       }
 
       private void init_from_event (Zeitgeist.Event event)
@@ -95,6 +102,23 @@ namespace Synapse
         {
           this.file_type = QueryFlags.UNCATEGORIZED;
         }
+      }
+
+      private void init_from_app_event (Zeitgeist.Event event)
+      {
+        this.file_type = QueryFlags.UNCATEGORIZED;
+        this.match_type = MatchType.APPLICATION;
+        var subject = event.get_subject (0);
+        this.uri = subject.get_uri ();
+
+        var dfs = DesktopFileService.get_default ();
+        var dfi = dfs.get_desktop_file_for_id (uri.offset (14));
+
+        this.title = dfi.name;
+        this.icon_name = dfi.icon_name;
+        this.description = dfi.comment;
+        this.needs_terminal = dfi.needs_terminal;
+        this.filename = dfi.filename;
       }
     }
     
@@ -334,6 +358,7 @@ namespace Synapse
         unowned string uri = subject.get_uri ();
         if (!(uri in uris))
         {
+          bool is_application = uri.has_prefix ("application://");
           int relevancy_penalty = Match.URI_PENALTY;
           string? thumbnail_path = null;
           string? icon = null;
@@ -361,9 +386,14 @@ namespace Synapse
               else continue; // file doesn't exist
             }
           }
-          else if (local_only)
+          else if (local_only && !is_application)
           {
             continue;
+          }
+          else if (is_application)
+          {
+            var dfs = DesktopFileService.get_default ();
+            if (dfs.get_desktop_file_for_id (uri.offset (14)) == null) continue;
           }
           else
           {
@@ -379,7 +409,8 @@ namespace Synapse
           //  more details about the item (ie last accessed info in this case)
           var match_obj = new MatchObject (event,
                                            thumbnail_path,
-                                           icon);
+                                           icon,
+                                           is_application);
 
           int relevancy = (int) ((events_size - event_index) / 
             (float) events_size * Query.MATCH_SCORE_MAX);
@@ -418,6 +449,16 @@ namespace Synapse
         templates.add (event);
 
         return templates; // this is the only template we need
+      }
+      
+      if (QueryFlags.APPLICATIONS in flags)
+      {
+        subject = new Zeitgeist.Subject ();
+        subject.set_interpretation (Zeitgeist.NFO_SOFTWARE);
+        event = new Zeitgeist.Event ();
+        event.add_subject (subject);
+
+        templates.add (event);
       }
 
       if (QueryFlags.AUDIO in flags)
@@ -479,6 +520,9 @@ namespace Synapse
       {
         event = new Zeitgeist.Event ();
         subject = new Zeitgeist.Subject ();
+        subject.set_interpretation ("!" + Zeitgeist.NFO_SOFTWARE);
+        event.add_subject (subject);
+        subject = new Zeitgeist.Subject ();
         subject.set_interpretation ("!" + Zeitgeist.NFO_AUDIO);
         event.add_subject (subject);
         subject = new Zeitgeist.Subject ();
@@ -515,23 +559,28 @@ namespace Synapse
 
     public override async ResultSet? search (Query q) throws SearchError
     {
-      var result = new ResultSet ();
+      var search_query = q.query_string.strip ();
+      bool empty_query = search_query == "";
+      // allow application searching only for empty queries
+      if (!empty_query) q.query_type = q.query_type & (~QueryFlags.APPLICATIONS);
 
       var timer = new Timer ();
 
       var templates = new PtrArray ();
       var event_templates = create_templates (q.query_type);
-      if (event_templates.length == 0) return result; // nothing to search for
+      if (event_templates.length == 0) return null; // nothing to search for
       for (int i=0; i<event_templates.length; i++)
       {
         templates.add (event_templates[i]);
       }
 
+      var result = new ResultSet ();
+
       try
       {
         Zeitgeist.ResultSet rs;
         bool only_local = !(QueryFlags.INCLUDE_REMOTE in q.query_type);
-        if (q.query_string == "")
+        if (empty_query)
         {
           // special case empty searches
           int64 start_ts = Zeitgeist.Timestamp.now () - Zeitgeist.Timestamp.WEEK;
@@ -549,15 +598,15 @@ namespace Synapse
         }
         else
         {
-          var search_query = q.query_string.strip ();
           if (!search_query.has_suffix ("*")) search_query += "*";
           rs = yield zg_index.search (search_query,
-                                          new Zeitgeist.TimeRange (int64.MIN, int64.MAX),
-                                          (owned) templates,
-                                          0,
-                                          q.max_results,
-                                          Zeitgeist.ResultType.MOST_RECENT_SUBJECTS,
-                                          q.cancellable);
+                                      new Zeitgeist.TimeRange (int64.MIN, int64.MAX),
+                                      (owned) templates,
+                                      0,
+                                      q.max_results,
+                                      Zeitgeist.ResultType.MOST_RECENT_SUBJECTS,
+                                      q.cancellable);
+
           if (!q.is_cancelled ())
           {
             yield process_results (q.query_string, rs, q.cancellable, result,

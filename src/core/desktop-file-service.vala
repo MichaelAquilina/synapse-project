@@ -179,11 +179,12 @@ namespace Synapse
     private Gee.List<DesktopFileInfo> non_hidden_desktop_files;
     private Gee.Map<unowned string, Gee.List<DesktopFileInfo> > mimetype_map;
     private Gee.Map<string, Gee.List<DesktopFileInfo> > exec_map;
+    private Gee.Map<string, DesktopFileInfo> desktop_id_map;
     
     construct
     {
       instance = this;
-      
+
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
       all_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
       non_hidden_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
@@ -381,6 +382,9 @@ namespace Synapse
       // and exec map
       exec_map =
         new Gee.HashMap<string, Gee.List<DesktopFileInfo> > ();
+      // and desktop id map
+      desktop_id_map =
+        new Gee.HashMap<string, DesktopFileInfo> ();
 
       Regex exec_re;
       try
@@ -404,6 +408,9 @@ namespace Synapse
           exec_map[exec] = exec_list;
         }
         exec_list.add (dfi);
+
+        // update desktop id map
+        desktop_id_map[Path.get_basename (dfi.filename)] = dfi;
 
         // update mimetype map
         if (dfi.mime_types == null) continue;
@@ -442,6 +449,11 @@ namespace Synapse
     public Gee.List<DesktopFileInfo> get_desktop_files_for_exec (string exec)
     {
       return exec_map[exec] ?? new Gee.ArrayList<DesktopFileInfo> ();
+    }
+    
+    public DesktopFileInfo? get_desktop_file_for_id (string desktop_id)
+    {
+      return desktop_id_map[desktop_id];
     }
   }
 }

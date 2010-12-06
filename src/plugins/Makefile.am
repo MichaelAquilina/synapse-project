@@ -10,7 +10,7 @@ libplugins_la_VALAFLAGS = \
 	--pkg dbus-glib-1 \
 	--pkg gio-unix-2.0 \
 	--pkg zeitgeist-1.0 \
-	--vapidir $(srcdir)/../core \
+	--vapidir $(top_srcdir)/src/core \
 	--pkg synapse-core \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
