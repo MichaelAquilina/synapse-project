@@ -19,7 +19,7 @@ libplugins_la_VALAFLAGS = \
 
 libplugins_la_CFLAGS = \
 	$(SYNAPSE_MODULES_CFLAGS) \
-	-include config.h \
+	-include config.h -w \
 	-I$(top_srcdir)/src/core \
 	$(NULL)
 libplugins_la_LIBADD = $(SYNAPSE_MODULES_LIBS) ../core/libsynapsecore.la

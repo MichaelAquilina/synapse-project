@@ -28,7 +28,7 @@ synapse_VALAFLAGS = \
 
 synapse_CFLAGS = \
 	$(SYNAPSE_MODULES_CFLAGS) \
-	-include config.h \
+	-include config.h -w \
 	-I$(top_srcdir)/src/core \
 	-I$(top_srcdir)/src/plugins \
 	-I$(top_srcdir)/src/tile-view \

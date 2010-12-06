@@ -121,7 +121,7 @@ namespace UI.Widgets
     protected override void realize ()
     {
       this.set_flags (WidgetFlags.NO_WINDOW);
-      this.set_window (this.parent.get_window ());
+      this.set_window (this.get_parent ().get_window ());
       base.realize ();
     }
 

@@ -137,7 +137,8 @@ namespace UI.Widgets
 
       changing_style = true;
       base.style_set (prev_style);
-      parent.modify_bg (StateType.NORMAL, style.@base[StateType.NORMAL]);
+      unowned Widget p = this.get_parent ();
+      p.modify_bg (StateType.NORMAL, style.@base[StateType.NORMAL]);
       changing_style = false;
     }
 
