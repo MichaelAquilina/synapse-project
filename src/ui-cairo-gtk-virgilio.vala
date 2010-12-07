@@ -165,9 +165,11 @@ namespace Synapse.Gui
         list_view_matches_renderer = new MatchRenderer ();
         list_view_matches_renderer.icon_size = 48;
         list_view_matches_renderer.cell_vpadding = 1;
-        list_view_matches_renderer.markup = "<span size=\"x-large\"><b>%s</b></span>\n<span size=\"medium\">%s</span>";
+        list_view_matches_renderer.title_markup = "<span size=\"large\"><b>%s</b></span>";
+        list_view_matches_renderer.description_markup = "<span size=\"medium\">%s</span>";
         list_view_matches_renderer.set_width_request (100);
         list_view_matches_renderer.hilight_on_selected = true;
+        list_view_matches_renderer.hide_extended_on_selected = true;
         list_view_matches = new ListView<Match> (list_view_matches_renderer);
         list_view_matches.min_visible_rows = 5;
         list_view_matches.use_base_background = false;
@@ -180,9 +182,11 @@ namespace Synapse.Gui
         list_view_actions_renderer = new MatchRenderer ();
         list_view_actions_renderer.icon_size = 36;
         list_view_actions_renderer.cell_vpadding = 1;
-        list_view_actions_renderer.markup = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";
+        list_view_actions_renderer.title_markup = "<span size=\"medium\"><b>%s</b></span>";
+        list_view_actions_renderer.description_markup = "<span size=\"small\">%s</span>";
         list_view_actions_renderer.set_width_request (100);
         list_view_actions_renderer.hilight_on_selected = true;
+        list_view_actions_renderer.show_extended_info = false;
         list_view_actions = new ListView<Match> (list_view_actions_renderer);
         list_view_actions.min_visible_rows = 5;
         list_view_actions.use_base_background = false;

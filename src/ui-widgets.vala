@@ -31,9 +31,14 @@ namespace Synapse.Gui
     public int cell_hpadding {get; set; default = 3;}
     public bool hilight_on_selected {get; set; default = false;}
     public bool show_pattern_in_hilight {get; set; default = false;}
+    public bool show_extended_info {get; set; default = true;}
+    public bool hide_extended_on_selected {get; set; default = false;}
+    public bool overlay_action {get; set; default = false;}
     public string pattern {get; set; default = "";}
     public Match action {get; set; default = null;}
-    public string markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>\n<span size=\"small\">%s</span>";}
+    public string title_markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>";}
+    public string description_markup {get; set; default = "<span size=\"small\">%s</span>";}
+    public string extended_info_markup {get; set; default = "%s";}
 
     private Utils.ColorHelper ch;
     private Label label;
@@ -55,7 +60,8 @@ namespace Synapse.Gui
       this.notify["icon-size"].connect (size_changed);
       this.notify["cell-vpadding"].connect (size_changed);
       this.notify["cell-hpadding"].connect (size_changed);
-      this.notify["markup"].connect (size_changed);
+      this.notify["title-markup"].connect (size_changed);
+      this.notify["description-markup"].connect (size_changed);
     }
     private void size_changed ()
     {
@@ -80,7 +86,8 @@ namespace Synapse.Gui
     }
     private void calc_requisition ()
     {
-      string s = Markup.printf_escaped (markup, " ", " ");
+      string s = "%s\n%s".printf (title_markup, description_markup);
+      Markup.printf_escaped (s, " ", " ");
       layout.set_markup (s, -1);
       int width = 0, height = 0;
       layout.get_pixel_size (out width, out height);
@@ -88,31 +95,18 @@ namespace Synapse.Gui
       height += cell_hpadding * 2;
       this.precalc_req.height = int.max (height, icon_size + cell_hpadding * 2);
     }
-    private void draw_icon (Cairo.Context ctx, Match m, Requisition req)
+    private void draw_icon (Cairo.Context ctx, Match m, int x, int y)
     {
       ctx.save ();
-
-      if (rtl == Gtk.TextDirection.RTL)
-        ctx.translate (req.width - cell_hpadding - icon_size, (req.height - icon_size) / 2);
-      else
-        ctx.translate (cell_hpadding, (req.height - icon_size) / 2);
-
+      ctx.translate (x, y);
       draw_icon_in_position (ctx, m.icon_name, icon_size);
       ctx.restore ();
     }
-    private void draw_action (Cairo.Context ctx, Requisition req)
+    private void draw_action (Cairo.Context ctx, int x, int y)
     {
-      if (action == null) return;
       ctx.save ();
-      
-      int action_icon_size = icon_size;
-
-      if (rtl == Gtk.TextDirection.RTL)
-        ctx.translate (cell_hpadding, (req.height - action_icon_size) / 2);
-      else
-        ctx.translate (req.width - cell_hpadding - action_icon_size, (req.height - action_icon_size) / 2);
-
-      draw_icon_in_position (ctx, action.icon_name, action_icon_size);
+      ctx.translate (x, y);
+      draw_icon_in_position (ctx, action.icon_name, icon_size);
       ctx.restore ();
     }
     private void draw_icon_in_position (Cairo.Context ctx, string? name, int pixel_size)
@@ -136,32 +130,67 @@ namespace Synapse.Gui
         }
       } catch (GLib.Error err) { /* do not render icon */ }
     }
-    private void draw_text (Cairo.Context ctx, Match m, Requisition req, Gtk.StateType state)
+    private void draw_text (Cairo.Context ctx, Match m, int x, int y, int width, Gtk.StateType state)
     {
       ctx.save ();
-      int width = req.width - cell_hpadding * 4 - icon_size;
-
-      if (rtl == Gtk.TextDirection.RTL)
-        ctx.translate (cell_hpadding, (req.height - text_height) / 2);
-      else
-        ctx.translate (icon_size + cell_hpadding * 3, (req.height - text_height) / 2);
-
+      ctx.translate (x, y);
       ctx.rectangle (0, 0, width, text_height);
       ctx.clip ();
-      
+
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
       string s = "";
-      if (!this.hilight_on_selected || state != Gtk.StateType.SELECTED)
-        s = Markup.printf_escaped (markup, m.title, m.description);
+      /* ----------------------- draw title --------------------- */
+      if (hilight_on_selected && state == Gtk.StateType.SELECTED)
+      {
+        s = title_markup.printf (Utils.markup_string_with_search (m.title, pattern, "", show_pattern_in_hilight));
+      }
       else
       {
-        s = markup.printf (Utils.markup_string_with_search (m.title, pattern, "", show_pattern_in_hilight),
-                           Markup.printf_escaped ("%s", m.description));
+        s = Markup.printf_escaped (title_markup, m.title);
       }
       layout.set_markup (s, -1);
       layout.set_width (Pango.SCALE * width);
       Pango.cairo_show_layout (ctx, layout);
 
+      bool has_extended_info = show_extended_info && (m is ExtendedInfo);
+      if (hide_extended_on_selected && state == Gtk.StateType.SELECTED) has_extended_info = false;
+      int width_for_description = width - cell_hpadding;
+      
+      /* ----------------- draw extended info ------------------- */
+      if (has_extended_info)
+      {
+        ctx.save ();
+        s = Markup.printf_escaped (extended_info_markup, (m as ExtendedInfo).extended_info ?? "");
+        s = description_markup.printf (s);
+        layout.set_markup (s, -1);
+        layout.set_width (Pango.SCALE * width_for_description);
+        int w = 0, h = 0;
+        layout.get_pixel_size (out w, out h);
+        
+        width_for_description -= w;
+        
+        if (rtl == Gtk.TextDirection.RTL) 
+          ctx.translate (0, text_height - h);
+        else
+          ctx.translate (width - w, text_height - h);
+        Pango.cairo_show_layout (ctx, layout);
+        ctx.restore ();
+      }
+      
+      /* ------------------ draw description --------------------- */
+      s = Markup.printf_escaped (description_markup, m.description);
+
+      layout.set_markup (s, -1);
+      layout.set_width (Pango.SCALE * width_for_description);
+      int w = 0, h = 0;
+      layout.get_pixel_size (out w, out h);
+      
+      if (rtl == Gtk.TextDirection.RTL) 
+        ctx.translate (width - width_for_description, text_height - h);
+      else
+        ctx.translate (0, text_height - h);
+
+      Pango.cairo_show_layout (ctx, layout);
       ctx.restore ();
     }
     public override void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj)
@@ -169,13 +198,58 @@ namespace Synapse.Gui
       if (obj == null)
         return;
       Match m = (Match) obj;
-
+      /* _____   ____________________________   _____
+        |     | |                            | |     |
+        |     | |____________________________| |     |
+        |_____| |____|__________________|____| |_____|
+      */
       ctx.set_operator (Cairo.Operator.OVER);
+      //rtl = Gtk.TextDirection.RTL; // <-- uncomment to test RTL
+      bool has_action = false;
+      if (state == Gtk.StateType.SELECTED && action != null) has_action = true;
 
-      draw_text (ctx, m, req, state);
-      draw_icon (ctx, m, req);
-      if (state == Gtk.StateType.SELECTED)
-        draw_action (ctx, req);
+      int x = 0, y = 0;
+      int text_width = req.width - cell_hpadding * 4 - icon_size;
+      if (has_action && !overlay_action) text_width = text_width - cell_hpadding * 2 - icon_size;
+
+      if (rtl != Gtk.TextDirection.RTL)
+      {
+        /* Match Icon */
+        x = cell_hpadding;
+        y = (req.height - icon_size) / 2;
+        draw_icon (ctx, m, x, y);
+
+        /* Title and description */
+        x += icon_size + cell_hpadding * 2;
+        y = (req.height - text_height) / 2;
+        draw_text (ctx, m, x, y, text_width, state);
+
+        /* Action Icon */
+        if (has_action)
+        {
+          y = (req.height - icon_size) / 2;
+          draw_action (ctx, req.width - cell_hpadding - icon_size, y);
+        }
+      }
+      else
+      {
+        /* Match Icon */
+        x = req.width - cell_hpadding - icon_size;
+        y = (req.height - icon_size) / 2;
+        draw_icon (ctx, m, x, y);
+
+        /* Title and description */
+        x = x - cell_hpadding * 2 - text_width;
+        y = (req.height - text_height) / 2;
+        draw_text (ctx, m, x, y, text_width, state);
+        
+        /* Action Icon */
+        if (has_action)
+        {
+          y = (req.height - icon_size) / 2;
+          draw_action (ctx, cell_hpadding, y);
+        }
+      }
     }
     public override void size_request (out Requisition requisition)
     {
