@@ -247,9 +247,9 @@ namespace Synapse
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var shell = (RhythmboxShell) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
-                                                          RhythmboxPlayer.OBJECT_PATH,
-                                                          RhythmboxPlayer.INTERFACE_NAME);
+          var shell = (RhythmboxShell) conn.get_object (RhythmboxShell.UNIQUE_NAME,
+                                                          RhythmboxShell.OBJECT_PATH,
+                                                          RhythmboxShell.INTERFACE_NAME);
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH,
                                                           RhythmboxPlayer.INTERFACE_NAME);
@@ -294,9 +294,9 @@ namespace Synapse
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
         try {
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var shell = (RhythmboxShell) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
-                                                          RhythmboxPlayer.OBJECT_PATH,
-                                                          RhythmboxPlayer.INTERFACE_NAME);
+          var shell = (RhythmboxShell) conn.get_object (RhythmboxShell.UNIQUE_NAME,
+                                                          RhythmboxShell.OBJECT_PATH,
+                                                          RhythmboxShell.INTERFACE_NAME);
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH,
                                                           RhythmboxPlayer.INTERFACE_NAME);
