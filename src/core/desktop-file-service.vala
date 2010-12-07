@@ -103,7 +103,7 @@ namespace Synapse
         }
         
         if (keyfile.has_key (GROUP, "Categories") &&
-          keyfile.get_string ("Screensaver")) // FIXME: string_list?!
+          keyfile.get_string (GROUP, "Categories") == "Screensaver") // FIXME: string_list?!
         {
           throw new DesktopFileError.UNINTERESTING_ENTRY ("Screensaver desktop entry");
         }
