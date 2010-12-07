@@ -180,110 +180,19 @@ namespace Synapse
 
     private Zeitgeist.Index zg_index;
     private Zeitgeist.Log zg_log;
-    private Gee.Map<string, int> popularity_map;
 
     construct
     {
       zg_log = new Zeitgeist.Log ();
       zg_index = new Zeitgeist.Index ();
-      popularity_map = new Gee.HashMap<string, int> ();
-
-      initialize_popularity_map ();
-      Timeout.add_seconds (60*60, refresh_popularity);
     }
-    
-    private bool refresh_popularity ()
+
+    private int compute_relevancy (string uri, int base_relevancy)
     {
-      initialize_popularity_map ();
-      return true;
-    }
-    
-    private async void initialize_popularity_map ()
-    {
-      Idle.add (initialize_popularity_map.callback, Priority.LOW);
-      yield;
-      
-      int64 end = Zeitgeist.Timestamp.now ();
-      int64 start = end - Zeitgeist.Timestamp.WEEK * 4;
-      Zeitgeist.TimeRange tr = new Zeitgeist.TimeRange (start, end);
-      
-      var event = new Zeitgeist.Event ();
-      event.set_interpretation ("!" + Zeitgeist.ZG_LEAVE_EVENT);
-      
-      var ptr_arr = new PtrArray ();
-      ptr_arr.add (event);
-      
-      Zeitgeist.ResultSet rs;
+      var rs = RelevancyService.get_default ();
+      float pop = rs.get_uri_popularity (uri);
 
-      try
-      {
-        rs =
-          yield zg_log.find_events (tr, (owned) ptr_arr,
-                                    Zeitgeist.StorageState.ANY,
-                                    256,
-                                    Zeitgeist.ResultType.MOST_POPULAR_SUBJECTS,
-                                    null);
-      }
-      catch (Error err)
-      {
-        warning ("%s", err.message);
-        return;
-      }
-
-      // approximate the higher relevancy of the first results
-      uint size = rs.size ();
-      uint index = 0;
-      foreach (var e in rs)
-      {
-        float power = index / (size * 2) + 0.5f; // linearly <0.5, 1.0>
-        float relevancy = 1.0f / Math.powf (index + 1, power);
-        
-        popularity_map[e.get_subject (0).get_uri ()] = (int)(relevancy * 65535);
-        
-        index++;
-      }
-
-      /*
-      uint requests = 0;
-      
-      foreach (var e in rs)
-      {
-        var uri = e.get_subject (0).get_uri ();
-        
-        var subject = new Zeitgeist.Subject ();
-        subject.set_uri (uri);
-        event = new Zeitgeist.Event ();
-        event.set_interpretation ("!" + Zeitgeist.ZG_LEAVE_EVENT);
-        event.add_subject (subject);
-        
-        ptr_arr = new PtrArray ();
-        ptr_arr.add (event);
-
-        requests++;
-        zg_log.find_event_ids (tr, (owned) ptr_arr,
-                               Zeitgeist.StorageState.ANY, 0,
-                               Zeitgeist.ResultType.MOST_RECENT_EVENTS,
-                               null, (obj, res) =>
-        {
-          try
-          {
-            Array<int> events = zg_log.find_event_ids.end (res);
-            map[uri] = events.length;
-          }
-          catch (Error err)
-          {
-          }
-          requests--;
-          if (requests <= 0) initialize_popularity_map.callback ();
-        });
-      }
-      if (requests > 0) yield;
-
-      foreach (var entry in popularity_map.entries)
-      {
-        print ("%d score - %s\n", entry.value, Path.get_basename (entry.key));
-      }
-      */
+      return RelevancyService.compute_relevancy (base_relevancy, pop);
     }
 
     private string interesting_attributes =
@@ -312,7 +221,7 @@ namespace Synapse
         unowned string uri = subject.get_uri ();
         if (!(uri in uris))
         {
-          int relevancy_penalty = Match.URI_PENALTY;
+          int relevancy_penalty = Match.Score.URI_PENALTY;
           string? thumbnail_path = null;
           string? icon = null;
           uris.add (uri);
@@ -345,7 +254,7 @@ namespace Synapse
           }
           else
           {
-            relevancy_penalty += 5;
+            relevancy_penalty += Match.Score.INCREMENT_SMALL;
             if (f.get_uri_scheme () == "data") continue;
             unowned string mimetype = subject.get_mimetype ();
             if (mimetype != null && mimetype != "")
@@ -361,19 +270,13 @@ namespace Synapse
           {
             if (matcher.key.match (match_obj.title))
             {
-              int relevancy = matcher.value - relevancy_penalty;
-              if (uri in popularity_map)
-              {
-                float pr = popularity_map[uri] / 65535f;
-                float mr = (float) relevancy / Query.MATCH_SCORE_MAX;
-                relevancy = (int) (float.min(pr + mr, 1.0f) * Query.MATCH_SCORE_MAX);
-              }
+              int relevancy = compute_relevancy (uri, matcher.value - relevancy_penalty);
               results.add (match_obj, relevancy);
               match_found = true;
               break;
             }
           }
-          if (!match_found) results.add (match_obj, 60);
+          if (!match_found) results.add (match_obj, Match.Score.POOR + Match.Score.INCREMENT_MINOR);
         }
       }
     }
@@ -397,7 +300,7 @@ namespace Synapse
         if (!(uri in uris))
         {
           bool is_application = uri.has_prefix ("application://");
-          int relevancy_penalty = Match.URI_PENALTY;
+          int relevancy_penalty = Match.Score.URI_PENALTY;
           string? thumbnail_path = null;
           string? icon = null;
           uris.add (uri);
@@ -451,7 +354,7 @@ namespace Synapse
           match_obj.init_extended_info_from_event (event);
 
           int relevancy = (int) ((events_size - event_index) / 
-            (float) events_size * Query.MATCH_SCORE_MAX);
+            (float) events_size * Match.Score.HIGHEST);
           results.add (match_obj, relevancy);
         }
       }

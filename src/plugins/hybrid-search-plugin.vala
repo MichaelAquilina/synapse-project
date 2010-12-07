@@ -496,6 +496,8 @@ namespace Synapse
           warning ("%s", err.message);
         }
 
+        var rel_srv = RelevancyService.get_default ();
+
         // only add the uri if it matches our query
         foreach (var entry in di.files.entries)
         {
@@ -519,7 +521,10 @@ namespace Synapse
                 // file info is now initialized
                 if (fi.match_obj != null && fi.file_type in q.query_type)
                 {
-                  results.add (fi.match_obj, matcher.value - Match.URI_PENALTY);
+                  int base_relevancy = matcher.value - Match.Score.URI_PENALTY;
+                  float pop = rel_srv.get_uri_popularity (fi.uri);
+                  results.add (fi.match_obj, 
+                    RelevancyService.compute_relevancy (base_relevancy, pop));
                   num_results++;
                 }
               }

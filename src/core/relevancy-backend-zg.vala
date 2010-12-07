@@ -34,7 +34,16 @@ namespace Synapse
       application_popularity = new Gee.HashMap<string, int> ();
       uri_popularity = new Gee.HashMap<string, int> ();
 
+      refresh_popularity ();
+
+      Timeout.add_seconds (60*60, refresh_popularity);
+    }
+
+    private bool refresh_popularity ()
+    {
       load_application_relevancies.begin ();
+      load_uri_relevancies.begin ();
+      return true;
     }
 
     private async void load_application_relevancies ()
@@ -89,6 +98,93 @@ namespace Synapse
         warning ("%s", err.message);
         return;
       }
+    }
+
+    private async void load_uri_relevancies ()
+    {
+      Idle.add (load_uri_relevancies.callback, Priority.LOW);
+      yield;
+
+      int64 end = Zeitgeist.Timestamp.now ();
+      int64 start = end - Zeitgeist.Timestamp.WEEK * 4;
+      Zeitgeist.TimeRange tr = new Zeitgeist.TimeRange (start, end);
+
+      var event = new Zeitgeist.Event ();
+      event.set_interpretation ("!" + Zeitgeist.ZG_LEAVE_EVENT);
+      var subject = new Zeitgeist.Subject ();
+      subject.set_interpretation ("!" + Zeitgeist.NFO_SOFTWARE);
+      subject.set_uri ("file://*");
+      event.add_subject (subject);
+
+      var ptr_arr = new PtrArray ();
+      ptr_arr.add (event);
+
+      Zeitgeist.ResultSet rs;
+      Gee.Map<string, int> popularity_map = new Gee.HashMap<string, int> ();
+
+      try
+      {
+        uint size, index;
+        float power, relevancy;
+        /* Get popularity for file uris */
+        rs = yield zg_log.find_events (tr, (owned) ptr_arr,
+                                       Zeitgeist.StorageState.ANY,
+                                       256,
+                                       Zeitgeist.ResultType.MOST_POPULAR_SUBJECTS,
+                                       null);
+
+        size = rs.size ();
+        index = 0;
+
+        // Zeitgeist (0.6) doesn't have any stats API, so let's approximate
+
+        foreach (Zeitgeist.Event e1 in rs)
+        {
+          if (e1.num_subjects () <= 0) continue;
+          Zeitgeist.Subject s1 = e1.get_subject (0);
+
+          power = index / (size * 2) + 0.5f; // linearly <0.5, 1.0>
+          relevancy = 1.0f / Math.powf (index + 1, power);
+          popularity_map[s1.get_uri ()] = (int)(relevancy * MULTIPLIER);
+
+          index++;
+        }
+        
+        /* Get popularity for web uris */
+        subject.set_interpretation (Zeitgeist.NFO_WEBSITE);
+        subject.set_uri ("");
+        ptr_arr = new PtrArray ();
+        ptr_arr.add (event);
+
+        rs = yield zg_log.find_events (tr, (owned) ptr_arr,
+                                       Zeitgeist.StorageState.ANY,
+                                       128,
+                                       Zeitgeist.ResultType.MOST_POPULAR_SUBJECTS,
+                                       null);
+
+        size = rs.size ();
+        index = 0;
+
+        // Zeitgeist (0.6) doesn't have any stats API, so let's approximate
+
+        foreach (Zeitgeist.Event e2 in rs)
+        {
+          if (e2.num_subjects () <= 0) continue;
+          Zeitgeist.Subject s2 = e2.get_subject (0);
+
+          power = index / (size * 2) + 0.5f; // linearly <0.5, 1.0>
+          relevancy = 1.0f / Math.powf (index + 1, power);
+          popularity_map[s2.get_uri ()] = (int)(relevancy * MULTIPLIER);
+
+          index++;
+        }
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
+
+      uri_popularity = popularity_map;
     }
     
     public float get_application_popularity (string desktop_id)

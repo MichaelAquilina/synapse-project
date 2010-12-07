@@ -116,7 +116,7 @@ namespace Synapse
       if (query_empty)
       {
         int relevancy = action.default_relevancy;
-        if (symbol_re.match (match.title)) relevancy += 5;
+        if (symbol_re.match (match.title)) relevancy += Match.Score.INCREMENT_SMALL;
         results.add (action, relevancy);
       }
       else

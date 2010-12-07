@@ -102,10 +102,13 @@ namespace Synapse
           throw new DesktopFileError.UNINTERESTING_ENTRY ("Not Application-type desktop entry");
         }
         
-        if (keyfile.has_key (GROUP, "Categories") &&
-          keyfile.get_string (GROUP, "Categories") == "Screensaver") // FIXME: string_list?!
+        if (keyfile.has_key (GROUP, "Categories"))
         {
-          throw new DesktopFileError.UNINTERESTING_ENTRY ("Screensaver desktop entry");
+          string[] categories = keyfile.get_string_list (GROUP, "Categories");
+          if ("Screensaver" in categories)
+          {
+            throw new DesktopFileError.UNINTERESTING_ENTRY ("Screensaver desktop entry");
+          }
         }
 
         name = keyfile.get_locale_string (GROUP, "Name");
@@ -159,7 +162,6 @@ namespace Synapse
       }
       catch (Error err)
       {
-        warning ("%s", err.message);
         is_valid = false;
       }
     }

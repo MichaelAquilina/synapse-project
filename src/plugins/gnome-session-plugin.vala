@@ -178,8 +178,6 @@ namespace Synapse
       actions.add (new ShutDownAction ());
     }
     
-    private DBus.Connection connection;
-    
     public override async ResultSet? search (Query q) throws SearchError
     {
       if (!session_manager_available) return null;
@@ -197,7 +195,7 @@ namespace Synapse
         {
           if (matcher.key.match (action.title))
           {
-            result.add (action, matcher.value - 5);
+            result.add (action, matcher.value - Match.Score.INCREMENT_SMALL);
             break;
           }
         }

@@ -57,7 +57,7 @@ namespace Synapse
       debug ("finished search for \"%s\"", q.query_string);
       
       var rs = new ResultSet ();
-      rs.add (new TestResult (q.query_string), 80);
+      rs.add (new TestResult (q.query_string), 0);
 
       return rs;
     }

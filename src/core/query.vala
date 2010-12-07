@@ -81,22 +81,6 @@ namespace Synapse
         throw new SearchError.SEARCH_CANCELLED ("Cancelled");
       }
     }
-    
-    // FIXME: turn into 0.0 - 1.0 floats
-    public const int MATCH_SCORE_MAX = 100;
-    
-    public const int MATCH_EXACT = 100;
-    public const int MATCH_PREFIX = 90;
-    public const int MATCH_WORD_PREFIX = 85;
-    public const int MATCH_MULTIPLE_WORDS = 80;
-    public const int MATCH_MULTIPLE_WORDS_REVERSED = 78;
-    public const int MATCH_SUBSTRING = 75;
-    public const int MATCH_FIRST_LETTERS = 70;
-    public const int MATCH_FUZZY = 50;
-    
-    public const int MATCH_PENALTY_SMALL = 5;
-    public const int MATCH_PENALTY_MEDIUM = 10;
-    public const int MATCH_PENALTY_LARGE = 20;
 
     public static Gee.List<Gee.Map.Entry<Regex, int>>
     get_matchers_for_query (string query,
@@ -122,7 +106,7 @@ namespace Synapse
       try
       {
         re = new Regex ("^(%s)$".printf (Regex.escape_string (query)), flags);
-        results[re] = MATCH_EXACT;
+        results[re] = Match.Score.HIGHEST;
       }
       catch (RegexError err)
       {
@@ -131,7 +115,7 @@ namespace Synapse
       try
       {
         re = new Regex ("^(%s)".printf (Regex.escape_string (query)), flags);
-        results[re] = MATCH_PREFIX;
+        results[re] = Match.Score.EXCELLENT;
       }
       catch (RegexError err)
       {
@@ -140,7 +124,7 @@ namespace Synapse
       try
       {
         re = new Regex ("\\b(%s)".printf (Regex.escape_string (query)), flags);
-        results[re] = MATCH_WORD_PREFIX;
+        results[re] = Match.Score.VERY_GOOD;
       }
       catch (RegexError err)
       {
@@ -161,7 +145,7 @@ namespace Synapse
         try
         {
           re = new Regex (pattern, flags);
-          results[re] = MATCH_MULTIPLE_WORDS;
+          results[re] = Match.Score.GOOD;
         }
         catch (RegexError err)
         {
@@ -179,7 +163,7 @@ namespace Synapse
             try
             {
               re = new Regex (reversed, flags);
-              results[re] = MATCH_MULTIPLE_WORDS_REVERSED;
+              results[re] = Match.Score.GOOD - Match.Score.INCREMENT_MINOR;
             }
             catch (RegexError err)
             {
@@ -199,7 +183,7 @@ namespace Synapse
             try
             {
               re = new Regex (any_order, flags);
-              results[re] = MATCH_MULTIPLE_WORDS_REVERSED - 1;
+              results[re] = Match.Score.ABOVE_AVERAGE + Match.Score.INCREMENT_MINOR;
             }
             catch (RegexError err)
             {
@@ -213,7 +197,7 @@ namespace Synapse
         try
         {
           re = new Regex ("(%s)".printf (Regex.escape_string (query)), flags);
-          results[re] = MATCH_SUBSTRING;
+          results[re] = Match.Score.ABOVE_AVERAGE;
         }
         catch (RegexError err)
         {
@@ -236,7 +220,7 @@ namespace Synapse
         try
         {
           re = new Regex (pattern, flags);
-          results[re] = MATCH_FIRST_LETTERS;
+          results[re] = Match.Score.AVERAGE;
         }
         catch (RegexError err)
         {
@@ -250,7 +234,7 @@ namespace Synapse
         try
         {
           re = new Regex (pattern, flags);
-          results[re] = MATCH_FUZZY;
+          results[re] = Match.Score.POOR;
         }
         catch (RegexError err)
         {

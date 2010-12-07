@@ -79,6 +79,15 @@ namespace Synapse
       return_if_fail (backend != null);
       backend.application_launched (app_info);
     }
+    
+    public static int compute_relevancy (int base_relevancy, float modifier)
+    {
+      // FIXME: let's experiment here
+      // the other idea is to use base_relevancy * (1.0f + modifier)
+      int relevancy = (int) (base_relevancy * (1.0f + modifier));
+      //int relevancy = base_relevancy + (int) (modifier * Match.Score.HIGHEST);
+      return int.min (relevancy, Match.Score.HIGHEST);
+    }
   }
 }
 

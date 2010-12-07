@@ -33,13 +33,15 @@ namespace Synapse
       public MatchType match_type { get; construct set; }
       
       public int default_relevancy { get; set; }
-      
+      public bool notify_match { get; set; default = true; }
+
       public abstract bool valid_for_match (Match match);
       // stupid Vala...
       public abstract void execute_internal (Match? match);
       public void execute (Match? match)
       {
         execute_internal (match);
+        if (notify_match) match.executed ();
       }
     }
     

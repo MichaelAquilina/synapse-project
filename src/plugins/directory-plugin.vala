@@ -287,7 +287,7 @@ namespace Synapse
       {
         if (entry.name_folded.has_prefix (q.query_string_folded))
         {
-          rs.add (entry.match_obj, Query.MATCH_PREFIX - Match.URI_PENALTY);
+          rs.add (entry.match_obj, Match.Score.VERY_GOOD - Match.Score.URI_PENALTY);
         }
       }
       

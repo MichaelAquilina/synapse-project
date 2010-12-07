@@ -30,7 +30,24 @@ namespace Synapse
 
   public interface Match: Object
   {
-    public const int URI_PENALTY = 10;
+    public enum Score
+    {
+      INCREMENT_MINOR = 2,
+      INCREMENT_SMALL = 5,
+      INCREMENT_MEDIUM = 10,
+      INCREMENT_LARGE = 20,
+      URI_PENALTY = 10,
+
+      POOR = 50,
+      BELOW_AVERAGE = 60,
+      AVERAGE = 70,
+      ABOVE_AVERAGE = 75,
+      GOOD = 80,
+      VERY_GOOD = 85,
+      EXCELLENT = 90,
+
+      HIGHEST = 100
+    }
     
     // properties
     public abstract string title { get; construct set; }
@@ -44,6 +61,8 @@ namespace Synapse
     {
       warning ("%s.execute () is not implemented", this.get_type ().name ());
     }
+    
+    public signal void executed ();
   }
   
   public interface ApplicationMatch: Match

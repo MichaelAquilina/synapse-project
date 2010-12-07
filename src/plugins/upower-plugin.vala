@@ -215,7 +215,7 @@ namespace Synapse
         {
           if (matcher.key.match (action.title))
           {
-            result.add (action, matcher.value - 5);
+            result.add (action, matcher.value - Match.Score.INCREMENT_SMALL);
             break;
           }
         }

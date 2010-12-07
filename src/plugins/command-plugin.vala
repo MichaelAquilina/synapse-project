@@ -37,14 +37,23 @@ namespace Synapse
       public AppInfo? app_info { get; set; default = null; }
       public bool needs_terminal { get; set; default = false; }
       public string? filename { get; construct set; default = null; }
+      public string command { get; construct set; }
       
       public CommandObject (string cmd)
       {
-        Object (title: cmd, description: _ ("Run command"), icon_name: "unknown",
+        Object (title: cmd, description: _ ("Run command"), command: cmd,
+                icon_name: "application-x-executable",
                 match_type: MatchType.APPLICATION,
                 needs_terminal: cmd.has_prefix ("sudo "));
 
-        app_info = AppInfo.create_from_commandline (cmd, null, 0);
+        try
+        {
+          app_info = AppInfo.create_from_commandline (cmd, null, 0);
+        }
+        catch (Error err)
+        {
+          warning ("%s", err.message);
+        }
       }
     }
     
@@ -80,6 +89,39 @@ namespace Synapse
         critical ("%s", err.message);
       }
     }
+    
+    private CommandObject? create_co (string exec)
+    {
+      // ignore results that will be returned by DesktopFilePlugin
+      // and at the same time look for hidden and no-display desktop files,
+      // so we can display their info (title, comment, icon)
+      var dfs = DesktopFileService.get_default ();
+      var df_list = dfs.get_desktop_files_for_exec (exec);
+      DesktopFileInfo? dfi = null;
+      foreach (var df in df_list)
+      {
+        if (!df.is_hidden) return null; // will be handled by App plugin
+        dfi = df;
+      }
+
+      var co = new CommandObject (exec);
+      if (dfi != null)
+      {
+        co.title = dfi.name;
+        if (dfi.comment != "") co.description = dfi.comment;
+        if (dfi.icon_name != null && dfi.icon_name != "") co.icon_name = dfi.icon_name;
+      }
+
+      return co;
+    }
+    
+    private void command_executed (Match match)
+    {
+      CommandObject? co = match as CommandObject;
+      if (co == null) return;
+
+      past_commands.add (co.command);
+    }
 
     public override async ResultSet? search (Query q) throws SearchError
     {
@@ -91,54 +133,39 @@ namespace Synapse
 
       var result = new ResultSet ();
 
-      if (!(q.query_string in past_commands))
+      string stripped = q.query_string.strip ();
+      if (stripped == "") return null;
+      if (stripped.has_prefix ("~/"))
+      {
+        stripped = stripped.replace ("~", Environment.get_home_dir ());
+      }
+
+      if (!(stripped in past_commands))
       {
         foreach (var command in past_commands)
         {
-          if (command.has_prefix (q.query_string))
+          if (command.has_prefix (stripped))
           {
-            // TODO: add result
+            result.add (create_co (command), Match.Score.AVERAGE);
           }
         }
-        
-        string stripped = q.query_string.strip ();
-        if (stripped == "") return null;
-        if (stripped.has_prefix ("~/"))
-        {
-          stripped = stripped.replace ("~", Environment.get_home_dir ());
-        }
+
         string[] args = split_regex.split (stripped);
         string? valid_cmd = Environment.find_program_in_path (args[0]);
 
         if (valid_cmd != null)
         {
-          // ignore results that will be returned by DesktopFilePlugin
-          var dfs = DesktopFileService.get_default ();
-          var df_list = dfs.get_desktop_files_for_exec (stripped);
-          DesktopFileInfo? dfi = null;
-          bool has_valid_df_result = false;
-          foreach (var df in df_list)
-          {
-            if (!df.is_hidden) has_valid_df_result = true;
-            dfi = df;
-          }
           // don't allow dangerous commands
-          if (!has_valid_df_result && args[0] != "rm")
-          {
-            var co = new CommandObject (stripped);
-            if (dfi != null)
-            {
-              co.title = dfi.name;
-              co.description = dfi.comment;
-              co.icon_name = dfi.icon_name;
-            }
-            result.add (co, Query.MATCH_FUZZY);
-          }
+          if (args[0] == "rm") return null;
+          CommandObject? co = create_co (stripped);
+          if (co == null) return null;
+          result.add (co, Match.Score.POOR);
+          co.executed.connect (this.command_executed);
         }
       }
       else
       {
-        // TODO: add with high relevancy
+        result.add (create_co (stripped), Match.Score.VERY_GOOD);
       }
       
       q.check_cancellable ();

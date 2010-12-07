@@ -140,9 +140,8 @@ namespace Synapse
     {
       var rs = RelevancyService.get_default ();
       float popularity = rs.get_application_popularity (dfm.desktop_id);
-      
-      int bump = (int) (popularity * Query.MATCH_SCORE_MAX);
-      return int.min (base_relevancy + bump, Query.MATCH_SCORE_MAX);
+
+      return RelevancyService.compute_relevancy (base_relevancy, popularity);
     }
 
     private void simple_search (Query q, ResultSet results)
@@ -154,15 +153,15 @@ namespace Synapse
       {
         if (dfm.get_title_folded ().has_prefix (query))
         {
-          results.add (dfm, compute_relevancy (dfm, Query.MATCH_PREFIX));
+          results.add (dfm, compute_relevancy (dfm, Match.Score.EXCELLENT));
         }
         else if (dfm.title_unaccented != null && dfm.title_unaccented.has_prefix (query))
         {
-          results.add (dfm, compute_relevancy (dfm, Query.MATCH_PREFIX - Query.MATCH_PENALTY_SMALL));
+          results.add (dfm, compute_relevancy (dfm, Match.Score.EXCELLENT - Match.Score.INCREMENT_SMALL));
         }
         else if (dfm.exec.has_prefix (q.query_string))
         {
-          results.add (dfm, compute_relevancy (dfm, Query.MATCH_FIRST_LETTERS - Query.MATCH_PENALTY_MEDIUM));
+          results.add (dfm, compute_relevancy (dfm, Match.Score.AVERAGE - Match.Score.INCREMENT_MEDIUM));
         }
       }
     }
@@ -190,7 +189,7 @@ namespace Synapse
           }
           else if (unaccented_title != null && matcher.key.match (unaccented_title))
           {
-            results.add (dfm, compute_relevancy (dfm, matcher.value - Query.MATCH_PENALTY_SMALL));
+            results.add (dfm, compute_relevancy (dfm, matcher.value - Match.Score.INCREMENT_SMALL));
             matched = true;
             break;
           }
@@ -198,7 +197,7 @@ namespace Synapse
         if (!matched && dfm.exec.has_prefix (q.query_string))
         {
           results.add (dfm, compute_relevancy (dfm, dfm.exec == q.query_string ?
-            Query.MATCH_WORD_PREFIX : Query.MATCH_FIRST_LETTERS - Query.MATCH_PENALTY_SMALL));
+            Match.Score.VERY_GOOD : Match.Score.AVERAGE - Match.Score.INCREMENT_SMALL));
         }
       }
     }
@@ -325,7 +324,7 @@ namespace Synapse
       {
         foreach (var action in ow_list)
         {
-          rs.add (action, Query.MATCH_FUZZY);
+          rs.add (action, Match.Score.POOR);
         }
       }
       else

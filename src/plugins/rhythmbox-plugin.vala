@@ -33,7 +33,7 @@ namespace Synapse
       [DBus (name = "clearQueue")]
       public abstract void clear_queue () throws DBus.Error;
   }
-  
+
   [DBus (name = "org.gnome.Rhythmbox.Player")]
   interface RhythmboxPlayer : Object {
       public const string UNIQUE_NAME = "org.gnome.Rhythmbox";
@@ -93,7 +93,7 @@ namespace Synapse
       {
         bool rb_running = DBusNameCache.get_default ().name_has_owner (
           RhythmboxPlayer.UNIQUE_NAME);
-        return rb_running ? default_relevancy + 20 : default_relevancy;
+        return rb_running ? default_relevancy + Match.Score.INCREMENT_LARGE : default_relevancy;
       }
     }
     
@@ -237,7 +237,7 @@ namespace Synapse
                 description: _ ("Add the song to Rhythmbox playlist"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 70);
+                default_relevancy: Match.Score.AVERAGE);
       }
 
       public override void execute_internal (Match? match)
@@ -284,7 +284,7 @@ namespace Synapse
                 description: _ ("Clears the current playlist and plays the song"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 75);
+                default_relevancy: Match.Score.ABOVE_AVERAGE);
       }
 
       public override void execute_internal (Match? match)
@@ -363,7 +363,7 @@ namespace Synapse
         {
           if (matcher.key.match (action.title))
           {
-            result.add (action, matcher.value - 5);
+            result.add (action, matcher.value - Match.Score.INCREMENT_SMALL);
             break;
           }
         }
