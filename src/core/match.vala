@@ -59,7 +59,12 @@ namespace Synapse
     public abstract QueryFlags file_type { get; set; }
     public abstract string mime_type { get; set; }
   }
-  
+
+  public interface ExtendedInfo: Match
+  {
+    public abstract string? extended_info { get; set; }
+  }
+
   public class DefaultMatch: Object, Match
   {
     public string title { get; construct set; }

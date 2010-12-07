@@ -101,6 +101,12 @@ namespace Synapse
         {
           throw new DesktopFileError.UNINTERESTING_ENTRY ("Not Application-type desktop entry");
         }
+        
+        if (keyfile.has_key (GROUP, "Categories") &&
+          keyfile.get_string ("Screensaver")) // FIXME: string_list?!
+        {
+          throw new DesktopFileError.UNINTERESTING_ENTRY ("Screensaver desktop entry");
+        }
 
         name = keyfile.get_locale_string (GROUP, "Name");
         exec = keyfile.get_string (GROUP, "Exec");

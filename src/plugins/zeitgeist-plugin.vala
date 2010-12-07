@@ -24,7 +24,8 @@ namespace Synapse
   public class ZeitgeistPlugin: DataPlugin
   {
     private const string UNIQUE_NAME = "org.gnome.zeitgeist.Engine";
-    private class MatchObject: Object, Match, UriMatch, ApplicationMatch
+    private class MatchObject: Object, 
+      Match, UriMatch, ApplicationMatch, ExtendedInfo
     {
       // for Match interface
       public string title { get; construct set; }
@@ -43,6 +44,9 @@ namespace Synapse
       public string uri { get; set; }
       public QueryFlags file_type { get; set; }
       public string mime_type { get; set; }
+      
+      // for ExtendedInfo
+      public string? extended_info { get; set; default = null; }
 
       public MatchObject (Zeitgeist.Event event,
                           string? thumbnail_path,
@@ -119,6 +123,40 @@ namespace Synapse
         this.description = dfi.comment;
         this.needs_terminal = dfi.needs_terminal;
         this.filename = dfi.filename;
+      }
+      
+      public void init_extended_info_from_event (Zeitgeist.Event event)
+      {
+        var now = Zeitgeist.Timestamp.now ();
+        var delta = now - event.get_timestamp ();
+        if (delta < Zeitgeist.Timestamp.MINUTE * 2)
+        {
+          extended_info = _("few moments ago");
+        }
+        else if (delta < Zeitgeist.Timestamp.HOUR)
+        {
+          int mins = (int) (delta / Zeitgeist.Timestamp.MINUTE);
+          extended_info = ngettext ("%d minute ago", "%d minutes ago", mins).printf (mins);
+        }
+        else if (delta < Zeitgeist.Timestamp.DAY * 2)
+        {
+          int hours = (int) (delta / Zeitgeist.Timestamp.HOUR);
+          extended_info = ngettext ("%d hour ago", "%d hours ago", hours).printf (hours);
+        }
+        else if (delta < Zeitgeist.Timestamp.WEEK * 2)
+        {
+          int days = (int) (delta / Zeitgeist.Timestamp.DAY);
+          extended_info = ngettext ("%d day ago", "%d days ago", days).printf (days);
+        }
+        else if (delta < Zeitgeist.Timestamp.YEAR)
+        {
+          int weeks = (int) (delta / Zeitgeist.Timestamp.WEEK);
+          extended_info = ngettext ("%d week ago", "%d weeks ago", weeks).printf (weeks);
+        }
+        else
+        {
+          extended_info = "long time ago";
+        }
       }
     }
     
@@ -405,12 +443,12 @@ namespace Synapse
               icon = g_content_type_get_icon (mimetype).to_string ();
             }
           }
-          // TODO: implement a special interface in MatchObject that will give
-          //  more details about the item (ie last accessed info in this case)
+
           var match_obj = new MatchObject (event,
                                            thumbnail_path,
                                            icon,
                                            is_application);
+          match_obj.init_extended_info_from_event (event);
 
           int relevancy = (int) ((events_size - event_index) / 
             (float) events_size * Query.MATCH_SCORE_MAX);
