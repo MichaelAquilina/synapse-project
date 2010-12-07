@@ -22,33 +22,6 @@ using Gee;
 
 namespace Synapse.Gui
 {
-  /* The target of this abstract class, is to separate model/control from view. */
-  /* Each IU must implement this abstract class by translating user input into actions for this class. */
-  /* Here is a list of possible actions: */
-  /* - update_query_flags : when user selects a new filter like "Audio", "Video", "Applications"
-     - select_next_match : when user wants to select the next match in the list
-     - select_prev_match : when user wants to select the prev match in the list
-     - select_next_action : when user wants to select the next action in the list
-     - select_prev_action : when user wants to select the prev action in the list
-     - reset_search : when user hits the "Esc" button to hide Synapse2
-     - set_match_search : when user writes a new string for searching matches
-     - set_action_search : when user writes a new string for searching actions
-     - execute : when user wants to execute the match
-  Validity checks are already implemented in these methods.
-  Each UI must implement four methods:
-  - protected abstract void focus_match ( int index, Match? match );
-    This one has to show the Match "match" (that you can find in "index" position in results list)
-  - protected abstract void focus_action ( int index, Match? action );
-    This one has to show the Action "action" (that you can find in "index" position in results list)
-  - protected abstract void update_match_result_list (Gee.List<Match>? matches, int index, Match? match);
-    This one has to update visually the result list, and then select the Match "match" in the "index" position
-    The UI can choose to show the list or not.
-  - protected abstract void update_action_result_list (Gee.List<Match>? actions, int index, Match? action);
-    This one has to update visually the action list, and then select the Action "action" in the "index" position
-    The UI can choose to show the list or not.
-  - protected abstract void set_throbber_visible (bool visible);
-    This one is to notify the user that search is not yet completed
-  */
   public enum CommandTypes
   {
     INVALID_COMMAND,
@@ -68,8 +41,253 @@ namespace Synapse.Gui
 
   public abstract class UIInterface : Object
   {
-    private const int PARTIAL_TIMEOUT = 100;
+    /* The target of this abstract class, is to separate model/control from view. */
+    /* Each IU must implement this abstract class by translating user input into actions for this class. */
+    /* UIs must implement following methods: */
+
+    /**
+     * The show method has to show the window to the user.
+     */
+    public abstract void show ();
+
+    /**
+     * The hide method has to hide the window to the user.
+     */
+    public abstract void hide ();
+    
+    /**
+     * This method needs to:
+     * - call show () , when window isn't visible
+     * - call hide () , when window is visible
+     */
+    public abstract void show_hide_with_time (uint32 timestamp);
+    
+    /**
+     * This signal must be emitted from the UI when the button/menu
+     * to show settings is pressed.
+     */
+    public signal void show_settings_clicked ();
+
+    /**
+     * Focus match needs to show the user what match is selected.
+     * @param index The index of selected match in result list
+     * @param match The match selected
+     */
+    protected abstract void focus_match ( int index, Match? match );
+    
+    /**
+     * Focus action needs to show the user what action is selected.
+     * @param index The index of selected action in result list
+     * @param match The action selected
+     */
+    protected abstract void focus_action ( int index, Match? action );
+    
+    /**
+     * This method tells the UI that the match's result list is updated, and a new match is selected.
+     * @param matches The new result list
+     * @param index The index of selected match in result list
+     * @param match The selected match
+     */
+    protected abstract void update_match_result_list (Gee.List<Match>? matches, int index, Match? match);
+    
+    /**
+     * This method tells the UI that the action's result list is updated, and a new action is selected.
+     * @param matches The new result list
+     * @param index The index of selected action in result list
+     * @param match The selected action
+     */
+    protected abstract void update_action_result_list (Gee.List<Match>? actions, int index, Match? action);
+    
+    /**
+     * This method sets the visibility of the throbber.
+     * @param visible if true, show the trobber, else hide it.
+     */
+    protected abstract void set_throbber_visible (bool visible);
+    
+    /**
+     * This method is called when the handle_empty staus changes.
+     * handle_empty staus defines if the UI can show recent actions
+     * when the search string is empty.
+     */
+    protected virtual void handle_empty_updated () {}
+    
+    /* -------------------------------------------------------------------- */
+    
+    /* This strings should be used into the UI */
+    protected static string SEARCHING; /* Searching... */
+    protected static string NO_RESULTS; /* No results found. */
+    protected static string NO_RECENT_ACTIVITIES; /* No recent activities found. */
+    protected static string TYPE_TO_SEARCH; /* Type to search */
+    protected static string DOWN_TO_SEE_RECENT; /* Press down to see recent */
+
+    /* What this abstract class offer - methods have internal checks to avoid incorrect actions */
+    
+    /* Get & Set methods for the Match's search string */
+    protected string get_match_search () {return search[T.MATCH];}
+    protected void set_match_search (string pattern)
+    {
+      search_with_empty = false;
+      search[T.MATCH] = pattern;
+      search_for_matches ();
+    }
+    
+    /* Get & Set methods for the Action's search string */
+    protected string get_action_search () {return search[T.ACTION];}
+    protected void set_action_search (string pattern)
+    {
+      if (search[T.ACTION] == pattern)
+        return;
+      search[T.ACTION] = pattern;
+      search_for_actions ();
+    }
+    
+    protected void focus_current_match () {focus_match (focus_index[T.MATCH], focus[T.MATCH]);}
+    protected void focus_current_action () {focus_action (focus_index[T.ACTION], focus[T.ACTION]);}
+    
+    /* Getters for results list, and focused Matches and Actions */
+    protected Gee.List<Match>? get_action_results () {return results[T.ACTION];}
+    protected Gee.List<Match>? get_match_results () {return results[T.MATCH];}
+    protected void get_action_focus (out int index, out Match? action) {index = focus_index[T.ACTION]; action = focus[T.ACTION];}
+    protected void get_match_focus (out int index, out Match? match) {index = focus_index[T.MATCH]; match = focus[T.MATCH];}
+    
+    /* This method has to be called when user wants to change query flags */
+    protected void update_query_flags (QueryFlags flags)
+    {
+      if (qf == flags)
+        return;
+      qf = flags;
+      focus_index = {0, 0};
+      focus = {null, null};
+      results = {null, null};
+      search[T.ACTION] = "";
+      search_for_matches ();
+    }
+    
+    /* Those methods has to be called when user wants to select first or last match / action */
+    protected bool select_first_last_match (bool first)
+    {
+      return util_select_first_last (first, T.MATCH);
+    }
+    protected bool select_first_last_action (bool first)
+    {
+      return util_select_first_last (first, T.ACTION);
+    }
+    
+    /* Those methods moves the selection by "delta" position */
+    protected bool move_selection_action (int delta)
+    {
+      return move_selection (T.ACTION, delta);
+    }
+    protected bool move_selection_match (int delta)
+    {
+      return move_selection (T.MATCH, delta);
+    }
+    
+    /**
+     * This method can be called to reset the search.
+     * @param notify if true, visual update matches and actions in the UI
+     * @param reset_flags, if true, resets query flags to default (All)
+     */
+    protected void reset_search (bool notify = true, bool reset_flags = true)
+    {
+      if (tid != 0)
+      {
+        Source.remove (tid);
+        tid = 0;
+      }
+      current_cancellable.cancel ();
+      partial_result_sent = false;
+      search_with_empty = false;
+      focus_index = {0, 0};
+      focus = {null, null};
+      results = {null, null};
+      search = {"", ""};
+      if (reset_flags)
+        qf = QueryFlags.ALL;
+      if (notify)
+      {
+        set_throbber_visible (false);
+        update_match_result_list (null, 0, null);
+        update_action_result_list (null, 0, null);
+      }
+    }
+    
+    /* Returns true if Match search is empty- */
+    protected bool is_search_empty ()
+    {
+      return search[T.MATCH].length == 0;
+    }
+    
+    /* Returns true if user is searching for recent activities with empty search string */
+    protected bool is_searching_for_recent ()
+    {
+      return search_with_empty;
+    }
+    
+    /* Returns true if the status is equal to the starting status of Synapse */
+    protected bool is_in_initial_status ()
+    {
+      return (!search_with_empty) && search[T.MATCH].length == 0 && (results[T.MATCH] == null || results[T.MATCH].size == 0);
+    }
+    
+    /* Returns true if the ui can show recent activities */
+    protected bool can_handle_empty ()
+    {
+      return handle_empty;
+    }
+    
+    /* This method must be called when you want to search for recent activities */
+    protected void search_for_empty ()
+    {
+      search_with_empty = true;
+      search_for_matches ();
+    }
+    
+    /* This method should be called when user wants to execute the current match */
+    /* returns false if there's no valid match/action to execute */
+    protected bool execute ()
+    {
+      if (focus[T.MATCH] == null || focus[T.ACTION] == null)
+        return false;
+      var match = focus[T.MATCH];
+      var action = focus[T.ACTION];
+      /* Async execute to avoid freezes when executing a dbus action */
+      Timeout.add (30, ()=>{ return _execute (match, action);});
+      return true;
+    }
+    
+    public void map_key_to_command (uint keyval, CommandTypes command)
+    {
+      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map.entries)
+      {
+        if (entry.value == command) command_map.unset (entry.key);
+      }
+      command_map.set (keyval, command);
+    }
+    public uint get_key_for_command (CommandTypes command)
+    {
+      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map.entries)
+      {
+        if (entry.value == command) return entry.key;
+      }
+      return 0;
+    }
+    protected CommandTypes get_command_from_key_event (Gdk.EventKey event)
+    {
+      var key = event.keyval;
+      if (command_map.has_key (key))
+      {
+        return command_map.get (key);
+      }
+      else
+        return CommandTypes.INVALID_COMMAND;
+    }
+    
     public DataSink data_sink { get; construct; }
+    /* Private section -- You shouldn't need to look after this line */
+    
+    private const int PARTIAL_TIMEOUT = 100;
+    private ResultSet last_result_set;
     private enum T 
     {
       MATCH,
@@ -86,12 +304,6 @@ namespace Synapse.Gui
     private bool search_with_empty;
     private bool handle_empty;
     
-    protected static string SEARCHING;
-    protected static string NO_RESULTS;
-    protected static string NO_RECENT_ACTIVITIES;
-    protected static string TYPE_TO_SEARCH;
-    protected static string DOWN_TO_SEE_RECENT;
-    
     private uint tid; //for timer
     
     static construct
@@ -102,6 +314,7 @@ namespace Synapse.Gui
       TYPE_TO_SEARCH = _("Type to search...");
       DOWN_TO_SEE_RECENT = "";
     }
+    
     construct
     {
       command_map = new Gee.HashMap<uint, CommandTypes> ();
@@ -121,6 +334,7 @@ namespace Synapse.Gui
       data_sink.plugin_registered.connect (plugin_registered_handler);
       update_handle_empty ();
     }
+    
     private void plugin_registered_handler (DataPlugin plugin)
     {
       if (plugin.get_type () == typeof (ZeitgeistPlugin))
@@ -129,38 +343,7 @@ namespace Synapse.Gui
         update_handle_empty ();
       }
     }
-    /* UI must do the following things */
-    public abstract void show ();
-    public abstract void hide ();
-    public abstract void show_hide_with_time (uint32 timestamp);
-    public signal void show_settings_clicked ();
-
-    protected abstract void focus_match ( int index, Match? match );
-    protected abstract void focus_action ( int index, Match? action );
-    protected abstract void update_match_result_list (Gee.List<Match>? matches, int index, Match? match);
-    protected abstract void update_action_result_list (Gee.List<Match>? actions, int index, Match? action);
-    protected abstract void set_throbber_visible (bool visible);
-
-    /* What this abstract class offer */
-    protected void update_query_flags (QueryFlags flags)
-    {
-      if (qf == flags)
-        return;
-      qf = flags;
-      focus_index = {0, 0};
-      focus = {null, null};
-      results = {null, null};
-      search[T.ACTION] = "";
-      search_for_matches ();
-    }
-    protected bool select_first_last_match (bool first)
-    {
-      return util_select_first_last (first, T.MATCH);
-    }
-    protected bool select_first_last_action (bool first)
-    {
-      return util_select_first_last (first, T.ACTION);
-    }
+    
     private bool util_select_first_last (bool first, T t)
     {
       if (results[t] == null || results[t].size == 0)
@@ -178,14 +361,7 @@ namespace Synapse.Gui
         focus_action (focus_index[t], focus[t]);
       return true;
     }
-    protected bool move_selection_action (int delta)
-    {
-      return move_selection (T.ACTION, delta);
-    }
-    protected bool move_selection_match (int delta)
-    {
-      return move_selection (T.MATCH, delta);
-    }
+    
     private bool move_selection (T t, int delta)
     {
       if (results[t] == null || results[t].size == 0)
@@ -212,29 +388,6 @@ namespace Synapse.Gui
         focus_action (focus_index[t], focus[t]);
       return true;
     }
-    protected void reset_search (bool notify = true, bool reset_flags = true)
-    {
-      if (tid != 0)
-      {
-        Source.remove (tid);
-        tid = 0;
-      }
-      current_cancellable.cancel ();
-      partial_result_sent = false;
-      search_with_empty = false;
-      focus_index = {0, 0};
-      focus = {null, null};
-      results = {null, null};
-      search = {"", ""};
-      if (reset_flags)
-        qf = QueryFlags.ALL;
-      if (notify)
-      {
-        set_throbber_visible (false);
-        update_match_result_list (null, 0, null);
-        update_action_result_list (null, 0, null);
-      }
-    }
     
     private void update_handle_empty ()
     {
@@ -242,59 +395,6 @@ namespace Synapse.Gui
       handle_empty = plugin != null && plugin.enabled;
       DOWN_TO_SEE_RECENT = handle_empty ? _("...or press down key to browse recent activities") : "";
       handle_empty_updated ();
-    }
-    protected virtual void handle_empty_updated () {}
-    
-    protected bool is_search_empty ()
-    {
-      return search[T.MATCH].length == 0;
-    }
-    
-    protected bool is_searching_for_recent ()
-    {
-      return search_with_empty;
-    }
-    
-    protected bool is_in_initial_status ()
-    {
-      return (!search_with_empty) && search[T.MATCH].length == 0 && (results[T.MATCH] == null || results[T.MATCH].size == 0);
-    }
-    
-    protected bool can_handle_empty ()
-    {
-      return handle_empty;
-    }
-    
-    protected string get_match_search () {return search[T.MATCH];}
-    protected void set_match_search (string pattern)
-    {
-      search_with_empty = false;
-      search[T.MATCH] = pattern;
-      search_for_matches ();
-    }
-
-    protected string get_action_search () {return search[T.ACTION];}
-    protected void set_action_search (string pattern)
-    {
-      if (search[T.ACTION] == pattern)
-        return;
-      search[T.ACTION] = pattern;
-      search_for_actions ();
-    }
-    
-    protected void focus_current_match () {focus_match (focus_index[T.MATCH], focus[T.MATCH]);}
-    protected void focus_current_action () {focus_action (focus_index[T.ACTION], focus[T.ACTION]);}
-    protected Gee.List<Match>? get_action_results () {return results[T.ACTION];}
-    protected Gee.List<Match>? get_match_results () {return results[T.MATCH];}
-    protected void get_action_focus (out int index, out Match? action) {index = focus_index[T.ACTION]; action = focus[T.ACTION];}
-    protected void get_match_focus (out int index, out Match? match) {index = focus_index[T.MATCH]; match = focus[T.MATCH];}
-
-    protected ResultSet last_result_set;
-    
-    protected void search_for_empty ()
-    {
-      search_with_empty = true;
-      search_for_matches ();
     }
     
     private void search_for_matches ()
@@ -439,16 +539,6 @@ namespace Synapse.Gui
       update_action_result_list (results[T.ACTION], focus_index[T.ACTION], focus[T.ACTION]);
     }
     
-    protected bool execute ()
-    {
-      if (focus[T.MATCH] == null || focus[T.ACTION] == null)
-        return false;
-      var match = focus[T.MATCH];
-      var action = focus[T.ACTION];
-      /* Async execute to avoid freezes when executing a dbus action */
-      Timeout.add (30, ()=>{ return _execute (match, action);});
-      return true;
-    }
     private bool _execute (Match match, Match action)
     {
       action.execute (match);
@@ -472,32 +562,6 @@ namespace Synapse.Gui
       command_map.set (Gdk.KeySyms.Page_Up, CommandTypes.PREV_PAGE);
       command_map.set (Gdk.KeySyms.Page_Down, CommandTypes.NEXT_PAGE);
       command_map.set (Gdk.KeySyms.Tab, CommandTypes.SWITCH_SEARCH_TYPE);
-    }
-    public void map_key_to_command (uint keyval, CommandTypes command)
-    {
-      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map.entries)
-      {
-        if (entry.value == command) command_map.unset (entry.key);
-      }
-      command_map.set (keyval, command);
-    }
-    public uint get_key_for_command (CommandTypes command)
-    {
-      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map.entries)
-      {
-        if (entry.value == command) return entry.key;
-      }
-      return 0;
-    }
-    protected CommandTypes get_command_from_key_event (Gdk.EventKey event)
-    {
-      var key = event.keyval;
-      if (command_map.has_key (key))
-      {
-        return command_map.get (key);
-      }
-      else
-        return CommandTypes.INVALID_COMMAND;
     }
   }
 }
