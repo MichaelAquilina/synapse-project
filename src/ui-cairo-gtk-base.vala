@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>
+ * Copyright (C) 2010 Alberto Aldegheri <albyrock87+dev@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +29,26 @@ namespace Synapse.Gui
 {
   public abstract class GtkCairoBase : UIInterface
   {
+    /* With this base ui class, you can create your custom UI by implementing
+       only a few methods of ui-interface:
+       - protected override void handle_empty_updated ()
+       - protected override void focus_match ( int index, Match? match )
+       - protected override void focus_action ( int index, Match? action )
+       - protected override void update_match_result_list (Gee.List<Match>? matches, int index, Match? match)
+       - protected override void update_action_result_list (Gee.List<Match>? actions, int index, Match? action)
+       show () and hide () methods are alredy implemented in this class, but you could always override them.
+       
+       Your UI should implement following graphical methods:
+       - protected override void build_ui ()
+         within this method you should build your UI (ie layout).
+         There is only one rule: you have to include in your layout following (already implemented here) widgets:
+         - flag_selector  (an HTextSelector that handles Query Flags)
+         - menu (a MenuButton **this object must be initialized in your class**)
+       
+       Your UI can override some graphicals methods already handled:
+       - protected override void on_composited_changed (Widget w)   //w is window
+       - protected virtual void set_input_mask () {}
+    */
     protected string[] categories =
     {
       _("Actions"),
@@ -56,6 +77,8 @@ namespace Synapse.Gui
     protected Throbber throbber = null;
     protected HTextSelector flag_selector = null;
     protected bool searching_for_matches = true;
+    
+    protected virtual void set_input_mask () {}
     
     protected IMContext im_context;
     
@@ -348,7 +371,6 @@ namespace Synapse.Gui
 
       return true;
     }
-    protected virtual void set_input_mask () {}
 
     /* UI INTERFACE IMPLEMENTATION */
     public override void show ()

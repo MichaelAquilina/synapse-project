@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>
+ * Copyright (C) 2010 Alberto Aldegheri <albyrock87+dev@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,18 +27,31 @@ namespace Synapse.Gui
 {
   public class MatchRenderer : ListView.Renderer
   {
+    // the size of Match and Action icons
     public int icon_size {get; set; default = 32;}
+    // top and bottom row's padding
     public int cell_vpadding {get; set; default = 2;}
+    // left and right padding on each component of the row
     public int cell_hpadding {get; set; default = 3;}
+    //hilight matched text into selected match's title
     public bool hilight_on_selected {get; set; default = false;}
+    //shows the pattern after the title if hilight doesn't match the title
     public bool show_pattern_in_hilight {get; set; default = false;}
+    //shows extended info when present (ie "xx minutes ago")
     public bool show_extended_info {get; set; default = true;}
+    //hides extended info on selected row if present
     public bool hide_extended_on_selected {get; set; default = false;}
+    //overlay action icon to the text, or reserve space for action icon shrinking labels
     public bool overlay_action {get; set; default = false;}
+    //the string pattern to use in the hilight
     public string pattern {get; set; default = "";}
+    //the Action match to use to retrive the action icon to show
     public Match action {get; set; default = null;}
+    //the markup of the title
     public string title_markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>";}
+    //the markup of the description
     public string description_markup {get; set; default = "<span size=\"small\">%s</span>";}
+    //the markup of the extended info **extend info is already inserted into description markup**
     public string extended_info_markup {get; set; default = "%s";}
 
     private Utils.ColorHelper ch;
@@ -277,23 +291,19 @@ namespace Synapse.Gui
       MIDDLE_FORCED,
       BOTTOM_FORCED
     }
-    private Utils.ColorHelper ch;
-    private Gee.List<T> data;
-    private Renderer renderer;
-    private int min_rows;
-    private int scrollto;
+    /* Sets the scroll mode **not all scroll modes are implemented** */
     public ScrollMode scroll_mode {get; set; default = ScrollMode.MIDDLE;}
+    /* Sets if ListView has to paint the style[BASE] background */
     public bool use_base_background {get; set; default = true;}
-    private int selected_index; //for now only single selection mode
+    /* Enable or disable the animation */
     public bool animation_enabled {get; set; default = true;}
-    private bool inhibit_focus = false;
+    /* If Inihibit focus is true, the selection is not painted */
     public void set_inhibit_focus (bool b)
     {
       inhibit_focus = b;
       queue_draw ();
     }
-    private const int ANIM_TIMEOUT = 40;
-    private const int ANIM_MAX_PIXEL_JUMP = 2;
+    /* Selects a row */
     public int selected {
       get {
         return selected_index;
@@ -304,6 +314,7 @@ namespace Synapse.Gui
         selected_index = value;
       }
     }
+    /* Specify the minimum visible rows (size_request depends on this) */
     public int min_visible_rows {
       get {
         return min_rows;
@@ -314,7 +325,77 @@ namespace Synapse.Gui
         queue_resize ();
       }
     }
-
+    /* Set a new list **Warning: The list is not copied** */
+    public void set_list (Gee.List<T>? new_data)
+    {
+      data = new_data;
+      if (new_data==null || scrollto >= new_data.size)
+      {
+        scrollto = 0;
+        selection_voffset = 0;
+        current_voffset = 0;
+        selected_index = -1;
+      }
+      this.queue_draw ();
+    }
+    /* Adds a data to the list */
+    public void add_data (T obj)
+    {
+      if (data == null)
+      {
+        data = new Gee.ArrayList<T> ();
+        current_voffset = 0;
+        selection_voffset = 0;
+        scrollto = 0;
+      }
+      data.add (obj);
+      this.queue_draw ();
+    }
+    /* Clears the list */
+    public void clear ()
+    {
+      data = null;
+      scrollto = 0;
+      selection_voffset = 0;
+      current_voffset = 0;
+      selected_index = -1;
+      this.queue_draw ();
+    }
+    /* Scrolls to row. */
+    public void scroll_to (int index)
+    {
+      if (data == null || index < 0 || index >= data.size)
+      {
+        scrollto = 0;
+        return;
+      }
+      scrollto = index;
+      if (!animation_enabled)
+      {
+        update_current_voffset ();
+        this.queue_draw ();
+      }
+      else
+      {
+        if (tid == 0)
+        {
+          tid = Timeout.add (ANIM_TIMEOUT, ()=>{
+            return update_current_voffset ();
+          });
+        }
+      }
+    }
+    
+    private Utils.ColorHelper ch;
+    private Gee.List<T> data;
+    private Renderer renderer;
+    private int min_rows;
+    private int scrollto;
+    private int selected_index; //for now only single selection mode
+    private bool inhibit_focus = false;
+    private const int ANIM_TIMEOUT = 40;
+    private const int ANIM_MAX_PIXEL_JUMP = 2;
+    
     public ListView (ListView.Renderer rend)
     {
       min_rows = 1;
@@ -341,39 +422,6 @@ namespace Synapse.Gui
       });
       this.notify["scroll-mode"].connect (()=>{scroll_to (scrollto);});
     }
-    public void set_list (Gee.List<T>? new_data)
-    {
-      data = new_data;
-      if (new_data==null || scrollto >= new_data.size)
-      {
-        scrollto = 0;
-        selection_voffset = 0;
-        current_voffset = 0;
-        selected_index = -1;
-      }
-      this.queue_draw ();
-    }
-    public void add_data (T obj)
-    {
-      if (data == null)
-      {
-        data = new Gee.ArrayList<T> ();
-        current_voffset = 0;
-        selection_voffset = 0;
-        scrollto = 0;
-      }
-      data.add (obj);
-      this.queue_draw ();
-    }
-    public void clear ()
-    {
-      data = null;
-      scrollto = 0;
-      selection_voffset = 0;
-      current_voffset = 0;
-      selected_index = -1;
-      this.queue_draw ();
-    }
     public override void size_request (out Requisition requisition)
     {
       renderer.size_request (out requisition);
@@ -386,29 +434,7 @@ namespace Synapse.Gui
         update_current_voffset ();
       this.queue_draw ();
     }
-    public void scroll_to (int index)
-    {
-      if (data == null || index < 0 || index >= data.size)
-      {
-        scrollto = 0;
-        return;
-      }
-      scrollto = index;
-      if (!animation_enabled)
-      {
-        update_current_voffset ();
-        this.queue_draw ();
-      }
-      else
-      {
-        if (tid == 0)
-        {
-          tid = Timeout.add (ANIM_TIMEOUT, ()=>{
-            return update_current_voffset ();
-          });
-        }
-      }
-    }
+    
     private uint tid = 0;
     private int current_voffset = 0;
     private int selection_voffset = 0;
