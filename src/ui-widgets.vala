@@ -69,6 +69,8 @@ namespace Synapse.Gui
       rtl = label.get_default_direction ();
       layout.context_changed ();
       layout.set_ellipsize (Pango.EllipsizeMode.END);
+      /* set_auto_dir (false) to handle mixed rtl/ltr text */
+      layout.set_auto_dir (false);
       calc_requisition ();
       this.request_redraw ();
     }
@@ -1451,6 +1453,8 @@ namespace Synapse.Gui
       base.size_allocate (alloc);
       
       var layout = this.get_layout ();
+      /* set_auto_dir (false) to handle mixed rtl/ltr text */
+      layout.set_auto_dir (false);
       if (this.get_ellipsize () != Pango.EllipsizeMode.NONE)
       {
         int width = (int) ((alloc.width - this.xpad * 2) * Pango.SCALE);
