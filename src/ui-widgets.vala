@@ -1404,8 +1404,10 @@ namespace Synapse.Gui
     private Gtk.Menu menu;
     private bool entered;
     public double button_scale {get; set; default = 0.5;}
+    private Utils.ColorHelper ch;
     public MenuButton ()
     {
+      ch = new Utils.ColorHelper (this);
       entered = false;
       menu = new Gtk.Menu ();
       Gtk.MenuItem item = null;
@@ -1469,7 +1471,6 @@ namespace Synapse.Gui
       ctx.translate (SIZE, SIZE);
       ctx.set_operator (Cairo.Operator.OVER);
       
-      Gtk.Style style = this.get_parent ().get_style();
       double r = 0.0, g = 0.0, b = 0.0;
       double size = button_scale * int.min (this.allocation.width, this.allocation.height) - SIZE * 2;
 
@@ -1481,11 +1482,11 @@ namespace Synapse.Gui
                                 this.allocation.y + this.allocation.height);
       if (entered)
       {
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.SELECTED], out r, out g, out b);
+        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.SELECTED);
       }
       else
       {
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.NORMAL);
       }
       pat.add_color_stop_rgb (0.0,
                               double.max(r - 0.15, 0),
@@ -1493,7 +1494,7 @@ namespace Synapse.Gui
                               double.max(b - 0.15, 0));
       if (entered)
       {
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.NORMAL);
       }
       pat.add_color_stop_rgb (1.0,
                               double.min(r + 0.15, 1),
@@ -1509,11 +1510,11 @@ namespace Synapse.Gui
 
       if (entered)
       {
-        Utils.gdk_color_to_rgb (style.fg[Gtk.StateType.NORMAL], out r, out g, out b);
+        ch.get_rgb (out r, out g, out b, ch.StyleType.FG, StateType.NORMAL);
       }
       else
       {
-        Utils.gdk_color_to_rgb (style.bg[Gtk.StateType.NORMAL], out r, out g, out b);
+        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.NORMAL);
       }
       
       ctx.set_source_rgb (r, g, b);
