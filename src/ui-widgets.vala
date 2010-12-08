@@ -59,7 +59,6 @@ namespace Synapse.Gui
     //the markup of the extended info **extend info is already inserted into description markup**
     public string extended_info_markup {get; set; default = "%s";}
 
-    private Utils.ColorHelper ch;
     private Label label;
     private Pango.Layout layout;
     private Requisition precalc_req;
@@ -68,7 +67,7 @@ namespace Synapse.Gui
     
     public MatchRenderer ()
     {
-      ch = Utils.ColorHelper.get_default ();
+      ch = null;
       text_height = 0;
       rtl = Gtk.TextDirection.LTR;
       precalc_req = {400, icon_size + cell_hpadding * 2};
@@ -289,6 +288,12 @@ namespace Synapse.Gui
       public abstract void size_request (out Requisition requisition);
       public signal void request_redraw ();
       public signal void on_style_set ();
+      
+      protected Utils.ColorHelper ch;
+      public void set_color_helper (Utils.ColorHelper colorhelper)
+      {
+        this.ch = colorhelper;
+      }
     }
     public enum ScrollMode
     {
@@ -406,7 +411,9 @@ namespace Synapse.Gui
         this.queue_draw ();
       });
 
-      ch = Utils.ColorHelper.get_default ();
+      ch = new Utils.ColorHelper (this);
+      rend.set_color_helper (ch);
+
       this.style_set.connect (()=>{
         this.renderer.on_style_set ();
       });
@@ -607,10 +614,13 @@ namespace Synapse.Gui
     private VBox vbox;
     private HBox status_box;
     
+    private Utils.ColorHelper ch;
+    
     public ResultBox (int width, int nrows = 5)
     {
       this.mwidth = width;
       this.nrows = nrows;
+      ch = new Utils.ColorHelper (this);
       build_ui();
     }
 
@@ -627,7 +637,7 @@ namespace Synapse.Gui
 
         /* Prepare bg's colors using GtkStyle */
         Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
-        Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
+
         ch.add_color_stop_rgba (pat, 1.0 - 15.0 / w.allocation.height, 0.95, ch.StyleType.BASE, StateType.NORMAL);
         ch.add_color_stop_rgba (pat, 1, 0.95, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
         /* Prepare and draw top bg's rect */
@@ -1128,6 +1138,7 @@ namespace Synapse.Gui
     private string current;
     private IconSize current_size;
     private uint tid; //for timer
+    private Utils.ColorHelper ch;
     public int update_timeout {get; set; default = -1;}
     public bool stop_prev_timeout {get; set; default = false;}
     public bool glow {get; set; default = false;}
@@ -1136,6 +1147,7 @@ namespace Synapse.Gui
       current = "";
       current_size = IconSize.DIALOG;
       tid = 0;
+      ch = new Utils.ColorHelper (this);
       this.notify["glow"].connect (this.queue_draw);
     }
     public override bool expose_event (Gdk.EventExpose event)
@@ -1150,7 +1162,6 @@ namespace Synapse.Gui
         double yc = this.allocation.y + this.allocation.height / 2;
         double rad = double.min ( this.allocation.height, this.allocation.width ) / 2.0;
         Pattern pat = new Pattern.radial (xc, yc, 0, xc, yc, rad);
-        Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
         ch.add_color_stop_rgba (pat, 0.7, 1.0, ch.StyleType.BASE, StateType.SELECTED);
         ch.add_color_stop_rgba (pat, 1, 0, ch.StyleType.BASE, StateType.SELECTED);
         /* Prepare and draw top bg's rect */
@@ -1235,6 +1246,8 @@ namespace Synapse.Gui
     public double border_radius {get; set; default = 3.0;}
     public double shadow_height {get; set; default = 3;}
     public double focus_height {get; set; default = 3;}
+    
+    private Utils.ColorHelper ch;
     public Widget? focus_widget 
     {
       get {return _focus_widget;}
@@ -1253,6 +1266,7 @@ namespace Synapse.Gui
     construct
     {
       _focus_widget = null;
+      ch = new Utils.ColorHelper (this);
       this.notify["draw-input"].connect (this.queue_draw);
       this.notify["input-alpha"].connect (this.queue_draw);
       this.notify["border-radius"].connect (this.queue_draw);
@@ -1268,7 +1282,7 @@ namespace Synapse.Gui
         ctx.translate (1.5, 1.5);
         ctx.set_operator (Cairo.Operator.OVER);
         ctx.set_line_width (1.25);
-        Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
+
         double x = this.allocation.x + this.left_padding,
                y = this.allocation.y + this.top_padding,
                w = this.allocation.width - this.left_padding - this.right_padding - 3.0,
@@ -1715,9 +1729,11 @@ namespace Synapse.Gui
     private int wmax;
     private int hmax;
     private int current_offset;
+    private Utils.ColorHelper ch;
     
     public HTextSelector ()
     {
+      ch = new Utils.ColorHelper (this);
       cached_surface = null;
       tid = 0;
       wmax = hmax = current_offset = 0;
@@ -1799,7 +1815,6 @@ namespace Synapse.Gui
     private void update_cached_surface ()
     {
       int w = 0, h = 0;
-      Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
       PangoReadyText txt;
       txt = texts.last ();
       w = txt.offset + txt.width;

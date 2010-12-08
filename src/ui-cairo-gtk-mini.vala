@@ -158,13 +158,6 @@ namespace Synapse.Gui
         container_top.pack_start (vbox, false);
       }
       
-      /* Prepare colors using label */
-      ColorHelper.get_default ().init_from_widget_type (typeof (Label));
-      window.style_set.connect (()=>{
-        ColorHelper.get_default ().init_from_widget_type (typeof (Label));
-        window.queue_draw ();
-      });
-      
       container.show_all ();
     }
     
@@ -205,7 +198,6 @@ namespace Synapse.Gui
       ctx.set_operator (Operator.CLEAR);
       ctx.paint ();
       ctx.translate (0.5, 0.5);
-      Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
       double border_radius = comp ? BORDER_RADIUS : 0;
       double x = this.container.border_width,
              y = flag_selector.allocation.y - border_radius;

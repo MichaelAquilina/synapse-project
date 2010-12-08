@@ -340,13 +340,65 @@ namespace Synapse.Gui
         DARKER,
         INVERTED
       }
-      private static ColorHelper helper = null;
-      public static unowned ColorHelper get_default ()
+
+      private Gee.Map <string, Color> colormap;
+      private Gtk.Widget widget;
+
+      public ColorHelper (Gtk.Widget for_widget)
       {
-        if (helper == null)
-          helper = new ColorHelper ();
-        return helper;
+      	this.colormap = new Gee.HashMap <string, Color> ();
+      	this.widget = for_widget;
+        this.widget.style_set.connect (()=>{
+          colormap.clear ();
+        });
       }
+			private Color get_color_from_map (StyleType t, Gtk.StateType st, Mod mod)
+			{
+				Color col;
+        string key = "%d%d%d".printf (t, st, mod);
+        if (this.colormap.has_key (key))
+        	col = this.colormap.get (key);
+        else
+        {
+        	col = new Color ();
+        	switch (t)
+        	{
+        		case StyleType.BG:
+        			col.init_from_gdk_color (widget.style.bg[st]);
+        			break;
+        		case StyleType.FG:
+        			col.init_from_gdk_color (widget.style.fg[st]);
+        			break;
+        		case StyleType.BASE:
+        			col.init_from_gdk_color (widget.style.base[st]);
+        			break;
+        		case StyleType.TEXT:
+        			col.init_from_gdk_color (widget.style.text[st]);
+        			break;
+        	}
+        	col.apply_mod (mod);
+        	this.colormap.set (key, col);
+        }
+        return col;
+			}
+      public void set_source_rgba (Cairo.Context ctx, double alpha, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      {
+        Color col = get_color_from_map (t, st, mod);
+        ctx.set_source_rgba (col.r, col.g, col.b, alpha);
+      }
+      public void add_color_stop_rgba (Cairo.Pattern pat, double val, double alpha, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      {
+        Color col = get_color_from_map (t, st, mod);
+        pat.add_color_stop_rgba (val, col.r, col.g, col.b, alpha);
+      }
+      public void get_rgb (out double r, out double g, out double b, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      {
+        Color col = get_color_from_map (t, st, mod);
+        r = col.r;
+        g = col.g;
+        b = col.b;
+      }
+      
       private class Color
       {
         public double r;
@@ -586,103 +638,6 @@ namespace Synapse.Gui
 	        g = green;
 	        b = blue;
         }
-      }
-      /* [StyleType, StateType, Mod] */
-      private Color[,,] c;
-      /* End of static section */
-      private ColorHelper ()
-      {
-        c = new Color[4,5,4];
-        for (int i = 0; i < 4; i++)
-          for (int j = 0; j < 5; j++)
-            for (int k = 0; k < 4; k++)
-              c[i,j,k] = new Color ();
-      }
-      protected Gtk.Style current_style = null;
-      public void force_color_helper_style_on_widget (Gtk.Widget w)
-      {
-      	if (current_style != null)
-	      	w.style = current_style;
-      	//w.style_set.disconnect (_style_set_cb);
-      	//w.style_set.connect (_style_set_cb);
-      }
-      private void _style_set_cb (Gtk.Widget widget, Gtk.Style? prev_style)
-      {
-      	if (current_style != null)
-    			widget.set_style (current_style);
-      }
-      public void init_from_widget_type (Type widget_type)
-      {
-        Gtk.Widget widget = (Gtk.Widget) Object.new (widget_type);
-      	current_style = Gtk.rc_get_style (widget);
-      	_init_from_style (current_style);
-      }
-      
-      public void init_from_panel_or_widget_type (Type widget_type)
-      {
-        Gtk.Settings sett = Gtk.Settings.get_default ();
-        current_style = Gtk.rc_get_style_by_paths (sett, "PanelWidget", "", 0);
-        if (current_style == null)
-        	init_from_widget_type (widget_type);
-        else
-        	_init_from_style (current_style);
-      }
-      
-      public void _init_from_style (Gtk.Style s)
-      {
-        for (int j = 0; j < 5; j++)
-        {
-          c[StyleType.BG,j,0].init_from_gdk_color (s.bg[j]);
-          for (int k = 1; k < 4; k++)
-          {
-            c[StyleType.BG,j,k].clone (c[StyleType.BG,j,0]);
-            c[StyleType.BG,j,k].apply_mod ((Mod)k);
-          }
-        }
-        for (int j = 0; j < 5; j++)
-        {
-          c[StyleType.FG,j,0].init_from_gdk_color (s.fg[j]);
-          for (int k = 1; k < 4; k++)
-          {
-            c[StyleType.FG,j,k].clone (c[StyleType.FG,j,0]);
-            c[StyleType.FG,j,k].apply_mod ((Mod)k);
-          }
-        }
-        for (int j = 0; j < 5; j++)
-        {
-          c[StyleType.TEXT,j,0].init_from_gdk_color (s.text[j]);
-          for (int k = 1; k < 4; k++)
-          {
-            c[StyleType.TEXT,j,k].clone (c[StyleType.TEXT,j,0]);
-            c[StyleType.TEXT,j,k].apply_mod ((Mod)k);
-          }
-        }
-        for (int j = 0; j < 5; j++)
-        {
-          c[StyleType.BASE,j,0].init_from_gdk_color (s.base[j]);
-          for (int k = 1; k < 4; k++)
-          {
-            c[StyleType.BASE,j,k].clone (c[StyleType.BASE,j,0]);
-            c[StyleType.BASE,j,k].apply_mod ((Mod)k);
-          }
-        }
-      }
-      public void set_source_rgba (Cairo.Context ctx, double alpha, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
-      {
-        Color col = c[t,st,mod];
-        ctx.set_source_rgba (col.r, col.g, col.b, alpha);
-      }
-      public void add_color_stop_rgba (Cairo.Pattern pat, double val, double alpha, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
-      {
-        Color col = c[t,st,mod];
-        pat.add_color_stop_rgba (val, col.r, col.g, col.b, alpha);
-      }
-      public void get_rgb (out double r, out double g, out double b, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
-      {
-        Color col = c[t,st,mod];
-        r = col.r;
-        g = col.g;
-        b = col.b;
       }
     }
   }

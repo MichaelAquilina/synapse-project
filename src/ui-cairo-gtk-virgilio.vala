@@ -98,13 +98,6 @@ namespace Synapse.Gui
 
     protected override void build_ui ()
     {
-      /* Prepare colors using label */
-      ColorHelper.get_default ().init_from_widget_type (typeof (Label));
-      window.style_set.connect (()=>{
-        ColorHelper.get_default ().init_from_widget_type (typeof (Label));
-        window.queue_draw ();
-      });
-
       /* Build the UI */
       container = new VBox (false, 4);
       container.border_width = BORDER_RADIUS;
@@ -285,7 +278,6 @@ namespace Synapse.Gui
       ctx.set_operator (Operator.CLEAR);
       ctx.paint ();
       ctx.translate (0.5, 0.5);
-      Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
       double border_radius = comp ? BORDER_RADIUS : 0;
       double x = window.border_width,
              y = window.border_width;

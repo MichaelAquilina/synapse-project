@@ -77,6 +77,7 @@ namespace Synapse.Gui
     protected Throbber throbber = null;
     protected HTextSelector flag_selector = null;
     protected bool searching_for_matches = true;
+    protected ColorHelper ch;
     
     protected virtual void set_input_mask () {}
     
@@ -97,6 +98,8 @@ namespace Synapse.Gui
       window.notify["is-active"].connect (()=>{
         Idle.add (check_focus);
       });
+      
+      ch = new Utils.ColorHelper (window);
       
       /* Query flag selector  */
       flag_selector = new HTextSelector();

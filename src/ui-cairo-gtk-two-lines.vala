@@ -190,13 +190,6 @@ namespace Synapse.Gui
       labels_hbox.pack_start (fake_input_match, false);
       labels_hbox.pack_start (fake_input_action, false);
       
-      /* Prepare colors using label */
-      ColorHelper.get_default ().init_from_widget_type (typeof (Label));
-      window.style_set.connect (()=>{
-        ColorHelper.get_default ().init_from_widget_type (typeof (Label));
-        window.queue_draw ();
-      });
-
       container.show_all ();
     }
     protected override bool show_list (bool visible)
@@ -284,7 +277,6 @@ namespace Synapse.Gui
       double h = container_top.allocation.height;
       double x = container_top.allocation.x;
       double y = container_top.allocation.y;
-      unowned Utils.ColorHelper ch = Utils.ColorHelper.get_default ();
       if (comp)
       {
         int spacing = top_spacer.allocation.height;
