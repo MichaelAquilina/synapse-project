@@ -25,6 +25,11 @@ using Gee;
 
 namespace Synapse.Gui
 {
+  public class UIWidgetsConfig : ConfigObject
+  {
+    public bool animation_enabled { get; set; default = true; }
+    public bool extended_info_enabled { get; set; default = true; }
+  }
   public class MatchRenderer : ListView.Renderer
   {
     // the size of Match and Action icons
@@ -76,6 +81,9 @@ namespace Synapse.Gui
       this.notify["cell-hpadding"].connect (size_changed);
       this.notify["title-markup"].connect (size_changed);
       this.notify["description-markup"].connect (size_changed);
+      
+      var config = (UIWidgetsConfig) ConfigService.get_default ().get_config ("ui", "widgets", typeof (UIWidgetsConfig));
+      show_extended_info = config.extended_info_enabled;
     }
     private void size_changed ()
     {
@@ -312,6 +320,7 @@ namespace Synapse.Gui
         queue_draw ();
         if (selected_index == value || data == null || value >= data.size) return;
         selected_index = value;
+        update_voffsets ();
       }
     }
     /* Specify the minimum visible rows (size_request depends on this) */
@@ -370,20 +379,7 @@ namespace Synapse.Gui
         return;
       }
       scrollto = index;
-      if (!animation_enabled)
-      {
-        update_current_voffset ();
-        this.queue_draw ();
-      }
-      else
-      {
-        if (tid == 0)
-        {
-          tid = Timeout.add (ANIM_TIMEOUT, ()=>{
-            return update_current_voffset ();
-          });
-        }
-      }
+      update_voffsets ();
     }
     
     private Utils.ColorHelper ch;
@@ -421,6 +417,9 @@ namespace Synapse.Gui
         scroll_to (scrollto);
       });
       this.notify["scroll-mode"].connect (()=>{scroll_to (scrollto);});
+      
+      var config = (UIWidgetsConfig) ConfigService.get_default ().get_config ("ui", "widgets", typeof (UIWidgetsConfig));
+      animation_enabled = config.animation_enabled;
     }
     public override void size_request (out Requisition requisition)
     {
@@ -438,6 +437,22 @@ namespace Synapse.Gui
     private uint tid = 0;
     private int current_voffset = 0;
     private int selection_voffset = 0;
+    private void update_voffsets ()
+    {
+      if (!animation_enabled)
+      {
+        update_current_voffset ();
+      }
+      else
+      {
+        if (tid == 0)
+        {
+          tid = Timeout.add (ANIM_TIMEOUT, ()=>{
+            return update_current_voffset ();
+          });
+        }
+      }
+    }
     private bool update_current_voffset ()
     {
       Requisition req = {0, 0};
@@ -1724,6 +1739,9 @@ namespace Synapse.Gui
       this.notify["selected-markup"].connect (_global_update);
       this.notify["unselected-markup"].connect (_global_update);
       _selected = 0;
+      
+      var config = (UIWidgetsConfig) ConfigService.get_default ().get_config ("ui", "widgets", typeof (UIWidgetsConfig));
+      animation_enabled = config.animation_enabled;
     }
     public void add_text (string txt)
     {
