@@ -223,6 +223,23 @@ namespace Synapse
       Gtk.main ();
     }
 
+    private static void load_custom_style ()
+    {
+      string custom_gtkrc = 
+        Path.build_filename (Environment.get_user_config_dir (), "synapse",
+                             "gtkrc");
+      File f = File.new_for_path (custom_gtkrc);
+      debug ("Try to load custom gtkrc in %s", custom_gtkrc);
+      if (f.query_exists ())
+      {
+        Gtk.rc_add_default_file (custom_gtkrc);
+        Gtk.rc_reparse_all ();
+        debug ("Custom style loaded.");
+      }
+      else
+        debug ("Custom style not present.");
+    }
+    
     public static int main (string[] argv)
     {
       var context = new OptionContext (" - Synapse");
@@ -232,6 +249,8 @@ namespace Synapse
       {
         context.parse (ref argv);
 
+        /* Custom style loading must be done before Gtk.init */
+        load_custom_style ();
         Gtk.init (ref argv);
         
         var app = new Unique.App ("org.gnome.Synapse", null);

@@ -25,6 +25,18 @@ using Cairo;
 using Gee;
 using Synapse.Gui.Utils;
 
+namespace Synapse
+{
+  public class Window : Gtk.Window
+  {
+    /* --- class for custom gtkrc purpose --- */
+    /* In ~/.config/synapse/gtkrc  use:
+       widget_class "*SynapseWindow*" style : highest "synapse" 
+       and set your custom colors
+    */
+  }
+}
+
 namespace Synapse.Gui
 {
   public abstract class GtkCairoBase : UIInterface
@@ -85,8 +97,7 @@ namespace Synapse.Gui
     
     construct
     {
-      window = new Window (Gtk.WindowType.TOPLEVEL);
-      window.set_name ("synapse");
+      window = new Synapse.Window ();
       window.skip_taskbar_hint = true;
       window.skip_pager_hint = true;
       window.set_position (WindowPosition.CENTER);

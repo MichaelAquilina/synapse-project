@@ -218,7 +218,7 @@ namespace Synapse.Gui
              y3 = y1+h-rad,
              y4 = y1+h,
              thick = size+rad;
-      double am = 0.25, amv = a * 0.25;
+      double am = 0.25, amv = a * 0.32;
       /*                           y
            _____________________   1
           /                     \  2
@@ -437,10 +437,10 @@ namespace Synapse.Gui
               Utils.rgb_invert_color (ref this.r, ref this.g, ref this.b);
               break;
             case Mod.LIGHTER:
-            	murrine_shade (ref this.r, ref this.g, ref this.b, 1.10);
+            	murrine_shade (ref this.r, ref this.g, ref this.b, 1.16);
             	break;
            	case Mod.DARKER:
-           		murrine_shade (ref this.r, ref this.g, ref this.b, 0.90);
+           		murrine_shade (ref this.r, ref this.g, ref this.b, 0.84);
            		break;
             default:
               break;

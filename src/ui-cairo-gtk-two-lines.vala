@@ -283,13 +283,13 @@ namespace Synapse.Gui
         y += spacing;
         h -= spacing;
         double r = 0, b = 0, g = 0;
-        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+        ch.get_rgb (out r, out g, out b, ch.StyleType.FG, StateType.NORMAL);
         //draw shadow
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
                                           r, g, b, 0.9, SHADOW_SIZE);
         // border
         _cairo_path_for_main (ctx, comp, x + 0.5, y + 0.5, w - 1, h - 1);
-        ch.set_source_rgba (ctx, 0.6, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+        ch.set_source_rgba (ctx, 0.6, ch.StyleType.FG, StateType.NORMAL);
         ctx.set_line_width (2.5);
         ctx.stroke ();
         if (this.list_visible)
@@ -325,7 +325,7 @@ namespace Synapse.Gui
       {
         ctx.set_operator (Operator.OVER);
         _cairo_path_for_main (ctx, comp, x, y, w, h);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, StateType.NORMAL);
         ctx.set_line_width (3.5);
         ctx.stroke (); 
       }

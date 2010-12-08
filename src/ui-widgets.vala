@@ -151,14 +151,17 @@ namespace Synapse.Gui
         }
       } catch (GLib.Error err) { /* do not render icon */ }
     }
-    private void draw_text (Cairo.Context ctx, Match m, int x, int y, int width, Gtk.StateType state)
+    private void draw_text (Cairo.Context ctx, Match m, int x, int y, int width, Gtk.StateType state, bool use_base)
     {
       ctx.save ();
       ctx.translate (x, y);
       ctx.rectangle (0, 0, width, text_height);
       ctx.clip ();
 
-      ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
+      if (use_base)
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
+      else
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, state);
       string s = "";
       /* ----------------------- draw title --------------------- */
       if (hilight_on_selected && state == Gtk.StateType.SELECTED)
@@ -214,7 +217,7 @@ namespace Synapse.Gui
       Pango.cairo_show_layout (ctx, layout);
       ctx.restore ();
     }
-    public override void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj)
+    public override void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, bool use_base, void* obj)
     {
       if (obj == null)
         return;
@@ -243,7 +246,7 @@ namespace Synapse.Gui
         /* Title and description */
         x += icon_size + cell_hpadding * 2;
         y = (req.height - text_height) / 2;
-        draw_text (ctx, m, x, y, text_width, state);
+        draw_text (ctx, m, x, y, text_width, state, use_base);
 
         /* Action Icon */
         if (has_action)
@@ -262,7 +265,7 @@ namespace Synapse.Gui
         /* Title and description */
         x = x - cell_hpadding * 2 - text_width;
         y = (req.height - text_height) / 2;
-        draw_text (ctx, m, x, y, text_width, state);
+        draw_text (ctx, m, x, y, text_width, state, use_base);
         
         /* Action Icon */
         if (has_action)
@@ -284,7 +287,7 @@ namespace Synapse.Gui
     public abstract class Renderer: GLib.Object
     {
       /* Render ojb at state on ctx with req.width and req.height */
-      public abstract void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, void* obj);
+      public abstract void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, bool use_base, void* obj);
       public abstract void size_request (out Requisition requisition);
       public signal void request_redraw ();
       public signal void on_style_set ();
@@ -598,7 +601,7 @@ namespace Synapse.Gui
       ctx.translate (0, y);
       renderer.render (ctx, req, 
                        !inhibit_focus && selected_index == row && y == selection_voffset? 
-                       Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, 
+                       Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, use_base_background, 
                        data.get (row));
       ctx.restore ();
     }

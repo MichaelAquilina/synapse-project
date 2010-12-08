@@ -212,7 +212,7 @@ namespace Synapse.Gui
       
       /* Prepare shadow color */
       double r = 0, b = 0, g = 0;
-      ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+      ch.get_rgb (out r, out g, out b, ch.StyleType.FG, StateType.NORMAL);
 
       if (list_visible)
       {
@@ -250,7 +250,7 @@ namespace Synapse.Gui
         // border
         ctx.set_operator (Operator.OVER);
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        ch.set_source_rgba (ctx, 0.6, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+        ch.set_source_rgba (ctx, 0.6, ch.StyleType.FG, StateType.NORMAL);
         ctx.set_line_width (1.0);
         ctx.stroke ();
       }
