@@ -515,6 +515,7 @@ namespace Synapse.Gui
       if (target == current_voffset && selection_target == selection_voffset)
       {
         tid = 0;
+        queue_draw ();
         return false; // stop animation
       }
       if (target != current_voffset)
@@ -600,7 +601,7 @@ namespace Synapse.Gui
       ctx.clip ();
       ctx.translate (0, y);
       renderer.render (ctx, req, 
-                       !inhibit_focus && selected_index == row && y == selection_voffset? 
+                       !inhibit_focus && selected_index == row && tid == 0 ? 
                        Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, use_base_background, 
                        data.get (row));
       ctx.restore ();
