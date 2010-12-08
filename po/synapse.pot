@@ -8,13 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-05 00:43+0100\n"
+"POT-Creation-Date: 2010-12-08 17:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
 #: ../data/synapse.desktop.in.h:1
 msgid "Search everything you do."
@@ -24,276 +25,268 @@ msgstr ""
 msgid "Synapse"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1048
+#: ../src/synapse-main.c:313 ../src/ui-settings.c:942
+msgid "Activate"
+msgstr ""
+
+#: ../src/ui-cairo-gtk-base.c:1069
 msgid "Actions"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1050
+#: ../src/ui-cairo-gtk-base.c:1071
 msgid "Audio"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1052
+#: ../src/ui-cairo-gtk-base.c:1073
 msgid "Applications"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1054
+#: ../src/ui-cairo-gtk-base.c:1075
 msgid "All"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1056
+#: ../src/ui-cairo-gtk-base.c:1077
 msgid "Documents"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1058
+#: ../src/ui-cairo-gtk-base.c:1079
 msgid "Images"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1060
+#: ../src/ui-cairo-gtk-base.c:1081
 msgid "Video"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1062
+#: ../src/ui-cairo-gtk-base.c:1083
 msgid "Internet"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-virgilio.c:1036 ../src/ui-cairo-gtk-virgilio.c:1091
-#: ../src/ui-widgets.c:2660
+#: ../src/ui-cairo-gtk-virgilio.c:1040 ../src/ui-cairo-gtk-virgilio.c:1095
+#: ../src/ui-widgets.c:3115
 #, c-format
 msgid "<b>%d of %d</b>"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-virgilio.c:1146 ../src/ui-widgets.c:2605
+#: ../src/ui-cairo-gtk-virgilio.c:1150 ../src/ui-widgets.c:3060
 msgid "Home"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-virgilio.c:1158 ../src/ui-cairo-gtk-virgilio.c:1216
-#: ../src/ui-widgets.c:2637
+#: ../src/ui-cairo-gtk-virgilio.c:1162 ../src/ui-cairo-gtk-virgilio.c:1220
+#: ../src/ui-widgets.c:3092
 #, c-format
 msgid "<b>1 of %d</b>"
 msgstr ""
 
-#: ../src/ui-interface.c:588
+#: ../src/ui-interface.c:996
 msgid "...or press down key to browse recent activities"
 msgstr ""
 
-#: ../src/ui-interface.c:1358
+#: ../src/ui-interface.c:1408
 msgid "Searching..."
 msgstr ""
 
-#: ../src/ui-interface.c:1363
+#: ../src/ui-interface.c:1413
 msgid "No results found."
 msgstr ""
 
-#: ../src/ui-interface.c:1368
+#: ../src/ui-interface.c:1418
 msgid "No recent activities found."
 msgstr ""
 
-#: ../src/ui-interface.c:1373
+#: ../src/ui-interface.c:1423
 msgid "Type to search..."
 msgstr ""
 
-#: ../src/ui-settings.c:325
+#: ../src/ui-settings.c:333
 msgid "Synapse - Settings"
 msgstr ""
 
-#: ../src/ui-settings.c:379
+#: ../src/ui-settings.c:387
 msgid "Default"
 msgstr ""
 
-#: ../src/ui-settings.c:385
+#: ../src/ui-settings.c:393
 msgid "Mini"
 msgstr ""
 
-#: ../src/ui-settings.c:391
+#: ../src/ui-settings.c:399
 msgid "Dual"
 msgstr ""
 
-#: ../src/ui-settings.c:397
+#: ../src/ui-settings.c:405
 msgid "Virgilio"
 msgstr ""
 
-#: ../src/ui-settings.c:800
+#: ../src/ui-settings.c:826
 msgid "General"
 msgstr ""
 
-#: ../src/ui-settings.c:805
+#: ../src/ui-settings.c:831
 msgid "Plugins"
 msgstr ""
 
-#: ../src/ui-settings.c:815
+#: ../src/ui-settings.c:841
 msgid "Behavior & Look"
 msgstr ""
 
-#: ../src/ui-settings.c:831
+#: ../src/ui-settings.c:857
 msgid "Theme:"
 msgstr ""
 
-#: ../src/ui-settings.c:839
+#: ../src/ui-settings.c:865
 msgid "Startup on login"
 msgstr ""
 
-#: ../src/ui-settings.c:852
+#: ../src/ui-settings.c:872
+msgid "Show notification icon"
+msgstr ""
+
+#: ../src/ui-settings.c:885
 msgid "Shortcuts"
 msgstr ""
 
-#: ../src/ui-settings.c:887
+#: ../src/ui-settings.c:920
 msgid "Action"
 msgstr ""
 
-#: ../src/ui-settings.c:901
+#: ../src/ui-settings.c:934
 msgid "Shortcut"
 msgstr ""
 
-#: ../src/ui-settings.c:909
-msgid "Activate"
-msgstr ""
-
-#: ../src/ui-settings.c:916
+#: ../src/ui-settings.c:949
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr ""
 
-#: ../src/ui-settings.c:990 ../src/ui-settings.c:1268
+#: ../src/ui-settings.c:1024 ../src/ui-settings.c:1306
 msgid "Disabled"
 msgstr ""
 
-#: ../src/ui-settings.c:1276
+#: ../src/ui-settings.c:1314
 msgid "Enabled"
 msgstr ""
 
-#: ../src/ui-settings.c:1360
+#: ../src/ui-settings.c:1398
 msgid "Status"
 msgstr ""
 
-#: ../src/ui-settings.c:1362
+#: ../src/ui-settings.c:1400
 msgid "Enable this plugin"
 msgstr ""
 
-#: ../src/ui-settings.c:1364
+#: ../src/ui-settings.c:1402
 msgid "Disable this plugin"
 msgstr ""
 
-#: ../src/ui-widgets.c:2554 ../src/ui-widgets.c:2627
+#: ../src/ui-widgets.c:3009 ../src/ui-widgets.c:3082
 msgid "No results."
 msgstr ""
 
-#: ../src/ui-widgets.c:4704
-msgid "Settings"
-msgstr ""
-
-#: ../src/ui-widgets.c:4711
-msgid "About"
-msgstr ""
-
-#: ../src/ui-widgets.c:4723
-msgid "Quit"
-msgstr ""
-
-#: ../src/core/common-actions.c:958
+#: ../src/core/common-actions.c:1000
 msgid "Run"
 msgstr ""
 
-#: ../src/core/common-actions.c:959
+#: ../src/core/common-actions.c:1001
 msgid "Run an application, action or script"
 msgstr ""
 
-#: ../src/core/common-actions.c:1107
+#: ../src/core/common-actions.c:1155
 msgid "Run in Terminal"
 msgstr ""
 
-#: ../src/core/common-actions.c:1108
+#: ../src/core/common-actions.c:1156
 msgid "Run application or command in terminal"
 msgstr ""
 
-#: ../src/core/common-actions.c:1261
+#: ../src/core/common-actions.c:1309
 msgid "Open"
 msgstr ""
 
-#: ../src/core/common-actions.c:1262
+#: ../src/core/common-actions.c:1310
 msgid "Open using default application"
 msgstr ""
 
-#: ../src/core/common-actions.c:1396
+#: ../src/core/common-actions.c:1444
 msgid "Open folder"
 msgstr ""
 
-#: ../src/core/common-actions.c:1397
+#: ../src/core/common-actions.c:1445
 msgid "Open folder containing this file"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:2676
+#: ../src/plugins/banshee-plugin.c:2677
 msgid "Control Banshee and add items to playlists."
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:2679
+#: ../src/plugins/banshee-plugin.c:2681
 msgid "Banshee is not installed"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3704 ../src/plugins/rhythmbox-plugin.c:3489
+#: ../src/plugins/banshee-plugin.c:3706 ../src/plugins/rhythmbox-plugin.c:3492
 msgid "Play"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3705
+#: ../src/plugins/banshee-plugin.c:3707
 msgid "Start playback in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3805 ../src/plugins/rhythmbox-plugin.c:3687
+#: ../src/plugins/banshee-plugin.c:3807 ../src/plugins/rhythmbox-plugin.c:3690
 msgid "Pause"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3806
+#: ../src/plugins/banshee-plugin.c:3808
 msgid "Pause playback in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3896 ../src/plugins/rhythmbox-plugin.c:3741
+#: ../src/plugins/banshee-plugin.c:3898 ../src/plugins/rhythmbox-plugin.c:3744
 msgid "Next"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3897
+#: ../src/plugins/banshee-plugin.c:3899
 msgid "Plays the next song in Banshee's playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3987 ../src/plugins/rhythmbox-plugin.c:3832
+#: ../src/plugins/banshee-plugin.c:3989 ../src/plugins/rhythmbox-plugin.c:3835
 msgid "Previous"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3988
+#: ../src/plugins/banshee-plugin.c:3990
 msgid "Plays the previous song in Banshee's playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4078
+#: ../src/plugins/banshee-plugin.c:4080
 msgid "Enqueue in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4079
+#: ../src/plugins/banshee-plugin.c:4081
 msgid "Add the song to Banshee playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4232
+#: ../src/plugins/banshee-plugin.c:4234
 msgid "Play in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4233 ../src/plugins/rhythmbox-plugin.c:4127
+#: ../src/plugins/banshee-plugin.c:4235 ../src/plugins/rhythmbox-plugin.c:4130
 msgid "Clears the current playlist and plays the song"
 msgstr ""
 
-#: ../src/plugins/command-plugin.c:210
+#: ../src/plugins/command-plugin.c:201
 msgid "Find and execute arbitrary commands."
 msgstr ""
 
-#: ../src/plugins/command-plugin.c:602
+#: ../src/plugins/command-plugin.c:699
 msgid "Run command"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:284
+#: ../src/plugins/desktop-file-plugin.c:294
 msgid "Search for and run applications on your computer."
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1561
+#: ../src/plugins/desktop-file-plugin.c:1672
 #, c-format
 msgid "Open with %s"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1569
+#: ../src/plugins/desktop-file-plugin.c:1680
 #, c-format
 msgid "Opens current selection using %s"
 msgstr ""
@@ -330,43 +323,59 @@ msgstr ""
 msgid "Look up definition in dictionary"
 msgstr ""
 
-#: ../src/plugins/directory-plugin.c:371
+#: ../src/plugins/directory-plugin.c:416
 msgid "Open commonly used directories."
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1561
+#: ../src/plugins/gnome-session-plugin.c:1560
 msgid "Log out from your session, restart or shutdown your computer."
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1565
-msgid "Gnome Session Manager wan't found"
+#: ../src/plugins/gnome-session-plugin.c:1564
+msgid "Gnome Session Manager wasn't found"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1815
+#: ../src/plugins/gnome-session-plugin.c:1814
 msgid "Shut Down"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1816
+#: ../src/plugins/gnome-session-plugin.c:1815
 msgid "Turn your computer off"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2134
+#: ../src/plugins/gnome-session-plugin.c:2133
 msgid "Restart"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2135
+#: ../src/plugins/gnome-session-plugin.c:2134
 msgid "Restart your computer"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2453
+#: ../src/plugins/gnome-session-plugin.c:2452
 msgid "Log Out"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2454
+#: ../src/plugins/gnome-session-plugin.c:2453
 msgid "Close your session and return to the login screen"
 msgstr ""
 
-#: ../src/plugins/hybrid-search-plugin.c:659
+#: ../src/plugins/gnome-screensaver-plugin.c:684
+msgid "Lock screen of your computer."
+msgstr ""
+
+#: ../src/plugins/gnome-screensaver-plugin.c:688
+msgid "Gnome Screen Saver wasn't found"
+msgstr ""
+
+#: ../src/plugins/gnome-screensaver-plugin.c:926
+msgid "Lock Screen"
+msgstr ""
+
+#: ../src/plugins/gnome-screensaver-plugin.c:927
+msgid "Locks screen and starts screensaver."
+msgstr ""
+
+#: ../src/plugins/hybrid-search-plugin.c:667
 msgid ""
 "Improve results returned by the Zeitgeist plugin by looking for similar "
 "files on the filesystem."
@@ -376,39 +385,39 @@ msgstr ""
 msgid "Runs locate command to find files on the filesystem."
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:2461
+#: ../src/plugins/rhythmbox-plugin.c:2463
 msgid "Control Rhythmbox and add items to playlists."
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:2464
+#: ../src/plugins/rhythmbox-plugin.c:2467
 msgid "Rhythmbox is not installed"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3490
+#: ../src/plugins/rhythmbox-plugin.c:3493
 msgid "Start playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3688
+#: ../src/plugins/rhythmbox-plugin.c:3691
 msgid "Pause playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3742
+#: ../src/plugins/rhythmbox-plugin.c:3745
 msgid "Plays the next song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3833
+#: ../src/plugins/rhythmbox-plugin.c:3836
 msgid "Plays the previous song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3936
+#: ../src/plugins/rhythmbox-plugin.c:3939
 msgid "Enqueue in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3937
+#: ../src/plugins/rhythmbox-plugin.c:3940
 msgid "Add the song to Rhythmbox playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:4126
+#: ../src/plugins/rhythmbox-plugin.c:4129
 msgid "Play in Rhythmbox"
 msgstr ""
 
@@ -436,10 +445,42 @@ msgstr ""
 msgid "Put your computer into hibernation mode"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:409
+#: ../src/plugins/zeitgeist-plugin.c:382
 msgid "Search various items logged by Zeitgeist."
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:413
+#: ../src/plugins/zeitgeist-plugin.c:386
 msgid "Zeitgeist is not installed"
 msgstr ""
+
+#: ../src/plugins/zeitgeist-plugin.c:1745
+msgid "few moments ago"
+msgstr ""
+
+#: ../src/plugins/zeitgeist-plugin.c:1754
+#, c-format
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/plugins/zeitgeist-plugin.c:1766
+#, c-format
+msgid "%d hour ago"
+msgid_plural "%d hours ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/plugins/zeitgeist-plugin.c:1778
+#, c-format
+msgid "%d day ago"
+msgid_plural "%d days ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/plugins/zeitgeist-plugin.c:1790
+#, c-format
+msgid "%d week ago"
+msgid_plural "%d weeks ago"
+msgstr[0] ""
+msgstr[1] ""
