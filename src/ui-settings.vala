@@ -119,7 +119,7 @@ namespace Synapse.Gui
       this.delete_event.connect (this.hide_on_delete);
 
       config = (UIConfig)
-        ConfigService.get_default ().get_config ("ui", "global", typeof (UIConfig));
+        ConfigService.get_default ().bind_config ("ui", "global", typeof (UIConfig));
 
       init_settings ();
       build_ui ();
@@ -259,7 +259,6 @@ namespace Synapse.Gui
       notification.toggled.connect ((tb) =>
       {
         config.show_indicator = tb.get_active ();
-        ConfigService.get_default ().set_config ("ui", "global", config);
         this.notify_property ("indicator-active");
       });
       behavior_vbox.pack_start (notification, false);
@@ -395,7 +394,6 @@ namespace Synapse.Gui
         cb_themes.get_active_iter (out active_iter);
         theme_list.get (active_iter, 0, out selected_theme);
         config.ui_type = selected_theme;
-        ConfigService.get_default ().set_config ("ui", "global", config);
         theme_selected (get_current_theme ());
       });
       

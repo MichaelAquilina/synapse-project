@@ -99,6 +99,11 @@ namespace Synapse
       }
     }
     
+    private class Config: ConfigObject
+    {
+      public bool home_dir_children_only { get; set; default = true; }
+    }
+    
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -116,10 +121,13 @@ namespace Synapse
     }
     
     private Gee.Map<unowned string, DirectoryInfo> directory_info_map;
+    private Config config;
 
     construct
     {
       directory_info_map = new Gee.HashMap<unowned string, DirectoryInfo> ();
+      var cs = ConfigService.get_default ();
+      config = (Config) cs.get_config ("plugins", "directory-plugin", typeof (Config));
     }
     
     private bool connected_to_zg = false;
@@ -198,8 +206,8 @@ namespace Synapse
       {
         f = f.get_parent ();
         string parent_uri = f.get_uri ();
-        // FIXME: we're doing only home dir subdirs for now
-        if (!parent_uri.has_prefix (home_dir_uri)) break;
+        if (config.home_dir_children_only &&
+            !parent_uri.has_prefix (home_dir_uri)) break;
         dirs += parent_uri;
       }
 
@@ -228,8 +236,8 @@ namespace Synapse
       foreach (var dir in dirs)
       {
         if (dir in directory_info_map) continue;
-        // FIXME: we're doing only home dir subdirs for now
-        if (!dir.has_prefix (home_dir_uri)) continue;
+        if (config.home_dir_children_only &&
+            !dir.has_prefix (home_dir_uri)) continue;
 
         string[] directories = get_dir_parents (dir, true);
         foreach (unowned string dir_uri in directories)
@@ -287,7 +295,10 @@ namespace Synapse
       {
         if (entry.name_folded.has_prefix (q.query_string_folded))
         {
-          rs.add (entry.match_obj, Match.Score.VERY_GOOD - Match.Score.URI_PENALTY);
+          int relevancy = entry.match_obj.uri.has_prefix (home_dir_uri) ?
+            Match.Score.VERY_GOOD - Match.Score.URI_PENALTY :
+            Match.Score.ABOVE_AVERAGE - Match.Score.URI_PENALTY;
+          rs.add (entry.match_obj, relevancy);
         }
       }
       

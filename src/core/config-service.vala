@@ -74,7 +74,17 @@ namespace Synapse
         root_node.take_object (new Json.Object ());
       }
     }
-    
+
+    /**
+     * Creates an instance of an object derived from ConfigObject class, which
+     * will have its public properties set to values stored in config file, or
+     * to the default values if this object wasn't yet stored.
+     *
+     * @param group A group name.
+     * @param key A key name.
+     * @param config_type Type of the object (must be subclass of ConfigObject)
+     * @return An instance of config_type.
+     */
     public ConfigObject get_config (string group, string key, Type config_type)
     {
       unowned Json.Object obj = root_node.get_object ();
@@ -96,6 +106,32 @@ namespace Synapse
       return GLib.Object.new (config_type) as ConfigObject;
     }
     
+    /**
+     * Behaves in a similar way to get_config, but it also watches for changes
+     * in the returned config object and saves them back to the config file
+     * (without the need of calling set_config).
+     *
+     * @param group A group name.
+     * @param key A key name.
+     * @param config_type Type of the object (must be subclass of ConfigObject)
+     */
+    public ConfigObject bind_config (string group, string key, Type config_type)
+    {
+      ConfigObject config_object = get_config (group, key, config_type);
+      // make sure the lambda doesn't take a ref on the config_object
+      unowned ConfigObject co = config_object;
+      co.notify.connect (() => { this.set_config (group, key, co); });
+      return config_object;
+    }
+    
+    /**
+     * Stores all public properties of the object to the config file under
+     * specified group and key names.
+     *
+     * @param group A group name.
+     * @param key A key name.
+     * @param cfg_obj ConfigObject instance.
+     */
     public void set_config (string group, string key, ConfigObject cfg_obj)
     {
       unowned Json.Object obj = root_node.get_object ();
@@ -129,7 +165,10 @@ namespace Synapse
 
       return false;
     }
-    
+
+    /**
+     * Forces immediate saving of the configuration file to the filesystem.
+     */
     public void save ()
     {
       if (save_timer_id != 0)
@@ -139,6 +178,7 @@ namespace Synapse
       }
       
       var generator = new Generator ();
+      generator.pretty = true;
       generator.set_root (root_node);
 
       DirUtils.create_with_parents (Path.get_dirname (config_file_name), 0755);
