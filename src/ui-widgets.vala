@@ -151,17 +151,26 @@ namespace Synapse.Gui
         }
       } catch (GLib.Error err) { /* do not render icon */ }
     }
-    private void draw_text (Cairo.Context ctx, Match m, int x, int y, int width, Gtk.StateType state, bool use_base)
+    private void draw_text (Cairo.Context ctx, Match m, int x, int y, int width, Gtk.StateType state, bool use_base, double selected_fill_pct)
     {
       ctx.save ();
       ctx.translate (x, y);
       ctx.rectangle (0, 0, width, text_height);
       ctx.clip ();
 
-      if (use_base)
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.TEXT, state);
-      else
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, state);
+      var styletype = ch.StyleType.FG;
+      if (use_base) styletype = ch.StyleType.TEXT;
+      
+      if (state == Gtk.StateType.SELECTED && selected_fill_pct < 1.0)
+      {
+        double r = 0, g = 0, b = 0;
+        ch.get_rgb_from_mix (styletype, Gtk.StateType.NORMAL, ch.Mod.NORMAL,
+                             styletype, Gtk.StateType.SELECTED, ch.Mod.NORMAL,
+                             selected_fill_pct, out r, out g, out b);
+        ctx.set_source_rgba (r, g, b, 1.0);
+      }
+      else ch.set_source_rgba (ctx, 1.0, styletype, state);
+
       string s = "";
       /* ----------------------- draw title --------------------- */
       if (hilight_on_selected && state == Gtk.StateType.SELECTED)
@@ -217,7 +226,7 @@ namespace Synapse.Gui
       Pango.cairo_show_layout (ctx, layout);
       ctx.restore ();
     }
-    public override void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, bool use_base, void* obj)
+    public override void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, bool use_base, double selected_fill_pct, void* obj)
     {
       if (obj == null)
         return;
@@ -246,7 +255,7 @@ namespace Synapse.Gui
         /* Title and description */
         x += icon_size + cell_hpadding * 2;
         y = (req.height - text_height) / 2;
-        draw_text (ctx, m, x, y, text_width, state, use_base);
+        draw_text (ctx, m, x, y, text_width, state, use_base, selected_fill_pct);
 
         /* Action Icon */
         if (has_action)
@@ -265,7 +274,7 @@ namespace Synapse.Gui
         /* Title and description */
         x = x - cell_hpadding * 2 - text_width;
         y = (req.height - text_height) / 2;
-        draw_text (ctx, m, x, y, text_width, state, use_base);
+        draw_text (ctx, m, x, y, text_width, state, use_base, selected_fill_pct);
         
         /* Action Icon */
         if (has_action)
@@ -287,7 +296,8 @@ namespace Synapse.Gui
     public abstract class Renderer: GLib.Object
     {
       /* Render ojb at state on ctx with req.width and req.height */
-      public abstract void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, bool use_base, void* obj);
+      public abstract void render (Cairo.Context ctx, Requisition req, Gtk.StateType state,
+                                   bool use_base, double selected_fill_pct, void* obj);
       public abstract void size_request (out Requisition requisition);
       public signal void request_redraw ();
       public signal void on_style_set ();
@@ -558,6 +568,7 @@ namespace Synapse.Gui
       
       Requisition req = {0, 0};
       renderer.size_request (out req);
+      req.height = int.max (1, req.height);
       req.width = (int)w; //use allocation width
       
       if (!inhibit_focus && selected_index >= 0 && 
@@ -600,10 +611,13 @@ namespace Synapse.Gui
       ctx.rectangle (0, double.max (0, y), req.width, double.min (req.height, h - y));
       ctx.clip ();
       ctx.translate (0, y);
+      double pct = 1.0;
+      if (selected_index == row) pct -= double.min (1.0 , (Math.fabs (y - selection_voffset) / req.height));
+
       renderer.render (ctx, req, 
-                       !inhibit_focus && selected_index == row && ((int)y) == selection_voffset ? 
-                       Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, use_base_background, 
-                       data.get (row));
+                       !inhibit_focus && selected_index == row ? 
+                       Gtk.StateType.SELECTED : Gtk.StateType.NORMAL,
+                       use_base_background, pct, data.get (row));
       ctx.restore ();
     }
   }

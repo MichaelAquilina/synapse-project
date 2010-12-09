@@ -391,6 +391,15 @@ namespace Synapse.Gui
         Color col = get_color_from_map (t, st, mod);
         pat.add_color_stop_rgba (val, col.r, col.g, col.b, alpha);
       }
+      public void get_rgb_from_mix (StyleType t, Gtk.StateType st, Mod mod,
+                                    StyleType t2, Gtk.StateType st2, Mod mod2,
+                                    double mix_pct,
+                                    out double r, out double g, out double b)
+      {
+        Color col = get_color_from_map (t, st, mod);
+        Color col2 = get_color_from_map (t2, st2, mod2);
+        col.mix (col2, mix_pct, out r, out g, out b);
+      }
       public void get_rgb (out double r, out double g, out double b, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
       {
         Color col = get_color_from_map (t, st, mod);
@@ -425,6 +434,16 @@ namespace Synapse.Gui
           this.r = r;
           this.g = g;
           this.b = b;
+        }
+        
+        public void mix (Color target, double mix_pct, out double r, out double g, out double b)
+        {
+          r = target.r - this.r;
+          g = target.g - this.g;
+          b = target.b - this.b;
+          r = this.r + r * mix_pct;
+          g = this.g + g * mix_pct;
+          b = this.b + b * mix_pct;
         }
 
         public void clone (Color col)
