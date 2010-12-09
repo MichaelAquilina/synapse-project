@@ -601,7 +601,7 @@ namespace Synapse.Gui
       ctx.clip ();
       ctx.translate (0, y);
       renderer.render (ctx, req, 
-                       !inhibit_focus && selected_index == row && y == current_voffset ? 
+                       !inhibit_focus && selected_index == row && ((int)y) == selection_voffset ? 
                        Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, use_base_background, 
                        data.get (row));
       ctx.restore ();
