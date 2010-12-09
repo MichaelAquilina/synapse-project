@@ -36,7 +36,7 @@ namespace Synapse
       INCREMENT_SMALL = 5,
       INCREMENT_MEDIUM = 10,
       INCREMENT_LARGE = 20,
-      URI_PENALTY = 10,
+      URI_PENALTY = 15,
 
       POOR = 50,
       BELOW_AVERAGE = 60,
