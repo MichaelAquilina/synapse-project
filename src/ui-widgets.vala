@@ -586,7 +586,7 @@ namespace Synapse.Gui
       {
         y1 = req.height * i + current_voffset;
         y2 = y1 + req.height;
-        render_row_at (ctx, i, y1, h, req, ( 0 <= y1 <= h ) || ( 0 <= y2 <= h ));
+        render_row_at (ctx, i, y1, h, req, ( 0 <= y1 < h ) || ( 0 <= y2 < h ));
       }
       //double elap = t.elapsed ();
       //stderr.printf ("timer %.3f\n", elap);
@@ -601,7 +601,7 @@ namespace Synapse.Gui
       ctx.clip ();
       ctx.translate (0, y);
       renderer.render (ctx, req, 
-                       !inhibit_focus && selected_index == row && tid == 0 ? 
+                       !inhibit_focus && selected_index == row && y == current_voffset ? 
                        Gtk.StateType.SELECTED : Gtk.StateType.NORMAL, use_base_background, 
                        data.get (row));
       ctx.restore ();
@@ -642,8 +642,10 @@ namespace Synapse.Gui
         /* Prepare bg's colors using GtkStyle */
         Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
 
-        ch.add_color_stop_rgba (pat, 1.0 - 15.0 / w.allocation.height, 0.95, ch.StyleType.BASE, StateType.NORMAL);
-        ch.add_color_stop_rgba (pat, 1, 0.95, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
+        double status_bar_pct = 15.0 / w.allocation.height;
+        ch.add_color_stop_rgba (pat, 1.0 - status_bar_pct, 0.95, ch.StyleType.BASE, StateType.NORMAL);
+        ch.add_color_stop_rgba (pat, 1.0 - 0.85 * status_bar_pct, 0.95, ch.StyleType.BG, StateType.NORMAL);
+        ch.add_color_stop_rgba (pat, 1.0, 0.95, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
         /* Prepare and draw top bg's rect */
         ctx.rectangle (0, 0, w.allocation.width, w.allocation.height);
         ctx.set_source (pat);
@@ -1292,7 +1294,10 @@ namespace Synapse.Gui
                w = this.allocation.width - this.left_padding - this.right_padding - 3.0,
                h = this.allocation.height - this.top_padding - this.bottom_padding - 3.0;
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        ch.set_source_rgba (ctx, input_alpha, ch.StyleType.FG, StateType.NORMAL, ch.Mod.INVERTED);
+        if (!ch.is_dark_color (ch.StyleType.FG, StateType.NORMAL))
+          ch.set_source_rgba (ctx, input_alpha, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
+        else
+          ch.set_source_rgba (ctx, input_alpha, ch.StyleType.FG, StateType.NORMAL, ch.Mod.INVERTED);
         Cairo.Path path = ctx.copy_path ();
         ctx.save ();
         ctx.clip ();

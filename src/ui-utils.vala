@@ -398,6 +398,11 @@ namespace Synapse.Gui
         g = col.g;
         b = col.b;
       }
+      public bool is_dark_color (StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      {
+        Color col = get_color_from_map (t, st, mod);
+        return col.is_dark_color ();
+      }
       
       private class Color
       {
@@ -437,15 +442,30 @@ namespace Synapse.Gui
               Utils.rgb_invert_color (ref this.r, ref this.g, ref this.b);
               break;
             case Mod.LIGHTER:
-            	murrine_shade (ref this.r, ref this.g, ref this.b, 1.16);
+            	shade (ref this.r, ref this.g, ref this.b, 1.08);
             	break;
            	case Mod.DARKER:
-           		murrine_shade (ref this.r, ref this.g, ref this.b, 0.84);
+           		shade (ref this.r, ref this.g, ref this.b, 0.92);
            		break;
             default:
               break;
           }
         }
+        
+        public bool is_dark_color ()
+        {
+        	double h;
+	        double l;
+	        double s;
+
+	        h = r;
+	        l = g;
+	        s = b;
+	        
+	        murrine_rgb_to_hls (&h, &l, &s);
+	        return l < 0.40;
+        }
+        
         /* RGB / HLS utils - from Murrine gtk-engine:
          * Copyright (C) 2006-2007-2008-2009 Andrea Cimitan
          */
@@ -600,8 +620,10 @@ namespace Synapse.Gui
 	        }
         }
 
-        private static void murrine_shade (ref double r, ref double g, ref double b, double k)
+        private static void shade (ref double r, ref double g, ref double b, double k)
         {
+        	if (k == 1.0) return;
+
 	        double red;
 	        double green;
 	        double blue;
@@ -610,23 +632,17 @@ namespace Synapse.Gui
 	        green = g;
 	        blue  = b;
 
-	        if (k == 1.0)
-	        {
-		        r = red;
-		        g = green;
-		        b = blue;
-		        return;
-	        }
-
 	        murrine_rgb_to_hls (&red, &green, &blue);
+	        
+	        k -= 1.0;
 
-	        green *= k;
+	        green += k;
 	        if (green > 1.0)
 		        green = 1.0;
 	        else if (green < 0.0)
 		        green = 0.0;
 
-	        blue *= k;
+	        blue += k;
 	        if (blue > 1.0)
 		        blue = 1.0;
 	        else if (blue < 0.0)
