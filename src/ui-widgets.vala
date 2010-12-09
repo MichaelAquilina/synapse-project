@@ -178,7 +178,7 @@ namespace Synapse.Gui
 
       string s = "";
       /* ----------------------- draw title --------------------- */
-      if (hilight_on_selected && state == Gtk.StateType.SELECTED)
+      if (hilight_on_selected && state == Gtk.StateType.SELECTED && selected_fill_pct == 1.0)
       {
         s = title_markup.printf (Utils.markup_string_with_search (m.title, pattern, "", show_pattern_in_hilight));
       }
