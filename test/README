@@ -1,0 +1,2 @@
+copy "gtkrc" to ~/.config/synapse
+and restart Synapse to use a custom dark theme!
