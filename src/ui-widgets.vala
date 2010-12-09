@@ -1449,9 +1449,9 @@ namespace Synapse.Gui
       released ();
       return true;
     }
-    public signal virtual void leave () {}
-    public signal virtual void enter () {}
-    public signal virtual void released () {}
+    public virtual signal void leave () {}
+    public virtual signal void enter () {}
+    public virtual signal void released () {}
   }
 
   public class MenuButton: FakeButton
