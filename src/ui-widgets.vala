@@ -123,14 +123,16 @@ namespace Synapse.Gui
       draw_icon_in_position (ctx, m.icon_name, icon_size);
       ctx.restore ();
     }
-    private void draw_action (Cairo.Context ctx, int x, int y)
+    private void draw_action (Cairo.Context ctx, int x, int y, double selected_fill_pct)
     {
+      if (selected_fill_pct < 0.9) return;
+      if (selected_fill_pct < 1.0) selected_fill_pct /= 3.0;
       ctx.save ();
       ctx.translate (x, y);
-      draw_icon_in_position (ctx, action.icon_name, icon_size);
+      draw_icon_in_position (ctx, action.icon_name, icon_size, selected_fill_pct);
       ctx.restore ();
     }
-    private void draw_icon_in_position (Cairo.Context ctx, string? name, int pixel_size)
+    private void draw_icon_in_position (Cairo.Context ctx, string? name, int pixel_size, double with_alpha = 1.0)
     {
       ctx.rectangle (0, 0, pixel_size, pixel_size);
       ctx.clip ();
@@ -145,7 +147,10 @@ namespace Synapse.Gui
             if (icon_pixbuf != null)
             {
               Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 0, 0);
-              ctx.paint ();
+              if (with_alpha == 1.0)
+                ctx.paint ();
+              else
+                ctx.paint_with_alpha (with_alpha);
             }
           }
         }
@@ -261,7 +266,7 @@ namespace Synapse.Gui
         if (has_action)
         {
           y = (req.height - icon_size) / 2;
-          draw_action (ctx, req.width - cell_hpadding - icon_size, y);
+          draw_action (ctx, req.width - cell_hpadding - icon_size, y, selected_fill_pct);
         }
       }
       else
@@ -280,7 +285,7 @@ namespace Synapse.Gui
         if (has_action)
         {
           y = (req.height - icon_size) / 2;
-          draw_action (ctx, cell_hpadding, y);
+          draw_action (ctx, cell_hpadding, y, selected_fill_pct);
         }
       }
     }
@@ -1419,7 +1424,36 @@ namespace Synapse.Gui
       return true;
     }
   }
-  public class MenuButton: Button
+  
+  public class FakeButton: EventBox
+  {
+    construct
+    {
+      this.set_events (Gdk.EventMask.BUTTON_RELEASE_MASK |
+                       Gdk.EventMask.ENTER_NOTIFY_MASK | 
+                       Gdk.EventMask.LEAVE_NOTIFY_MASK);
+      this.visible_window = false;
+    }
+    public override bool enter_notify_event (Gdk.EventCrossing event) 
+    {
+      enter ();
+      return true;
+    }
+    public override bool leave_notify_event (Gdk.EventCrossing event)
+    {
+      leave ();
+      return true;
+    }
+    public override bool button_release_event (Gdk.EventButton event)
+    {
+      released ();
+      return true;
+    }
+    private virtual void leave () {}
+    private virtual void enter () {}
+    private virtual void released () {}
+  }
+  public class MenuButton: FakeButton
   {
     private Gtk.Menu menu;
     private bool entered;
