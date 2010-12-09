@@ -1449,10 +1449,11 @@ namespace Synapse.Gui
       released ();
       return true;
     }
-    private virtual void leave () {}
-    private virtual void enter () {}
-    private virtual void released () {}
+    public signal virtual void leave () {}
+    public signal virtual void enter () {}
+    public signal virtual void released () {}
   }
+
   public class MenuButton: FakeButton
   {
     private Gtk.Menu menu;
