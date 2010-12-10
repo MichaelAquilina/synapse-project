@@ -315,7 +315,7 @@ namespace Synapse
 
       create_indices ();
       
-      improve_indices ();
+      yield improve_indices ();
 
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
       foreach (File d in desktop_file_dirs)
@@ -442,7 +442,7 @@ namespace Synapse
       }
     }
     
-    private void improve_indices ()
+    private async void improve_indices ()
     {
       /* Have to do some array tricks to make this works in Vala 0.10 */
       /* Get System and User data dir */
@@ -460,18 +460,27 @@ namespace Synapse
       /* get mimetype parents */
       foreach (string dir in dirs)
       {
-        load_mime_parents_from_file (
+        yield load_mime_parents_from_file (
           Path.build_filename (dir, "mime", "subclasses"));
       }
+      debug ("Cached %ld mime types.", mimetype_parent_map.size);
     }
 
-    private void load_mime_parents_from_file (string fi)
+    private async void load_mime_parents_from_file (string fi)
     {
       var file = File.new_for_path (fi);
-      if (!file.query_exists ()) return;
+      bool exists = yield Utils.query_exists_async (file);
+      if (!exists) return;
       try
       {
-        var dis = new DataInputStream (file.read ());
+        size_t length;
+        string contents;
+        bool success = yield file.load_contents_async (null, 
+                                                       out contents, out length);
+        if (!success) return;
+        var dis = new DataInputStream (
+            new GLib.MemoryInputStream.from_data ((void*)contents, (ssize_t)length, null)
+            );
         string line = null;
         string[] mimes = null;
         int len = 0;
