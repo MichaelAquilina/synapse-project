@@ -304,7 +304,6 @@ namespace Synapse
       
       if (uri_match.mime_type == null) return null;
 
-      Gee.List<DesktopFileInfo> list_for_mimetype = null;
       Gee.List<OpenWithAction> ow_list = mimetype_map[uri_match.mime_type];
       /* Query DesktopFileService only if is necessary */
       if (ow_list == null)
@@ -313,7 +312,7 @@ namespace Synapse
         ow_list = new Gee.LinkedList<OpenWithAction> ();
         mimetype_map[uri_match.mime_type] = ow_list;
         var dfs = DesktopFileService.get_default ();
-        list_for_mimetype = dfs.get_desktop_files_for_type (uri_match.mime_type);
+        var list_for_mimetype = dfs.get_desktop_files_for_type (uri_match.mime_type);
         /* If there's more than one application, fill the ow list */
         if (list_for_mimetype.size > 1)
         {
