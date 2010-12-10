@@ -198,6 +198,7 @@ namespace Synapse
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
       all_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
       non_hidden_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
+      mimetype_parent_map = null;
 
       initialize ();
     }
@@ -316,6 +317,8 @@ namespace Synapse
       create_indices ();
 
       /* Load parents mime types */
+      if (mimetype_parent_map != null) mimetype_parent_map.clear ();
+      mimetype_parent_map = new Gee.HashMultiMap<string, string> ();
       foreach (unowned string dir in data_dirs)
       {
         string file_path = Path.build_filename (dir, "mime", "subclasses");
@@ -396,8 +399,6 @@ namespace Synapse
       // create mimetype maps
       mimetype_map =
         new Gee.HashMap<unowned string, Gee.List<DesktopFileInfo> > ();
-      mimetype_parent_map = 
-        new Gee.HashMultiMap<string, string> ();
       // and exec map
       exec_map =
         new Gee.HashMap<string, Gee.List<DesktopFileInfo> > ();
@@ -454,19 +455,14 @@ namespace Synapse
       if (!exists) return;
       try
       {
-        size_t length;
-        string contents;
-        bool success = yield file.load_contents_async (null, 
-                                                       out contents, out length);
-        if (!success) return;
-        var dis = new DataInputStream (
-            new GLib.MemoryInputStream.from_data ((void*)contents, (ssize_t)length, null)
-            );
+        var fis = yield file.read_async (GLib.Priority.DEFAULT);
+        var dis = new DataInputStream (fis);
         string line = null;
         string[] mimes = null;
         int len = 0;
         // Read lines until end of file (null) is reached
-        while ((line = dis.read_line (null)) != null) {
+        line = yield dis.read_line_async (GLib.Priority.DEFAULT);
+        while (line != null) {
           if (line.has_prefix ("#")) continue; //comment line
           mimes = line.split (" ");
           len = (int)GLib.strv_length (mimes);
@@ -474,6 +470,7 @@ namespace Synapse
           if (mimes[0] == mimes[1]) continue;
           //debug ("Map %s -> %s", mimes[0], mimes[1]);
           mimetype_parent_map.set (mimes[0], mimes[1]);
+          line = yield dis.read_line_async (GLib.Priority.DEFAULT);
         }
       }catch (GLib.Error err){ /* can't read file */ }
     }
