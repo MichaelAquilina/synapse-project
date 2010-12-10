@@ -312,10 +312,15 @@ namespace Synapse
         var directory = File.new_for_path (dir_path);
         yield process_directory (directory, desktop_file_dirs);
       }
-
-      create_indices ();
       
-      yield improve_indices ();
+      create_indices ();
+
+      /* Load parents mime types */
+      foreach (unowned string dir in data_dirs)
+      {
+        string file_path = Path.build_filename (dir, "mime", "subclasses");
+        yield load_mime_parents_from_file (file_path);
+      }
 
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
       foreach (File d in desktop_file_dirs)
@@ -440,30 +445,6 @@ namespace Synapse
           list.add (dfi);
         }
       }
-    }
-    
-    private async void improve_indices ()
-    {
-      /* Have to do some array tricks to make this works in Vala 0.10 */
-      /* Get System and User data dir */
-      string[] app_dirs = null;
-      app_dirs = GLib.Environment.get_system_data_dirs ();
-      int len = (int)GLib.strv_length (app_dirs);
-      Gee.List<string> dirs = new Gee.ArrayList<string> ();
-      for (int i = 0; i < len; i++)
-      {
-        dirs.add (app_dirs[i]);
-      }
-      string user_app_dir = GLib.Environment.get_user_data_dir ();
-      dirs.add (user_app_dir);
-      
-      /* get mimetype parents */
-      foreach (string dir in dirs)
-      {
-        yield load_mime_parents_from_file (
-          Path.build_filename (dir, "mime", "subclasses"));
-      }
-      debug ("Cached %ld mime types.", mimetype_parent_map.size);
     }
 
     private async void load_mime_parents_from_file (string fi)
