@@ -198,7 +198,7 @@ namespace Synapse
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
       all_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
       non_hidden_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
-      mimetype_parent_map = null;
+      mimetype_parent_map = new Gee.HashMultiMap<string, string> ();
 
       initialize ();
     }
@@ -307,8 +307,7 @@ namespace Synapse
 
       Gee.Set<File> desktop_file_dirs = new Gee.HashSet<File> ();
 
-      if (mimetype_parent_map != null) mimetype_parent_map.clear ();
-      mimetype_parent_map = new Gee.HashMultiMap<string, string> ();
+      mimetype_parent_map.clear ();
 
       foreach (unowned string data_dir in data_dirs)
       {
