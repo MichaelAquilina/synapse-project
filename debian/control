@@ -36,3 +36,15 @@ Description: semantic file launcher
  Synapse is a graphical launcher enabling you to start applications and also
  to quickly find and access relevant documents and files (by making use of the
  Zeitgeist engine).
+
+Package: synapse-dbg
+Architecture: any
+Depends: synapse (= ${binary:Version})
+         ${shlibs:Depends},
+         ${misc:Depends}
+Description: semantic file launcher - debug package
+ Synapse is a graphical launcher enabling you to start applications and also
+ to quickly find and access relevant documents and files (by making use of the
+ Zeitgeist engine).
+ .
+ This package contains the debug symbols.
