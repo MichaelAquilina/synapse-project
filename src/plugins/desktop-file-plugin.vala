@@ -321,7 +321,7 @@ namespace Synapse
             ow_list.add (new OpenWithAction (entry));
           }
         }
-        if (list_for_mimetype.size < 2) return null;
+        else return null;
       }
       else if (ow_list.size == 0) return null;
 
