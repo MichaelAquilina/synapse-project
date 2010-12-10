@@ -82,8 +82,10 @@ namespace Synapse
     private void init_indicator ()
     {
 #if HAVE_INDICATOR
-      indicator = new AppIndicator.Indicator (
-        "synapse", "synapse", AppIndicator.Category.APPLICATION_STATUS);
+      // Why Category.OTHER? See >
+      // https://bugs.launchpad.net/synapse-project/+bug/685634/comments/13
+      indicator = new AppIndicator.Indicator ("synapse", "synapse",
+                                              AppIndicator.Category.OTHER);
 
       var indicator_menu = new Menu ();
       var activate_item = new ImageMenuItem.with_label (_ ("Activate"));
