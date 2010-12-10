@@ -442,7 +442,6 @@ namespace Synapse
       }
     }
     
-    private static const string MIME_CACHE_GROUP = "MIME Cache";
     private void improve_indices ()
     {
       /* Have to do some array tricks to make this works in Vala 0.10 */
@@ -462,16 +461,6 @@ namespace Synapse
       {
         load_mime_parents_from_file (
           Path.build_filename (dir, "mime", "subclasses"));
-      }
-      
-      /* get mimetype associations */
-      foreach (string dir in dirs)
-      {
-        Idle.add (()=>{
-          load_mime_cache_from_file (
-            Path.build_filename (dir, "applications", "mimeinfo.cache"));
-          return false;
-        });
       }
     }
 
@@ -514,48 +503,7 @@ namespace Synapse
       foreach (string parent in parents)
         add_dfi_for_mime (parent, ret);
     }
-    
-    private void load_mime_cache_from_file (string fi)
-    {
-      int app_len = 0, len = 0;
-      string tmp = null;
-      DesktopFileInfo dfi = null;
-      string[] app_dirs = null;
-      string[] mimes = null;
 
-      try
-      {
-        GLib.KeyFile keyfile = new GLib.KeyFile ();
-        keyfile.load_from_file (fi, GLib.KeyFileFlags.NONE);
-
-        mimes = keyfile.get_keys (MIME_CACHE_GROUP);
-        len = (int)GLib.strv_length (mimes);
-        for (int i = 0; i < len; i++)
-        {
-          app_dirs = keyfile.get_string_list (MIME_CACHE_GROUP, mimes[i]);
-          app_len = (int)GLib.strv_length (app_dirs);
-          for (int j = 0; j < app_len; j++)
-          {
-            tmp = app_dirs[j];
-            if (!desktop_id_map.has_key (tmp)) continue;
-            dfi = desktop_id_map.get (tmp);
-            Gee.List<DesktopFileInfo>? list = mimetype_map[mimes[i]];
-            if (list == null)
-            {
-              list = new Gee.ArrayList<DesktopFileInfo> ();
-              mimetype_map[mimes[i]] = list;
-              list.add (dfi);
-            }
-            else
-            {
-              if (!(dfi in list)) list.add (dfi);
-            }
-            //debug ("Added %s for %s", dfi.name, mimes[i]);
-          }
-        }
-      }catch (GLib.Error err){ /* can't read file */ }
-    }
-    
     // retuns desktop files available on the system (without hidden ones)
     public Gee.List<DesktopFileInfo> get_desktop_files ()
     {
