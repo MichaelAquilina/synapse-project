@@ -473,8 +473,7 @@ namespace Synapse
     
     private void add_dfi_for_mime (string mime, Gee.ArrayList<DesktopFileInfo> ret)
     {
-      Gee.List<DesktopFileInfo> tmp = null;
-      tmp = mimetype_map[mime];
+      Gee.List<DesktopFileInfo> tmp = mimetype_map[mime];
       if (tmp != null)
       {
         foreach (var dfi in tmp)
