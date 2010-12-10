@@ -303,22 +303,30 @@ namespace Synapse
       return_val_if_fail (uri_match != null, null);
       
       if (uri_match.mime_type == null) return null;
-      var dfs = DesktopFileService.get_default ();
 
-      var list_for_mimetype = dfs.get_desktop_files_for_type (uri_match.mime_type);
-      if (list_for_mimetype.size < 2) return null;
-
-      var rs = new ResultSet ();
+      Gee.List<DesktopFileInfo> list_for_mimetype = null;
       Gee.List<OpenWithAction> ow_list = mimetype_map[uri_match.mime_type];
+      /* Query DesktopFileService only if is necessary */
       if (ow_list == null)
       {
+        /* Initialize ow_list */
         ow_list = new Gee.LinkedList<OpenWithAction> ();
         mimetype_map[uri_match.mime_type] = ow_list;
-        foreach (var entry in list_for_mimetype)
+        var dfs = DesktopFileService.get_default ();
+        list_for_mimetype = dfs.get_desktop_files_for_type (uri_match.mime_type);
+        /* If there's more than one application, fill the ow list */
+        if (list_for_mimetype.size > 1)
         {
-          ow_list.add (new OpenWithAction (entry));
+          foreach (var entry in list_for_mimetype)
+          {
+            ow_list.add (new OpenWithAction (entry));
+          }
         }
+        if (list_for_mimetype.size < 2) return null;
       }
+      else if (ow_list.size == 0) return null;
+
+      var rs = new ResultSet ();
       
       if (query.query_string == "")
       {

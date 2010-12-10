@@ -445,6 +445,7 @@ namespace Synapse
     private void improve_indices ()
     {
       /* Have to do some array tricks to make this works in Vala 0.10 */
+      /* Get System and User data dir */
       string[] app_dirs = null;
       app_dirs = GLib.Environment.get_system_data_dirs ();
       int len = (int)GLib.strv_length (app_dirs);
@@ -474,7 +475,6 @@ namespace Synapse
         string line = null;
         string[] mimes = null;
         int len = 0;
-        Gee.List<string> list = null;
         // Read lines until end of file (null) is reached
         while ((line = dis.read_line (null)) != null) {
           if (line.has_prefix ("#")) continue; //comment line
