@@ -307,23 +307,19 @@ namespace Synapse
 
       Gee.Set<File> desktop_file_dirs = new Gee.HashSet<File> ();
 
+      if (mimetype_parent_map != null) mimetype_parent_map.clear ();
+      mimetype_parent_map = new Gee.HashMultiMap<string, string> ();
+
       foreach (unowned string data_dir in data_dirs)
       {
         string dir_path = Path.build_filename (data_dir, "applications", null);
         var directory = File.new_for_path (dir_path);
         yield process_directory (directory, desktop_file_dirs);
+        dir_path = Path.build_filename (data_dir, "mime", "subclasses");
+        yield load_mime_parents_from_file (dir_path);
       }
       
       create_indices ();
-
-      /* Load parents mime types */
-      if (mimetype_parent_map != null) mimetype_parent_map.clear ();
-      mimetype_parent_map = new Gee.HashMultiMap<string, string> ();
-      foreach (unowned string dir in data_dirs)
-      {
-        string file_path = Path.build_filename (dir, "mime", "subclasses");
-        yield load_mime_parents_from_file (file_path);
-      }
 
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
       foreach (File d in desktop_file_dirs)
