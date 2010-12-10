@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by Michal Hruby <michal.mhr@gmail.com>
+ *             Alberto Aldegheri <albyrock87+dev@gmail.com>
  *
  */
 
@@ -188,6 +189,7 @@ namespace Synapse
     private Gee.Map<unowned string, Gee.List<DesktopFileInfo> > mimetype_map;
     private Gee.Map<string, Gee.List<DesktopFileInfo> > exec_map;
     private Gee.Map<string, DesktopFileInfo> desktop_id_map;
+    private Gee.MultiMap<string, string> mimetype_parent_map;
     
     construct
     {
@@ -312,6 +314,8 @@ namespace Synapse
       }
 
       create_indices ();
+      
+      improve_indices ();
 
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
       foreach (File d in desktop_file_dirs)
@@ -387,6 +391,8 @@ namespace Synapse
       // create mimetype maps
       mimetype_map =
         new Gee.HashMap<unowned string, Gee.List<DesktopFileInfo> > ();
+      mimetype_parent_map = 
+        new Gee.HashMultiMap<string, string> ();
       // and exec map
       exec_map =
         new Gee.HashMap<string, Gee.List<DesktopFileInfo> > ();
@@ -436,6 +442,120 @@ namespace Synapse
       }
     }
     
+    private static const string MIME_CACHE_GROUP = "MIME Cache";
+    private void improve_indices ()
+    {
+      /* Have to do some array tricks to make this works in Vala 0.10 */
+      string[] app_dirs = null;
+      app_dirs = GLib.Environment.get_system_data_dirs ();
+      int len = (int)GLib.strv_length (app_dirs);
+      Gee.List<string> dirs = new Gee.ArrayList<string> ();
+      for (int i = 0; i < len; i++)
+      {
+        dirs.add (app_dirs[i]);
+      }
+      string user_app_dir = GLib.Environment.get_user_data_dir ();
+      dirs.add (user_app_dir);
+      
+      /* get mimetype parents */
+      foreach (string dir in dirs)
+      {
+        load_mime_parents_from_file (
+          Path.build_filename (dir, "mime", "subclasses"));
+      }
+      
+      /* get mimetype associations */
+      foreach (string dir in dirs)
+      {
+        Idle.add (()=>{
+          load_mime_cache_from_file (
+            Path.build_filename (dir, "applications", "mimeinfo.cache"));
+          return false;
+        });
+      }
+    }
+
+    private void load_mime_parents_from_file (string fi)
+    {
+      var file = File.new_for_path (fi);
+      if (!file.query_exists ()) return;
+      try
+      {
+        var dis = new DataInputStream (file.read ());
+        string line = null;
+        string[] mimes = null;
+        int len = 0;
+        Gee.List<string> list = null;
+        // Read lines until end of file (null) is reached
+        while ((line = dis.read_line (null)) != null) {
+          if (line.has_prefix ("#")) continue; //comment line
+          mimes = line.split (" ");
+          len = (int)GLib.strv_length (mimes);
+          if (len != 2) continue;
+          if (mimes[0] == mimes[1]) continue;
+          //debug ("Map %s -> %s", mimes[0], mimes[1]);
+          mimetype_parent_map.set (mimes[0], mimes[1]);
+        }
+      }catch (GLib.Error err){ /* can't read file */ }
+    }
+    
+    private void add_dfi_for_mime (string mime, Gee.ArrayList<DesktopFileInfo> ret)
+    {
+      Gee.List<DesktopFileInfo> tmp = null;
+      tmp = mimetype_map[mime];
+      if (tmp != null)
+      {
+        foreach (var dfi in tmp)
+          if (!(dfi in ret)) ret.add (dfi);
+      }
+
+      var parents = mimetype_parent_map[mime];
+      if (parents == null) return;
+      foreach (string parent in parents)
+        add_dfi_for_mime (parent, ret);
+    }
+    
+    private void load_mime_cache_from_file (string fi)
+    {
+      int app_len = 0, len = 0;
+      string tmp = null;
+      DesktopFileInfo dfi = null;
+      string[] app_dirs = null;
+      string[] mimes = null;
+
+      try
+      {
+        GLib.KeyFile keyfile = new GLib.KeyFile ();
+        keyfile.load_from_file (fi, GLib.KeyFileFlags.NONE);
+
+        mimes = keyfile.get_keys (MIME_CACHE_GROUP);
+        len = (int)GLib.strv_length (mimes);
+        for (int i = 0; i < len; i++)
+        {
+          app_dirs = keyfile.get_string_list (MIME_CACHE_GROUP, mimes[i]);
+          app_len = (int)GLib.strv_length (app_dirs);
+          for (int j = 0; j < app_len; j++)
+          {
+            tmp = app_dirs[j];
+            if (!desktop_id_map.has_key (tmp)) continue;
+            dfi = desktop_id_map.get (tmp);
+            Gee.List<DesktopFileInfo>? list = mimetype_map[mimes[i]];
+            if (list == null)
+            {
+              list = new Gee.ArrayList<DesktopFileInfo> ();
+              mimetype_map[mimes[i]] = list;
+              list.add (dfi);
+            }
+            else
+            {
+              if (!(dfi in list)) list.add (dfi);
+            }
+            //debug ("Added %s for %s", dfi.name, mimes[i]);
+          }
+        }
+      }catch (GLib.Error err){ /* can't read file */ }
+    }
+    
     // retuns desktop files available on the system (without hidden ones)
     public Gee.List<DesktopFileInfo> get_desktop_files ()
     {
@@ -451,9 +571,11 @@ namespace Synapse
     
     public Gee.List<DesktopFileInfo> get_desktop_files_for_type (string mime_type)
     {
-      return mimetype_map[mime_type] ?? new Gee.ArrayList<DesktopFileInfo> ();
+      Gee.ArrayList<DesktopFileInfo> ret = new Gee.ArrayList<DesktopFileInfo> ();
+      add_dfi_for_mime (mime_type, ret);
+      return ret;
     }
-    
+
     public Gee.List<DesktopFileInfo> get_desktop_files_for_exec (string exec)
     {
       return exec_map[exec] ?? new Gee.ArrayList<DesktopFileInfo> ();
