@@ -207,6 +207,7 @@ namespace Synapse
     }
     
     private bool connected_to_zg = false;
+    private bool initialization_done = false;
 
     protected override void constructed ()
     {
@@ -276,9 +277,11 @@ namespace Synapse
             string dir_path = sorted_dirs[i].key;
             if (dir_path.has_prefix ("/tmp")) continue;
             var dir_f = File.new_for_path (dir_path);
-            if (dir_f.is_native () && dir_f.query_exists ()) // FIXME: async!
+            if (dir_f.is_native ())
             {
-              directories.add (dir_path);
+              bool exists;
+              exists = yield Utils.query_exists_async (dir_f);
+              if (exists) directories.add (dir_path);
             }
           }
 
@@ -297,6 +300,8 @@ namespace Synapse
       {
         warning ("Unable to parse ~/%s", RECENT_XML_NAME);
       }
+
+      initialization_done = true;
     }
 
     public signal void zeitgeist_search_complete (ResultSet? rs, uint query_id);
@@ -561,7 +566,7 @@ namespace Synapse
       var common_flags = q.query_type & our_results;
       // ignore short searches
       if (common_flags == 0 || q.query_string.length <= 1) return null;
-      
+
       // FIXME: what about deleting one character?
       if (current_query != null && !q.query_string.has_prefix (current_query))
       {
@@ -608,6 +613,13 @@ namespace Synapse
       q.cancellable.disconnect (canc_sig_id);
 
       q.check_cancellable ();
+
+      // make sure we've done the initial load
+      while (!initialization_done)
+      {
+        Timeout.add (250, search.callback);
+        yield;
+      }
 
       // process results from the zeitgeist plugin
       current_level_uris = uris.size;

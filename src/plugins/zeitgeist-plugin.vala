@@ -338,7 +338,7 @@ namespace Synapse
           }
           else
           {
-            relevancy_penalty += 5;
+            relevancy_penalty += Match.Score.INCREMENT_SMALL;
             if (f.get_uri_scheme () == "data") continue;
             unowned string mimetype = subject.get_mimetype ();
             if (mimetype != null && mimetype != "")
