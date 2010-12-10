@@ -457,8 +457,9 @@ namespace Synapse
         string[] mimes = null;
         int len = 0;
         // Read lines until end of file (null) is reached
-        line = yield dis.read_line_async (GLib.Priority.DEFAULT);
-        while (line != null) {
+        do {
+          line = yield dis.read_line_async (GLib.Priority.DEFAULT);
+          if (line == null) break;
           if (line.has_prefix ("#")) continue; //comment line
           mimes = line.split (" ");
           len = (int)GLib.strv_length (mimes);
@@ -467,8 +468,7 @@ namespace Synapse
           if (mimes[0] == mimes[1]) continue;
           //debug ("Map %s -> %s", mimes[0], mimes[1]);
           mimetype_parent_map.set (mimes[0], mimes[1]);
-          line = yield dis.read_line_async (GLib.Priority.DEFAULT);
-        }
+        } while (true);
       }catch (GLib.Error err){ /* can't read file */ }
     }
     
