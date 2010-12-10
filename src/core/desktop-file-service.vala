@@ -463,6 +463,7 @@ namespace Synapse
           mimes = line.split (" ");
           len = (int)GLib.strv_length (mimes);
           if (len != 2) continue;
+          // cannot be parent of myself!
           if (mimes[0] == mimes[1]) continue;
           //debug ("Map %s -> %s", mimes[0], mimes[1]);
           mimetype_parent_map.set (mimes[0], mimes[1]);
@@ -471,14 +472,10 @@ namespace Synapse
       }catch (GLib.Error err){ /* can't read file */ }
     }
     
-    private void add_dfi_for_mime (string mime, Gee.ArrayList<DesktopFileInfo> ret)
+    private void add_dfi_for_mime (string mime, Gee.Set<DesktopFileInfo> ret)
     {
-      Gee.List<DesktopFileInfo> tmp = mimetype_map[mime];
-      if (tmp != null)
-      {
-        foreach (var dfi in tmp)
-          if (!(dfi in ret)) ret.add (dfi);
-      }
+      var dfis = mimetype_map[mime];
+      if (dfis != null) ret.add_all (dfis);
 
       var parents = mimetype_parent_map[mime];
       if (parents == null) return;
@@ -501,8 +498,10 @@ namespace Synapse
     
     public Gee.List<DesktopFileInfo> get_desktop_files_for_type (string mime_type)
     {
-      Gee.ArrayList<DesktopFileInfo> ret = new Gee.ArrayList<DesktopFileInfo> ();
-      add_dfi_for_mime (mime_type, ret);
+      var dfi_set = new Gee.HashSet<DesktopFileInfo> ();
+      add_dfi_for_mime (mime_type, dfi_set);
+      var ret = new Gee.ArrayList<DesktopFileInfo> ();
+      ret.add_all (dfi_set);
       return ret;
     }
 
