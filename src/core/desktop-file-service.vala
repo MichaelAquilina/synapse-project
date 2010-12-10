@@ -469,7 +469,7 @@ namespace Synapse
           //debug ("Map %s -> %s", mimes[0], mimes[1]);
           mimetype_parent_map.set (mimes[0], mimes[1]);
         } while (true);
-      }catch (GLib.Error err){ /* can't read file */ }
+      } catch (GLib.Error err) { /* can't read file */ }
     }
     
     private void add_dfi_for_mime (string mime, Gee.Set<DesktopFileInfo> ret)
