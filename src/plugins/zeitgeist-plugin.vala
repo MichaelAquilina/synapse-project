@@ -199,6 +199,7 @@ namespace Synapse
       string.join (",", FILE_ATTRIBUTE_STANDARD_TYPE,
                         FILE_ATTRIBUTE_STANDARD_ICON,
                         FILE_ATTRIBUTE_THUMBNAIL_PATH,
+                        FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
                         null);
 
     private async void process_results (string query,
@@ -240,6 +241,11 @@ namespace Synapse
               {
                 thumbnail_path =
                   fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH);
+              }
+              // decrease relevancy of hidden files
+              if (fi.get_is_hidden ())
+              {
+                relevancy_penalty += Match.Score.INCREMENT_MEDIUM;
               }
             }
             catch (Error err)
@@ -319,6 +325,11 @@ namespace Synapse
               {
                 thumbnail_path =
                   fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH);
+              }
+              // decrease relevancy of hidden files
+              if (fi.get_is_hidden ())
+              {
+                relevancy_penalty += Match.Score.INCREMENT_MEDIUM;
               }
             }
             catch (Error err)

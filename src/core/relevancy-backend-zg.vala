@@ -214,7 +214,12 @@ namespace Synapse
       // FIXME: perhaps we should check app_info.should_show?
       //   but user specifically asked to open this, so probably not
       //   otoh the gio module won't pick it up if it's not should_show
-      if (zg_gio_module != 0) return;
+      if (zg_gio_module != 0)
+      {
+        // refresh relevancies
+        load_application_relevancies.begin ();
+        return;
+      }
 
       string app_uri = null;
       if (app_info.get_id () != null)
@@ -229,6 +234,9 @@ namespace Synapse
       }
 
       push_app_launch (app_uri, app_info.get_display_name ());
+
+      // and refresh
+      load_application_relevancies.begin ();
     }
 
     private void push_app_launch (string app_uri, string? display_name)
@@ -249,9 +257,6 @@ namespace Synapse
       subject.set_text (display_name);
 
       zg_log.insert_events_no_reply (event, null);
-
-      // and refresh
-      load_application_relevancies.begin ();
     }
   }
 }
