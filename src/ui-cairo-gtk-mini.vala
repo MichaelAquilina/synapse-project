@@ -48,7 +48,6 @@ namespace Synapse.Gui
 
     private const int UI_WIDTH = 620; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
-    private const int SHADOW_SIZE = 8; // assigned to containers's border width in composited
     private const int SECTION_PADDING = 10;
     private const int BORDER_RADIUS = 10;
     private const int ICON_SIZE = 160;
@@ -212,13 +211,13 @@ namespace Synapse.Gui
       
       /* Prepare shadow color */
       double r = 0, b = 0, g = 0;
-      ch.get_rgb (out r, out g, out b, ch.StyleType.FG, StateType.NORMAL);
 
       if (list_visible)
       {
         double ly = y + h - border_radius;
         double lh = results_container.allocation.y - ly + results_container.allocation.height;
         ctx.rectangle (x, ly, w, lh);
+        /* draw background for the result list */
         ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, StateType.NORMAL);
         ctx.fill ();
         if (comp)
@@ -250,7 +249,7 @@ namespace Synapse.Gui
         // border
         ctx.set_operator (Operator.OVER);
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        ch.set_source_rgba (ctx, 0.6, ch.StyleType.FG, StateType.NORMAL);
+        ctx.set_source_rgba (r, g, b, 0.6);
         ctx.set_line_width (1.0);
         ctx.stroke ();
       }

@@ -83,6 +83,8 @@ namespace Synapse.Gui
       QueryFlags.VIDEO,
       QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
     };
+    
+    protected const int SHADOW_SIZE = 10; // shadow preferred size
 
     protected Window window = null;
     protected MenuButton menu = null;

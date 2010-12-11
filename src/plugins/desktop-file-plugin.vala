@@ -232,7 +232,7 @@ namespace Synapse
       // FIXME: spawn new thread and do the search there?
       var result = new ResultSet ();
 
-      if (q.query_string.length == 1)
+      if (false && q.query_string.length == 1)
       {
         simple_search (q, result);
       }

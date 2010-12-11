@@ -205,10 +205,23 @@ namespace Synapse.Gui
       ctx.arc (x+r, y2-r, r, Math.PI * 0.5, Math.PI);
     }
     
+    private void add_shadow_stops (Cairo.Pattern pat, double r, double g, double b, double size, double alpha)
+    {
+      size = 2 / size;
+      pat.add_color_stop_rgba (1, r, g, b, 0);
+      for (double i = 1.0 - size; i > 0.0; i -= size)
+      {
+        pat.add_color_stop_rgba (i, r, g, b, alpha * Math.pow (Math.log2 (2 - i), 2));
+      }
+      pat.add_color_stop_rgba (0, r, g, b, alpha);
+    }
     private void cairo_make_shadow_for_rect (Cairo.Context ctx, double x1, double y1, double w, double h, double rad,
                                              double r, double g, double b, double a, double size)
     {
+      if (size < 1) return;
       ctx.save ();
+      /* When this function is called, the ctx is translated of 0.5 */
+      /* We need to restore the 1.0 to avoid glitches */
       ctx.translate (0.5, 0.5);
       w -= 1; h -= 1;
       double x2 = x1+rad,
@@ -218,7 +231,6 @@ namespace Synapse.Gui
              y3 = y1+h-rad,
              y4 = y1+h,
              thick = size+rad;
-      double am = 0.25, amv = a * 0.32;
       /*                           y
            _____________________   1
           /                     \  2
@@ -232,10 +244,7 @@ namespace Synapse.Gui
       /* Top left corner */
       ctx.save ();
       pat = new Cairo.Pattern.radial (x2, y2, rad, x2, y2, thick);
-      pat.add_color_stop_rgba (0, r, g, b, 0);
-      pat.add_color_stop_rgba (0, r, g, b, a);
-      pat.add_color_stop_rgba (am, r, g, b, amv);
-      pat.add_color_stop_rgba (0.9, r, g, b, 0);
+      add_shadow_stops (pat, r, g, b, size, a);
       ctx.set_source (pat);
       ctx.rectangle (x1-size, y1-size, thick, thick);
       ctx.clip ();
@@ -244,10 +253,7 @@ namespace Synapse.Gui
       /* Bottom left corner */
       ctx.save ();
       pat = new Cairo.Pattern.radial (x2, y3, rad, x2, y3, thick);
-      pat.add_color_stop_rgba (0, r, g, b, 0);
-      pat.add_color_stop_rgba (0, r, g, b, a);
-      pat.add_color_stop_rgba (am, r, g, b, amv);
-      pat.add_color_stop_rgba (0.9, r, g, b, 0);
+      add_shadow_stops (pat, r, g, b, size, a);
       ctx.set_source (pat);
       ctx.rectangle (x1-size, y3, thick, thick);
       ctx.clip ();
@@ -256,10 +262,7 @@ namespace Synapse.Gui
       /* Top right corner */
       ctx.save ();
       pat = new Cairo.Pattern.radial (x3, y2, rad, x3, y2, thick);
-      pat.add_color_stop_rgba (0, r, g, b, 0);
-      pat.add_color_stop_rgba (0, r, g, b, a);
-      pat.add_color_stop_rgba (am, r, g, b, amv);
-      pat.add_color_stop_rgba (0.9, r, g, b, 0);
+      add_shadow_stops (pat, r, g, b, size, a);
       ctx.set_source (pat);
       ctx.rectangle (x3, y1-size, thick, thick);
       ctx.clip ();
@@ -268,10 +271,7 @@ namespace Synapse.Gui
       /* Bottom right corner */
       ctx.save ();
       pat = new Cairo.Pattern.radial (x3, y3, rad, x3, y3, thick);
-      pat.add_color_stop_rgba (0, r, g, b, 0);
-      pat.add_color_stop_rgba (0, r, g, b, a);
-      pat.add_color_stop_rgba (am, r, g, b, amv);
-      pat.add_color_stop_rgba (0.9, r, g, b, 0);
+      add_shadow_stops (pat, r, g, b, size, a);
       ctx.set_source (pat);
       ctx.rectangle (x3, y3, thick, thick);
       ctx.clip ();
@@ -280,9 +280,7 @@ namespace Synapse.Gui
       /* Right */
       ctx.save ();
       pat = new Cairo.Pattern.linear (x4, 0, x4+size, 0);
-      pat.add_color_stop_rgba (0, r, g, b, a);
-      pat.add_color_stop_rgba (am, r, g, b, amv);
-      pat.add_color_stop_rgba (0.9, r, g, b, 0);
+      add_shadow_stops (pat, r, g, b, size, a);
       ctx.set_source (pat);
       ctx.rectangle (x4, y2, size, y3-y2);
       ctx.clip ();
@@ -291,9 +289,7 @@ namespace Synapse.Gui
       /* Left */
       ctx.save ();
       pat = new Cairo.Pattern.linear (x1, 0, x1-size, 0);
-      pat.add_color_stop_rgba (0, r, g, b, a);
-      pat.add_color_stop_rgba (am, r, g, b, amv);
-      pat.add_color_stop_rgba (0.9, r, g, b, 0);
+      add_shadow_stops (pat, r, g, b, size, a);
       ctx.set_source (pat);
       ctx.rectangle (x1-size, y2, size, y3-y2);
       ctx.clip ();
@@ -302,9 +298,7 @@ namespace Synapse.Gui
       /* Bottom */
       ctx.save ();
       pat = new Cairo.Pattern.linear (0, y4, 0, y4+size);
-      pat.add_color_stop_rgba (0, r, g, b, a);
-      pat.add_color_stop_rgba (am, r, g, b, amv);
-      pat.add_color_stop_rgba (0.9, r, g, b, 0);
+      add_shadow_stops (pat, r, g, b, size, a);
       ctx.set_source (pat);
       ctx.rectangle (x2, y4, x3-x2, size);
       ctx.clip ();
@@ -313,9 +307,7 @@ namespace Synapse.Gui
        /* Top */
       ctx.save ();
       pat = new Cairo.Pattern.linear (0, y1, 0, y1-size);
-      pat.add_color_stop_rgba (0, r, g, b, a);
-      pat.add_color_stop_rgba (am, r, g, b, amv);
-      pat.add_color_stop_rgba (0.9, r, g, b, 0);
+      add_shadow_stops (pat, r, g, b, size, a);
       ctx.set_source (pat);
       ctx.rectangle (x2, y1-size, x3-x2, size);
       ctx.clip ();
