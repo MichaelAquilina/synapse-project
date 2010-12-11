@@ -53,7 +53,7 @@ namespace Synapse
                 description: _ ("Run an application, action or script"),
                 icon_name: "system-run", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 100);
+                default_relevancy: Match.Score.EXCELLENT);
       }
 
       public override void execute_internal (Match? match)
@@ -106,7 +106,7 @@ namespace Synapse
                 description: _ ("Run application or command in terminal"),
                 icon_name: "terminal", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 60);
+                default_relevancy: Match.Score.BELOW_AVERAGE);
       }
 
       public override void execute_internal (Match? match)
@@ -154,7 +154,7 @@ namespace Synapse
                 description: _ ("Open using default application"),
                 icon_name: "fileopen", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 80);
+                default_relevancy: Match.Score.GOOD);
       }
 
       public override void execute_internal (Match? match)
@@ -195,7 +195,7 @@ namespace Synapse
                 description: _ ("Open folder containing this file"),
                 icon_name: "folder-open", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: 70);
+                default_relevancy: Match.Score.AVERAGE);
       }
 
       public override void execute_internal (Match? match)
