@@ -7,6 +7,9 @@ AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([1.11])
 
+dnl -- Populate top_srcdir variable
+top_srcdir=$(readlink -f $0 | sed -e s/configure$//)
+
 dnl ==============================================
 dnl Translation support
 dnl ==============================================
@@ -14,13 +17,10 @@ dnl ==============================================
 GETTEXT_PACKAGE=synapse
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Gettext package])
-ALL_LINGUAS=""
+ALL_LINGUAS=`ls ${top_srcdir}/*.po | sed 's/.po$//' | tr '\n' ' '`
 
 IT_PROG_INTLTOOL([0.35])
 AM_GLIB_GNU_GETTEXT
-
-dnl -- Populate top_srcdir variable
-top_srcdir=$(readlink -f $0 | sed -e s/configure$//)
 
 dnl pkg-config
 AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
