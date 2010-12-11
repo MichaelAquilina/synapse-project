@@ -395,8 +395,12 @@ namespace Synapse
       // wait for our initialization
       while (!plugins_loaded)
       {
-        Timeout.add (50, search.callback);
+        Timeout.add (100, search.callback);
         yield;
+        if (cancellable != null && cancellable.is_cancelled ())
+        {
+          throw new SearchError.SEARCH_CANCELLED ("Cancelled");
+        }
       }
       var q = Query (query_id++, query, flags);
       string query_stripped = query.strip ();
