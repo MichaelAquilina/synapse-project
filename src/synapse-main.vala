@@ -135,7 +135,8 @@ namespace Synapse
         typeof (TestSlowPlugin),
 #endif
         typeof (DictionaryPlugin),
-        typeof (DevhelpPlugin)
+        typeof (DevhelpPlugin),
+        typeof (OpenSearchPlugin)
       };
       foreach (Type t in plugin_types)
       {

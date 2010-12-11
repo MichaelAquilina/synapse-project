@@ -34,6 +34,7 @@ libplugins_la_VALASOURCES = \
 	gnome-screensaver-plugin.vala \
 	hybrid-search-plugin.vala \
 	locate-plugin.vala \
+	opensearch.vala \
 	rhythmbox-plugin.vala \
 	test-slow-plugin.vala \
 	upower-plugin.vala \
