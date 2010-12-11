@@ -227,6 +227,7 @@ namespace Synapse
           string? icon = null;
           uris.add (uri);
           var f = File.new_for_uri (uri);
+          if (f.get_uri_scheme () == "data") continue;
           if (f.is_native ())
           {
             try
@@ -261,7 +262,6 @@ namespace Synapse
           else
           {
             relevancy_penalty += Match.Score.INCREMENT_SMALL;
-            if (f.get_uri_scheme () == "data") continue;
             unowned string mimetype = subject.get_mimetype ();
             if (mimetype != null && mimetype != "")
             {
@@ -311,6 +311,7 @@ namespace Synapse
           string? icon = null;
           uris.add (uri);
           var f = File.new_for_uri (uri);
+          if (f.get_uri_scheme () == "data") continue;
           if (f.is_native ())
           {
             try
@@ -350,7 +351,6 @@ namespace Synapse
           else
           {
             relevancy_penalty += Match.Score.INCREMENT_SMALL;
-            if (f.get_uri_scheme () == "data") continue;
             unowned string mimetype = subject.get_mimetype ();
             if (mimetype != null && mimetype != "")
             {
