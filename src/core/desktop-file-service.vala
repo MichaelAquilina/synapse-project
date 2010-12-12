@@ -268,6 +268,8 @@ namespace Synapse
     {
       try
       {
+        string path = directory.get_path ();
+        if (path != null && path.has_suffix ("menu-xdg")) continue; // lp:686624
         bool exists = yield Utils.query_exists_async (directory);
         if (!exists) return;
         monitored_dirs.add (directory);
