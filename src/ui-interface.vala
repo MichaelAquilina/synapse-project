@@ -33,6 +33,7 @@ namespace Synapse.Gui
     PREV_CATEGORY,
     SWITCH_SEARCH_TYPE,
     EXECUTE,
+    EXECUTE_WITHOUT_HIDE,
     NEXT_PAGE,
     PREV_PAGE,
     FIRST_RESULT,
@@ -257,25 +258,25 @@ namespace Synapse.Gui
       return true;
     }
     
-    public void map_key_to_command (uint keyval, CommandTypes command)
+    public void map_key_to_command (KeyCombo key, CommandTypes command)
     {
-      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map.entries)
+      foreach (var entry in command_map.entries)
       {
         if (entry.value == command) command_map.unset (entry.key);
       }
-      command_map.set (keyval, command);
+      command_map.set (key, command);
     }
-    public uint get_key_for_command (CommandTypes command)
+    public KeyCombo? get_key_for_command (CommandTypes command)
     {
-      foreach (Gee.Map.Entry<uint, CommandTypes> entry in command_map.entries)
+      foreach (var entry in command_map.entries)
       {
         if (entry.value == command) return entry.key;
       }
-      return 0;
+      return null;
     }
     protected CommandTypes get_command_from_key_event (Gdk.EventKey event)
     {
-      var key = event.keyval;
+      var key = new KeyCombo (event.keyval, event.state);
       if (command_map.has_key (key))
       {
         return command_map.get (key);
@@ -301,11 +302,37 @@ namespace Synapse.Gui
     private string search[2];
     private Cancellable current_cancellable;
     private bool partial_result_sent;
-    private Gee.Map<uint, CommandTypes> command_map;
+    private Gee.HashMap<KeyCombo, CommandTypes> command_map;
     private bool search_with_empty;
     private bool handle_empty;
     
     private uint tid; //for timer
+    
+    public class KeyCombo: GLib.Object
+    {
+      public uint key {get; construct set;}
+      public Gdk.ModifierType mod {get; construct set;}
+      public KeyCombo (uint keyval, Gdk.ModifierType modifier = 0)
+      {
+        key = keyval;
+        modifier = modifier | Gdk.ModifierType.MOD1_MASK
+                            | Gdk.ModifierType.MOD2_MASK
+                            | Gdk.ModifierType.MOD3_MASK
+                            | Gdk.ModifierType.MOD4_MASK;
+        mod = modifier;
+      }
+      public static uint hashfunc (void* va)
+      {
+        KeyCombo a = (KeyCombo) va;
+        return a.key;
+      }
+      public static bool equalfunc (void* va, void* vb)
+      {
+        KeyCombo a = (KeyCombo) va;
+        KeyCombo b = (KeyCombo) vb;
+        return (a.key == b.key && a.mod == b.mod);
+      }
+    }
     
     static construct
     {
@@ -318,7 +345,7 @@ namespace Synapse.Gui
     
     construct
     {
-      command_map = new Gee.HashMap<uint, CommandTypes> ();
+      command_map = new Gee.HashMap<KeyCombo, CommandTypes> (KeyCombo.hashfunc, KeyCombo.equalfunc);
       search_with_empty = false;
       init_default_command_map ();
       tid = 0;
@@ -548,21 +575,24 @@ namespace Synapse.Gui
     
     private void init_default_command_map ()
     {
-      command_map.set (Gdk.KeySyms.Return, CommandTypes.EXECUTE);
-      command_map.set (Gdk.KeySyms.KP_Enter, CommandTypes.EXECUTE);
-      command_map.set (Gdk.KeySyms.ISO_Enter, CommandTypes.EXECUTE);
-      command_map.set (Gdk.KeySyms.Delete, CommandTypes.SEARCH_DELETE_CHAR);
-      command_map.set (Gdk.KeySyms.BackSpace, CommandTypes.SEARCH_DELETE_CHAR);
-      command_map.set (Gdk.KeySyms.Escape, CommandTypes.CLEAR_SEARCH_OR_HIDE);
-      command_map.set (Gdk.KeySyms.Left, CommandTypes.PREV_CATEGORY);
-      command_map.set (Gdk.KeySyms.Right, CommandTypes.NEXT_CATEGORY);
-      command_map.set (Gdk.KeySyms.Up, CommandTypes.PREV_RESULT);
-      command_map.set (Gdk.KeySyms.Down, CommandTypes.NEXT_RESULT);
-      command_map.set (Gdk.KeySyms.Home, CommandTypes.FIRST_RESULT);
-      command_map.set (Gdk.KeySyms.End, CommandTypes.LAST_RESULT);
-      command_map.set (Gdk.KeySyms.Page_Up, CommandTypes.PREV_PAGE);
-      command_map.set (Gdk.KeySyms.Page_Down, CommandTypes.NEXT_PAGE);
-      command_map.set (Gdk.KeySyms.Tab, CommandTypes.SWITCH_SEARCH_TYPE);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Return), CommandTypes.EXECUTE);
+      command_map.set (new KeyCombo (Gdk.KeySyms.KP_Enter), CommandTypes.EXECUTE);
+      command_map.set (new KeyCombo (Gdk.KeySyms.ISO_Enter), CommandTypes.EXECUTE);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Return, Gdk.ModifierType.SHIFT_MASK), CommandTypes.EXECUTE_WITHOUT_HIDE);
+      command_map.set (new KeyCombo (Gdk.KeySyms.KP_Enter, Gdk.ModifierType.SHIFT_MASK), CommandTypes.EXECUTE_WITHOUT_HIDE);
+      command_map.set (new KeyCombo (Gdk.KeySyms.ISO_Enter, Gdk.ModifierType.SHIFT_MASK), CommandTypes.EXECUTE_WITHOUT_HIDE);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Delete), CommandTypes.SEARCH_DELETE_CHAR);
+      command_map.set (new KeyCombo (Gdk.KeySyms.BackSpace), CommandTypes.SEARCH_DELETE_CHAR);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Escape), CommandTypes.CLEAR_SEARCH_OR_HIDE);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Left), CommandTypes.PREV_CATEGORY);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Right), CommandTypes.NEXT_CATEGORY);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Up), CommandTypes.PREV_RESULT);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Down), CommandTypes.NEXT_RESULT);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Home), CommandTypes.FIRST_RESULT);
+      command_map.set (new KeyCombo (Gdk.KeySyms.End), CommandTypes.LAST_RESULT);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Page_Up), CommandTypes.PREV_PAGE);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Page_Down), CommandTypes.NEXT_PAGE);
+      command_map.set (new KeyCombo (Gdk.KeySyms.Tab), CommandTypes.SWITCH_SEARCH_TYPE);
     }
   }
 }
