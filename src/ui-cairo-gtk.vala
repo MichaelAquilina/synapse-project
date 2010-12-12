@@ -253,14 +253,14 @@ namespace Synapse.Gui
         {
           //draw shadow
           Utils.cairo_make_shadow_for_rect (ctx, x, ly, w, lh, 0,
-                                            r, g, b, 0.9, SHADOW_SIZE);
+                                            r, g, b, SHADOW_SIZE);
         }
       }
       if (comp)
       {
         //draw shadow
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
-                                          r, g, b, 0.9, SHADOW_SIZE);
+                                          r, g, b, SHADOW_SIZE);
       }
       ctx.set_operator (Operator.SOURCE);
       Pattern pat = new Pattern.linear(0, y, 0, y + h);

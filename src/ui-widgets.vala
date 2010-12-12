@@ -162,11 +162,13 @@ namespace Synapse.Gui
       ctx.translate (x, y);
       ctx.rectangle (0, 0, width, text_height);
       ctx.clip ();
+      
+      bool selected = (state == Gtk.StateType.SELECTED);
 
       var styletype = ch.StyleType.FG;
-      if (use_base) styletype = ch.StyleType.TEXT;
+      if (use_base || selected) styletype = ch.StyleType.TEXT;
       
-      if (state == Gtk.StateType.SELECTED && selected_fill_pct < 1.0)
+      if (selected && selected_fill_pct < 1.0)
       {
         double r = 0, g = 0, b = 0;
         ch.get_rgb_from_mix (styletype, Gtk.StateType.NORMAL, ch.Mod.NORMAL,
@@ -178,7 +180,7 @@ namespace Synapse.Gui
 
       string s = "";
       /* ----------------------- draw title --------------------- */
-      if (hilight_on_selected && state == Gtk.StateType.SELECTED && selected_fill_pct == 1.0)
+      if (hilight_on_selected && selected && selected_fill_pct == 1.0)
       {
         s = title_markup.printf (Utils.markup_string_with_search (m.title, pattern, "", show_pattern_in_hilight));
       }
@@ -191,7 +193,7 @@ namespace Synapse.Gui
       Pango.cairo_show_layout (ctx, layout);
 
       bool has_extended_info = show_extended_info && (m is ExtendedInfo);
-      if (hide_extended_on_selected && state == Gtk.StateType.SELECTED) has_extended_info = false;
+      if (hide_extended_on_selected && selected) has_extended_info = false;
       int width_for_description = width - cell_hpadding;
       
       /* ----------------- draw extended info ------------------- */

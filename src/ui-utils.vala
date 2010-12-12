@@ -207,19 +207,21 @@ namespace Synapse.Gui
     
     private void add_shadow_stops (Cairo.Pattern pat, double r, double g, double b, double size, double alpha)
     {
-      size = 2 / size;
-      pat.add_color_stop_rgba (1, r, g, b, 0);
-      for (double i = 1.0 - size; i > 0.0; i -= size)
-      {
-        pat.add_color_stop_rgba (i, r, g, b, alpha * Math.pow (Math.log2 (2 - i), 2));
-      }
-      pat.add_color_stop_rgba (0, r, g, b, alpha);
+      /* Let's make a nice shadow */
+      pat.add_color_stop_rgba (1.0, r, g, b, 0);
+      pat.add_color_stop_rgba (0.8, r, g, b, alpha * 0.07);
+      pat.add_color_stop_rgba (0.6, r, g, b, alpha * 0.24);
+      pat.add_color_stop_rgba (0.4, r, g, b, alpha * 0.46);
+      pat.add_color_stop_rgba (0.2, r, g, b, alpha * 0.77);
+      pat.add_color_stop_rgba (0.0, r, g, b, alpha);
     }
+
     private void cairo_make_shadow_for_rect (Cairo.Context ctx, double x1, double y1, double w, double h, double rad,
-                                             double r, double g, double b, double a, double size)
+                                             double r, double g, double b, double size)
     {
       if (size < 1) return;
       ctx.save ();
+      double a = 0.25;
       /* When this function is called, the ctx is translated of 0.5 */
       /* We need to restore the 1.0 to avoid glitches */
       ctx.translate (0.5, 0.5);

@@ -292,7 +292,7 @@ namespace Synapse.Gui
       {
         //draw shadow
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, border_radius,
-                                          r, g, b, 0.6, SHADOW_SIZE);
+                                          r, g, b, SHADOW_SIZE);
       }
       else
       {

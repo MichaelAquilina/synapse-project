@@ -285,7 +285,7 @@ namespace Synapse.Gui
         double r = 0, b = 0, g = 0;
         //draw black shadow
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
-                                          r, g, b, 0.9, SHADOW_SIZE);
+                                          r, g, b, SHADOW_SIZE);
         // border
         _cairo_path_for_main (ctx, comp, x, y, w, h);
         ctx.set_source_rgba (r, g, b, 0.6);
@@ -298,7 +298,7 @@ namespace Synapse.Gui
                                                  results_container.allocation.y,
                                                  results_container.allocation.width,
                                                  results_container.allocation.height,
-                                                 0, r, g, b, 0.9, SHADOW_SIZE);
+                                                 0, r, g, b, SHADOW_SIZE);
           ctx.rectangle (results_container.allocation.x,
                          results_container.allocation.y,
                          results_container.allocation.width,

@@ -84,7 +84,7 @@ namespace Synapse.Gui
       QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
     };
     
-    protected const int SHADOW_SIZE = 10; // shadow preferred size
+    protected const int SHADOW_SIZE = 12; // shadow preferred size
 
     protected Window window = null;
     protected MenuButton menu = null;
