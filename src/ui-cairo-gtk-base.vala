@@ -283,7 +283,11 @@ namespace Synapse.Gui
       switch (command)
       {
         case CommandTypes.EXECUTE_WITHOUT_HIDE:
-          execute ();
+          if (execute ())
+          {
+            searching_for_matches = true;
+            searching_for_changed ();
+          }
           break;
         case CommandTypes.EXECUTE:
           if (execute ())
