@@ -527,7 +527,7 @@ namespace Synapse.Gui
         update_action_result_list (null, 0, null);
         return;
       }
-      results[T.ACTION] = data_sink.find_actions_for_match (focus[T.MATCH], search[T.ACTION]);
+      results[T.ACTION] = data_sink.find_actions_for_match (focus[T.MATCH], search[T.ACTION], qf);
       if (results[T.ACTION].size > 0)
       {
         focus[T.ACTION] = results[T.ACTION].first();

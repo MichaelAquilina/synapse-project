@@ -26,7 +26,7 @@ namespace Synapse
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
   <ShortName>Google</ShortName>
-  <Description>Use Google.com to search the web</Description>
+  <Description>Search the web using Google.com</Description>
   <Url type="text/html" method="get" template="http://www.google.com/search?q={searchTerms}&amp;hl={language}"/>
   <Url type="application/x-suggestions+json" template="http://suggestqueries.google.com/complete/search?output=firefox&amp;client=firefox&amp;hl=en&amp;q={searchTerms}"/>
 
@@ -151,9 +151,9 @@ namespace Synapse
       public string thumbnail_path { get; construct set; }
       public MatchType match_type { get; construct set; }
       
-      public int default_relevancy { get; set; default = 0; }
+      public int default_relevancy { get; set; default = Match.Score.INCREMENT_MINOR; }
       public string query_template { get; construct set; }
-      
+
       public void execute (Match? match)
       {
         try
@@ -173,6 +173,7 @@ namespace Synapse
         result = query_template.replace ("{searchTerms}",
                                          Uri.escape_string (query, "", false));
         result = result.replace ("{language}", get_lang ());
+        // FIXME: remove all other "{codes}"
 
         return result;
       }
@@ -204,7 +205,19 @@ namespace Synapse
     private class Config: ConfigObject
     {
       public bool use_internal { get; set; default = true; }
-      //public string[] plugins;
+
+      private string[] _search_engines;
+      public string[] search_engines
+      {
+        get
+        {
+          return _search_engines;
+        }
+        set
+        {
+          _search_engines = value;
+        }
+      }
     }
     
     static void register_plugin ()
@@ -221,6 +234,13 @@ namespace Synapse
     static construct
     {
       register_plugin ();
+
+      // keep in sync with the internal XMLs!
+      unowned string dummy;
+      dummy = N_ ("Google");
+      dummy = N_ ("Search the web using Google.com");
+      dummy = N_ ("Google Maps");
+      dummy = N_ ("Search using Google Maps");
     }
 
     private Gee.List<SearchAction> actions;
@@ -232,7 +252,12 @@ namespace Synapse
       config = (Config) cs.get_config ("plugins", "opensearch", typeof (Config));
 
       actions = new Gee.ArrayList<SearchAction> ();
-
+      load_xmls.begin ();
+    }
+    
+    private async void load_xmls ()
+    {
+      OpenSearchParser parser;
       if (config.use_internal)
       {
         Gee.List<unowned string> internals = new Gee.ArrayList<unowned string> ();
@@ -240,18 +265,44 @@ namespace Synapse
         internals.add (GOOGLE_MAPS_XML);
         foreach (unowned string s in internals)
         {
-          var parser = new OpenSearchParser ();
+          parser = new OpenSearchParser ();
           try
           {
             parser.parse (s);
             if (parser.has_valid_result ())
             {
-              actions.add (new SearchAction (parser.short_name,
-                                             parser.description,
+              actions.add (new SearchAction (_ (parser.short_name),
+                                             _ (parser.description),
                                              parser.query_url));
             }
           }
-          catch (Error err) { /* this really shouldn't happen */ }
+          catch (Error no_way) { /* this really shouldn't happen */ }
+        }
+      }
+
+      string[] xmls = config.search_engines;
+      foreach (unowned string xml in xmls)
+      {
+        var f = File.new_for_path (xml);
+        try
+        {
+          string contents;
+          size_t len;
+          
+          yield f.load_contents_async (null, out contents, out len, null);
+          parser = new OpenSearchParser ();
+          parser.parse (contents);
+          if (parser.has_valid_result ())
+          {
+            actions.add (new SearchAction (parser.short_name,
+                                           parser.description,
+                                           parser.query_url));
+          }
+          else warning ("Unable to parse search plugin [%s]", xml);
+        }
+        catch (Error err)
+        {
+          warning ("Unable to load search plugin [%s]: %s", xml, err.message);
         }
       }
     }
@@ -267,6 +318,8 @@ namespace Synapse
       {
         return null;
       }
+      var my_flags = QueryFlags.ACTIONS | QueryFlags.INTERNET;
+      if ((query.query_type & my_flags) == 0) return null;
 
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
