@@ -46,6 +46,8 @@ namespace Synapse
     private ConfigService config;
 #if HAVE_INDICATOR
     private AppIndicator.Indicator indicator;
+#else
+    private StatusIcon status_icon;
 #endif
     
     public UILauncher ()
@@ -81,12 +83,6 @@ namespace Synapse
     
     private void init_indicator ()
     {
-#if HAVE_INDICATOR
-      // Why Category.OTHER? See >
-      // https://bugs.launchpad.net/synapse-project/+bug/685634/comments/13
-      indicator = new AppIndicator.Indicator ("synapse", "synapse",
-                                              AppIndicator.Category.OTHER);
-
       var indicator_menu = new Menu ();
       var activate_item = new ImageMenuItem.with_label (_ ("Activate"));
       activate_item.set_image (new Gtk.Image.from_stock (Gtk.STOCK_EXECUTE, Gtk.IconSize.MENU));
@@ -103,7 +99,13 @@ namespace Synapse
       quit_item.activate.connect (Gtk.main_quit);
       indicator_menu.append (quit_item);
       indicator_menu.show_all ();
-      
+
+#if HAVE_INDICATOR
+      // Why Category.OTHER? See >
+      // https://bugs.launchpad.net/synapse-project/+bug/685634/comments/13
+      indicator = new AppIndicator.Indicator ("synapse", "synapse",
+                                              AppIndicator.Category.OTHER);
+
       indicator.set_menu (indicator_menu);
       if (settings.indicator_active) indicator.set_status (AppIndicator.Status.ACTIVE);
 
@@ -111,6 +113,23 @@ namespace Synapse
       {
         indicator.set_status (settings.indicator_active ?
           AppIndicator.Status.ACTIVE : AppIndicator.Status.PASSIVE);
+      });
+#else
+      status_icon = new StatusIcon.from_icon_name ("synapse");
+
+      status_icon.popup_menu.connect ((icon, button, event_time) =>
+      {
+        indicator_menu.popup (null, null, status_icon.position_menu, button, event_time);
+      });
+      status_icon.activate.connect (() =>
+      {
+        show_ui (Gtk.get_current_event_time ());
+      });
+      status_icon.set_visible (settings.indicator_active);
+      
+      settings.notify["indicator-active"].connect (() =>
+      {
+        status_icon.set_visible (settings.indicator_active);
       });
 #endif
     }

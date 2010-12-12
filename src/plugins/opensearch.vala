@@ -226,7 +226,7 @@ namespace Synapse
         typeof (OpenSearchPlugin),
         "OpenSearch",
         _ ("Search the web."),
-        "accessories-internet",
+        "applications-internet",
         register_plugin
       );
     }
