@@ -136,8 +136,9 @@ namespace Synapse.Gui
     {
       ctx.rectangle (0, 0, pixel_size, pixel_size);
       ctx.clip ();
+      if (name == null || name == "") name = "unknown";
       try {
-        var icon = GLib.Icon.new_for_string(name ?? "");
+        var icon = GLib.Icon.new_for_string(name);
         if (icon != null)
         {
           Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, pixel_size, Gtk.IconLookupFlags.FORCE_SIZE);
@@ -1161,7 +1162,7 @@ namespace Synapse.Gui
   }
   public class NamedIcon: Gtk.Image
   {
-    public string not_found_name {get; set; default = "missing-image";}
+    public string not_found_name {get; set; default = "unknown";}
     private string current;
     private IconSize current_size;
     private uint tid; //for timer
@@ -1219,9 +1220,7 @@ namespace Synapse.Gui
       {
         if (name == "")
         {
-          this.clear ();
-          current = "";
-          return;
+          name = not_found_name;
         }
         current = name;
         current_size = size;
