@@ -428,7 +428,7 @@ namespace Synapse
         desktop_id_map[Path.get_basename (dfi.filename)] = dfi;
 
         // update mimetype map
-        if (dfi.mime_types == null) continue;
+        if (dfi.is_hidden || dfi.mime_types == null) continue;
         
         foreach (unowned string mime_type in dfi.mime_types)
         {
