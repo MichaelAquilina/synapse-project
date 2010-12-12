@@ -25,7 +25,8 @@ namespace Synapse
     UNKNOWN = 0,
     APPLICATION,
     GENERIC_URI,
-    ACTION
+    ACTION,
+    SEARCH
   }
 
   public interface Match: Object
