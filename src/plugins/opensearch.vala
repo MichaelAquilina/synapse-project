@@ -26,7 +26,7 @@ namespace Synapse
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
   <ShortName>Google</ShortName>
-  <Description>Search the web using Google.com</Description>
+  <Description>Search the web using google.com</Description>
   <Url type="text/html" method="get" template="http://www.google.com/search?q={searchTerms}&amp;hl={language}"/>
   <Url type="application/x-suggestions+json" template="http://suggestqueries.google.com/complete/search?output=firefox&amp;client=firefox&amp;hl=en&amp;q={searchTerms}"/>
 
@@ -238,7 +238,7 @@ namespace Synapse
       // keep in sync with the internal XMLs!
       unowned string dummy;
       dummy = N_ ("Google");
-      dummy = N_ ("Search the web using Google.com");
+      dummy = N_ ("Search the web using google.com");
       dummy = N_ ("Google Maps");
       dummy = N_ ("Search using Google Maps");
     }
