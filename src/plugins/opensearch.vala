@@ -110,15 +110,22 @@ namespace Synapse
           }
         }
       }
-      
+
       private void start (MarkupParseContext ctx, string name,
                           string[] attr_names, string[] attr_vals) throws MarkupError
       {
         switch (name)
         {
+          case "SearchPlugin": //try to support Mozilla OpenSearch xmls
+            if ("xmlns:os" in attr_names)
+              is_opensearch = true;
+            break;
           case "OpenSearchDescription": is_opensearch = true; break;
+          case "os:ShortName":
           case "ShortName": has_name = true; in_name_elem = true; break;
+          case "os:Description":
           case "Description": has_desc = true; in_description_elem = true; break;
+          case "os:Url":
           case "Url": process_url (attr_names, attr_vals); break;
           default: break;
         }
@@ -128,7 +135,9 @@ namespace Synapse
       {
         switch (name)
         {
+          case "os:ShortName":
           case "ShortName": in_name_elem = false; break;
+          case "os:Description":
           case "Description": in_description_elem = false; break;
           default: break;
         }
@@ -283,7 +292,13 @@ namespace Synapse
       string[] xmls = config.search_engines;
       foreach (unowned string xml in xmls)
       {
-        var f = File.new_for_path (xml);
+        string xml_path = xml;
+        if (xml_path.has_prefix ("~"))
+        {
+          xml_path = Environment.get_home_dir () +
+                     xml_path.substring (1);
+        }
+        var f = File.new_for_path (xml_path);
         try
         {
           string contents;
