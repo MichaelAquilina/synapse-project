@@ -68,13 +68,15 @@ synapse_VALASOURCES = \
 	$(NULL)
 
 synapse_SOURCES = \
+	synapse_vala.stamp \
 	$(synapse_VALASOURCES:.vala=.c) \
 	$(NULL)
 
 # we can't let make handle this, otherwise tarballs won't support configure
 # flags (ie --disable-indicator won't rebuild the Vala sources)
 
-BUILT_SOURCES = synapse_vala.stamp
+$(synapse_VALASOURCES:.vala=.c): synapse_vala.stamp
+#BUILT_SOURCES = synapse_vala.stamp
 
 synapse_vala.stamp: $(synapse_VALASOURCES)
 	$(AM_V_GEN)$(VALAC) $(synapse_VALAFLAGS) -C $^
