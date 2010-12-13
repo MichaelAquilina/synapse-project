@@ -253,9 +253,9 @@ namespace Synapse.Gui
         return false;
       var match = focus[T.MATCH];
       var action = focus[T.ACTION];
-      if (match is SearchEngine)
+      if (action is SearchEngine)
       {
-        search_for_matches (match as SearchEngine);
+        search_for_matches (action as SearchEngine);
         return false;
       }
       /* Async execute to avoid freezes when executing a dbus action */

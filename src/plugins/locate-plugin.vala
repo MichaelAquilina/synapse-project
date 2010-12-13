@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class LocatePlugin: DataPlugin
+  public class LocatePlugin: ActionPlugin
   {
     private class MatchObject: Object, Match, UriMatch
     {
@@ -57,6 +57,7 @@ namespace Synapse
       public string thumbnail_path { get; construct set; }
       public MatchType match_type { get; construct set; }
 
+      public int default_relevancy { get; set; default = Match.Score.INCREMENT_SMALL; }
       // for SearchMatch interface
       public async Gee.List<Match> search (string query,
                                            QueryFlags flags,
@@ -78,6 +79,7 @@ namespace Synapse
         Object (match_type: MatchType.SEARCH,
                 has_thumbnail: false,
                 icon_name: "search",
+                title: _ ("Locate"),
                 description: _ ("Locate files with this name on the filesystem"));
         this.plugin = plugin;
       }
@@ -101,8 +103,16 @@ namespace Synapse
       register_plugin ();
     }
 
+    LocateItem action;
+
     construct
     {
+      action = new LocateItem (this);
+    }
+
+    public virtual bool handles_unknown ()
+    {
+      return true;
     }
 
     public async ResultSet? locate (Query q) throws SearchError
@@ -174,7 +184,7 @@ namespace Synapse
       return result;
     }
 
-    public override async ResultSet? search (Query q) throws SearchError
+    public override ResultSet? find_for_match (Query q, Match match)
     {
       var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
         | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
@@ -183,15 +193,30 @@ namespace Synapse
       // strip query
       q.query_string = q.query_string.strip ();
       // ignore short searches
-      if (common_flags == 0 || q.query_string.length <= 1) return null;
+      if (common_flags == 0 || match.match_type != MatchType.UNKNOWN) return null;
 
-      q.check_cancellable ();
+      bool query_empty = q.query_string == "";
+      var results = new ResultSet ();
 
-      var result = new ResultSet ();
-      var item = new LocateItem (this);
-      item.title = q.query_string;
-      result.add (item, -1);
-      return result;
+      if (query_empty)
+      {
+        results.add (action, action.default_relevancy);
+      }
+      else
+      {
+        var matchers = Query.get_matchers_for_query (q.query_string, 0,
+          RegexCompileFlags.CASELESS);
+        foreach (var matcher in matchers)
+        {
+          if (matcher.key.match (action.title))
+          {
+            results.add (action, matcher.value);
+            break;
+          }
+        }
+      }
+
+      return results;
     }
   }
 }

@@ -26,7 +26,7 @@ namespace Synapse
     UNKNOWN_ERROR
   }
   
-  public interface SearchEngine
+  public interface SearchEngine : Object
   {
     public abstract async Gee.List<Match> search (string query,
                                                   QueryFlags flags,
