@@ -522,7 +522,7 @@ namespace Synapse.Gui
       }
       else
         selection_target = 0;
-      if (!animation_enabled)
+      if (!animation_enabled || !this.is_realized())
       {
         current_voffset = target;
         selection_voffset = selection_target;
