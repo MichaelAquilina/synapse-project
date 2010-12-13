@@ -199,6 +199,7 @@ namespace Synapse
       string.join (",", FILE_ATTRIBUTE_STANDARD_TYPE,
                         FILE_ATTRIBUTE_STANDARD_ICON,
                         FILE_ATTRIBUTE_THUMBNAIL_PATH,
+                        FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
                         null);
 
     private async void process_results (string query,
@@ -226,6 +227,7 @@ namespace Synapse
           string? icon = null;
           uris.add (uri);
           var f = File.new_for_uri (uri);
+          if (f.get_uri_scheme () == "data") continue;
           if (f.is_native ())
           {
             try
@@ -241,6 +243,11 @@ namespace Synapse
                 thumbnail_path =
                   fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH);
               }
+              // decrease relevancy of hidden files
+              if (fi.get_is_hidden ())
+              {
+                relevancy_penalty += Match.Score.INCREMENT_MEDIUM;
+              }
             }
             catch (Error err)
             {
@@ -255,7 +262,6 @@ namespace Synapse
           else
           {
             relevancy_penalty += Match.Score.INCREMENT_SMALL;
-            if (f.get_uri_scheme () == "data") continue;
             unowned string mimetype = subject.get_mimetype ();
             if (mimetype != null && mimetype != "")
             {
@@ -305,6 +311,7 @@ namespace Synapse
           string? icon = null;
           uris.add (uri);
           var f = File.new_for_uri (uri);
+          if (f.get_uri_scheme () == "data") continue;
           if (f.is_native ())
           {
             try
@@ -319,6 +326,11 @@ namespace Synapse
               {
                 thumbnail_path =
                   fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH);
+              }
+              // decrease relevancy of hidden files
+              if (fi.get_is_hidden ())
+              {
+                relevancy_penalty += Match.Score.INCREMENT_MEDIUM;
               }
             }
             catch (Error err)
@@ -338,8 +350,7 @@ namespace Synapse
           }
           else
           {
-            relevancy_penalty += 5;
-            if (f.get_uri_scheme () == "data") continue;
+            relevancy_penalty += Match.Score.INCREMENT_SMALL;
             unowned string mimetype = subject.get_mimetype ();
             if (mimetype != null && mimetype != "")
             {

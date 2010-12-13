@@ -36,7 +36,7 @@ namespace Synapse
 
       refresh_popularity ();
 
-      Timeout.add_seconds (60*60, refresh_popularity);
+      Timeout.add_seconds (60*30, refresh_popularity);
     }
 
     private bool refresh_popularity ()
@@ -207,6 +207,15 @@ namespace Synapse
       return 0.0f;
     }
     
+    private void reload_relevancies ()
+    {
+      Idle.add_full (Priority.LOW, () =>
+      {
+        load_application_relevancies.begin ();
+        return false;
+      });
+    }
+    
     public void application_launched (AppInfo app_info)
     {
       // detect if the Zeitgeist GIO module is installed
@@ -214,7 +223,11 @@ namespace Synapse
       // FIXME: perhaps we should check app_info.should_show?
       //   but user specifically asked to open this, so probably not
       //   otoh the gio module won't pick it up if it's not should_show
-      if (zg_gio_module != 0) return;
+      if (zg_gio_module != 0)
+      {
+        reload_relevancies ();
+        return;
+      }
 
       string app_uri = null;
       if (app_info.get_id () != null)
@@ -229,6 +242,9 @@ namespace Synapse
       }
 
       push_app_launch (app_uri, app_info.get_display_name ());
+
+      // and refresh
+      reload_relevancies ();
     }
 
     private void push_app_launch (string app_uri, string? display_name)
@@ -249,9 +265,6 @@ namespace Synapse
       subject.set_text (display_name);
 
       zg_log.insert_events_no_reply (event, null);
-
-      // and refresh
-      load_application_relevancies.begin ();
     }
   }
 }

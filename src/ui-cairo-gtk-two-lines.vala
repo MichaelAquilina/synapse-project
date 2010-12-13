@@ -50,7 +50,6 @@ namespace Synapse.Gui
 
     private const int UI_WIDTH = 600; // height is dynamic
     private const int PADDING = 8; // assinged to container_top's border width
-    private const int SHADOW_SIZE = 12; // assigned to containers's border width in composited
     private const int BORDER_RADIUS = 20;
     private const int ICON_SIZE = 172;
     private const int ACTION_ICON_SIZE = 48;
@@ -273,8 +272,9 @@ namespace Synapse.Gui
       ctx.set_operator (Operator.CLEAR);
       ctx.paint ();
       ctx.set_operator (Operator.OVER);
-      double w = container_top.allocation.width;
-      double h = container_top.allocation.height;
+      ctx.translate (0.5, 0.5);
+      double w = container_top.allocation.width - 1;
+      double h = container_top.allocation.height - 1;
       double x = container_top.allocation.x;
       double y = container_top.allocation.y;
       if (comp)
@@ -283,14 +283,13 @@ namespace Synapse.Gui
         y += spacing;
         h -= spacing;
         double r = 0, b = 0, g = 0;
-        ch.get_rgb (out r, out g, out b, ch.StyleType.FG, StateType.NORMAL);
-        //draw shadow
+        //draw black shadow
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
-                                          r, g, b, 0.9, SHADOW_SIZE);
+                                          r, g, b, SHADOW_SIZE);
         // border
-        _cairo_path_for_main (ctx, comp, x + 0.5, y + 0.5, w - 1, h - 1);
-        ch.set_source_rgba (ctx, 0.6, ch.StyleType.FG, StateType.NORMAL);
-        ctx.set_line_width (2.5);
+        _cairo_path_for_main (ctx, comp, x, y, w, h);
+        ctx.set_source_rgba (r, g, b, 0.6);
+        ctx.set_line_width (1);
         ctx.stroke ();
         if (this.list_visible)
         {
@@ -299,12 +298,12 @@ namespace Synapse.Gui
                                                  results_container.allocation.y,
                                                  results_container.allocation.width,
                                                  results_container.allocation.height,
-                                                 0, r, g, b, 0.9, SHADOW_SIZE);
+                                                 0, r, g, b, SHADOW_SIZE);
           ctx.rectangle (results_container.allocation.x,
                          results_container.allocation.y,
                          results_container.allocation.width,
                          results_container.allocation.height);
-          ch.set_source_rgba (ctx, 0.9, ch.StyleType.BG, StateType.NORMAL, ch.Mod.INVERTED);
+          ctx.set_source_rgba (r, g, b, 0.6);
           ctx.set_line_width (2.5);
           ctx.stroke ();
         }
@@ -323,6 +322,7 @@ namespace Synapse.Gui
       ctx.restore ();
       if (!comp)
       {
+        //border for non composited
         ctx.set_operator (Operator.OVER);
         _cairo_path_for_main (ctx, comp, x, y, w, h);
         ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, StateType.NORMAL);
@@ -398,14 +398,14 @@ namespace Synapse.Gui
             Markup.printf_escaped ("<span size=\"x-large\">%s</span>",
                                    TYPE_TO_SEARCH));
             match_label_description.set_markup (
-              get_description_markup (throbber.active ? SEARCHING : NO_RECENT_ACTIVITIES)
+              get_description_markup (menuthrobber.active ? SEARCHING : NO_RECENT_ACTIVITIES)
             );
           }
           else
           {
             match_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), size));
             match_label_description.set_markup (
-              get_description_markup (throbber.active ? SEARCHING : NO_RESULTS)
+              get_description_markup (menuthrobber.active ? SEARCHING : NO_RESULTS)
             );
           }
           match_icon.set_icon_name ("search", IconSize.DIALOG);

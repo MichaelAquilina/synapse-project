@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by Michal Hruby <michal.mhr@gmail.com>
+ *             Alberto Aldegheri <albyrock87+dev@gmail.com>
  *
  */
 
@@ -188,6 +189,7 @@ namespace Synapse
     private Gee.Map<unowned string, Gee.List<DesktopFileInfo> > mimetype_map;
     private Gee.Map<string, Gee.List<DesktopFileInfo> > exec_map;
     private Gee.Map<string, DesktopFileInfo> desktop_id_map;
+    private Gee.MultiMap<string, string> mimetype_parent_map;
     
     construct
     {
@@ -196,6 +198,7 @@ namespace Synapse
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
       all_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
       non_hidden_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
+      mimetype_parent_map = new Gee.HashMultiMap<string, string> ();
 
       initialize ();
     }
@@ -265,6 +268,8 @@ namespace Synapse
     {
       try
       {
+        string path = directory.get_path ();
+        if (path != null && path.has_suffix ("menu-xdg")) return; // lp:686624
         bool exists = yield Utils.query_exists_async (directory);
         if (!exists) return;
         monitored_dirs.add (directory);
@@ -304,13 +309,17 @@ namespace Synapse
 
       Gee.Set<File> desktop_file_dirs = new Gee.HashSet<File> ();
 
+      mimetype_parent_map.clear ();
+
       foreach (unowned string data_dir in data_dirs)
       {
         string dir_path = Path.build_filename (data_dir, "applications", null);
         var directory = File.new_for_path (dir_path);
         yield process_directory (directory, desktop_file_dirs);
+        dir_path = Path.build_filename (data_dir, "mime", "subclasses");
+        yield load_mime_parents_from_file (dir_path);
       }
-
+      
       create_indices ();
 
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
@@ -421,7 +430,7 @@ namespace Synapse
         desktop_id_map[Path.get_basename (dfi.filename)] = dfi;
 
         // update mimetype map
-        if (dfi.mime_types == null) continue;
+        if (dfi.is_hidden || dfi.mime_types == null) continue;
         
         foreach (unowned string mime_type in dfi.mime_types)
         {
@@ -435,7 +444,46 @@ namespace Synapse
         }
       }
     }
+
+    private async void load_mime_parents_from_file (string fi)
+    {
+      var file = File.new_for_path (fi);
+      bool exists = yield Utils.query_exists_async (file);
+      if (!exists) return;
+      try
+      {
+        var fis = yield file.read_async (GLib.Priority.DEFAULT);
+        var dis = new DataInputStream (fis);
+        string line = null;
+        string[] mimes = null;
+        int len = 0;
+        // Read lines until end of file (null) is reached
+        do {
+          line = yield dis.read_line_async (GLib.Priority.DEFAULT);
+          if (line == null) break;
+          if (line.has_prefix ("#")) continue; //comment line
+          mimes = line.split (" ");
+          len = (int)GLib.strv_length (mimes);
+          if (len != 2) continue;
+          // cannot be parent of myself!
+          if (mimes[0] == mimes[1]) continue;
+          //debug ("Map %s -> %s", mimes[0], mimes[1]);
+          mimetype_parent_map.set (mimes[0], mimes[1]);
+        } while (true);
+      } catch (GLib.Error err) { /* can't read file */ }
+    }
     
+    private void add_dfi_for_mime (string mime, Gee.Set<DesktopFileInfo> ret)
+    {
+      var dfis = mimetype_map[mime];
+      if (dfis != null) ret.add_all (dfis);
+
+      var parents = mimetype_parent_map[mime];
+      if (parents == null) return;
+      foreach (string parent in parents)
+        add_dfi_for_mime (parent, ret);
+    }
+
     // retuns desktop files available on the system (without hidden ones)
     public Gee.List<DesktopFileInfo> get_desktop_files ()
     {
@@ -451,9 +499,13 @@ namespace Synapse
     
     public Gee.List<DesktopFileInfo> get_desktop_files_for_type (string mime_type)
     {
-      return mimetype_map[mime_type] ?? new Gee.ArrayList<DesktopFileInfo> ();
+      var dfi_set = new Gee.HashSet<DesktopFileInfo> ();
+      add_dfi_for_mime (mime_type, dfi_set);
+      var ret = new Gee.ArrayList<DesktopFileInfo> ();
+      ret.add_all (dfi_set);
+      return ret;
     }
-    
+
     public Gee.List<DesktopFileInfo> get_desktop_files_for_exec (string exec)
     {
       return exec_map[exec] ?? new Gee.ArrayList<DesktopFileInfo> ();

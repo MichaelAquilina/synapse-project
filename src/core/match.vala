@@ -25,28 +25,29 @@ namespace Synapse
     UNKNOWN = 0,
     APPLICATION,
     GENERIC_URI,
-    ACTION
+    ACTION,
+    SEARCH
   }
 
   public interface Match: Object
   {
     public enum Score
     {
-      INCREMENT_MINOR = 2,
-      INCREMENT_SMALL = 5,
-      INCREMENT_MEDIUM = 10,
-      INCREMENT_LARGE = 20,
-      URI_PENALTY = 15,
+      INCREMENT_MINOR = 200,
+      INCREMENT_SMALL = 500,
+      INCREMENT_MEDIUM = 1000,
+      INCREMENT_LARGE = 2000,
+      URI_PENALTY = 1500,
 
-      POOR = 50,
-      BELOW_AVERAGE = 60,
-      AVERAGE = 70,
-      ABOVE_AVERAGE = 75,
-      GOOD = 80,
-      VERY_GOOD = 85,
-      EXCELLENT = 90,
+      POOR = 5000,
+      BELOW_AVERAGE = 6000,
+      AVERAGE = 7000,
+      ABOVE_AVERAGE = 7500,
+      GOOD = 8000,
+      VERY_GOOD = 8500,
+      EXCELLENT = 9000,
 
-      HIGHEST = 100
+      HIGHEST = 10000
     }
     
     // properties
@@ -82,6 +83,11 @@ namespace Synapse
   public interface ExtendedInfo: Match
   {
     public abstract string? extended_info { get; set; }
+  }
+  
+  public interface SearchMatch: Match, SearchEngine
+  {
+
   }
 
   public class DefaultMatch: Object, Match

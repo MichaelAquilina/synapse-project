@@ -25,8 +25,16 @@ namespace Synapse
     SEARCH_CANCELLED,
     UNKNOWN_ERROR
   }
+  
+  public interface SearchEngine : Object
+  {
+    public abstract async Gee.List<Match> search (string query,
+                                                  QueryFlags flags,
+                                                  ResultSet? dest_result_set,
+                                                  Cancellable? cancellable = null) throws SearchError;
+  }
 
-  public class DataSink : Object
+  public class DataSink : Object, SearchEngine
   {
     public class PluginRegistry : Object
     {
@@ -395,8 +403,12 @@ namespace Synapse
       // wait for our initialization
       while (!plugins_loaded)
       {
-        Timeout.add (50, search.callback);
+        Timeout.add (100, search.callback);
         yield;
+        if (cancellable != null && cancellable.is_cancelled ())
+        {
+          throw new SearchError.SEARCH_CANCELLED ("Cancelled");
+        }
       }
       var q = Query (query_id++, query, flags);
       string query_stripped = query.strip ();
@@ -462,20 +474,49 @@ namespace Synapse
       {
         throw new SearchError.SEARCH_CANCELLED ("Cancelled");
       }
-      
-      if (has_unknown_handlers && query_stripped != "" &&
-        (QueryFlags.UNCATEGORIZED in flags || QueryFlags.ACTIONS in flags))
+
+      if (has_unknown_handlers && query_stripped != "")
       {
-        current_result_set.add (new DefaultMatch (query), 0);
+        var unknown_match = new DefaultMatch (query);
+        bool add_to_rs = false;
+        if (QueryFlags.ACTIONS in flags)
+        {
+          // FIXME: maybe we should also check here if there are any matches
+          add_to_rs = true;
+        }
+        else
+        {
+          // check whether any of the actions support this category
+          var unknown_match_actions = find_actions_for_unknown_match (unknown_match, flags);
+          if (unknown_match_actions.size > 0) add_to_rs = true;
+        }
+
+        if (add_to_rs) current_result_set.add (unknown_match, 0);
       }
 
       return current_result_set.get_sorted_list ();
     }
-
-    public Gee.List<Match> find_actions_for_match (Match match, string? query)
+    
+    protected Gee.List<Match> find_actions_for_unknown_match (Match match,
+                                                              QueryFlags flags)
     {
       var rs = new ResultSet ();
-      var q = Query (0, query ?? "");
+      var q = Query (0, "", flags);
+      foreach (var action_plugin in actions)
+      {
+        if (!action_plugin.enabled) continue;
+        if (!action_plugin.handles_unknown ()) continue;
+        rs.add_all (action_plugin.find_for_match (q, match));
+      }
+
+      return rs.get_sorted_list ();
+    }
+
+    public Gee.List<Match> find_actions_for_match (Match match, string? query,
+                                                   QueryFlags flags)
+    {
+      var rs = new ResultSet ();
+      var q = Query (0, query ?? "", flags);
       foreach (var action_plugin in actions)
       {
         if (!action_plugin.enabled) continue;

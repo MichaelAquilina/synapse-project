@@ -144,32 +144,12 @@ namespace Synapse
       return RelevancyService.compute_relevancy (base_relevancy, popularity);
     }
 
-    private void simple_search (Query q, ResultSet results)
-    {
-      // search method used for 1 letter searches
-      unowned string query = q.query_string_folded;
-
-      foreach (var dfm in desktop_files)
-      {
-        if (dfm.get_title_folded ().has_prefix (query))
-        {
-          results.add (dfm, compute_relevancy (dfm, Match.Score.EXCELLENT));
-        }
-        else if (dfm.title_unaccented != null && dfm.title_unaccented.has_prefix (query))
-        {
-          results.add (dfm, compute_relevancy (dfm, Match.Score.EXCELLENT - Match.Score.INCREMENT_SMALL));
-        }
-        else if (dfm.exec.has_prefix (q.query_string))
-        {
-          results.add (dfm, compute_relevancy (dfm, Match.Score.AVERAGE - Match.Score.INCREMENT_MEDIUM));
-        }
-      }
-    }
-
-    private void full_search (Query q, ResultSet results)
+    private void full_search (Query q, ResultSet results,
+                              MatcherFlags flags = 0)
     {
       // try to match against global matchers and if those fail, try also exec
-      var matchers = Query.get_matchers_for_query (q.query_string_folded);
+      var matchers = Query.get_matchers_for_query (q.query_string_folded,
+                                                   flags);
 
       foreach (var dfm in desktop_files)
       {
@@ -232,9 +212,12 @@ namespace Synapse
       // FIXME: spawn new thread and do the search there?
       var result = new ResultSet ();
 
+      // FIXME: make sure this is one unichar, not just byte
       if (q.query_string.length == 1)
       {
-        simple_search (q, result);
+        var flags = MatcherFlags.NO_SUBSTRING | MatcherFlags.NO_PARTIAL |
+                    MatcherFlags.NO_FUZZY;
+        full_search (q, result, flags);
       }
       else
       {
@@ -303,22 +286,29 @@ namespace Synapse
       return_val_if_fail (uri_match != null, null);
       
       if (uri_match.mime_type == null) return null;
-      var dfs = DesktopFileService.get_default ();
 
-      var list_for_mimetype = dfs.get_desktop_files_for_type (uri_match.mime_type);
-      if (list_for_mimetype.size < 2) return null;
-
-      var rs = new ResultSet ();
       Gee.List<OpenWithAction> ow_list = mimetype_map[uri_match.mime_type];
+      /* Query DesktopFileService only if is necessary */
       if (ow_list == null)
       {
+        /* Initialize ow_list */
         ow_list = new Gee.LinkedList<OpenWithAction> ();
         mimetype_map[uri_match.mime_type] = ow_list;
-        foreach (var entry in list_for_mimetype)
+        var dfs = DesktopFileService.get_default ();
+        var list_for_mimetype = dfs.get_desktop_files_for_type (uri_match.mime_type);
+        /* If there's more than one application, fill the ow list */
+        if (list_for_mimetype.size > 1)
         {
-          ow_list.add (new OpenWithAction (entry));
+          foreach (var entry in list_for_mimetype)
+          {
+            ow_list.add (new OpenWithAction (entry));
+          }
         }
+        else return null;
       }
+      else if (ow_list.size == 0) return null;
+
+      var rs = new ResultSet ();
       
       if (query.query_string == "")
       {

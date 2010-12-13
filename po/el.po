@@ -1,0 +1,507 @@
+# Greek translation for synapse-project
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# This file is distributed under the same license as the synapse-project package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: synapse-project\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-12-12 14:11+0100\n"
+"PO-Revision-Date: 2010-12-02 18:17+0000\n"
+"Last-Translator: Γουργιώτης Γιώργος (aka Gourgi) <Unknown>\n"
+"Language-Team: Greek <el@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Launchpad-Export-Date: 2010-12-13 06:08+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: ../data/synapse.desktop.in.h:1
+msgid "Search everything you do."
+msgstr ""
+
+#: ../data/synapse.desktop.in.h:2
+msgid "Synapse"
+msgstr ""
+
+#: ../src/synapse-main.c:315 ../src/ui-settings.c:942
+msgid "Activate"
+msgstr "Ενεργοποίηση"
+
+#: ../src/ui-cairo-gtk-base.c:1167
+msgid "Actions"
+msgstr "Ενέργειες"
+
+#: ../src/ui-cairo-gtk-base.c:1169
+msgid "Audio"
+msgstr "Ήχος"
+
+#: ../src/ui-cairo-gtk-base.c:1171
+msgid "Applications"
+msgstr "Εφαρμογές"
+
+#: ../src/ui-cairo-gtk-base.c:1173
+msgid "All"
+msgstr "Όλα"
+
+#: ../src/ui-cairo-gtk-base.c:1175
+msgid "Documents"
+msgstr "Έγγραφα"
+
+#: ../src/ui-cairo-gtk-base.c:1177
+msgid "Images"
+msgstr "Εικόνες"
+
+#: ../src/ui-cairo-gtk-base.c:1179
+msgid "Video"
+msgstr "Βίντεο"
+
+#: ../src/ui-cairo-gtk-base.c:1181
+msgid "Internet"
+msgstr "Διαδίκτυο"
+
+#: ../src/ui-cairo-gtk-virgilio.c:1021 ../src/ui-cairo-gtk-virgilio.c:1076
+#: ../src/ui-widgets.c:3241
+#, c-format
+msgid "<b>%d of %d</b>"
+msgstr "<b>%d από %d</b>"
+
+#: ../src/ui-cairo-gtk-virgilio.c:1131 ../src/ui-widgets.c:3186
+msgid "Home"
+msgstr "Αρχική"
+
+#: ../src/ui-cairo-gtk-virgilio.c:1143 ../src/ui-cairo-gtk-virgilio.c:1201
+#: ../src/ui-widgets.c:3218
+#, c-format
+msgid "<b>1 of %d</b>"
+msgstr "<b>1 από %d</b>"
+
+#: ../src/ui-interface.c:996
+msgid "...or press down key to browse recent activities"
+msgstr ""
+
+#: ../src/ui-interface.c:1408
+msgid "Searching..."
+msgstr "Αναζήτηση…"
+
+#: ../src/ui-interface.c:1413
+msgid "No results found."
+msgstr "Δε βρέθηκαν αποτελέσματα."
+
+#: ../src/ui-interface.c:1418
+msgid "No recent activities found."
+msgstr "Δε βρέθηκαν πρόσφατες δραστηριότητες"
+
+#: ../src/ui-interface.c:1423
+msgid "Type to search..."
+msgstr "Πληκτρολογήστε για αναζήτηση..."
+
+#: ../src/ui-settings.c:333
+msgid "Synapse - Settings"
+msgstr ""
+
+#: ../src/ui-settings.c:387
+msgid "Default"
+msgstr "Προεπιλογή"
+
+#: ../src/ui-settings.c:393
+msgid "Mini"
+msgstr "Μίνι"
+
+#: ../src/ui-settings.c:399
+msgid "Dual"
+msgstr "Δυϊκό"
+
+#: ../src/ui-settings.c:405
+msgid "Virgilio"
+msgstr ""
+
+#: ../src/ui-settings.c:826
+msgid "General"
+msgstr "Γενικά"
+
+#: ../src/ui-settings.c:831
+msgid "Plugins"
+msgstr "Πρόσθετα"
+
+#: ../src/ui-settings.c:841
+msgid "Behavior & Look"
+msgstr ""
+
+#: ../src/ui-settings.c:857
+msgid "Theme:"
+msgstr "Θέμα:"
+
+#: ../src/ui-settings.c:865
+msgid "Startup on login"
+msgstr ""
+
+#: ../src/ui-settings.c:872
+msgid "Show notification icon"
+msgstr ""
+
+#: ../src/ui-settings.c:885
+msgid "Shortcuts"
+msgstr "Συντομεύσεις"
+
+#: ../src/ui-settings.c:920
+msgid "Action"
+msgstr "Ενέργεια"
+
+#: ../src/ui-settings.c:934
+msgid "Shortcut"
+msgstr "Συντόμευση"
+
+#: ../src/ui-settings.c:949
+msgid "Click the shortcut you wish to change and press the new shortcut."
+msgstr ""
+
+#: ../src/ui-settings.c:1024 ../src/ui-settings.c:1306
+msgid "Disabled"
+msgstr "Ανενεργό"
+
+#: ../src/ui-settings.c:1314
+msgid "Enabled"
+msgstr "Ενεργοποιημένο"
+
+#: ../src/ui-settings.c:1398
+msgid "Status"
+msgstr "Κατάσταση"
+
+#: ../src/ui-settings.c:1400
+msgid "Enable this plugin"
+msgstr ""
+
+#: ../src/ui-settings.c:1402
+msgid "Disable this plugin"
+msgstr ""
+
+#: ../src/ui-widgets.c:3135 ../src/ui-widgets.c:3208
+msgid "No results."
+msgstr ""
+
+#: ../src/core/common-actions.c:1019
+msgid "Run"
+msgstr "Εκτέλεση"
+
+#: ../src/core/common-actions.c:1020
+msgid "Run an application, action or script"
+msgstr ""
+
+#: ../src/core/common-actions.c:1174
+msgid "Run in Terminal"
+msgstr "Εκτέλεση στο Τερματικό"
+
+#: ../src/core/common-actions.c:1175
+msgid "Run application or command in terminal"
+msgstr ""
+
+#: ../src/core/common-actions.c:1328
+msgid "Open"
+msgstr "Άνοιγμα"
+
+#: ../src/core/common-actions.c:1329
+msgid "Open using default application"
+msgstr ""
+
+#: ../src/core/common-actions.c:1463
+msgid "Open folder"
+msgstr "Άνοιγμα φακέλου"
+
+#: ../src/core/common-actions.c:1464
+msgid "Open folder containing this file"
+msgstr ""
+
+#: ../src/plugins/banshee-plugin.c:2677
+msgid "Control Banshee and add items to playlists."
+msgstr ""
+
+#: ../src/plugins/banshee-plugin.c:2681
+msgid "Banshee is not installed"
+msgstr ""
+
+#: ../src/plugins/banshee-plugin.c:3706 ../src/plugins/rhythmbox-plugin.c:3492
+msgid "Play"
+msgstr "Αναπαραγωγή"
+
+#: ../src/plugins/banshee-plugin.c:3707
+msgid "Start playback in Banshee"
+msgstr ""
+
+#: ../src/plugins/banshee-plugin.c:3807 ../src/plugins/rhythmbox-plugin.c:3690
+msgid "Pause"
+msgstr "Παύση"
+
+#: ../src/plugins/banshee-plugin.c:3808
+msgid "Pause playback in Banshee"
+msgstr ""
+
+#: ../src/plugins/banshee-plugin.c:3898 ../src/plugins/rhythmbox-plugin.c:3744
+msgid "Next"
+msgstr "Επόμενο"
+
+#: ../src/plugins/banshee-plugin.c:3899
+msgid "Plays the next song in Banshee's playlist"
+msgstr ""
+
+#: ../src/plugins/banshee-plugin.c:3989 ../src/plugins/rhythmbox-plugin.c:3835
+msgid "Previous"
+msgstr "Προηγούμενο"
+
+#: ../src/plugins/banshee-plugin.c:3990
+msgid "Plays the previous song in Banshee's playlist"
+msgstr ""
+
+#: ../src/plugins/banshee-plugin.c:4080
+msgid "Enqueue in Banshee"
+msgstr ""
+
+#: ../src/plugins/banshee-plugin.c:4081
+msgid "Add the song to Banshee playlist"
+msgstr ""
+
+#: ../src/plugins/banshee-plugin.c:4234
+msgid "Play in Banshee"
+msgstr ""
+
+#: ../src/plugins/banshee-plugin.c:4235 ../src/plugins/rhythmbox-plugin.c:4130
+msgid "Clears the current playlist and plays the song"
+msgstr ""
+
+#: ../src/plugins/command-plugin.c:201
+msgid "Find and execute arbitrary commands."
+msgstr ""
+
+#: ../src/plugins/command-plugin.c:699
+msgid "Run command"
+msgstr "Εκτέλεση εντολής"
+
+#: ../src/plugins/desktop-file-plugin.c:294
+msgid "Search for and run applications on your computer."
+msgstr ""
+
+#: ../src/plugins/desktop-file-plugin.c:1615
+#, c-format
+msgid "Open with %s"
+msgstr "Άνοιγμα με %s"
+
+#: ../src/plugins/desktop-file-plugin.c:1623
+#, c-format
+msgid "Opens current selection using %s"
+msgstr ""
+
+#: ../src/plugins/devhelp-search.c:150
+msgid "Search documentation using Devhelp."
+msgstr ""
+
+#: ../src/plugins/devhelp-search.c:153
+msgid "Devhelp is not installed"
+msgstr "Δεν είναι εγκατεστημένο το devhelp"
+
+#: ../src/plugins/devhelp-search.c:379
+msgid "Search in Devhelp"
+msgstr ""
+
+#: ../src/plugins/devhelp-search.c:380
+msgid "Search documentation for this symbol"
+msgstr ""
+
+#: ../src/plugins/dictionary.c:148
+msgid "Look up definitions of words."
+msgstr ""
+
+#: ../src/plugins/dictionary.c:151
+msgid "Gnome Dictionary is not installed"
+msgstr ""
+
+#: ../src/plugins/dictionary.c:342
+msgid "Define"
+msgstr "Ορισμός"
+
+#: ../src/plugins/dictionary.c:343
+msgid "Look up definition in dictionary"
+msgstr ""
+
+#: ../src/plugins/directory-plugin.c:416
+msgid "Open commonly used directories."
+msgstr ""
+
+#: ../src/plugins/gnome-session-plugin.c:1560
+msgid "Log out from your session, restart or shutdown your computer."
+msgstr ""
+
+#: ../src/plugins/gnome-session-plugin.c:1564
+msgid "Gnome Session Manager wasn't found"
+msgstr ""
+
+#: ../src/plugins/gnome-session-plugin.c:1814
+msgid "Shut Down"
+msgstr "Τερματισμός"
+
+#: ../src/plugins/gnome-session-plugin.c:1815
+msgid "Turn your computer off"
+msgstr ""
+
+#: ../src/plugins/gnome-session-plugin.c:2133
+msgid "Restart"
+msgstr "Επανεκκίνηση"
+
+#: ../src/plugins/gnome-session-plugin.c:2134
+msgid "Restart your computer"
+msgstr ""
+
+#: ../src/plugins/gnome-session-plugin.c:2452
+msgid "Log Out"
+msgstr "Αποσύνδεση"
+
+#: ../src/plugins/gnome-session-plugin.c:2453
+msgid "Close your session and return to the login screen"
+msgstr ""
+
+#: ../src/plugins/gnome-screensaver-plugin.c:684
+msgid "Lock screen of your computer."
+msgstr ""
+
+#: ../src/plugins/gnome-screensaver-plugin.c:688
+msgid "Gnome Screen Saver wasn't found"
+msgstr ""
+
+#: ../src/plugins/gnome-screensaver-plugin.c:926
+msgid "Lock Screen"
+msgstr ""
+
+#: ../src/plugins/gnome-screensaver-plugin.c:927
+msgid "Locks screen and starts screensaver."
+msgstr ""
+
+#: ../src/plugins/hybrid-search-plugin.c:668
+msgid ""
+"Improve results returned by the Zeitgeist plugin by looking for similar "
+"files on the filesystem."
+msgstr ""
+
+#: ../src/plugins/locate-plugin.c:376
+msgid "Runs locate command to find files on the filesystem."
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:228 ../src/plugins/opensearch.c:361
+msgid "Search the web."
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:240
+msgid "Google"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:241
+msgid "Search the web using Google.com"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:242
+msgid "Google Maps"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:243
+msgid "Search using Google Maps"
+msgstr ""
+
+#: ../src/plugins/rhythmbox-plugin.c:2463
+msgid "Control Rhythmbox and add items to playlists."
+msgstr ""
+
+#: ../src/plugins/rhythmbox-plugin.c:2467
+msgid "Rhythmbox is not installed"
+msgstr ""
+
+#: ../src/plugins/rhythmbox-plugin.c:3493
+msgid "Start playback in Rhythmbox"
+msgstr ""
+
+#: ../src/plugins/rhythmbox-plugin.c:3691
+msgid "Pause playback in Rhythmbox"
+msgstr ""
+
+#: ../src/plugins/rhythmbox-plugin.c:3745
+msgid "Plays the next song in Rhythmbox's playlist"
+msgstr ""
+
+#: ../src/plugins/rhythmbox-plugin.c:3836
+msgid "Plays the previous song in Rhythmbox's playlist"
+msgstr ""
+
+#: ../src/plugins/rhythmbox-plugin.c:3939
+msgid "Enqueue in Rhythmbox"
+msgstr ""
+
+#: ../src/plugins/rhythmbox-plugin.c:3940
+msgid "Add the song to Rhythmbox playlist"
+msgstr ""
+
+#: ../src/plugins/rhythmbox-plugin.c:4129
+msgid "Play in Rhythmbox"
+msgstr ""
+
+#: ../src/plugins/upower-plugin.c:1691
+msgid "Suspend or hibernate your computer."
+msgstr ""
+
+#: ../src/plugins/upower-plugin.c:1695
+msgid "UPower wasn't found"
+msgstr ""
+
+#: ../src/plugins/upower-plugin.c:2208
+msgid "Suspend"
+msgstr "Αναστολή"
+
+#: ../src/plugins/upower-plugin.c:2209
+msgid "Put your computer into suspend mode"
+msgstr ""
+
+#: ../src/plugins/upower-plugin.c:2435
+msgid "Hibernate"
+msgstr "Αδρανοποίηση"
+
+#: ../src/plugins/upower-plugin.c:2436
+msgid "Put your computer into hibernation mode"
+msgstr ""
+
+#: ../src/plugins/zeitgeist-plugin.c:384
+msgid "Search various items logged by Zeitgeist."
+msgstr ""
+
+#: ../src/plugins/zeitgeist-plugin.c:388
+msgid "Zeitgeist is not installed"
+msgstr ""
+
+#: ../src/plugins/zeitgeist-plugin.c:1755
+msgid "few moments ago"
+msgstr ""
+
+#: ../src/plugins/zeitgeist-plugin.c:1764
+#, c-format
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/plugins/zeitgeist-plugin.c:1776
+#, c-format
+msgid "%d hour ago"
+msgid_plural "%d hours ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/plugins/zeitgeist-plugin.c:1788
+#, c-format
+msgid "%d day ago"
+msgid_plural "%d days ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/plugins/zeitgeist-plugin.c:1800
+#, c-format
+msgid "%d week ago"
+msgid_plural "%d weeks ago"
+msgstr[0] ""
+msgstr[1] ""

@@ -32,6 +32,9 @@ namespace Synapse
       public abstract void add_to_queue (string uri) throws DBus.Error;
       [DBus (name = "clearQueue")]
       public abstract void clear_queue () throws DBus.Error;
+      [DBus (name = "loadURI")]
+      public abstract void load_uri (string uri, bool b) throws DBus.Error;
+      
   }
 
   [DBus (name = "org.gnome.Rhythmbox.Player")]
@@ -300,11 +303,9 @@ namespace Synapse
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH,
                                                           RhythmboxPlayer.INTERFACE_NAME);
-          shell.clear_queue ();
-          shell.add_to_queue (uri.uri);
-          player.next ();
           if (!player.get_playing())
             player.play_pause (true);
+          shell.load_uri (uri.uri, true);
         } catch (DBus.Error e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }

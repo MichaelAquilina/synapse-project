@@ -1,11 +1,14 @@
-AC_INIT([synapse], [0.2.1])
-AC_DEFINE(RELEASE_NAME, "Acetylcholine", "Codename of this release")
+AC_INIT([synapse], [0.2.3])
+AC_DEFINE(RELEASE_NAME, "Adenosine triphosphate", "Codename of this release")
 
-#AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([1.11])
+
+dnl -- Populate top_srcdir variable
+top_srcdir=$(readlink -f $0 | sed -e s/configure$//)
 
 dnl ==============================================
 dnl Translation support
@@ -14,13 +17,10 @@ dnl ==============================================
 GETTEXT_PACKAGE=synapse
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Gettext package])
-ALL_LINGUAS=""
+ALL_LINGUAS=`ls ${top_srcdir}/po/*.po | sed 's/.po$//' | sed 's/.*\///' | tr '\n' ' '`
 
 IT_PROG_INTLTOOL([0.35])
 AM_GLIB_GNU_GETTEXT
-
-dnl -- Populate top_srcdir variable
-top_srcdir=$(readlink -f $0 | sed -e s/configure$//)
 
 dnl pkg-config
 AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
@@ -38,6 +38,9 @@ dnl ==============================================
 dnl Check for Vala
 dnl ==============================================
 AM_PROG_VALAC([0.9.7])
+if test "x$VALAC" = "x"; then
+	AC_MSG_ERROR([You need Vala compiler])
+fi
 
 AM_SILENT_RULES([yes])
 
@@ -101,12 +104,13 @@ fi
 AM_CONDITIONAL(HAVE_INDICATOR, test "x$enable_indicator" = "xyes")
 
 dnl Expansions
-dnl AS_AC_EXPAND([PKGDATADIR], [$datadir/$PACKAGE_NAME])
-dnl AS_AC_EXPAND([DATADIR], [$datadir])
+AS_AC_EXPAND([PKGDATADIR], [$datadir/$PACKAGE_NAME])
+AS_AC_EXPAND([DATADIR], [$datadir])
 dnl AS_AC_EXPAND([LIBDIR], [$libdir])
 dnl AS_AC_EXPAND([LIBEXECDIR], [$libexecdir])
 
 AC_DEFINE_UNQUOTED(PKGDATADIR, "$PKGDATADIR", [Package base directory])
+AC_DEFINE_UNQUOTED(DATADIR, "$DATADIR", [Data directory])
 
 AC_CONFIG_FILES([
 Makefile
@@ -116,8 +120,8 @@ src/core/Makefile
 src/plugins/Makefile
 src/tile-view/Makefile
 po/Makefile.in
+vapi/Makefile
 ])
-
 
 AC_OUTPUT
 
@@ -127,9 +131,14 @@ ${PACKAGE}-${VERSION}
 
   Build Environment
     Install Prefix:     ${prefix}
+    Zeitgeist support:  ${enable_zeitgeist}
 
   Optional dependencies
     AppIndicator:       ${enable_indicator}
-    Zeitgeist:          ${enable_zeitgeist}
 
 EOF
+
+if test "x$enable_zeitgeist" != "xyes" ; then
+	AC_MSG_WARN([Zeitgeist is disabled, building without relevancy backend!])
+fi
+

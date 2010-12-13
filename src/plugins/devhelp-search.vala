@@ -105,7 +105,8 @@ namespace Synapse
 
     public override ResultSet? find_for_match (Query query, Match match)
     {
-      if (!has_devhelp || match.match_type != MatchType.UNKNOWN)
+      if (!has_devhelp || match.match_type != MatchType.UNKNOWN ||
+          !(QueryFlags.ACTIONS in query.query_type))
       {
         return null;
       }

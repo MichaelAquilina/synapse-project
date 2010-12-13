@@ -25,6 +25,11 @@ using Gee;
 
 namespace Synapse.Gui
 {
+  public errordomain WidgetError
+  {
+    ICON_NOT_FOUND,
+    UNKNOWN
+  }
   public class UIWidgetsConfig : ConfigObject
   {
     public bool animation_enabled { get; set; default = true; }
@@ -136,25 +141,26 @@ namespace Synapse.Gui
     {
       ctx.rectangle (0, 0, pixel_size, pixel_size);
       ctx.clip ();
+      if (name == null || name == "") name = "unknown";
       try {
-        var icon = GLib.Icon.new_for_string(name ?? "");
-        if (icon != null)
-        {
-          Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, pixel_size, Gtk.IconLookupFlags.FORCE_SIZE);
-          if (iconinfo != null)
-          {
-            Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
-            if (icon_pixbuf != null)
-            {
-              Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 0, 0);
-              if (with_alpha == 1.0)
-                ctx.paint ();
-              else
-                ctx.paint_with_alpha (with_alpha);
-            }
-          }
-        }
-      } catch (GLib.Error err) { /* do not render icon */ }
+        var icon = GLib.Icon.new_for_string(name);
+        if (icon == null) throw new WidgetError.ICON_NOT_FOUND ("GLib Icon not found");
+
+        Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, pixel_size, Gtk.IconLookupFlags.FORCE_SIZE);
+        if (iconinfo == null) throw new WidgetError.ICON_NOT_FOUND ("Icon not found in theme");
+
+        Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
+        if (icon_pixbuf == null) throw new WidgetError.ICON_NOT_FOUND ("Cannot load icon pixbuf");
+
+        Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 0, 0);
+        if (with_alpha == 1.0)
+          ctx.paint ();
+        else
+          ctx.paint_with_alpha (with_alpha);
+      } catch (GLib.Error err) { 
+        if (name == "unknown") return; //error on drawing unknown WTF!!
+        draw_icon_in_position (ctx, "unknown", pixel_size, with_alpha);
+      }
     }
     private void draw_text (Cairo.Context ctx, Match m, int x, int y, int width, Gtk.StateType state, bool use_base, double selected_fill_pct)
     {
@@ -162,11 +168,13 @@ namespace Synapse.Gui
       ctx.translate (x, y);
       ctx.rectangle (0, 0, width, text_height);
       ctx.clip ();
+      
+      bool selected = (state == Gtk.StateType.SELECTED);
 
       var styletype = ch.StyleType.FG;
-      if (use_base) styletype = ch.StyleType.TEXT;
+      if (use_base || selected) styletype = ch.StyleType.TEXT;
       
-      if (state == Gtk.StateType.SELECTED && selected_fill_pct < 1.0)
+      if (selected && selected_fill_pct < 1.0)
       {
         double r = 0, g = 0, b = 0;
         ch.get_rgb_from_mix (styletype, Gtk.StateType.NORMAL, ch.Mod.NORMAL,
@@ -178,7 +186,7 @@ namespace Synapse.Gui
 
       string s = "";
       /* ----------------------- draw title --------------------- */
-      if (hilight_on_selected && state == Gtk.StateType.SELECTED && selected_fill_pct == 1.0)
+      if (hilight_on_selected && selected && selected_fill_pct == 1.0)
       {
         s = title_markup.printf (Utils.markup_string_with_search (m.title, pattern, "", show_pattern_in_hilight));
       }
@@ -191,7 +199,7 @@ namespace Synapse.Gui
       Pango.cairo_show_layout (ctx, layout);
 
       bool has_extended_info = show_extended_info && (m is ExtendedInfo);
-      if (hide_extended_on_selected && state == Gtk.StateType.SELECTED) has_extended_info = false;
+      if (hide_extended_on_selected && selected) has_extended_info = false;
       int width_for_description = width - cell_hpadding;
       
       /* ----------------- draw extended info ------------------- */
@@ -519,7 +527,7 @@ namespace Synapse.Gui
       }
       else
         selection_target = 0;
-      if (!animation_enabled)
+      if (!animation_enabled || !this.is_realized())
       {
         current_voffset = target;
         selection_voffset = selection_target;
@@ -1159,7 +1167,7 @@ namespace Synapse.Gui
   }
   public class NamedIcon: Gtk.Image
   {
-    public string not_found_name {get; set; default = "missing-image";}
+    public string not_found_name {get; set; default = "unknown";}
     private string current;
     private IconSize current_size;
     private uint tid; //for timer
@@ -1217,9 +1225,7 @@ namespace Synapse.Gui
       {
         if (name == "")
         {
-          this.clear ();
-          current = "";
-          return;
+          name = not_found_name;
         }
         current = name;
         current_size = size;
@@ -1248,7 +1254,12 @@ namespace Synapse.Gui
     {
       try
       {
-        this.set_from_gicon (GLib.Icon.new_for_string (current), current_size);
+        var icon = GLib.Icon.new_for_string (current);
+        //make sure that it exist in the icon theme
+        var iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, 32, 0);
+        if (iconinfo == null)
+          throw new WidgetError.ICON_NOT_FOUND ("Requested icon could not be found.");
+        this.set_from_gicon (icon, current_size);
       }
       catch (Error err)
       {

@@ -83,6 +83,8 @@ namespace Synapse.Gui
       QueryFlags.VIDEO,
       QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
     };
+    
+    protected const int SHADOW_SIZE = 12; // shadow preferred size
 
     protected Window window = null;
     protected MenuButton menu = null;
@@ -280,9 +282,19 @@ namespace Synapse.Gui
 
       switch (command)
       {
+        case CommandTypes.EXECUTE_WITHOUT_HIDE:
+          execute ();
+          searching_for_matches = true;
+          searching_for_changed ();
+          break;
         case CommandTypes.EXECUTE:
           if (execute ())
             hide ();
+          else
+          {
+            searching_for_matches = true;
+            searching_for_changed ();
+          }
           break;
         case CommandTypes.SEARCH_DELETE_CHAR:
           search_delete_char ();

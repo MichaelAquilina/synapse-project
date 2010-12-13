@@ -34,20 +34,20 @@ libplugins_la_VALASOURCES = \
 	gnome-screensaver-plugin.vala \
 	hybrid-search-plugin.vala \
 	locate-plugin.vala \
+	opensearch.vala \
 	rhythmbox-plugin.vala \
 	test-slow-plugin.vala \
 	upower-plugin.vala \
-	zeitgeist-plugin.vala \
 	$(NULL)
 
 if HAVE_ZEITGEIST
+libplugins_la_VALASOURCES += zeitgeist-plugin.vala
 libplugins_la_VALAFLAGS += --pkg zeitgeist-1.0 -D HAVE_ZEITGEIST
 libplugins_la_CFLAGS += $(ZEITGEIST_CFLAGS)
 libplugins_la_LIBADD += $(ZEITGEIST_LIBS)
 endif
 
 libplugins_la_SOURCES = \
-	plugins.vala.stamp \
 	$(libplugins_la_VALASOURCES:.vala=.c) \
 	$(NULL)
 
@@ -60,6 +60,12 @@ BUILT_SOURCES = plugins.vala.stamp
 EXTRA_DIST = \
 	$(libplugins_la_VALASOURCES) \
 	plugins.vapi \
-	plugins.vala.stamp \
 	plugins.h
+
+DISTCLEANFILES = \
+	$(libplugins_la_VALASOURCES:.vala=.c) \
+	plugins.vala.stamp \
+	plugins.vapi \
+	plugins.h \
+	$(NULL)
 

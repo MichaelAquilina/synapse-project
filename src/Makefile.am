@@ -53,7 +53,7 @@ synapse_CFLAGS += $(ZEITGEIST_CFLAGS)
 synapse_LDADD += $(ZEITGEIST_LIBS)
 endif
 
-synapse_SOURCES = \
+synapse_VALASOURCES = \
 	synapse-main.vala \
 	ui-cairo-gtk-base.vala \
 	ui-cairo-gtk.vala \
@@ -67,3 +67,21 @@ synapse_SOURCES = \
 	ui-inspector.vala \
 	$(NULL)
 
+synapse_SOURCES = \
+	synapse_vala.stamp \
+	$(synapse_VALASOURCES:.vala=.c) \
+	$(NULL)
+
+# we can't let make handle this, otherwise tarballs won't support configure
+# flags (ie --disable-indicator won't rebuild the Vala sources)
+
+$(synapse_VALASOURCES:.vala=.c): synapse_vala.stamp
+#BUILT_SOURCES = synapse_vala.stamp
+
+synapse_vala.stamp: $(synapse_VALASOURCES)
+	$(AM_V_GEN)$(VALAC) $(synapse_VALAFLAGS) -C $^
+	touch $@
+
+EXTRA_DIST = $(synapse_VALASOURCES)
+
+DISTCLEANFILES = $(synapse_VALASOURCES:.vala=.c) synapse_vala.stamp

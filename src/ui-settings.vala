@@ -320,11 +320,13 @@ namespace Synapse.Gui
       
       var info_box = new HBox (false, 6);
       var info_image = new Image.from_stock (STOCK_INFO, IconSize.MENU);
-      info_box.pack_start (info_image, false, true);
+      info_box.pack_start (info_image, false);
       var info_label = new Label (Markup.printf_escaped ("<span size=\"small\">%s</span>",
             _("Click the shortcut you wish to change and press the new shortcut.")));
       info_label.set_use_markup(true);
-      info_box.pack_start (info_label, false, false);
+      info_label.set_alignment (0.0f, 0.5f);
+      info_label.wrap = true;
+      info_box.pack_start (info_label);
       info_box.show_all ();
 
       tree_vbox.pack_start (info_box, false);

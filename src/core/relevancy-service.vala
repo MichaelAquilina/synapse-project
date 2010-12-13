@@ -64,29 +64,32 @@ namespace Synapse
     
     public float get_application_popularity (string desktop_id)
     {
-      return_if_fail (backend != null);
+      if (backend == null) return 0.0f;
       return backend.get_application_popularity (desktop_id);
     }
 
     public float get_uri_popularity (string uri)
     {
-      return_if_fail (backend != null);
+      if (backend == null) return 0.0f;
       return backend.get_uri_popularity (uri);
     }
     
     public void application_launched (AppInfo app_info)
     {
-      return_if_fail (backend != null);
+      if (backend == null) return;
       backend.application_launched (app_info);
     }
-    
+
     public static int compute_relevancy (int base_relevancy, float modifier)
     {
       // FIXME: let's experiment here
       // the other idea is to use base_relevancy * (1.0f + modifier)
       int relevancy = (int) (base_relevancy + modifier * Match.Score.INCREMENT_LARGE * 2);
       //int relevancy = base_relevancy + (int) (modifier * Match.Score.HIGHEST);
-      return int.min (relevancy, Match.Score.HIGHEST);
+      return relevancy;
+      // FIXME: this clamping should be done, but it screws up the popularity
+      //   for very popular items with high match score
+      //return int.min (relevancy, Match.Score.HIGHEST);
     }
   }
 }

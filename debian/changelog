@@ -6,7 +6,6 @@ synapse (0.2.0+bzr-2) UNRELEASED; urgency=low
    - Update Vcs-*.
    - Build-depends on pkg-config.
    - Build-depends on libappindicator-dev.
-   - Add a debug binary.
   * debian/docs:
    - Add upstream documentation.
   * debian/watch
@@ -15,7 +14,7 @@ synapse (0.2.0+bzr-2) UNRELEASED; urgency=low
    - Update copyright holders and licenses.
   * debian/rules:
    - Pass --enable-indicator=auto to configure.
-   - Call dh_strip for the dbg package.
+   - Pass --fail-missing to dh_install.
   * debian/synapse.install:
    - Install all files in synapse binary.
 

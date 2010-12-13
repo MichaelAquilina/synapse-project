@@ -19,14 +19,9 @@
  *
  */
 
-/* 
- * This plugin keeps a cache of file names for directories that are commonly
- * used. 
- */
-
 namespace Synapse
 {
-  public class LocatePlugin: DataPlugin
+  public class LocatePlugin: ActionPlugin
   {
     private class MatchObject: Object, Match, UriMatch
     {
@@ -52,142 +47,54 @@ namespace Synapse
       }
     }
 
-    private class FileInfo
+    private class LocateItem: Object, SearchEngine, Match, SearchMatch
     {
-      private static string interesting_attributes;
-      static construct
-      {
-        interesting_attributes =
-          string.join (",", FILE_ATTRIBUTE_STANDARD_TYPE,
-                            FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
-                            FILE_ATTRIBUTE_STANDARD_IS_BACKUP,
-                            FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
-                            FILE_ATTRIBUTE_STANDARD_ICON,
-                            FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
-                            FILE_ATTRIBUTE_THUMBNAIL_PATH,
-                            null);
-      }
-      
-      public string uri;
-      public string parse_name;
-      public QueryFlags file_type;
-      public MatchObject? match_obj;
-      private bool initialized;
+      // for Match interface
+      public string title { get; construct set; }
+      public string description { get; set; default = ""; }
+      public string icon_name { get; construct set; default = ""; }
+      public bool has_thumbnail { get; construct set; default = false; }
+      public string thumbnail_path { get; construct set; }
+      public MatchType match_type { get; construct set; }
 
-      public FileInfo (string uri)
+      public int default_relevancy { get; set; default = Match.Score.INCREMENT_SMALL; }
+      // for SearchMatch interface
+      public async Gee.List<Match> search (string query,
+                                           QueryFlags flags,
+                                           ResultSet? dest_result_set,
+                                           Cancellable? cancellable = null) throws SearchError
       {
-        this.uri = uri;
-        this.match_obj = null;
-        this.initialized = false;
-        this.file_type = QueryFlags.UNCATEGORIZED;
+        var q = Query (0, query, flags);
+        q.cancellable = cancellable;
+        ResultSet? results = yield plugin.locate (q);
+        dest_result_set.add_all (results);
 
-        var f = File.new_for_uri (uri);
-        this.parse_name = f.get_parse_name ();
+        return dest_result_set.get_sorted_list ();
       }
-      
-      public bool is_initialized ()
+
+      private unowned LocatePlugin plugin;
+
+      public LocateItem (LocatePlugin plugin)
       {
-        return this.initialized;
-      }
-      
-      public async void initialize ()
-      {
-        initialized = true;
-        var f = File.new_for_uri (uri);
-        try
-        {
-          var fi = yield f.query_info_async (interesting_attributes,
-                                             0, 0, null);
-          if (fi.get_file_type () == FileType.REGULAR &&
-              !fi.get_is_hidden () &&
-              !fi.get_is_backup ())
-          {
-            match_obj = new MatchObject (
-              fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH),
-              fi.get_icon ().to_string ());
-            match_obj.uri = uri;
-            match_obj.title = fi.get_display_name ();
-            match_obj.description = f.get_parse_name ();
-            
-            // let's determine the file type
-            unowned string mime_type = 
-              fi.get_attribute_string (FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
-            if (g_content_type_is_unknown (mime_type))
-            {
-              file_type = QueryFlags.UNCATEGORIZED;
-            }
-            else if (g_content_type_is_a (mime_type, "audio/*"))
-            {
-              file_type = QueryFlags.AUDIO;
-            }
-            else if (g_content_type_is_a (mime_type, "video/*"))
-            {
-              file_type = QueryFlags.VIDEO;
-            }
-            else if (g_content_type_is_a (mime_type, "image/*"))
-            {
-              file_type = QueryFlags.IMAGES;
-            }
-            else if (g_content_type_is_a (mime_type, "text/*"))
-            {
-              file_type = QueryFlags.DOCUMENTS;
-            }
-            // FIXME: this isn't right
-            else if (g_content_type_is_a (mime_type, "application/*"))
-            {
-              file_type = QueryFlags.DOCUMENTS;
-            }
-            
-            match_obj.file_type = file_type;
-            match_obj.mime_type = mime_type;
-          }
-        }
-        catch (Error err)
-        {
-          warning ("%s", err.message);
-        }
-      }
-      
-      public async bool exists ()
-      {
-        bool result = true;
-        var f = File.new_for_uri (uri);
-        try
-        {
-          // will throw error if the file doesn't exist
-          yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_TYPE,
-                                    0, 0, null);
-        }
-        catch (Error err)
-        {
-          result = false;
-        }
-        
-        return result;
+        Object (match_type: MatchType.SEARCH,
+                has_thumbnail: false,
+                icon_name: "search",
+                title: _ ("Locate"),
+                description: _ ("Locate files with this name on the filesystem"));
+        this.plugin = plugin;
       }
     }
 
-    private class DirectoryInfo
-    {
-      public string path;
-      public TimeVal last_update;
-      public Gee.Map<unowned string, FileInfo?> files;
-
-      public DirectoryInfo (string path)
-      {
-        this.files = new Gee.HashMap<unowned string, FileInfo?> ();
-        this.path = path;
-      }
-    }
-    
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (LocatePlugin),
-        "Locate",
+        _ ("Locate"),
         _ ("Runs locate command to find files on the filesystem."),
         "search",
-        register_plugin
+        register_plugin,
+        Environment.find_program_in_path ("locate") != null,
+        _ ("Unable to find \"locate\" binary")
       );
     }
 
@@ -196,14 +103,19 @@ namespace Synapse
       register_plugin ();
     }
 
-    Gee.Map<string, DirectoryInfo> directory_contents;
+    LocateItem action;
 
     construct
     {
-      directory_contents = new Gee.HashMap<string, FileInfo?> ();
+      action = new LocateItem (this);
     }
 
-    public override async ResultSet? search (Query q) throws SearchError
+    public override bool handles_unknown ()
+    {
+      return true;
+    }
+
+    public async ResultSet? locate (Query q) throws SearchError
     {
       var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
         | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
@@ -214,14 +126,13 @@ namespace Synapse
       // ignore short searches
       if (common_flags == 0 || q.query_string.length <= 1) return null;
 
-      Timeout.add (90, search.callback);
-      yield;
-
       q.check_cancellable ();
 
+      q.max_results = 256;
+      string regex = Regex.escape_string (q.query_string);
       // FIXME: split pattern into words and search using --regexp?
       string[] argv = {"locate", "-i", "-l", "%u".printf (q.max_results),
-                       q.query_string};
+                       "-r", regex.replace (" ", ".")};
 
       Gee.Set<string> uris = new Gee.HashSet<string> ();
 
@@ -245,8 +156,9 @@ namespace Synapse
           line = yield locate_output.read_line_async (Priority.DEFAULT_IDLE, q.cancellable);
           if (line != null)
           {
-            if (!line.has_prefix ("/home") || filter_re.match (line)) continue;
-            uris.add (line);
+            if (filter_re.match (line)) continue;
+            var file = File.new_for_path (line);
+            uris.add (file.get_uri ());
           }
         } while (line != null);
       }
@@ -257,10 +169,57 @@ namespace Synapse
 
       q.check_cancellable ();
 
-      foreach (string s in uris) debug ("%s", s);
-
       var result = new ResultSet ();
+
+      foreach (string s in uris)
+      {
+        var fi = new Utils.FileInfo (s, typeof (MatchObject));
+        yield fi.initialize ();
+        if (fi.match_obj != null && fi.file_type in q.query_type)
+        {
+          int relevancy = Match.Score.INCREMENT_SMALL; // FIXME: relevancy
+          if (fi.uri.has_prefix ("file:///home/")) relevancy += Match.Score.INCREMENT_MINOR;
+          result.add (fi.match_obj, relevancy);
+        }
+        q.check_cancellable ();
+      }
+
       return result;
+    }
+
+    public override ResultSet? find_for_match (Query q, Match match)
+    {
+      var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
+        | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
+
+      var common_flags = q.query_type & our_results;
+      // ignore short searches
+      if (common_flags == 0 || match.match_type != MatchType.UNKNOWN) return null;
+
+      // strip query
+      q.query_string = q.query_string.strip ();
+      bool query_empty = q.query_string == "";
+      var results = new ResultSet ();
+
+      if (query_empty)
+      {
+        results.add (action, action.default_relevancy);
+      }
+      else
+      {
+        var matchers = Query.get_matchers_for_query (q.query_string, 0,
+          RegexCompileFlags.CASELESS);
+        foreach (var matcher in matchers)
+        {
+          if (matcher.key.match (action.title))
+          {
+            results.add (action, matcher.value);
+            break;
+          }
+        }
+      }
+
+      return results;
     }
   }
 }

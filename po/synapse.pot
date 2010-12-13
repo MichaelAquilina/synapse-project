@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-08 17:12+0100\n"
+"POT-Creation-Date: 2010-12-12 14:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,54 +25,54 @@ msgstr ""
 msgid "Synapse"
 msgstr ""
 
-#: ../src/synapse-main.c:313 ../src/ui-settings.c:942
+#: ../src/synapse-main.c:315 ../src/ui-settings.c:942
 msgid "Activate"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1069
+#: ../src/ui-cairo-gtk-base.c:1167
 msgid "Actions"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1071
+#: ../src/ui-cairo-gtk-base.c:1169
 msgid "Audio"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1073
+#: ../src/ui-cairo-gtk-base.c:1171
 msgid "Applications"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1075
+#: ../src/ui-cairo-gtk-base.c:1173
 msgid "All"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1077
+#: ../src/ui-cairo-gtk-base.c:1175
 msgid "Documents"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1079
+#: ../src/ui-cairo-gtk-base.c:1177
 msgid "Images"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1081
+#: ../src/ui-cairo-gtk-base.c:1179
 msgid "Video"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.c:1083
+#: ../src/ui-cairo-gtk-base.c:1181
 msgid "Internet"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-virgilio.c:1040 ../src/ui-cairo-gtk-virgilio.c:1095
-#: ../src/ui-widgets.c:3115
+#: ../src/ui-cairo-gtk-virgilio.c:1021 ../src/ui-cairo-gtk-virgilio.c:1076
+#: ../src/ui-widgets.c:3241
 #, c-format
 msgid "<b>%d of %d</b>"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-virgilio.c:1150 ../src/ui-widgets.c:3060
+#: ../src/ui-cairo-gtk-virgilio.c:1131 ../src/ui-widgets.c:3186
 msgid "Home"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-virgilio.c:1162 ../src/ui-cairo-gtk-virgilio.c:1220
-#: ../src/ui-widgets.c:3092
+#: ../src/ui-cairo-gtk-virgilio.c:1143 ../src/ui-cairo-gtk-virgilio.c:1201
+#: ../src/ui-widgets.c:3218
 #, c-format
 msgid "<b>1 of %d</b>"
 msgstr ""
@@ -177,39 +177,39 @@ msgstr ""
 msgid "Disable this plugin"
 msgstr ""
 
-#: ../src/ui-widgets.c:3009 ../src/ui-widgets.c:3082
+#: ../src/ui-widgets.c:3135 ../src/ui-widgets.c:3208
 msgid "No results."
 msgstr ""
 
-#: ../src/core/common-actions.c:1000
+#: ../src/core/common-actions.c:1019
 msgid "Run"
 msgstr ""
 
-#: ../src/core/common-actions.c:1001
+#: ../src/core/common-actions.c:1020
 msgid "Run an application, action or script"
 msgstr ""
 
-#: ../src/core/common-actions.c:1155
+#: ../src/core/common-actions.c:1174
 msgid "Run in Terminal"
 msgstr ""
 
-#: ../src/core/common-actions.c:1156
+#: ../src/core/common-actions.c:1175
 msgid "Run application or command in terminal"
 msgstr ""
 
-#: ../src/core/common-actions.c:1309
+#: ../src/core/common-actions.c:1328
 msgid "Open"
 msgstr ""
 
-#: ../src/core/common-actions.c:1310
+#: ../src/core/common-actions.c:1329
 msgid "Open using default application"
 msgstr ""
 
-#: ../src/core/common-actions.c:1444
+#: ../src/core/common-actions.c:1463
 msgid "Open folder"
 msgstr ""
 
-#: ../src/core/common-actions.c:1445
+#: ../src/core/common-actions.c:1464
 msgid "Open folder containing this file"
 msgstr ""
 
@@ -281,12 +281,12 @@ msgstr ""
 msgid "Search for and run applications on your computer."
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1672
+#: ../src/plugins/desktop-file-plugin.c:1615
 #, c-format
 msgid "Open with %s"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1680
+#: ../src/plugins/desktop-file-plugin.c:1623
 #, c-format
 msgid "Opens current selection using %s"
 msgstr ""
@@ -299,11 +299,11 @@ msgstr ""
 msgid "Devhelp is not installed"
 msgstr ""
 
-#: ../src/plugins/devhelp-search.c:373
+#: ../src/plugins/devhelp-search.c:379
 msgid "Search in Devhelp"
 msgstr ""
 
-#: ../src/plugins/devhelp-search.c:374
+#: ../src/plugins/devhelp-search.c:380
 msgid "Search documentation for this symbol"
 msgstr ""
 
@@ -315,11 +315,11 @@ msgstr ""
 msgid "Gnome Dictionary is not installed"
 msgstr ""
 
-#: ../src/plugins/dictionary.c:336
+#: ../src/plugins/dictionary.c:342
 msgid "Define"
 msgstr ""
 
-#: ../src/plugins/dictionary.c:337
+#: ../src/plugins/dictionary.c:343
 msgid "Look up definition in dictionary"
 msgstr ""
 
@@ -375,7 +375,7 @@ msgstr ""
 msgid "Locks screen and starts screensaver."
 msgstr ""
 
-#: ../src/plugins/hybrid-search-plugin.c:667
+#: ../src/plugins/hybrid-search-plugin.c:668
 msgid ""
 "Improve results returned by the Zeitgeist plugin by looking for similar "
 "files on the filesystem."
@@ -383,6 +383,26 @@ msgstr ""
 
 #: ../src/plugins/locate-plugin.c:376
 msgid "Runs locate command to find files on the filesystem."
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:228 ../src/plugins/opensearch.c:361
+msgid "Search the web."
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:240
+msgid "Google"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:241
+msgid "Search the web using Google.com"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:242
+msgid "Google Maps"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:243
+msgid "Search using Google Maps"
 msgstr ""
 
 #: ../src/plugins/rhythmbox-plugin.c:2463
@@ -445,40 +465,40 @@ msgstr ""
 msgid "Put your computer into hibernation mode"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:382
+#: ../src/plugins/zeitgeist-plugin.c:384
 msgid "Search various items logged by Zeitgeist."
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:386
+#: ../src/plugins/zeitgeist-plugin.c:388
 msgid "Zeitgeist is not installed"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1745
+#: ../src/plugins/zeitgeist-plugin.c:1755
 msgid "few moments ago"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1754
+#: ../src/plugins/zeitgeist-plugin.c:1764
 #, c-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1766
+#: ../src/plugins/zeitgeist-plugin.c:1776
 #, c-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1778
+#: ../src/plugins/zeitgeist-plugin.c:1788
 #, c-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1790
+#: ../src/plugins/zeitgeist-plugin.c:1800
 #, c-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"

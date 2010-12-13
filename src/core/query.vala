@@ -197,14 +197,14 @@ namespace Synapse
         try
         {
           re = new Regex ("(%s)".printf (Regex.escape_string (query)), flags);
-          results[re] = Match.Score.ABOVE_AVERAGE;
+          results[re] = Match.Score.AVERAGE;
         }
         catch (RegexError err)
         {
         }
       }
 
-      // split to individual chars
+      // split to individual characters
       string[] individual_chars = Regex.split_simple ("\\s*", query);
       string[] escaped_chars = {};
       foreach (unowned string word in individual_chars)
@@ -212,15 +212,16 @@ namespace Synapse
         escaped_chars += Regex.escape_string (word);
       }
 
+      // make  "aj" match "Activity Journal"
       if (!(MatcherFlags.NO_PARTIAL in match_flags) &&
-          individual_chars.length <= 5)
+          individual_words.length == 1 && individual_chars.length <= 5)
       {
         string pattern = "\\b(%s)".printf (string.joinv (").+\\b(",
                                                          escaped_chars));
         try
         {
           re = new Regex (pattern, flags);
-          results[re] = Match.Score.AVERAGE;
+          results[re] = Match.Score.ABOVE_AVERAGE;
         }
         catch (RegexError err)
         {
