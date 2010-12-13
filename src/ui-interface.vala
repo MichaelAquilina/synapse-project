@@ -253,6 +253,11 @@ namespace Synapse.Gui
         return false;
       var match = focus[T.MATCH];
       var action = focus[T.ACTION];
+      if (match is SearchEngine)
+      {
+        search_for_matches (match as SearchEngine);
+        return false;
+      }
       /* Async execute to avoid freezes when executing a dbus action */
       Timeout.add (30, ()=>{ return _execute (match, action);});
       return true;
@@ -426,10 +431,12 @@ namespace Synapse.Gui
       handle_empty_updated ();
     }
     
-    private void search_for_matches ()
+    private void search_for_matches (SearchEngine? search_engine = null)
     {
       current_cancellable.cancel ();
       current_cancellable = new Cancellable ();
+      
+      if (search_engine == null) search_engine = data_sink;
 
       if (!search_with_empty && search[T.MATCH] == "")
       {
@@ -447,7 +454,7 @@ namespace Synapse.Gui
             return false;
         });
       }
-      data_sink.search (search[T.MATCH], qf, last_result_set, current_cancellable, _search_ready);
+      search_engine.search (search[T.MATCH], qf, last_result_set, current_cancellable, _search_ready);
     }
     
     private void _send_partial_results (ResultSet rs)

@@ -47,7 +47,7 @@ namespace Synapse
       }
     }
 
-    private class LocateItem: Object, Match, SearchMatch
+    private class LocateItem: Object, SearchEngine, Match, SearchMatch
     {
       // for Match interface
       public string title { get; construct set; }

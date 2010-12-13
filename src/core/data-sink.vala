@@ -25,8 +25,16 @@ namespace Synapse
     SEARCH_CANCELLED,
     UNKNOWN_ERROR
   }
+  
+  public interface SearchEngine
+  {
+    public abstract async Gee.List<Match> search (string query,
+                                                  QueryFlags flags,
+                                                  ResultSet? dest_result_set,
+                                                  Cancellable? cancellable = null) throws SearchError;
+  }
 
-  public class DataSink : Object
+  public class DataSink : Object, SearchEngine
   {
     public class PluginRegistry : Object
     {
