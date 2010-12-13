@@ -110,7 +110,7 @@ namespace Synapse
       action = new LocateItem (this);
     }
 
-    public virtual bool handles_unknown ()
+    public override bool handles_unknown ()
     {
       return true;
     }
@@ -190,11 +190,11 @@ namespace Synapse
         | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
 
       var common_flags = q.query_type & our_results;
-      // strip query
-      q.query_string = q.query_string.strip ();
       // ignore short searches
       if (common_flags == 0 || match.match_type != MatchType.UNKNOWN) return null;
 
+      // strip query
+      q.query_string = q.query_string.strip ();
       bool query_empty = q.query_string == "";
       var results = new ResultSet ();
 

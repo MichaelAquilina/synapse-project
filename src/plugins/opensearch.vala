@@ -335,9 +335,9 @@ namespace Synapse
       {
         var matchers = Query.get_matchers_for_query (query.query_string, 0,
           RegexCompileFlags.CASELESS);
-        foreach (var matcher in matchers)
+        foreach (var item in actions)
         {
-          foreach (var item in actions)
+          foreach (var matcher in matchers)
           {
             if (matcher.key.match (item.title))
             {
