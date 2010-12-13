@@ -146,7 +146,8 @@ namespace Synapse
           if (line != null)
           {
             if (filter_re.match (line)) continue;
-            uris.add (line);
+            var file = File.new_for_path (line);
+            uris.add (file.get_uri ());
           }
         } while (line != null);
       }

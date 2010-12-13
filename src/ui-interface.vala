@@ -499,7 +499,7 @@ namespace Synapse.Gui
     {
       try
       {
-        results[T.MATCH] = data_sink.search.end (res);
+        results[T.MATCH] = (obj as SearchEngine).search.end (res);
         /* Do not write code before this line */
 
         if (!partial_result_sent)
