@@ -39,7 +39,9 @@ Description: semantic file launcher
 
 Package: synapse-dbg
 Architecture: any
-Depends: synapse (= ${binary:Version})
+Section: debug
+Priority: extra
+Depends: synapse (= ${binary:Version}),
          ${shlibs:Depends},
          ${misc:Depends}
 Description: semantic file launcher - debug package
