@@ -66,10 +66,10 @@ namespace Synapse
       {
         var q = Query (0, query, flags);
         q.cancellable = cancellable;
-        var results = yield plugin.locate (q);
-        dest_result_set = results;
+        ResultSet? results = yield plugin.locate (q);
+        dest_result_set.add_all (results);
 
-        return results.get_sorted_list ();
+        return dest_result_set.get_sorted_list ();
       }
 
       private unowned LocatePlugin plugin;
@@ -129,9 +129,10 @@ namespace Synapse
       q.check_cancellable ();
 
       q.max_results = 256;
+      string regex = Regex.escape_string (q.query_string);
       // FIXME: split pattern into words and search using --regexp?
       string[] argv = {"locate", "-i", "-l", "%u".printf (q.max_results),
-                       q.query_string};
+                       "-r", regex.replace (" ", ".")};
 
       Gee.Set<string> uris = new Gee.HashSet<string> ();
 
@@ -176,7 +177,9 @@ namespace Synapse
         yield fi.initialize ();
         if (fi.match_obj != null && fi.file_type in q.query_type)
         {
-          result.add (fi.match_obj, 5); // FIXME: relevancy
+          int relevancy = Match.Score.INCREMENT_SMALL; // FIXME: relevancy
+          if (fi.uri.has_prefix ("file:///home/")) relevancy += Match.Score.INCREMENT_MINOR;
+          result.add (fi.match_obj, relevancy);
         }
         q.check_cancellable ();
       }
