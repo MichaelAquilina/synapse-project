@@ -536,17 +536,15 @@ namespace Synapse.Gui
           else
           {
             focus[T.MATCH] = results[T.MATCH].get (focus_index[T.MATCH]);
-            /* Send also actions */
-            search_for_actions ();
           }
         }
         else
         {
           focus[T.MATCH] = null;
           focus_index[T.MATCH] = 0;
-          search_for_actions ();
         }
-
+        /* Send also actions */
+        search_for_actions ();
         update_match_result_list (results[T.MATCH], focus_index[T.MATCH], focus[T.MATCH]);
       }
       catch (SearchError err)
