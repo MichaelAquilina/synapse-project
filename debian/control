@@ -30,8 +30,8 @@ Depends: ${shlibs:Depends},
          libjson-glib-1.0-0 (>= 0.10.0),
          libgee2 (>= 0.5.2),
          libzeitgeist-1.0-0 (>= 0.2.14)
-Recommends: zeitgeist (>= 0.5.0~) | zeitgeist-core (>= 0.5.0~),
-            zeitgeist-fts-extension
+Recommends: zeitgeist (>= 0.6.0~) | zeitgeist-core (>= 0.6.0~),
+            zeitgeist-fts-extension | zeitgeist-extension-fts
 Description: semantic file launcher
  Synapse is a graphical launcher enabling you to start applications and also
  to quickly find and access relevant documents and files (by making use of the
