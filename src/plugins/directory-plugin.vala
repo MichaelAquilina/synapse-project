@@ -137,7 +137,7 @@ namespace Synapse
       // FIXME: if zeitgeist-plugin available
       unowned DataPlugin? zg_plugin;
       zg_plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin");
-      return_if_fail (zg_plugin != null);
+      if (zg_plugin == null) return;
 
       zg_plugin.search_done.connect (this.zg_plugin_search_done);
       connected_to_zg = true;
