@@ -84,6 +84,14 @@ namespace Synapse
   {
     public abstract string? extended_info { get; set; }
   }
+  
+  public interface SearchMatch: Match
+  {
+    public abstract async Gee.List<Match> search (string query,
+                                                  QueryFlags flags,
+                                                  ResultSet? dest_result_set,
+                                                  Cancellable? cancellable = null) throws SearchError;
+  }
 
   public class DefaultMatch: Object, Match
   {

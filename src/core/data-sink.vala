@@ -466,7 +466,7 @@ namespace Synapse
       {
         throw new SearchError.SEARCH_CANCELLED ("Cancelled");
       }
-      
+
       if (has_unknown_handlers && query_stripped != "")
       {
         var unknown_match = new DefaultMatch (query);

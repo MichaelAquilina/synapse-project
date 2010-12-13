@@ -47,7 +47,7 @@ namespace Synapse
       }
     }
 
-    private class LocateItem: Object, Match
+    private class LocateItem: Object, Match, SearchMatch
     {
       // for Match interface
       public string title { get; construct set; }
@@ -56,13 +56,30 @@ namespace Synapse
       public bool has_thumbnail { get; construct set; default = false; }
       public string thumbnail_path { get; construct set; }
       public MatchType match_type { get; construct set; }
-      
-      public LocateItem ()
+
+      // for SearchMatch interface
+      public async Gee.List<Match> search (string query,
+                                           QueryFlags flags,
+                                           ResultSet? dest_result_set,
+                                           Cancellable? cancellable = null) throws SearchError
+      {
+        var q = Query (0, query, flags);
+        q.cancellable = cancellable;
+        var results = yield plugin.locate (q);
+        dest_result_set = results;
+
+        return results.get_sorted_list ();
+      }
+
+      private unowned LocatePlugin plugin;
+
+      public LocateItem (LocatePlugin plugin)
       {
         Object (match_type: MatchType.SEARCH,
                 has_thumbnail: false,
                 icon_name: "search",
                 description: _ ("Locate files with this name on the filesystem"));
+        this.plugin = plugin;
       }
     }
 
@@ -88,7 +105,7 @@ namespace Synapse
     {
     }
 
-    public override async ResultSet? search (Query q) throws SearchError
+    public async ResultSet? locate (Query q) throws SearchError
     {
       var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
         | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
@@ -99,11 +116,9 @@ namespace Synapse
       // ignore short searches
       if (common_flags == 0 || q.query_string.length <= 1) return null;
 
-      Timeout.add (90, search.callback);
-      yield;
-
       q.check_cancellable ();
 
+      q.max_results = 256;
       // FIXME: split pattern into words and search using --regexp?
       string[] argv = {"locate", "-i", "-l", "%u".printf (q.max_results),
                        q.query_string};
@@ -130,7 +145,7 @@ namespace Synapse
           line = yield locate_output.read_line_async (Priority.DEFAULT_IDLE, q.cancellable);
           if (line != null)
           {
-            if (!line.has_prefix ("/home") || filter_re.match (line)) continue;
+            if (filter_re.match (line)) continue;
             uris.add (line);
           }
         } while (line != null);
@@ -142,9 +157,39 @@ namespace Synapse
 
       q.check_cancellable ();
 
-      foreach (string s in uris) debug ("%s", s);
+      var result = new ResultSet ();
+
+      foreach (string s in uris)
+      {
+        var fi = new Utils.FileInfo (s, typeof (MatchObject));
+        yield fi.initialize ();
+        if (fi.match_obj != null && fi.file_type in q.query_type)
+        {
+          result.add (fi.match_obj, 5); // FIXME: relevancy
+        }
+        q.check_cancellable ();
+      }
+
+      return result;
+    }
+
+    public override async ResultSet? search (Query q) throws SearchError
+    {
+      var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
+        | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
+
+      var common_flags = q.query_type & our_results;
+      // strip query
+      q.query_string = q.query_string.strip ();
+      // ignore short searches
+      if (common_flags == 0 || q.query_string.length <= 1) return null;
+
+      q.check_cancellable ();
 
       var result = new ResultSet ();
+      var item = new LocateItem (this);
+      item.title = q.query_string;
+      result.add (item, -1);
       return result;
     }
   }

@@ -87,6 +87,8 @@ namespace Synapse
       {
         switch (match.match_type)
         {
+          case MatchType.SEARCH:
+            return true;
           case MatchType.ACTION:
             return true;
           case MatchType.APPLICATION:
