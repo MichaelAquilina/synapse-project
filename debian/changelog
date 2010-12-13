@@ -16,6 +16,8 @@ synapse (0.2.0+bzr-2) UNRELEASED; urgency=low
   * debian/rules:
    - Pass --enable-indicator=auto to configure.
    - Call dh_strip for the dbg package.
+  * debian/synapse.install:
+   - Install all files in synapse binary.
 
  -- Julien Lavergne <gilir@ubuntu.com>  Tue, 30 Nov 2010 21:55:53 +0100
 
