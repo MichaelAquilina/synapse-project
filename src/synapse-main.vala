@@ -142,7 +142,7 @@ namespace Synapse
         typeof (DesktopFilePlugin),
         typeof (ZeitgeistPlugin),
         typeof (HybridSearchPlugin),
-        //typeof (LocatePlugin),
+        typeof (LocatePlugin),
         typeof (GnomeSessionPlugin),
         typeof (GnomeScreenSaverPlugin),
         typeof (UPowerPlugin),
