@@ -1,0 +1,503 @@
+# Korean translation for synapse-project
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# This file is distributed under the same license as the synapse-project package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: synapse-project\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-12-12 14:11+0100\n"
+"PO-Revision-Date: 2010-12-09 15:49+0000\n"
+"Last-Translator: Ernesto2k <boramism@gmail.com>\n"
+"Language-Team: Kim Boram <Boramism@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Launchpad-Export-Date: 2010-12-13 06:08+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: ../data/synapse.desktop.in.h:1
+msgid "Search everything you do."
+msgstr "원하는 모든 것을 검색합니다."
+
+#: ../data/synapse.desktop.in.h:2
+msgid "Synapse"
+msgstr "시냅스"
+
+#: ../src/synapse-main.c:315 ../src/ui-settings.c:942
+msgid "Activate"
+msgstr "활동"
+
+#: ../src/ui-cairo-gtk-base.c:1167
+msgid "Actions"
+msgstr "활성화"
+
+#: ../src/ui-cairo-gtk-base.c:1169
+msgid "Audio"
+msgstr "오디오"
+
+#: ../src/ui-cairo-gtk-base.c:1171
+msgid "Applications"
+msgstr "응용 프로그램"
+
+#: ../src/ui-cairo-gtk-base.c:1173
+msgid "All"
+msgstr "모두"
+
+#: ../src/ui-cairo-gtk-base.c:1175
+msgid "Documents"
+msgstr "문서"
+
+#: ../src/ui-cairo-gtk-base.c:1177
+msgid "Images"
+msgstr "그림"
+
+#: ../src/ui-cairo-gtk-base.c:1179
+msgid "Video"
+msgstr "비디오"
+
+#: ../src/ui-cairo-gtk-base.c:1181
+msgid "Internet"
+msgstr "인터넷"
+
+#: ../src/ui-cairo-gtk-virgilio.c:1021 ../src/ui-cairo-gtk-virgilio.c:1076
+#: ../src/ui-widgets.c:3241
+#, c-format
+msgid "<b>%d of %d</b>"
+msgstr "<b>전체 %2$d 개 중 %1$d 번째</b>"
+
+#: ../src/ui-cairo-gtk-virgilio.c:1131 ../src/ui-widgets.c:3186
+msgid "Home"
+msgstr "홈"
+
+#: ../src/ui-cairo-gtk-virgilio.c:1143 ../src/ui-cairo-gtk-virgilio.c:1201
+#: ../src/ui-widgets.c:3218
+#, c-format
+msgid "<b>1 of %d</b>"
+msgstr "<b>전체 1 개 중 %1$d 번째</b>"
+
+#: ../src/ui-interface.c:996
+msgid "...or press down key to browse recent activities"
+msgstr "...아니면 아래 키를 누르신 후 최근 활동을 훑어보십시오."
+
+#: ../src/ui-interface.c:1408
+msgid "Searching..."
+msgstr "검색 중입니다..."
+
+#: ../src/ui-interface.c:1413
+msgid "No results found."
+msgstr "결과가 없습니다."
+
+#: ../src/ui-interface.c:1418
+msgid "No recent activities found."
+msgstr "최근 활동을 찾을 수 없습니다."
+
+#: ../src/ui-interface.c:1423
+msgid "Type to search..."
+msgstr "검색할 것을 입력하세요..."
+
+#: ../src/ui-settings.c:333
+msgid "Synapse - Settings"
+msgstr "시냅스 - 설정"
+
+#: ../src/ui-settings.c:387
+msgid "Default"
+msgstr "기본값"
+
+#: ../src/ui-settings.c:393
+msgid "Mini"
+msgstr "미니"
+
+#: ../src/ui-settings.c:399
+msgid "Dual"
+msgstr "듀얼"
+
+#: ../src/ui-settings.c:405
+msgid "Virgilio"
+msgstr "비르질리오"
+
+#: ../src/ui-settings.c:826
+msgid "General"
+msgstr "일반"
+
+#: ../src/ui-settings.c:831
+msgid "Plugins"
+msgstr "플러그인"
+
+#: ../src/ui-settings.c:841
+msgid "Behavior & Look"
+msgstr "행동 & 외형"
+
+#: ../src/ui-settings.c:857
+msgid "Theme:"
+msgstr "테마:"
+
+#: ../src/ui-settings.c:865
+msgid "Startup on login"
+msgstr "로그인할 때 시작"
+
+#: ../src/ui-settings.c:872
+msgid "Show notification icon"
+msgstr "알림 영역에 아이콘 보이기"
+
+#: ../src/ui-settings.c:885
+msgid "Shortcuts"
+msgstr "바로가기"
+
+#: ../src/ui-settings.c:920
+msgid "Action"
+msgstr "동작"
+
+#: ../src/ui-settings.c:934
+msgid "Shortcut"
+msgstr "바로가기"
+
+#: ../src/ui-settings.c:949
+msgid "Click the shortcut you wish to change and press the new shortcut."
+msgstr "바꾸고 싶은 바로 가기를 클릭한 후 새 바로 가기를 누르세요."
+
+#: ../src/ui-settings.c:1024 ../src/ui-settings.c:1306
+msgid "Disabled"
+msgstr "사용 안 함"
+
+#: ../src/ui-settings.c:1314
+msgid "Enabled"
+msgstr "사용"
+
+#: ../src/ui-settings.c:1398
+msgid "Status"
+msgstr "상태"
+
+#: ../src/ui-settings.c:1400
+msgid "Enable this plugin"
+msgstr "이 플러그인 사용"
+
+#: ../src/ui-settings.c:1402
+msgid "Disable this plugin"
+msgstr "이 플러그인 사용 안 함"
+
+#: ../src/ui-widgets.c:3135 ../src/ui-widgets.c:3208
+msgid "No results."
+msgstr "걸과가 없습니다."
+
+#: ../src/core/common-actions.c:1019
+msgid "Run"
+msgstr "실행"
+
+#: ../src/core/common-actions.c:1020
+msgid "Run an application, action or script"
+msgstr "응용 프로그램이나 동작, 스크립트를 실행합니다"
+
+#: ../src/core/common-actions.c:1174
+msgid "Run in Terminal"
+msgstr "터미널에서 실행"
+
+#: ../src/core/common-actions.c:1175
+msgid "Run application or command in terminal"
+msgstr "응용 프로그램이나 명령을 터미널에서 실행합니다."
+
+#: ../src/core/common-actions.c:1328
+msgid "Open"
+msgstr "열기"
+
+#: ../src/core/common-actions.c:1329
+msgid "Open using default application"
+msgstr "기본 응용 프로그램을 이용해 엽니다."
+
+#: ../src/core/common-actions.c:1463
+msgid "Open folder"
+msgstr "폴더 열기"
+
+#: ../src/core/common-actions.c:1464
+msgid "Open folder containing this file"
+msgstr "이 파일을 포함하고 있는 폴더를 엽니다"
+
+#: ../src/plugins/banshee-plugin.c:2677
+msgid "Control Banshee and add items to playlists."
+msgstr "밴시를 조작하고 재생 목록에 항목을 추가합니다."
+
+#: ../src/plugins/banshee-plugin.c:2681
+msgid "Banshee is not installed"
+msgstr "밴시를 설치하지 않았습니다"
+
+#: ../src/plugins/banshee-plugin.c:3706 ../src/plugins/rhythmbox-plugin.c:3492
+msgid "Play"
+msgstr "재생"
+
+#: ../src/plugins/banshee-plugin.c:3707
+msgid "Start playback in Banshee"
+msgstr "밴시를 재생합니다"
+
+#: ../src/plugins/banshee-plugin.c:3807 ../src/plugins/rhythmbox-plugin.c:3690
+msgid "Pause"
+msgstr "일시 정지"
+
+#: ../src/plugins/banshee-plugin.c:3808
+msgid "Pause playback in Banshee"
+msgstr "밴시를 일시 정지합니다"
+
+#: ../src/plugins/banshee-plugin.c:3898 ../src/plugins/rhythmbox-plugin.c:3744
+msgid "Next"
+msgstr "다음"
+
+#: ../src/plugins/banshee-plugin.c:3899
+msgid "Plays the next song in Banshee's playlist"
+msgstr "밴시 재생 목록의 다음 노래를 재생합니다."
+
+#: ../src/plugins/banshee-plugin.c:3989 ../src/plugins/rhythmbox-plugin.c:3835
+msgid "Previous"
+msgstr "이전"
+
+#: ../src/plugins/banshee-plugin.c:3990
+msgid "Plays the previous song in Banshee's playlist"
+msgstr "밴시 재생 목록의 이전 노래를 재생합니다."
+
+#: ../src/plugins/banshee-plugin.c:4080
+msgid "Enqueue in Banshee"
+msgstr "밴시 재생 목록에 추가"
+
+#: ../src/plugins/banshee-plugin.c:4081
+msgid "Add the song to Banshee playlist"
+msgstr "밴시 재생 목록에 노래를 추가합니다"
+
+#: ../src/plugins/banshee-plugin.c:4234
+msgid "Play in Banshee"
+msgstr "밴시로 재생"
+
+#: ../src/plugins/banshee-plugin.c:4235 ../src/plugins/rhythmbox-plugin.c:4130
+msgid "Clears the current playlist and plays the song"
+msgstr "현재 재생 목록을 비우고 노래를 재생합니다"
+
+#: ../src/plugins/command-plugin.c:201
+msgid "Find and execute arbitrary commands."
+msgstr "임의의 명령을 찾거나 실행합니다."
+
+#: ../src/plugins/command-plugin.c:699
+msgid "Run command"
+msgstr "명령 실행"
+
+#: ../src/plugins/desktop-file-plugin.c:294
+msgid "Search for and run applications on your computer."
+msgstr "컴퓨터에서 응용 프로그램을 검색하고 실행합니다."
+
+#: ../src/plugins/desktop-file-plugin.c:1615
+#, c-format
+msgid "Open with %s"
+msgstr "%s(으)로 열기"
+
+#: ../src/plugins/desktop-file-plugin.c:1623
+#, c-format
+msgid "Opens current selection using %s"
+msgstr "현재 선택한 것을 %s(으)로 엽니다"
+
+#: ../src/plugins/devhelp-search.c:150
+msgid "Search documentation using Devhelp."
+msgstr "Devhelp를 이용해 문서를 검색합니다."
+
+#: ../src/plugins/devhelp-search.c:153
+msgid "Devhelp is not installed"
+msgstr "Devhelp를 설치하지 않았습니다"
+
+#: ../src/plugins/devhelp-search.c:379
+msgid "Search in Devhelp"
+msgstr "Devhelp로 검색"
+
+#: ../src/plugins/devhelp-search.c:380
+msgid "Search documentation for this symbol"
+msgstr "이 상징에 대한 문서를 검색합니다"
+
+#: ../src/plugins/dictionary.c:148
+msgid "Look up definitions of words."
+msgstr "단어의 정의를 찾아봅니다"
+
+#: ../src/plugins/dictionary.c:151
+msgid "Gnome Dictionary is not installed"
+msgstr "그놈 사전을 설치하지 않았습니다"
+
+#: ../src/plugins/dictionary.c:342
+msgid "Define"
+msgstr "정의"
+
+#: ../src/plugins/dictionary.c:343
+msgid "Look up definition in dictionary"
+msgstr "사전에서 정의를 찾아봅니다"
+
+#: ../src/plugins/directory-plugin.c:416
+msgid "Open commonly used directories."
+msgstr "일반적으로 사용하는 디렉터리를 엽니다."
+
+#: ../src/plugins/gnome-session-plugin.c:1560
+msgid "Log out from your session, restart or shutdown your computer."
+msgstr "현재 세션에서 로그아웃한 후 컴퓨터를 다시 시작하거나 끝냅니다."
+
+#: ../src/plugins/gnome-session-plugin.c:1564
+msgid "Gnome Session Manager wasn't found"
+msgstr "그놈 세션 관리자를 찾을 수 없습니다."
+
+#: ../src/plugins/gnome-session-plugin.c:1814
+msgid "Shut Down"
+msgstr "전원 끄기"
+
+#: ../src/plugins/gnome-session-plugin.c:1815
+msgid "Turn your computer off"
+msgstr "컴퓨터의 전원을 끕니다"
+
+#: ../src/plugins/gnome-session-plugin.c:2133
+msgid "Restart"
+msgstr "다시 시작"
+
+#: ../src/plugins/gnome-session-plugin.c:2134
+msgid "Restart your computer"
+msgstr "컴퓨터를 다시 시작합니다"
+
+#: ../src/plugins/gnome-session-plugin.c:2452
+msgid "Log Out"
+msgstr "로그아웃"
+
+#: ../src/plugins/gnome-session-plugin.c:2453
+msgid "Close your session and return to the login screen"
+msgstr "세션을 끝내고 로그인 화면으로 돌아갑니다."
+
+#: ../src/plugins/gnome-screensaver-plugin.c:684
+msgid "Lock screen of your computer."
+msgstr "컴퓨터 화면을 잠급니다."
+
+#: ../src/plugins/gnome-screensaver-plugin.c:688
+msgid "Gnome Screen Saver wasn't found"
+msgstr "그놈 화면 보호기를 찾을 수 없습니다."
+
+#: ../src/plugins/gnome-screensaver-plugin.c:926
+msgid "Lock Screen"
+msgstr "화면 잠금"
+
+#: ../src/plugins/gnome-screensaver-plugin.c:927
+msgid "Locks screen and starts screensaver."
+msgstr "화면을 잠그고 화면 보호기를 시작합니다."
+
+#: ../src/plugins/hybrid-search-plugin.c:668
+msgid ""
+"Improve results returned by the Zeitgeist plugin by looking for similar "
+"files on the filesystem."
+msgstr "시스템에서 비슷한 파일을 찾아봄으로서 Zeitgeist 플러그인의 결과를 개선합니다."
+
+#: ../src/plugins/locate-plugin.c:376
+msgid "Runs locate command to find files on the filesystem."
+msgstr "시스템 상의 파일을 찾기 위해 로케이트 명령을 실행합니다."
+
+#: ../src/plugins/opensearch.vala:228 ../src/plugins/opensearch.c:361
+msgid "Search the web."
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:240
+msgid "Google"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:241
+msgid "Search the web using Google.com"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:242
+msgid "Google Maps"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:243
+msgid "Search using Google Maps"
+msgstr ""
+
+#: ../src/plugins/rhythmbox-plugin.c:2463
+msgid "Control Rhythmbox and add items to playlists."
+msgstr "리듬박스를 조작하고 재생 목록에 항목을 추가합니다."
+
+#: ../src/plugins/rhythmbox-plugin.c:2467
+msgid "Rhythmbox is not installed"
+msgstr "리듬박스를 설치하지 않았습니다"
+
+#: ../src/plugins/rhythmbox-plugin.c:3493
+msgid "Start playback in Rhythmbox"
+msgstr "리듬박스를 재생합니다"
+
+#: ../src/plugins/rhythmbox-plugin.c:3691
+msgid "Pause playback in Rhythmbox"
+msgstr "리듬박스를 일시 정지합니다"
+
+#: ../src/plugins/rhythmbox-plugin.c:3745
+msgid "Plays the next song in Rhythmbox's playlist"
+msgstr "리듬박스 재생 목록의 다음 노래를 재생합니다."
+
+#: ../src/plugins/rhythmbox-plugin.c:3836
+msgid "Plays the previous song in Rhythmbox's playlist"
+msgstr "리듬박스 재생 목록의 이전 노래를 재생합니다."
+
+#: ../src/plugins/rhythmbox-plugin.c:3939
+msgid "Enqueue in Rhythmbox"
+msgstr "리듬박스 재생 목록에 추가"
+
+#: ../src/plugins/rhythmbox-plugin.c:3940
+msgid "Add the song to Rhythmbox playlist"
+msgstr "노래를 리듬박스 재생 목록에 추가합니다"
+
+#: ../src/plugins/rhythmbox-plugin.c:4129
+msgid "Play in Rhythmbox"
+msgstr "리듬박스로 재생"
+
+#: ../src/plugins/upower-plugin.c:1691
+msgid "Suspend or hibernate your computer."
+msgstr "시스템을 절전 모드나 최대 절전 모드로 만듭니다."
+
+#: ../src/plugins/upower-plugin.c:1695
+msgid "UPower wasn't found"
+msgstr "UPower를 설치하지 않았습니다"
+
+#: ../src/plugins/upower-plugin.c:2208
+msgid "Suspend"
+msgstr "절전"
+
+#: ../src/plugins/upower-plugin.c:2209
+msgid "Put your computer into suspend mode"
+msgstr "컴퓨터를 절전 모드로 만듭니다"
+
+#: ../src/plugins/upower-plugin.c:2435
+msgid "Hibernate"
+msgstr "최대 절전"
+
+#: ../src/plugins/upower-plugin.c:2436
+msgid "Put your computer into hibernation mode"
+msgstr "컴퓨터를 최대 절전 모드로 만듭니다"
+
+#: ../src/plugins/zeitgeist-plugin.c:384
+msgid "Search various items logged by Zeitgeist."
+msgstr "Zeitgeist가 기록한 다양한 항목을 검색합니다."
+
+#: ../src/plugins/zeitgeist-plugin.c:388
+msgid "Zeitgeist is not installed"
+msgstr "Zeitgeist를 설치하지 않았습니다."
+
+#: ../src/plugins/zeitgeist-plugin.c:1755
+msgid "few moments ago"
+msgstr "조금 전"
+
+#: ../src/plugins/zeitgeist-plugin.c:1764
+#, c-format
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] "%d 분 전"
+
+#: ../src/plugins/zeitgeist-plugin.c:1776
+#, c-format
+msgid "%d hour ago"
+msgid_plural "%d hours ago"
+msgstr[0] "%d 시간 전"
+
+#: ../src/plugins/zeitgeist-plugin.c:1788
+#, c-format
+msgid "%d day ago"
+msgid_plural "%d days ago"
+msgstr[0] "%d 일 전"
+
+#: ../src/plugins/zeitgeist-plugin.c:1800
+#, c-format
+msgid "%d week ago"
+msgid_plural "%d weeks ago"
+msgstr[0] "%d 주 전"
