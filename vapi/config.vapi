@@ -4,4 +4,5 @@ namespace Config
   public const string GETTEXT_PACKAGE;
   public const string RELEASE_NAME;
   public const string VERSION;
+  public const string DATADIR;
 }

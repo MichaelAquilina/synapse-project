@@ -371,13 +371,14 @@ namespace Synapse.Gui
     
     private void plugin_registered_handler (DataPlugin plugin)
     {
-      if (plugin.get_type () == typeof (ZeitgeistPlugin))
+      // FIXME: expose this as prop of data-sink
+      if (plugin.get_type ().name () == "SynapseZeitgeistPlugin")
       {
         plugin.notify["enabled"].connect (update_handle_empty);
         update_handle_empty ();
       }
     }
-    
+
     private bool util_select_first_last (bool first, T t)
     {
       if (results[t] == null || results[t].size == 0)

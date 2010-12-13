@@ -140,7 +140,9 @@ namespace Synapse
       Type[] plugin_types =
       {
         typeof (DesktopFilePlugin),
+#if HAVE_ZEITGEIST
         typeof (ZeitgeistPlugin),
+#endif
         typeof (HybridSearchPlugin),
         typeof (LocatePlugin),
         typeof (GnomeSessionPlugin),
@@ -258,6 +260,7 @@ namespace Synapse
     
     public static int main (string[] argv)
     {
+      Intl.bindtextdomain ("synapse", Config.DATADIR + "/locale");
       var context = new OptionContext (" - Synapse");
       context.add_main_entries (options, null);
       context.add_group (Gtk.get_option_group (false));

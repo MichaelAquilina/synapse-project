@@ -26,6 +26,7 @@ Makefile.in
 *.o
 *.lo
 *.la
+*.gmo
 .deps
 .libs
 src/*.c

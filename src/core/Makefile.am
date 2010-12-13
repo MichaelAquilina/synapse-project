@@ -25,20 +25,20 @@ libsynapsecore_la_VALASOURCES = \
 	plugin.vala \
 	query.vala \
 	relevancy-service.vala \
-	relevancy-backend-zg.vala \
 	result-set.vala \
 	utils.vala \
 	$(NULL)
-libsynapsecore_la_SOURCES = \
-	synapse-core.vala.stamp \
-	$(libsynapsecore_la_VALASOURCES:.vala=.c) \
-	$(NULL)
 
 if HAVE_ZEITGEIST
+libsynapsecore_la_VALASOURCES += relevancy-backend-zg.vala
 libsynapsecore_la_VALAFLAGS += --pkg zeitgeist-1.0 -D HAVE_ZEITGEIST
 libsynapsecore_la_CFLAGS += $(ZEITGEIST_CFLAGS)
 libsynapsecore_la_LIBADD += $(ZEITGEIST_LIBS)
 endif
+
+libsynapsecore_la_SOURCES = \
+	$(libsynapsecore_la_VALASOURCES:.vala=.c) \
+	$(NULL)
 
 synapse-core.vapi synapse-core.vala.stamp: $(libsynapsecore_la_VALASOURCES)
 	$(AM_V_GEN)$(VALAC) $(libsynapsecore_la_VALAFLAGS) -C -H synapse-core.h --library synapse-core $^
@@ -49,6 +49,12 @@ BUILT_SOURCES = synapse-core.vala.stamp
 EXTRA_DIST = \
 	$(libsynapsecore_la_VALASOURCES) \
 	synapse-core.vapi \
-	synapse-core.vala.stamp \
 	synapse-core.h
+
+DISTCLEANFILES = \
+	$(libsynapsecore_la_VALASOURCES:.vala=.c) \
+	synapse-core.vala.stamp \
+	synapse-core.vapi \
+	synapse-core.h \
+	$(NULL)
 
