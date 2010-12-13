@@ -53,35 +53,24 @@ synapse_CFLAGS += $(ZEITGEIST_CFLAGS)
 synapse_LDADD += $(ZEITGEIST_LIBS)
 endif
 
-synapse_VALASOURCES = \
-	synapse-main.vala \
-	ui-cairo-gtk-base.vala \
-	ui-cairo-gtk.vala \
-	ui-cairo-gtk-mini.vala \
-	ui-cairo-gtk-two-lines.vala \
-	ui-cairo-gtk-virgilio.vala \
-	ui-interface.vala \
-	ui-widgets.vala \
-	ui-utils.vala \
-	ui-settings.vala \
-	ui-inspector.vala \
-	$(NULL)
-
 synapse_SOURCES = \
-	synapse_vala.stamp \
-	$(synapse_VALASOURCES:.vala=.c) \
+	$(srcdir)/synapse-main.vala \
+	$(srcdir)/ui-cairo-gtk-base.vala \
+	$(srcdir)/ui-cairo-gtk.vala \
+	$(srcdir)/ui-cairo-gtk-mini.vala \
+	$(srcdir)/ui-cairo-gtk-two-lines.vala \
+	$(srcdir)/ui-cairo-gtk-virgilio.vala \
+	$(srcdir)/ui-interface.vala \
+	$(srcdir)/ui-widgets.vala \
+	$(srcdir)/ui-utils.vala \
+	$(srcdir)/ui-settings.vala \
+	$(srcdir)/ui-inspector.vala \
 	$(NULL)
 
 # we can't let make handle this, otherwise tarballs won't support configure
 # flags (ie --disable-indicator won't rebuild the Vala sources)
 
-$(synapse_VALASOURCES:.vala=.c): synapse_vala.stamp
-#BUILT_SOURCES = synapse_vala.stamp
+DISTCLEANFILES = $(notdir $(synapse_SOURCES:.vala=.c)) synapse_vala.stamp
 
-synapse_vala.stamp: $(synapse_VALASOURCES)
-	$(AM_V_GEN)$(VALAC) $(synapse_VALAFLAGS) -C $^
-	touch $@
-
-EXTRA_DIST = $(synapse_VALASOURCES)
-
-DISTCLEANFILES = $(synapse_VALASOURCES:.vala=.c) synapse_vala.stamp
+dist-hook:
+	rm -rf $(distdir)/synapse_vala.stamp
