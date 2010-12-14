@@ -260,6 +260,7 @@ namespace Synapse
     
     public static int main (string[] argv)
     {
+      GLib.Environment.set_variable ("IBUS_NO_SNOOPER_APPS", "synapse", true);
       Intl.bindtextdomain ("synapse", Config.DATADIR + "/locale");
       var context = new OptionContext (" - Synapse");
       context.add_main_entries (options, null);
