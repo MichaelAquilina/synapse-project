@@ -315,10 +315,12 @@ namespace Synapse.Gui
     
     public class KeyCombo: GLib.Object
     {
-      private static uint mod_normalize_mask = ~ (Gdk.ModifierType.MOD1_MASK
+      /* Clear all non relevant masks like the ones used in IBUS */
+      private static uint mod_normalize_mask = Gdk.ModifierType.MODIFIER_MASK &
+                                              (~ (Gdk.ModifierType.MOD1_MASK
                                                 | Gdk.ModifierType.MOD2_MASK
                                                 | Gdk.ModifierType.MOD3_MASK
-                                                | Gdk.ModifierType.MOD4_MASK);
+                                                | Gdk.ModifierType.MOD4_MASK));
       public uint key {get; construct set;}
       public Gdk.ModifierType mod {get; construct set;}
       public KeyCombo (uint keyval, Gdk.ModifierType modifier = 0)
@@ -337,6 +339,10 @@ namespace Synapse.Gui
         KeyCombo a = (KeyCombo) va;
         KeyCombo b = (KeyCombo) vb;
         return (a.key == b.key && a.mod == b.mod);
+      }
+      public static void ibus_normalize (out Gdk.ModifierType modifier)
+      {
+        modifier = modifier & mod_normalize_mask;
       }
     }
     
