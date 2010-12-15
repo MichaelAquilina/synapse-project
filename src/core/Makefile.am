@@ -1,3 +1,6 @@
+# vim: set ft=automake ts=8 sts=8 sw=8 :
+include $(top_srcdir)/Makefile.common
+
 noinst_LTLIBRARIES = libsynapsecore.la
 
 VAPIDIR = $(top_srcdir)/vapi
@@ -41,7 +44,7 @@ libsynapsecore_la_SOURCES = \
 	$(NULL)
 
 synapse-core.vapi synapse-core.vala.stamp: $(libsynapsecore_la_VALASOURCES)
-	$(AM_V_GEN)$(VALAC) $(libsynapsecore_la_VALAFLAGS) -C -H synapse-core.h --library synapse-core $^
+	$(AM_V_VALA)$(VALAC) $(libsynapsecore_la_VALAFLAGS) -C -H synapse-core.h --library synapse-core $^
 	touch $@
 
 BUILT_SOURCES = synapse-core.vala.stamp

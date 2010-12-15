@@ -1,10 +1,10 @@
 data/synapse.desktop.in
-src/synapse-main.c
-src/ui-cairo-gtk-base.c
-src/ui-cairo-gtk-virgilio.c
-src/ui-interface.c
-src/ui-settings.c
-src/ui-widgets.c
+src/synapse-main.vala
+src/ui-cairo-gtk-base.vala
+src/ui-cairo-gtk-virgilio.vala
+src/ui-interface.vala
+src/ui-settings.vala
+src/ui-widgets.vala
 src/core/common-actions.c
 src/plugins/banshee-plugin.c
 src/plugins/command-plugin.c

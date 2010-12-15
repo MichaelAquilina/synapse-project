@@ -1,3 +1,6 @@
+# vim: set ft=automake ts=8 sts=8 sw=8 :
+include $(top_srcdir)/Makefile.common
+
 noinst_LTLIBRARIES = libtileview.la
 
 VAPIDIR = $(top_srcdir)/vapi
@@ -23,7 +26,7 @@ libtileview_la_SOURCES = \
 	$(NULL)
 
 tile-view.vapi tile-view.vala.stamp: $(libtileview_la_VALASOURCES)
-	$(AM_V_GEN)$(VALAC) $(libtileview_la_VALAFLAGS) -C -H tile-view.h --library tile-view $^
+	$(AM_V_VALA)$(VALAC) $(libtileview_la_VALAFLAGS) -C -H tile-view.h --library tile-view $^
 	touch $@
 
 BUILT_SOURCES = tile-view.vala.stamp

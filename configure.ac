@@ -1,11 +1,11 @@
-AC_INIT([synapse], [0.2.2.1])
+AC_INIT([synapse], [0.2.2.2])
 AC_DEFINE(RELEASE_NAME, "Adenosine triphosphate", "Codename of this release")
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS([config.h])
 
-AM_INIT_AUTOMAKE([1.11])
+AM_INIT_AUTOMAKE([1.11 -Wno-portability])
 
 dnl -- Populate top_srcdir variable
 top_srcdir=$(readlink -f $0 | sed -e s/configure$//)
