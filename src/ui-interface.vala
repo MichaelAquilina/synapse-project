@@ -317,7 +317,8 @@ namespace Synapse.Gui
     {
       /* Clear all non relevant masks like the ones used in IBUS */
       private static uint mod_normalize_mask = Gdk.ModifierType.MODIFIER_MASK &
-                                              (~ (Gdk.ModifierType.MOD1_MASK
+                                              (~ (Gdk.ModifierType.LOCK_MASK
+                                                | Gdk.ModifierType.MOD1_MASK
                                                 | Gdk.ModifierType.MOD2_MASK
                                                 | Gdk.ModifierType.MOD3_MASK
                                                 | Gdk.ModifierType.MOD4_MASK));
