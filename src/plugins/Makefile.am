@@ -13,6 +13,7 @@ libplugins_la_VALAFLAGS = \
 	--pkg dbus-glib-1 \
 	--pkg gio-unix-2.0 \
 	--pkg zeitgeist-1.0 \
+        --pkg posix \
 	--vapidir $(top_srcdir)/src/core \
 	--pkg synapse-core \
 	--vapidir $(VAPIDIR) \
@@ -28,6 +29,7 @@ libplugins_la_CFLAGS = \
 libplugins_la_LIBADD = $(SYNAPSE_MODULES_LIBS) ../core/libsynapsecore.la
 libplugins_la_VALASOURCES = \
 	banshee-plugin.vala \
+        calculator-plugin.vala \
 	command-plugin.vala \
 	desktop-file-plugin.vala \
 	devhelp-search.vala \

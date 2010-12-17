@@ -7,6 +7,7 @@ src/ui-settings.vala
 src/ui-widgets.vala
 src/core/common-actions.c
 src/plugins/banshee-plugin.c
+src/plugins/calculator-plugin.c
 src/plugins/command-plugin.c
 src/plugins/desktop-file-plugin.c
 src/plugins/devhelp-search.c
