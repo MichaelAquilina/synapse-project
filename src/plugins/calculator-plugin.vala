@@ -19,8 +19,6 @@
  *
  */
 
-using Posix;
-
 namespace Synapse
 {
   public class CalculatorPlugin: DataPlugin
@@ -76,35 +74,23 @@ namespace Synapse
         regex = new Regex("^\\(*(-?\\d+(\\.\\d+)?)((\\+|-|\\*|/)\\(*(-?\\d+(\\.\\d+)?)\\)*)+$", RegexCompileFlags.OPTIMIZE);
         if (regex.match(matchString)) {
 
-            int pc[2];
-            int cp[2];
-            if (pipe(pc) < 0) return null;
-            if (pipe(cp) < 0) return null;
+            Pid pid;
+            int read_fd, write_fd;
+            string[] argv = {"bc", "-l"};
+            Process.spawn_async_with_pipes (null, argv, null,
+                                            SpawnFlags.SEARCH_PATH,
+                                            null, out pid, out write_fd, out read_fd);
+            UnixInputStream read_stream = new UnixInputStream (read_fd, true);
+            DataInputStream bc_output = new DataInputStream (read_stream);
+            UnixOutputStream write_stream = new UnixOutputStream (write_fd, true);
+            DataOutputStream bc_input = new DataOutputStream (write_stream);    
+            string? s = null;
 
-            int pid = fork();
-            if (pid == -1) return null;
-            else if (pid == 0) {
+            bc_input.write(query.query_string + "\n", query.query_string.size() + 1);
+            bc_input.close();
 
-                close(1);
-                dup(cp[1]);
-                close(0);
-                dup(pc[0]);
-                close(pc[1]);
-	            close(cp[0]);
-                execlp("bc", "bc", "-l");
-                return null;
-            }
-            
-            write(pc[1], query.query_string + "\n", query.query_string.size() + 1);
-            close(pc[1]);
-            close(cp[1]);
-            string s = "";
-            char c = 0;
-            while(read(cp[0], &c, 1) == 1) {
+            s = yield bc_output.read_line_async(Priority.DEFAULT_IDLE);
 
-                if (c == '\n') break; 
-                s = s + c.to_string();
-            }
             if (s.size() == 0) return null;
             double d = s.to_double();
             Result result = new Result(d);
