@@ -32,13 +32,15 @@ namespace Synapse
             public bool has_thumbnail { get; construct set; }
             public string thumbnail_path { get; construct set; }
             public MatchType match_type { get; construct set; }
+            public string match_string { get; set; }
 
             public int default_relevancy { get; set; default = 0; }
 
-            public Result (double result)
+            public Result (double result, string match_string)
             {
                 Object (match_type: MatchType.UNKNOWN,               
                         title: "%g".printf (result),
+                        match_string: match_string,
                         description: _ ("Calulate basic expressions"),
                         has_thumbnail: true, icon_name: "accessories-calculator");
             }
@@ -72,8 +74,8 @@ namespace Synapse
 
         public override async ResultSet? search (Query query) throws SearchError
         { 
-            string matchString = query.query_string.replace (" ", "");
-            if (regex.match (matchString)) 
+            string match_string = query.query_string.replace (" ", "");
+            if (regex.match (match_string)) 
             {
                 Pid pid;
                 int read_fd, write_fd;
@@ -89,7 +91,7 @@ namespace Synapse
                     UnixOutputStream write_stream = new UnixOutputStream (write_fd, true);
                     DataOutputStream bc_input = new DataOutputStream (write_stream);    
                     
-                    yield bc_input.write_async (matchString + "\n", matchString.size() + 1, 
+                    yield bc_input.write_async (match_string + "\n", match_string.size() + 1, 
                                                 Priority.DEFAULT, query.cancellable);
                     yield bc_input.close_async (Priority.DEFAULT, query.cancellable);
                     solution = yield bc_output.read_line_async (Priority.DEFAULT_IDLE, query.cancellable);
@@ -97,7 +99,7 @@ namespace Synapse
                     if (solution != null) 
                     {
                         double d = solution.to_double ();
-                        Result result = new Result (d);
+                        Result result = new Result (d, match_string);
                         ResultSet results = new ResultSet ();
                         results.add (result, Match.Score.AVERAGE);
                         query.check_cancellable ();
