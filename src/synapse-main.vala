@@ -257,9 +257,25 @@ namespace Synapse
       Gtk.rc_add_default_file (custom_gtkrc);
       Gtk.rc_reparse_all ();
     }
-    
+    private static void ibus_fix ()
+    {
+      /* try to fix IBUS input method adding synapse to no-snooper-apps */
+      string ibus_no_snooper = GLib.Environment.get_variable ("IBUS_NO_SNOOPER_APPS");
+      if (ibus_no_snooper == null || ibus_no_snooper == "")
+      {
+        GLib.Environment.set_variable ("IBUS_NO_SNOOPER_APPS", "synapse", true);
+        return;
+      }
+      if ("synapse" in ibus_no_snooper) return;
+      /* add synapse */
+      if (!ibus_no_snooper.has_suffix (","))
+        ibus_no_snooper = ibus_no_snooper + ",";
+      ibus_no_snooper = ibus_no_snooper + "synapse";
+      GLib.Environment.set_variable ("IBUS_NO_SNOOPER_APPS", ibus_no_snooper, true);
+    }
     public static int main (string[] argv)
     {
+      ibus_fix ();
       Intl.bindtextdomain ("synapse", Config.DATADIR + "/locale");
       var context = new OptionContext (" - Synapse");
       context.add_main_entries (options, null);

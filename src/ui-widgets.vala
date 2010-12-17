@@ -99,13 +99,12 @@ namespace Synapse.Gui
       Gtk.Style s = Gtk.rc_get_style (label);
       label.style = s;
       rtl = label.get_default_direction ();
-      layout.context_changed ();
       layout.set_ellipsize (Pango.EllipsizeMode.END);
-      /* set_auto_dir (false) to handle mixed rtl/ltr text */
-      layout.set_auto_dir (false);
+      Utils.update_layout_rtl (layout, rtl);
       calc_requisition ();
       this.request_redraw ();
     }
+
     public void set_width_request (int w)
     {
       this.precalc_req.width = w;
@@ -1652,8 +1651,7 @@ namespace Synapse.Gui
       base.size_allocate (alloc);
       
       var layout = this.get_layout ();
-      /* set_auto_dir (false) to handle mixed rtl/ltr text */
-      layout.set_auto_dir (false);
+      Utils.update_layout_rtl (layout, get_default_direction ());
       if (this.get_ellipsize () != Pango.EllipsizeMode.NONE)
       {
         int width = (int) ((alloc.width - this.xpad * 2) * Pango.SCALE);

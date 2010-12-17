@@ -1,3 +1,6 @@
+# vim: set ft=automake ts=8 sts=8 sw=8 :
+include $(top_srcdir)/Makefile.common
+
 # these shouldn't actually be noinst... we'll fix that later
 noinst_LTLIBRARIES = libplugins.la
 
@@ -52,7 +55,7 @@ libplugins_la_SOURCES = \
 	$(NULL)
 
 plugins.vapi plugins.vala.stamp: $(libplugins_la_VALASOURCES)
-	$(AM_V_GEN)$(VALAC) $(libplugins_la_VALAFLAGS) -C -H plugins.h --library plugins $^
+	$(AM_V_VALA)$(VALAC) $(libplugins_la_VALAFLAGS) -C -H plugins.h --library plugins $^
 	touch $@
 
 BUILT_SOURCES = plugins.vala.stamp

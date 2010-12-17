@@ -112,6 +112,23 @@ namespace Synapse.Gui
       	return path;
     }
     
+    public static void update_layout_rtl (Pango.Layout layout, Gtk.TextDirection rtl)
+    {
+      /* set_auto_dir (false) to handle mixed rtl/ltr text */
+      layout.set_auto_dir (false);
+      if (rtl == Gtk.TextDirection.RTL)
+      {
+        layout.set_alignment (Pango.Alignment.RIGHT);
+        layout.get_context ().set_base_dir (Pango.Direction.RTL);
+      }
+      else
+      {
+        layout.set_alignment (Pango.Alignment.LEFT);
+        layout.get_context ().set_base_dir (Pango.Direction.LTR);
+      }
+      layout.context_changed ();
+    }
+    
     public static void make_transparent_bg (Gtk.Widget widget)
     {
       unowned Gdk.Window window = widget.get_window ();

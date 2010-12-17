@@ -1,3 +1,6 @@
+# vim: set ft=automake ts=8 sts=8 sw=8 :
+include $(top_srcdir)/Makefile.common
+
 SUBDIRS = core plugins tile-view
 
 bin_PROGRAMS = synapse
@@ -67,21 +70,21 @@ synapse_VALASOURCES = \
 	ui-inspector.vala \
 	$(NULL)
 
-synapse_SOURCES = \
-	synapse_vala.stamp \
-	$(synapse_VALASOURCES:.vala=.c) \
-	$(NULL)
+GENERATED_C_FILES = $(synapse_VALASOURCES:.vala=.c)
+synapse_SOURCES = $(synapse_VALASOURCES:.vala=.c)
 
 # we can't let make handle this, otherwise tarballs won't support configure
 # flags (ie --disable-indicator won't rebuild the Vala sources)
 
-$(synapse_VALASOURCES:.vala=.c): synapse_vala.stamp
-#BUILT_SOURCES = synapse_vala.stamp
+$(GENERATED_C_FILES): synapse_vala.stamp
 
-synapse_vala.stamp: $(synapse_VALASOURCES)
-	$(AM_V_GEN)$(VALAC) $(synapse_VALAFLAGS) -C $^
-	touch $@
+synapse_vala.stamp: $(addprefix $(srcdir)/,$(synapse_VALASOURCES))
+	$(AM_V_VALA)$(VALAC) $(synapse_VALAFLAGS) $(VALAFLAGS) -C $^
+	$(AM_V_at)touch $@
 
+DISTCLEANFILES = $(GENERATED_C_FILES) synapse_vala.stamp
 EXTRA_DIST = $(synapse_VALASOURCES)
 
-DISTCLEANFILES = $(synapse_VALASOURCES:.vala=.c) synapse_vala.stamp
+# need to make sure the vala sources are rebuilt
+dist-hook:
+	rm -rf $(addprefix $(distdir)/,$(GENERATED_C_FILES))
