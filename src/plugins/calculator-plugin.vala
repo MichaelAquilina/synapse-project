@@ -48,7 +48,7 @@ namespace Synapse
         {
             DataSink.PluginRegistry.get_default ().register_plugin (
                 typeof (CalculatorPlugin),
-                "Calculator",
+                _ ("Calculator"),
                 _ ("Calulate basic expressions."),
                 "accessories-calculator",
                 register_plugin,
@@ -62,24 +62,25 @@ namespace Synapse
             register_plugin ();
         }
 
+        private Regex regex;
+
         construct
         {
+            regex = new Regex ("^\\(*(-?\\d+(\\.\\d+)?)((\\+|-|\\*|/)\\(*(-?\\d+(\\.\\d+)?)\\)*)+$",
+                               RegexCompileFlags.OPTIMIZE);
         }
-
-        private Regex regex;
 
         public override async ResultSet? search (Query query) throws SearchError
         { 
             string matchString = query.query_string.replace (" ", "");
-            regex = new Regex ("^\\(*(-?\\d+(\\.\\d+)?)((\\+|-|\\*|/)\\(*(-?\\d+(\\.\\d+)?)\\)*)+$",
-                               RegexCompileFlags.OPTIMIZE);
-            if (regex.match (matchString)) {
-
+            if (regex.match (matchString)) 
+            {
                 Pid pid;
                 int read_fd, write_fd;
                 string[] argv = {"bc", "-l"};
                 string? solution = null;
-                try {
+                try 
+                {
                     Process.spawn_async_with_pipes (null, argv, null,
                                                     SpawnFlags.SEARCH_PATH,
                                                     null, out pid, out write_fd, out read_fd);
@@ -92,19 +93,20 @@ namespace Synapse
                                                 Priority.DEFAULT, query.cancellable);
                     yield bc_input.close_async (Priority.DEFAULT, query.cancellable);
                     solution = yield bc_output.read_line_async (Priority.DEFAULT_IDLE, query.cancellable);
+
+                    if (solution != null) 
+                    {
+                        double d = solution.to_double ();
+                        Result result = new Result (d);
+                        ResultSet results = new ResultSet ();
+                        results.add (result, Match.Score.AVERAGE);
+                        query.check_cancellable ();
+                        return results;
+                    }
                 } 
-                catch (Error err) {
-
+                catch (Error err) 
+                {
                     if (!query.is_cancelled ()) warning ("%s", err.message);
-                }
-                if (solution != null) {
-
-                    double d = solution.to_double ();
-                    Result result = new Result (d);
-                    ResultSet results = new ResultSet ();
-                    results.add (result, Match.Score.AVERAGE);
-                    query.check_cancellable ();
-                    return results;
                 }
             }
             query.check_cancellable ();
