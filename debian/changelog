@@ -21,6 +21,8 @@ synapse (0.2.0+bzr-2) UNRELEASED; urgency=low
    - Install all files in synapse binary.
   * debian/synapse.1
    - Add manpages.
+  * debian/synapse.manpages:
+   - Install the manpage.
 
  -- Julien Lavergne <gilir@ubuntu.com>  Tue, 30 Nov 2010 21:55:53 +0100
 
