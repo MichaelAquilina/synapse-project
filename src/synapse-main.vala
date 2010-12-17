@@ -158,7 +158,7 @@ namespace Synapse
         typeof (DictionaryPlugin),
         typeof (DevhelpPlugin),
         typeof (OpenSearchPlugin),
-	typeof (CalculatorPlugin)
+        typeof (CalculatorPlugin)
       };
       foreach (Type t in plugin_types)
       {

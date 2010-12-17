@@ -77,22 +77,27 @@ namespace Synapse
             Pid pid;
             int read_fd, write_fd;
             string[] argv = {"bc", "-l"};
-            Process.spawn_async_with_pipes (null, argv, null,
-                                            SpawnFlags.SEARCH_PATH,
-                                            null, out pid, out write_fd, out read_fd);
-            UnixInputStream read_stream = new UnixInputStream (read_fd, true);
-            DataInputStream bc_output = new DataInputStream (read_stream);
-            UnixOutputStream write_stream = new UnixOutputStream (write_fd, true);
-            DataOutputStream bc_input = new DataOutputStream (write_stream);    
-            string? s = null;
+            string? solution = null;
+            try {
+                Process.spawn_async_with_pipes (null, argv, null,
+                                                SpawnFlags.SEARCH_PATH,
+                                                null, out pid, out write_fd, out read_fd);
+                UnixInputStream read_stream = new UnixInputStream (read_fd, true);
+                DataInputStream bc_output = new DataInputStream (read_stream);
+                UnixOutputStream write_stream = new UnixOutputStream (write_fd, true);
+                DataOutputStream bc_input = new DataOutputStream (write_stream);    
+                
 
-            bc_input.write(query.query_string + "\n", query.query_string.size() + 1);
-            bc_input.close();
-
-            s = yield bc_output.read_line_async(Priority.DEFAULT_IDLE);
-
-            if (s.size() == 0) return null;
-            double d = s.to_double();
+                yield bc_input.write_async(query.query_string + "\n", query.query_string.size() + 1, Priority.DEFAULT);
+                yield bc_input.close_async (Priority.DEFAULT);
+                solution = yield bc_output.read_line_async(Priority.DEFAULT_IDLE);
+            } 
+            catch (Error e) {
+ 
+                return null;
+            }
+            if (solution == null) return null;
+            double d = solution.to_double();
             Result result = new Result(d);
             ResultSet results = new ResultSet();
             results.add(result, Match.Score.AVERAGE);
