@@ -6,7 +6,8 @@ Source: https://code.launchpad.net/synapse-project
 Files: *
 Copyright:
  2010, Michal Hruby <michal.mhr@gmail.com>,
- 2006-2007-2008-2009 Andrea Cimitan
+ 2006-2007-2008-2009 Andrea Cimitan,
+ 2010 Alberto Aldegheri <albyrock87+dev@gmail.com>
 License: GPL-3+
 
 Files: src/core/*
@@ -14,16 +15,12 @@ Copyright:
  2010, Michal Hruby <michal.mhr@gmail.com>,
 License: LGPL-2.1+
 
-Files: src/plugins
-       src/ui-cmd-line.vala
-       src/ui-basic-gtk.vala
-       src/tile-view/wrap-label.vala
-       src/tile-view/abstract-tile-object.vala
-       src/tile-view/tile.vala
-       src/tile-view/tile-view.vala
+Files: src/plugins/*
+       src/tile-view/*
 Copyright:
  2010, Michal Hruby <michal.mhr@gmail.com>,
- 2010, Igor S. Mandrigin <i@mandrigin.ru>
+ 2010, Igor S. Mandrigin <i@mandrigin.ru>,
+ 2010 Alberto Aldegheri <albyrock87+dev@gmail.com>
 License: GPL-2+
 
 Files: debian/*
@@ -80,3 +77,4 @@ License: GPL-2+
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
 X-Comment: On Debian systems, the complete text of the GNU General
  Public License can be found in `/usr/share/common-licenses/GPL-2’.
+

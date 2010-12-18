@@ -7,3 +7,9 @@ override_dh_auto_configure:
 	./autogen.sh
 	dh_auto_configure -- --enable-indicator=auto
 
+override_dh_install:
+	dh_install --fail-missing
+
+override_dh_strip:
+	dh_strip --dbg-package=synapse-dbg
+
