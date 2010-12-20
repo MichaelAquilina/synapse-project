@@ -78,6 +78,12 @@ namespace Synapse
       ui = GLib.Object.new (t, "data-sink", data_sink) as UIInterface;
       ui.show_settings_clicked.connect (()=>{
         settings.show ();
+        uint32 timestamp = Gtk.get_current_event_time ();
+        /* Make sure that the settings window is showed */
+        settings.deiconify ();
+        settings.present_with_time (timestamp);
+        settings.get_window ().raise ();
+        settings.get_window ().focus (timestamp);
       });
     }
     

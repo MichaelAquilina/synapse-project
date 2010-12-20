@@ -110,6 +110,8 @@ namespace Synapse.Gui
       match_icon_container_overlayed = new ContainerOverlayed();
       match_icon_thumb = new NamedIcon();
       match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
+      match_icon_thumb.update_timeout = 400;
+      match_icon_thumb.stop_prev_timeout = true;
       match_icon = new NamedIcon ();
       match_icon.set_size_request (ICON_SIZE, ICON_SIZE);
       match_icon.set_pixel_size (ICON_SIZE);
@@ -371,6 +373,8 @@ namespace Synapse.Gui
     private string get_description_markup (string s)
     {
       // FIXME: i18n
+      if (s == "") return "<span size=\"medium\"> </span>";
+
       return Utils.markup_string_with_search (Utils.replace_home_path_with (s, "Home", " > "),
                                              get_match_search (),
                                              "medium");

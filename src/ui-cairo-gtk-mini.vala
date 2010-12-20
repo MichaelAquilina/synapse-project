@@ -101,6 +101,8 @@ namespace Synapse.Gui
       match_icon_container_overlayed = new ContainerOverlayed();
       match_icon_thumb = new NamedIcon();
       match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
+      match_icon_thumb.update_timeout = 400;
+      match_icon_thumb.stop_prev_timeout = true;
       match_icon = new NamedIcon ();
       match_icon.set_pixel_size (ICON_SIZE);
       match_icon_container_overlayed.set_size_request (ICON_SIZE, ICON_SIZE);

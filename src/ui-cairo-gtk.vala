@@ -53,6 +53,7 @@ namespace Synapse.Gui
     private const int SECTION_PADDING = 10;
     private const int BORDER_RADIUS = 10;
     private const int ICON_SIZE = 160;
+    private const int ACTION_ICON_SIZE = 48;
     private const int TOP_SPACING = ICON_SIZE / 2;
     private const int ACTION_ICON_DISPLACEMENT = ICON_SIZE / 8;
     private const int LABEL_INTERNAL_PADDING = 4;
@@ -94,12 +95,14 @@ namespace Synapse.Gui
       
       /* Action Icon */
       action_icon = new NamedIcon ();
-      action_icon.set_pixel_size (ICON_SIZE * 29 / 100);
+      action_icon.set_pixel_size (ACTION_ICON_SIZE);
       action_icon.set_alignment (0.5f, 0.5f);
       /* Match Icon packed into container_top */
       match_icon_container_overlayed = new ContainerOverlayed();
       match_icon_thumb = new NamedIcon();
       match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
+      match_icon_thumb.update_timeout = 400;
+      match_icon_thumb.stop_prev_timeout = true;
       match_icon = new NamedIcon ();
       match_icon.set_alignment (0.0f, 0.5f);
       match_icon.set_pixel_size (ICON_SIZE);
@@ -405,10 +408,17 @@ namespace Synapse.Gui
         if (searching_for_matches)
         {
           main_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), LABEL_TEXT_SIZE, true));
-          main_label_description.set_markup (
-            Utils.markup_string_with_search (Utils.replace_home_path_with (match.description, "Home", " > "),
+          if (match.description != "")
+          {
+            main_label_description.set_markup (
+              Utils.markup_string_with_search (Utils.replace_home_path_with (match.description, "Home", " > "),
                                              get_match_search (),
                                              DESCRIPTION_TEXT_SIZE));
+          }
+          else
+          {
+            main_label_description.set_markup (Markup.printf_escaped ("<span size=\"%s\"> </span>", DESCRIPTION_TEXT_SIZE));
+          }
         }
         else
         {

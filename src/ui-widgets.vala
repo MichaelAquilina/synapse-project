@@ -419,8 +419,8 @@ namespace Synapse.Gui
     private int scrollto;
     private int selected_index; //for now only single selection mode
     private bool inhibit_focus = false;
-    private const int ANIM_TIMEOUT = 40;
-    private const int ANIM_MAX_PIXEL_JUMP = 2;
+    private static const int FPS = 24;
+    private static const int ANIM_TIMEOUT = 1000 / FPS;
     
     public ListView (ListView.Renderer rend)
     {
@@ -542,12 +542,21 @@ namespace Synapse.Gui
       }
       if (target != current_voffset)
       {
-        int inc = int.max (1, (int) Math.fabs ((target - current_voffset) / ANIM_MAX_PIXEL_JUMP));
-        current_voffset += target > current_voffset ? inc : - inc;
+        int inc = (int) Math.fabs (target - current_voffset);
+        if (inc < 4.0)
+        {
+          current_voffset = target;
+        }
+        else
+        {
+          inc = int.max (1, inc / 2);
+          current_voffset += target > current_voffset ? inc : - inc;
+        }
       }
       if (selection_target != selection_voffset)
       {
-        int inc = int.max (1, (int) Math.fabs ((selection_target - selection_voffset) / ANIM_MAX_PIXEL_JUMP));
+        int inc = (int) Math.fabs (selection_target - selection_voffset) / 2;
+        inc = int.max (1, inc);
         selection_voffset += selection_target > selection_voffset ? inc : - inc;
       }
       queue_draw ();
