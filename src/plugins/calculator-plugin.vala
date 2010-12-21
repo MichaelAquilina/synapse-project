@@ -32,16 +32,14 @@ namespace Synapse
             public bool has_thumbnail { get; construct set; }
             public string thumbnail_path { get; construct set; }
             public MatchType match_type { get; construct set; }
-            public string match_string { get; set; }
 
             public int default_relevancy { get; set; default = 0; }
 
             public Result (double result, string match_string)
             {
                 Object (match_type: MatchType.UNKNOWN,               
-                        title: "%g".printf (result),
-                        match_string: match_string,
-                        description: _ ("Calulate basic expressions"),
+                        title: "%g (%s)".printf (result, match_string),
+                        description: _ ("Calculate basic expressions"),
                         has_thumbnail: true, icon_name: "accessories-calculator");
             }
         }
@@ -68,7 +66,12 @@ namespace Synapse
 
         construct
         {
-            regex = new Regex ("^\\(*(-?\\d+(\\.\\d+)?)((\\+|-|\\*|/)\\(*(-?\\d+(\\.\\d+)?)\\)*)+$",
+            /* The regex describes a string which *resembles* a mathematical expression. It does not
+            check for pairs of parantheses to be used correctly and only whitespace-stripped strings
+            will match. Basically it matches strings of the form: 
+            "paratheses_open* number (operator paratheses_open* number paratheses_close*)+"*/
+
+            regex = new Regex ("^\\(*(-?\\d+(\\.\\d+)?)([*/+-^]\\(*(-?\\d+(\\.\\d+)?)\\)*)+$",
                                RegexCompileFlags.OPTIMIZE);
         }
 
