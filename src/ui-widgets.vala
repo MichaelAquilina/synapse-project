@@ -1802,7 +1802,7 @@ namespace Synapse.Gui
       }
     }}
     private Gee.List<PangoReadyText> texts;
-    private Cairo.ImageSurface cached_surface;
+    private Cairo.Surface cached_surface;
     private int wmax;
     private int hmax;
     private int current_offset;
@@ -1829,6 +1829,7 @@ namespace Synapse.Gui
             return update_current_offset ();
           });
       });
+      this.realize.connect (this._global_update);
       this.notify["selected-markup"].connect (_global_update);
       this.notify["unselected-markup"].connect (_global_update);
       _selected = 0;
@@ -1891,12 +1892,14 @@ namespace Synapse.Gui
     }
     private void update_cached_surface ()
     {
+      if (!this.get_realized ()) return;
       int w = 0, h = 0;
       PangoReadyText txt;
       txt = texts.last ();
       w = txt.offset + txt.width;
       h = hmax * 3; //triple h for nice vertical placement
-      this.cached_surface = new ImageSurface (Cairo.Format.ARGB32, w, h);
+      var window_context = Gdk.cairo_create (this.window);
+      this.cached_surface = new Surface.similar (window_context.get_target (), Cairo.Content.COLOR_ALPHA, w, h);
       var ctx = new Cairo.Context (this.cached_surface);
 
       Pango.cairo_update_context (ctx, layout.get_context ());
@@ -1968,7 +1971,7 @@ namespace Synapse.Gui
     }
     protected override bool expose_event (Gdk.EventExpose event)
     {
-      if (texts.size == 0)
+      if (texts.size == 0 || this.cached_surface == null)
         return true;
       var ctx = Gdk.cairo_create (this.window);
       ctx.translate (this.allocation.x, this.allocation.y);
@@ -1978,7 +1981,7 @@ namespace Synapse.Gui
       ctx.set_operator (Cairo.Operator.OVER);
       double x, y;
       x = current_offset;
-      y = Math.round ((h - this.cached_surface.get_height ()) / 2 );
+      y = Math.round ((h - (3 * hmax)) / 2 );
       ctx.set_source_surface (this.cached_surface, x, y);
       ctx.rectangle (0, 0, w, h);
       ctx.clip ();
