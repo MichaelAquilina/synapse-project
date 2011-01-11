@@ -22,6 +22,10 @@ namespace Synapse
 {
   namespace Utils
   {
+#if VALA_0_12
+    [CCode (cname = "g_utf8_strlen")]
+    public static extern long g_utf8_strlen (string s, ssize_t max);
+#endif
     /* Make sure setlocale was called before calling this function
      *   (Gtk.init calls it automatically)
      */
@@ -43,6 +47,26 @@ namespace Synapse
       }
 
       return result;
+    }
+    
+    public static string? remove_last_unichar (string input, long offset)
+    {
+#if VALA_0_12
+      long string_length = g_utf8_strlen (input, -1);
+      if (offset < 0) {
+        offset = string_length + offset;
+        GLib.return_val_if_fail (offset >= 0, null);
+      } else {
+        GLib.return_val_if_fail (offset <= string_length, null);
+      }
+      long len = string_length - offset - 1;
+
+      GLib.return_val_if_fail (offset + len <= string_length, null);
+      unowned string start = input.utf8_offset (offset);
+      return start.ndup (((char*) start.utf8_offset (len)) - ((char*) start));
+#else
+      return input.substring (offset, input.length - 1);
+#endif
     }
     
     public static async bool query_exists_async (GLib.File f)

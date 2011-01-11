@@ -211,7 +211,7 @@ namespace Synapse.Gui
       long len = s.length;
       if (len > 0)
       {
-        s = s.substring (0, len - 1);
+        s = Synapse.Utils.remove_last_unichar (s, 0);
         if (searching_for_matches)
         {
           set_match_search (s);
