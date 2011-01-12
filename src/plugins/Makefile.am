@@ -28,6 +28,7 @@ libplugins_la_CFLAGS = \
 libplugins_la_LIBADD = $(SYNAPSE_MODULES_LIBS) ../core/libsynapsecore.la
 libplugins_la_VALASOURCES = \
 	banshee-plugin.vala \
+	calculator-plugin.vala \
 	command-plugin.vala \
 	desktop-file-plugin.vala \
 	devhelp-search.vala \
