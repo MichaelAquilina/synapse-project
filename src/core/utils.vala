@@ -20,11 +20,12 @@
 
 namespace Synapse
 {
+  //[CCode (gir_namespace = "SynapseUtils", gir_version = "1.0")]
   namespace Utils
   {
 #if VALA_0_12
     [CCode (cname = "g_utf8_strlen")]
-    public static extern long g_utf8_strlen (string s, ssize_t max);
+    private static extern long g_utf8_strlen (string s, ssize_t max);
 #endif
     /* Make sure setlocale was called before calling this function
      *   (Gtk.init calls it automatically)

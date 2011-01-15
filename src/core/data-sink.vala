@@ -34,13 +34,14 @@ namespace Synapse
                                                   Cancellable? cancellable = null) throws SearchError;
   }
 
+  // don't move into a class, gir doesn't like it
+  [CCode (has_target = false)]
+  public delegate void PluginRegisterFunc ();
+  
   public class DataSink : Object, SearchEngine
   {
     public class PluginRegistry : Object
     {
-      [CCode (has_target = false)]
-      public delegate void PluginRegisterFunc ();
-  
       public class PluginInfo
       {
         public Type plugin_type;
@@ -256,13 +257,13 @@ namespace Synapse
     
     private void check_plugins ()
     {
-      PluginRegistry.PluginRegisterFunc[] reg_funcs = {};
+      PluginRegisterFunc[] reg_funcs = {};
       foreach (var pi in registry.get_plugins ())
       {
         reg_funcs += pi.register_func;
       }
 
-      foreach (PluginRegistry.PluginRegisterFunc func in reg_funcs)
+      foreach (PluginRegisterFunc func in reg_funcs)
       {
         func ();
       }

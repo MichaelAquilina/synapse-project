@@ -44,7 +44,7 @@ libsynapsecore_la_SOURCES = \
 	$(NULL)
 
 synapse-core.vapi synapse-core.vala.stamp: $(libsynapsecore_la_VALASOURCES)
-	$(AM_V_VALA)$(VALAC) $(libsynapsecore_la_VALAFLAGS) -C -H synapse-core.h --library synapse-core $^
+	$(AM_V_VALA)$(VALAC) $(libsynapsecore_la_VALAFLAGS) -C -H synapse-core.h --library synapse-core --gir SynapseCore-1.0.gir $^
 	touch $@
 
 BUILT_SOURCES = synapse-core.vala.stamp

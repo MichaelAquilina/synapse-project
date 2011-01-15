@@ -92,14 +92,13 @@ namespace Synapse
                     UnixInputStream read_stream = new UnixInputStream (read_fd, true);
                     DataInputStream bc_output = new DataInputStream (read_stream);
                     UnixOutputStream write_stream = new UnixOutputStream (write_fd, true);
-                    DataOutputStream bc_input = new DataOutputStream (write_stream);    
-                    
-                    yield bc_input.write_async (match_string + "\n", match_string.size() + 1, 
-                                                Priority.DEFAULT, query.cancellable);
+                    DataOutputStream bc_input = new DataOutputStream (write_stream);
+
+                    bc_input.put_string (match_string + "\n", query.cancellable);
                     yield bc_input.close_async (Priority.DEFAULT, query.cancellable);
                     solution = yield bc_output.read_line_async (Priority.DEFAULT_IDLE, query.cancellable);
 
-                    if (solution != null) 
+                    if (solution != null)
                     {
                         double d = solution.to_double ();
                         Result result = new Result (d, match_string);
@@ -108,8 +107,8 @@ namespace Synapse
                         query.check_cancellable ();
                         return results;
                     }
-                } 
-                catch (Error err) 
+                }
+                catch (Error err)
                 {
                     if (!query.is_cancelled ()) warning ("%s", err.message);
                 }
