@@ -28,7 +28,7 @@ namespace Synapse
     public const string OBJECT_PATH = "/org/gnome/ScreenSaver";
     public const string INTERFACE_NAME = "org.gnome.ScreenSaver";
     
-    public abstract void lock () throws DBus.Error;
+    public abstract async void lock () throws DBus.Error;
   }
 
   public class GnomeScreenSaverPlugin: DataPlugin
@@ -54,13 +54,14 @@ namespace Synapse
       {
         try
         {
-          var connection = DBus.Bus.get (DBus.BusType.SESSION);
+          var connection = DBusService.get_session_bus ();
           var dbus_interface = (GnomeScreenSaver)
             connection.get_object (GnomeScreenSaver.UNIQUE_NAME,
                                    GnomeScreenSaver.OBJECT_PATH,
                                    GnomeScreenSaver.INTERFACE_NAME);
 
-          dbus_interface.lock ();
+          // we need the async variant cause Screensaver doesn't send the reply
+          dbus_interface.lock.begin ();
         }
         catch (DBus.Error err)
         {
@@ -91,8 +92,6 @@ namespace Synapse
 
     construct
     {
-      var cache = DBusService.get_default ();
-      
       actions = new Gee.LinkedList<Match> ();
       actions.add (new LockScreenAction ());
     }
