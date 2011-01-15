@@ -39,7 +39,7 @@ namespace Synapse
     public abstract async string get_name_owner (string name) throws DBus.Error;
   }
   
-  public class DBusNameCache : Object
+  public class DBusService : Object
   {
     private DBus.Connection connection;
     private FreeDesktopDBus proxy;
@@ -50,16 +50,16 @@ namespace Synapse
     public bool initialized { get; private set; default = false; }
 
     // singleton that can be easily destroyed
-    public static DBusNameCache get_default ()
+    public static DBusService get_default ()
     {
-      return instance ?? new DBusNameCache ();
+      return instance ?? new DBusService ();
     }
 
-    private DBusNameCache ()
+    private DBusService ()
     {
     }
     
-    private static unowned DBusNameCache? instance;
+    private static unowned DBusService? instance;
     construct
     {
       instance = this;
@@ -70,7 +70,7 @@ namespace Synapse
       initialize ();
     }
     
-    ~DBusNameCache ()
+    ~DBusService ()
     {
       instance = null;
     }
@@ -107,6 +107,11 @@ namespace Synapse
       return name in system_activatable_names;
     }
     
+    public static DBus.Connection get_session_bus ()
+    {
+      return get_default ().connection;
+    }
+
     public signal void initialization_done ();
     
     private async void initialize ()

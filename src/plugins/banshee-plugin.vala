@@ -61,7 +61,7 @@ namespace Synapse
         _ ("Control Banshee and add items to playlists."),
         "banshee",
         register_plugin,
-        DBusNameCache.get_default ().name_is_activatable (BansheePlaybackController.UNIQUE_NAME),
+        DBusService.get_default ().name_is_activatable (BansheePlaybackController.UNIQUE_NAME),
         _ ("Banshee is not installed")
       );
     }
@@ -92,7 +92,7 @@ namespace Synapse
       }
       public virtual int get_relevancy ()
       {
-        bool banshee_running = DBusNameCache.get_default ().name_has_owner (
+        bool banshee_running = DBusService.get_default ().name_has_owner (
           BansheePlayerEngine.UNIQUE_NAME);
         return banshee_running ? default_relevancy + Match.Score.INCREMENT_LARGE : default_relevancy;
       }
@@ -117,7 +117,7 @@ namespace Synapse
       
       public virtual bool action_available ()
       {
-        return DBusNameCache.get_default ().name_has_owner (
+        return DBusService.get_default ().name_has_owner (
           BansheePlayerEngine.UNIQUE_NAME);
       }
     }

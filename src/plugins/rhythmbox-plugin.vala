@@ -63,7 +63,7 @@ namespace Synapse
         _ ("Control Rhythmbox and add items to playlists."),
         "rhythmbox",
         register_plugin,
-        DBusNameCache.get_default ().name_is_activatable (RhythmboxPlayer.UNIQUE_NAME),
+        DBusService.get_default ().name_is_activatable (RhythmboxPlayer.UNIQUE_NAME),
         _ ("Rhythmbox is not installed")
       );
     }
@@ -94,7 +94,7 @@ namespace Synapse
       }
       public virtual int get_relevancy ()
       {
-        bool rb_running = DBusNameCache.get_default ().name_has_owner (
+        bool rb_running = DBusService.get_default ().name_has_owner (
           RhythmboxPlayer.UNIQUE_NAME);
         return rb_running ? default_relevancy + Match.Score.INCREMENT_LARGE : default_relevancy;
       }
@@ -119,7 +119,7 @@ namespace Synapse
       
       public virtual bool action_available ()
       {
-        return DBusNameCache.get_default ().name_has_owner (
+        return DBusService.get_default ().name_has_owner (
           RhythmboxPlayer.UNIQUE_NAME);
       }
     }
@@ -138,7 +138,7 @@ namespace Synapse
       public override void do_action ()
       {
         try {
-          bool player_opened = DBusNameCache.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
+          bool player_opened = DBusService.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
           var conn = DBus.Bus.get(DBus.BusType.SESSION);
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH,
@@ -180,7 +180,7 @@ namespace Synapse
 
       public override bool action_available ()
       {
-        return DBusNameCache.get_default ().name_has_owner (
+        return DBusService.get_default ().name_has_owner (
           RhythmboxPlayer.UNIQUE_NAME);
       }
     }

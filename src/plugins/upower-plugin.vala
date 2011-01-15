@@ -179,7 +179,7 @@ namespace Synapse
         _ ("Suspend or hibernate your computer."),
         "system-suspend",
         register_plugin,
-        DBusNameCache.get_default ().service_is_available (UPowerObject.UNIQUE_NAME),
+        DBusService.get_default ().service_is_available (UPowerObject.UNIQUE_NAME),
         _ ("UPower wasn't found")
       );
     }

@@ -152,7 +152,7 @@ namespace Synapse
         _ ("Log out from your session, restart or shutdown your computer."),
         "gnome-session-logout",
         register_plugin,
-        DBusNameCache.get_default ().name_has_owner (GnomeSessionManager.UNIQUE_NAME),
+        DBusService.get_default ().name_has_owner (GnomeSessionManager.UNIQUE_NAME),
         _ ("Gnome Session Manager wasn't found")
       );
     }
@@ -167,7 +167,7 @@ namespace Synapse
 
     construct
     {
-      var cache = DBusNameCache.get_default ();
+      var cache = DBusService.get_default ();
       session_manager_available = cache.name_has_owner (GnomeSessionManager.UNIQUE_NAME);
       debug ("%s %s available", GnomeSessionManager.UNIQUE_NAME,
         session_manager_available ? "is" : "isn't");

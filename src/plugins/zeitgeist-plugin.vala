@@ -168,7 +168,7 @@ namespace Synapse
         _ ("Search various items logged by Zeitgeist."),
         "zeitgeist",
         register_plugin,
-        DBusNameCache.get_default ().name_is_activatable (UNIQUE_NAME),
+        DBusService.get_default ().name_is_activatable (UNIQUE_NAME),
         _ ("Zeitgeist is not installed")
       );
     }

@@ -197,7 +197,7 @@ namespace Synapse
     private uint query_id;
     // data sink will keep reference to the name cache, so others will get this
     // instance on call to get_default()
-    private DBusNameCache dbus_name_cache;
+    private DBusService dbus_name_cache;
     private DesktopFileService desktop_file_service;
     private PluginRegistry registry;
     private RelevancyService relevancy_service;
@@ -227,7 +227,7 @@ namespace Synapse
       int initialized_components = 0;
       int NUM_COMPONENTS = 2;
       
-      dbus_name_cache = DBusNameCache.get_default ();
+      dbus_name_cache = DBusService.get_default ();
       ulong sid1 = dbus_name_cache.initialization_done.connect (() =>
       {
         initialized_components++;

@@ -77,7 +77,7 @@ namespace Synapse
         _ ("Lock screen of your computer."),
         "system-lock-screen",
         register_plugin,
-        DBusNameCache.get_default ().name_has_owner (GnomeScreenSaver.UNIQUE_NAME),
+        DBusService.get_default ().name_is_activatable (GnomeScreenSaver.UNIQUE_NAME),
         _ ("Gnome Screen Saver wasn't found")
       );
     }
@@ -87,15 +87,11 @@ namespace Synapse
       register_plugin ();
     }
 
-    private bool gnome_screensaver_available = false;
     private Gee.List<Match> actions;
 
     construct
     {
-      var cache = DBusNameCache.get_default ();
-      gnome_screensaver_available = cache.name_has_owner (GnomeScreenSaver.UNIQUE_NAME);
-      debug ("%s %s available", GnomeScreenSaver.UNIQUE_NAME,
-        gnome_screensaver_available ? "is" : "isn't");
+      var cache = DBusService.get_default ();
       
       actions = new Gee.LinkedList<Match> ();
       actions.add (new LockScreenAction ());
@@ -103,7 +99,6 @@ namespace Synapse
     
     public override async ResultSet? search (Query q) throws SearchError
     {
-      if (!gnome_screensaver_available) return null;
       // we only search for actions
       if (!(QueryFlags.ACTIONS in q.query_type)) return null;
 
