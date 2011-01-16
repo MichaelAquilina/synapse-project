@@ -132,7 +132,7 @@ namespace Synapse
       string regex = Regex.escape_string (q.query_string);
       // FIXME: split pattern into words and search using --regexp?
       string[] argv = {"locate", "-i", "-l", "%u".printf (q.max_results),
-                       "-r", regex.replace (" ", ".")};
+                       "*%s*".printf (regex.replace (" ", "*"))};
 
       Gee.Set<string> uris = new Gee.HashSet<string> ();
 
