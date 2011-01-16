@@ -129,13 +129,18 @@ namespace Synapse
       {
         try
         {
-          var connection = DBus.Bus.get (DBus.BusType.SESSION);
+          var connection = DBusService.get_session_bus ();
           var dbus_interface = (GnomeSessionManager)
             connection.get_object (GnomeSessionManager.UNIQUE_NAME,
                                    GnomeSessionManager.OBJECT_PATH,
                                    GnomeSessionManager.INTERFACE_NAME);
 
-          dbus_interface.logout ();
+          /*
+           * 0: Normal.
+           * 1: No confirmation inferface should be shown.
+           * 2: Forcefully logout. No confirmation will be shown and any inhibitors will be ignored.
+           */
+          dbus_interface.logout (1);
         }
         catch (DBus.Error err)
         {
