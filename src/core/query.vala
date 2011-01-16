@@ -228,7 +228,7 @@ namespace Synapse
         }
       }
 
-      if (!(MatcherFlags.NO_FUZZY in match_flags))
+      if (!(MatcherFlags.NO_FUZZY in match_flags) && escaped_chars.length > 0)
       {
         string pattern = "\\b(%s)".printf (string.joinv (").*(",
                                                          escaped_chars));
