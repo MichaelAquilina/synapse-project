@@ -23,10 +23,6 @@ namespace Synapse
   //[CCode (gir_namespace = "SynapseUtils", gir_version = "1.0")]
   namespace Utils
   {
-#if VALA_0_12
-    [CCode (cname = "g_utf8_strlen")]
-    private static extern long g_utf8_strlen (string s, ssize_t max);
-#endif
     /* Make sure setlocale was called before calling this function
      *   (Gtk.init calls it automatically)
      */
@@ -53,7 +49,7 @@ namespace Synapse
     public static string? remove_last_unichar (string input, long offset)
     {
 #if VALA_0_12
-      long string_length = g_utf8_strlen (input, -1);
+      long string_length = input.char_count ();
       if (offset < 0) {
         offset = string_length + offset;
         GLib.return_val_if_fail (offset >= 0, null);
