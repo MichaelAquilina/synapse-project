@@ -41,7 +41,7 @@ libplugins_la_VALASOURCES = \
 	opensearch.vala \
 	rhythmbox-plugin.vala \
 	test-slow-plugin.vala \
-	upower-plugin.vala \
+	system-management.vala \
 	$(NULL)
 
 if HAVE_ZEITGEIST

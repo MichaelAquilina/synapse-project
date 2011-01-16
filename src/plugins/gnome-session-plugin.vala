@@ -154,7 +154,7 @@ namespace Synapse
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (GnomeSessionPlugin),
         "GNOME Session",
-        _ ("Log out from your session, restart or shutdown your computer."),
+        _ ("Log out from your session."),
         "gnome-session-logout",
         register_plugin,
         DBusService.get_default ().name_has_owner (GnomeSessionManager.UNIQUE_NAME),
@@ -179,8 +179,9 @@ namespace Synapse
       
       actions = new Gee.LinkedList<Match> ();
       actions.add (new LogOutAction ());
-      actions.add (new RebootAction ());
-      actions.add (new ShutDownAction ());
+      // TODO: add a config option to enable these actions (for example when ConsoleKit is not available)
+      //actions.add (new RebootAction ());
+      //actions.add (new ShutDownAction ());
     }
     
     public override async ResultSet? search (Query q) throws SearchError

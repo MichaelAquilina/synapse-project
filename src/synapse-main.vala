@@ -153,7 +153,7 @@ namespace Synapse
         typeof (LocatePlugin),
         typeof (GnomeSessionPlugin),
         typeof (GnomeScreenSaverPlugin),
-        typeof (UPowerPlugin),
+        typeof (SystemManagementPlugin),
         typeof (CommandPlugin),
         typeof (RhythmboxActions),
         typeof (BansheeActions),

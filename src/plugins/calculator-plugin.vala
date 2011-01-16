@@ -78,7 +78,7 @@ namespace Synapse
         public override async ResultSet? search (Query query) throws SearchError
         { 
             string match_string = query.query_string.replace (" ", "");
-            if (regex.match (match_string)) 
+            if (regex.match (match_string))
             {
                 Pid pid;
                 int read_fd, write_fd;

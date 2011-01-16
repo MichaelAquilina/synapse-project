@@ -34,9 +34,22 @@ namespace Synapse
     public abstract async bool suspend_allowed () throws DBus.Error;
   }
 
-  public class UPowerPlugin: DataPlugin
+  [DBus (name = "org.freedesktop.ConsoleKit.Manager")]
+  public interface ConsoleKitObject: Object
   {
-    private abstract class UPowerAction: Object, Match
+    public const string UNIQUE_NAME = "org.freedesktop.ConsoleKit";
+    public const string OBJECT_PATH = "/org/freedesktop/ConsoleKit/Manager";
+    public const string INTERFACE_NAME = "org.freedesktop.ConsoleKit.Manager";
+    
+    public abstract void restart () throws DBus.Error;
+    public abstract void stop () throws DBus.Error;
+    public abstract async bool can_restart () throws DBus.Error;
+    public abstract async bool can_stop () throws DBus.Error;
+  }
+
+  public class SystemManagementPlugin: DataPlugin
+  {
+    private abstract class SystemAction: Object, Match
     {
       // for Match interface
       public string title { get; construct set; }
@@ -55,7 +68,7 @@ namespace Synapse
       public abstract bool action_allowed ();
     }
 
-    private class SuspendAction: UPowerAction
+    private class SuspendAction: SystemAction
     {
       public SuspendAction ()
       {
@@ -113,7 +126,7 @@ namespace Synapse
       }
     }
 
-    private class HibernateAction: UPowerAction
+    private class HibernateAction: SystemAction
     {
       public HibernateAction ()
       {
@@ -171,16 +184,132 @@ namespace Synapse
       }
     }
 
+    private class ShutdownAction: SystemAction
+    {
+      public ShutdownAction ()
+      {
+        Object (match_type: MatchType.ACTION, title: _ ("Shut Down"),
+                description: _ ("Turn your computer off"),
+                icon_name: "system-shutdown", has_thumbnail: false);
+      }
+
+      construct
+      {
+        check_allowed.begin ();
+      }
+
+      private async void check_allowed ()
+      {
+        try
+        {
+          var connection = DBus.Bus.get (DBus.BusType.SYSTEM);
+          var dbus_interface = (ConsoleKitObject)
+            connection.get_object (ConsoleKitObject.UNIQUE_NAME,
+                                   ConsoleKitObject.OBJECT_PATH,
+                                   ConsoleKitObject.INTERFACE_NAME);
+
+          allowed = yield dbus_interface.can_stop ();
+        }
+        catch (DBus.Error err)
+        {
+          allowed = false;
+        }
+      }
+
+      private bool allowed = false;
+
+      public override bool action_allowed ()
+      {
+        return allowed;
+      }
+
+      public override void do_action ()
+      {
+        try
+        {
+          var connection = DBus.Bus.get (DBus.BusType.SYSTEM);
+          var dbus_interface = (ConsoleKitObject)
+            connection.get_object (ConsoleKitObject.UNIQUE_NAME,
+                                   ConsoleKitObject.OBJECT_PATH,
+                                   ConsoleKitObject.INTERFACE_NAME);
+
+          dbus_interface.stop ();
+        }
+        catch (DBus.Error err)
+        {
+          warning ("%s", err.message);
+        }
+      }
+    }
+
+    private class RestartAction: SystemAction
+    {
+      public RestartAction ()
+      {
+        Object (match_type: MatchType.ACTION, title: _ ("Restart"),
+                description: _ ("Restart your computer"),
+                icon_name: "system-restart", has_thumbnail: false);
+      }
+
+      construct
+      {
+        check_allowed.begin ();
+      }
+
+      private async void check_allowed ()
+      {
+        try
+        {
+          var connection = DBus.Bus.get (DBus.BusType.SYSTEM);
+          var dbus_interface = (ConsoleKitObject)
+            connection.get_object (ConsoleKitObject.UNIQUE_NAME,
+                                   ConsoleKitObject.OBJECT_PATH,
+                                   ConsoleKitObject.INTERFACE_NAME);
+
+          allowed = yield dbus_interface.can_restart ();
+        }
+        catch (DBus.Error err)
+        {
+          allowed = false;
+        }
+      }
+
+      private bool allowed = false;
+
+      public override bool action_allowed ()
+      {
+        return allowed;
+      }
+
+      public override void do_action ()
+      {
+        try
+        {
+          var connection = DBus.Bus.get (DBus.BusType.SYSTEM);
+          var dbus_interface = (ConsoleKitObject)
+            connection.get_object (ConsoleKitObject.UNIQUE_NAME,
+                                   ConsoleKitObject.OBJECT_PATH,
+                                   ConsoleKitObject.INTERFACE_NAME);
+
+          dbus_interface.restart ();
+        }
+        catch (DBus.Error err)
+        {
+          warning ("%s", err.message);
+        }
+      }
+    }
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
-        typeof (UPowerPlugin),
-        "UPower",
-        _ ("Suspend or hibernate your computer."),
-        "system-suspend",
+        typeof (SystemManagementPlugin),
+        "System Management",
+        _ ("Suspend, hibernate, restart or shutdown your computer."),
+        "system-restart",
         register_plugin,
-        DBusService.get_default ().service_is_available (UPowerObject.UNIQUE_NAME),
-        _ ("UPower wasn't found")
+        DBusService.get_default ().service_is_available (ConsoleKitObject.UNIQUE_NAME),
+        _ ("ConsoleKit wasn't found")
       );
     }
 
@@ -189,13 +318,15 @@ namespace Synapse
       register_plugin ();
     }
 
-    private Gee.List<UPowerAction> actions;
+    private Gee.List<SystemAction> actions;
 
     construct
     {
-      actions = new Gee.LinkedList<UPowerAction> ();
+      actions = new Gee.LinkedList<SystemAction> ();
       actions.add (new SuspendAction ());
       actions.add (new HibernateAction ());
+      actions.add (new ShutdownAction ());
+      actions.add (new RestartAction ());
     }
 
     public override async ResultSet? search (Query q) throws SearchError

@@ -52,21 +52,14 @@ namespace Synapse
       
       public void execute (Match? match)
       {
-        try
-        {
-          var connection = DBusService.get_session_bus ();
-          var dbus_interface = (GnomeScreenSaver)
-            connection.get_object (GnomeScreenSaver.UNIQUE_NAME,
-                                   GnomeScreenSaver.OBJECT_PATH,
-                                   GnomeScreenSaver.INTERFACE_NAME);
+        var connection = DBusService.get_session_bus ();
+        var dbus_interface = (GnomeScreenSaver)
+          connection.get_object (GnomeScreenSaver.UNIQUE_NAME,
+                                 GnomeScreenSaver.OBJECT_PATH,
+                                 GnomeScreenSaver.INTERFACE_NAME);
 
-          // we need the async variant cause Screensaver doesn't send the reply
-          dbus_interface.lock.begin ();
-        }
-        catch (DBus.Error err)
-        {
-          warning ("%s", err.message);
-        }
+        // we need the async variant cause Screensaver doesn't send the reply
+        dbus_interface.lock.begin ();
       }
     }
 
