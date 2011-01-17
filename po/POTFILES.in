@@ -20,6 +20,6 @@ src/plugins/locate-plugin.c
 src/plugins/opensearch.vala
 src/plugins/opensearch.c
 src/plugins/rhythmbox-plugin.c
-src/plugins/upower-plugin.c
+src/plugins/system-management.c
 src/plugins/zeitgeist-plugin.c
 
