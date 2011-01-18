@@ -29,7 +29,7 @@ Depends: ${shlibs:Depends},
 #Hard-code version for Lucid, ${shlibs:Depends} doesn't work for libs in the PPA
          libjson-glib-1.0-0 (>= 0.10.0),
          libgee2 (>= 0.5.2),
-         libzeitgeist-1.0-0 (>= 0.2.14)
+         libzeitgeist-1.0-0 (>= 0.2.14) | libzeitgeist-1.0-1 (>= 0.3.2)
 Recommends: zeitgeist (>= 0.6.0~) | zeitgeist-core (>= 0.6.0~),
             zeitgeist-fts-extension | zeitgeist-extension-fts
 Description: semantic file launcher
