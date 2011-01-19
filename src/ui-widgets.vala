@@ -1712,11 +1712,7 @@ namespace Synapse.Gui
       bool changed = false;
       var context = this.get_layout ();
       var attrs = context.get_attributes ();
-#if VALA_0_12
       Pango.AttrIterator iter = attrs.get_iterator ();
-#else
-      unowned Pango.AttrIterator iter = attrs.get_iterator (); // FIXME: leaks
-#endif
       do
       {
         unowned Pango.Attribute? attr = iter.get (Pango.AttrType.SCALE);

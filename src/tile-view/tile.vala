@@ -206,11 +206,7 @@ namespace UI.Widgets
       {
         try
         {
-#if VALA_0_12
           Gdk.Pixbuf temp_pb;
-#else
-          unowned Gdk.Pixbuf temp_pb;
-#endif
           unowned IconTheme it = IconTheme.get_default ();
           try
           {
@@ -225,10 +221,6 @@ namespace UI.Widgets
                                     IconLookupFlags.FORCE_SIZE);
           }
           pixbuf = temp_pb.copy ();
-#if VALA_0_12
-#else
-          temp_pb.unref (); // careful here!
-#endif
         }
         catch (Error err)
         {
