@@ -49,7 +49,7 @@ namespace Synapse
             DataSink.PluginRegistry.get_default ().register_plugin (
                 typeof (CalculatorPlugin),
                 _ ("Calculator"),
-                _ ("Calulate basic expressions."),
+                _ ("Calculate basic expressions."),
                 "accessories-calculator",
                 register_plugin,
                 Environment.find_program_in_path ("bc") != null,
