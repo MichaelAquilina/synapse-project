@@ -535,7 +535,7 @@ namespace Synapse
         if (empty_query)
         {
           // special case empty searches
-          int64 start_ts = Zeitgeist.Timestamp.now () - Zeitgeist.Timestamp.WEEK;
+          int64 start_ts = Zeitgeist.Timestamp.now () - Zeitgeist.Timestamp.WEEK * 4;
           rs = yield zg_log.find_events (new Zeitgeist.TimeRange (start_ts, int64.MAX),
                                          (owned) templates,
                                          Zeitgeist.StorageState.ANY,
