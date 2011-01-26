@@ -109,18 +109,38 @@ namespace Synapse
 
     private async void analyze_recent_documents ()
     {
-      var recent = File.new_for_path (
-        "%s/%s".printf (Environment.get_home_dir (), RECENT_XML_NAME)
+      var recent = File.new_for_path (Path.build_filename (
+        Environment.get_home_dir (), RECENT_XML_NAME, null));
       );
 
       try
       {
         string contents;
         size_t len;
+        bool load_ok;
 
-        bool load_ok = yield recent.load_contents_async (null, 
-                                                         out contents,
-                                                         out len);
+        try
+        {
+          load_ok = yield recent.load_contents_async (null,
+                                                      out contents,
+                                                      out len);
+        }
+        catch (GLib.Error load_error)
+        {
+          load_ok = false;
+        }
+
+        // try again in datadir
+        if (!load_ok)
+        {
+          recent = File.new_for_path (Path.build_filename (
+            Environment.get_user_data_dir (), RECENT_XML_NAME, null));
+
+          load_ok = yield recent.load_contents_async (null,
+                                                      out contents,
+                                                      out len);
+        }
+
         if (load_ok)
         {
           // load all uris from recently-used bookmark file
