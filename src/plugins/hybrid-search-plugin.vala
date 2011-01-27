@@ -111,7 +111,6 @@ namespace Synapse
     {
       var recent = File.new_for_path (Path.build_filename (
         Environment.get_home_dir (), RECENT_XML_NAME, null));
-      );
 
       try
       {
