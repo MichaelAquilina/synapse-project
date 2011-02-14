@@ -195,8 +195,7 @@ namespace Synapse
           {
             z += x.value.files.size;
           }
-          print ("%s keeps in cache now %d file names\n",
-                 this.get_type ().name (), z);
+          Utils.Logger.log (this, "keeps in cache now %d file names", z);
         }
       }
       catch (Error err)
@@ -326,7 +325,7 @@ namespace Synapse
     private async void update_directory_contents (GLib.File directory,
                                                   DirectoryInfo di) throws Error
     {
-      print ("%s:: Scanning %s\n", get_type ().name (), directory.get_path ());
+      Utils.Logger.debug (this, "Scanning %s", directory.get_path ());
       var enumerator = yield directory.enumerate_children_async (
         FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
       var files = yield enumerator.next_files_async (1024, 0);
@@ -452,9 +451,8 @@ namespace Synapse
 
       if (directories.size == 0) q.check_cancellable ();
 
-      print ("%s found %d extra uris (ZG returned %d)\n",
-        this.get_type ().name (), results.size,
-        original_rs == null ? 0 : original_rs.size);
+      Utils.Logger.debug (this, "found %d extra uris (ZG returned %d)",
+        results.size, original_rs == null ? 0 : original_rs.size);
 
       return results;
     }

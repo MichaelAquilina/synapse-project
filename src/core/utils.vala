@@ -82,6 +82,82 @@ namespace Synapse
 
       return exists;
     }
+    
+    public class Logger
+    {
+      protected const string RED = "\x1b[31m";
+      protected const string GREEN = "\x1b[32m";
+      protected const string YELLOW = "\x1b[33m";
+      protected const string BLUE = "\x1b[34m";
+      protected const string MAGENTA = "\x1b[35m";
+      protected const string CYAN = "\x1b[36m";
+      protected const string RESET = "\x1b[0m";
+
+      private static bool initialized = false;
+      private static bool show_debug = false;
+
+      private static void log_internal (Object? obj, LogLevelFlags level, string format, va_list args)
+      {
+        if (!initialized)
+        {
+          var levels = LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.LEVEL_INFO |
+            LogLevelFlags.LEVEL_CRITICAL | LogLevelFlags.LEVEL_ERROR;
+          Log.set_handler ("Synapse", levels, handler);
+          
+          show_debug = Environment.get_variable ("SYNAPSE_DEBUG") != null;
+          initialized = true;
+        }
+        Type obj_type = obj != null ? obj.get_type () : typeof (Logger);
+        string obj_class = obj_type.name ();
+        if (obj_class.has_prefix ("Synapse")) obj_class = obj_class.offset (7);
+        string pretty_obj = "%s[%s]%s ".printf (MAGENTA, obj_class, RESET);
+        logv ("Synapse", level, pretty_obj + format, args);
+      }
+      
+      public static void log (Object? obj, string format, ...)
+      {
+        var args = va_list ();
+        log_internal (obj, LogLevelFlags.LEVEL_INFO, format, args);
+      }
+
+      [Diagnostics]
+      public static void debug (Object? obj, string format, ...)
+      {
+        var args = va_list ();
+        log_internal (obj, LogLevelFlags.LEVEL_DEBUG, format, args);
+      }
+
+      public static void error (Object? obj, string format, ...)
+      {
+        var args = va_list ();
+        log_internal (obj, LogLevelFlags.LEVEL_ERROR, format, args);
+      }
+      
+      protected static void handler (string? domain, LogLevelFlags level, string msg)
+      {
+        string header;
+        string cur_time = TimeVal ().to_iso8601 ().substring (11, 15);
+        if (level == LogLevelFlags.LEVEL_DEBUG)
+        {
+          if (!show_debug) return;
+          header = @"$(GREEN)[$(cur_time) Debug]$(RESET)";
+        }
+        else if (level == LogLevelFlags.LEVEL_INFO)
+        {
+          header = @"$(BLUE)[$(cur_time) Info]$(RESET)";
+        }
+        else if (level == LogLevelFlags.LEVEL_CRITICAL || level == LogLevelFlags.LEVEL_ERROR)
+        {
+          header = @"$(RED)[$(cur_time) Critical]$(RESET)";
+        }
+        else
+        {
+          header = @"$(YELLOW)[$(cur_time)]$(RESET)";
+        }
+
+        stdout.printf ("%s %s\n", header, msg);
+      }
+    }
 
     public class FileInfo
     {

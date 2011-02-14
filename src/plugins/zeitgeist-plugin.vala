@@ -578,7 +578,7 @@ namespace Synapse
 
       q.check_cancellable ();
 
-      debug ("ZG search took %d ms", (int)(timer.elapsed ()*1000));
+      Utils.Logger.debug (this, "search took %d ms", (int)(timer.elapsed ()*1000));
 
       return result;
     }

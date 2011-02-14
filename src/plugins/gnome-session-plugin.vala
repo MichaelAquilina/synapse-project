@@ -174,7 +174,7 @@ namespace Synapse
     {
       var cache = DBusService.get_default ();
       session_manager_available = cache.name_has_owner (GnomeSessionManager.UNIQUE_NAME);
-      debug ("%s %s available", GnomeSessionManager.UNIQUE_NAME,
+      Utils.Logger.log (this, "%s %s available", GnomeSessionManager.UNIQUE_NAME,
         session_manager_available ? "is" : "isn't");
       
       actions = new Gee.LinkedList<Match> ();

@@ -185,7 +185,7 @@ namespace Synapse.Gui
         comp = false;
         cm = screen.get_rgb_colormap();
       }
-      debug ("Screen is%s composited.", comp?"": " NOT");
+      Synapse.Utils.Logger.log (this, "Screen is%s composited.", comp ? "": " NOT");
       w.set_colormap (cm);
     }
 

@@ -25,7 +25,7 @@ using UI;
 
 namespace Synapse
 {
-  public class UILauncher
+  public class UILauncher: GLib.Object
   {
     private static bool is_startup = false;
     const OptionEntry[] options =
@@ -193,7 +193,7 @@ namespace Synapse
                                        "<Control>space", null);
           registry.store_hotkey (hotkey);
         }
-        debug ("Binding activation to %s", hotkey.signature);
+        Utils.Logger.log (this, "Binding activation to %s", hotkey.signature);
         settings.set_keybinding (hotkey.signature, false);
         hotkey.bind ();
         hotkey.activated.connect ((event_time) => { this.show_ui (event_time); });
@@ -298,7 +298,7 @@ namespace Synapse
         var app = new Unique.App ("org.gnome.Synapse", null);
         if (app.is_running)
         {
-          debug ("Synapse is already running, activating...");
+          Utils.Logger.log (null, "Synapse is already running, activating...");
           app.send_message (Unique.Command.ACTIVATE, null);
         }
         else
