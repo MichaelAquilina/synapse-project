@@ -52,7 +52,7 @@ namespace Synapse
         Object (match_type: MatchType.UNKNOWN,
                 title: "%g (%s)".printf (result, match_string),
                 description: _ ("Calculate basic expressions"),
-                has_thumbnail: true, icon_name: "accessories-calculator");
+                has_thumbnail: false, icon_name: "accessories-calculator");
       }
     }
 
