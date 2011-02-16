@@ -95,8 +95,14 @@ namespace Synapse
 
     public async ResultSet? search (Query query) throws SearchError
     { 
-      string match_string = query.query_string.replace (" ", "");
-      if (regex.match (match_string))
+      string input = query.query_string.replace (" ", "");
+      bool matched = regex.match (input);
+      if (!matched && input.length > 1)
+      {
+        input = input[0 : input.length - 1];
+        matched = regex.match (input);
+      }
+      if (matched)
       {
         Pid pid;
         int read_fd, write_fd;
@@ -114,14 +120,14 @@ namespace Synapse
           UnixOutputStream write_stream = new UnixOutputStream (write_fd, true);
           DataOutputStream bc_input = new DataOutputStream (write_stream);
 
-          bc_input.put_string (match_string + "\n", query.cancellable);
+          bc_input.put_string (input + "\n", query.cancellable);
           yield bc_input.close_async (Priority.DEFAULT, query.cancellable);
           solution = yield bc_output.read_line_async (Priority.DEFAULT_IDLE, query.cancellable);
 
           if (solution != null)
           {
             double d = solution.to_double ();
-            Result result = new Result (d, match_string);
+            Result result = new Result (d, query.query_string);
             ResultSet results = new ResultSet ();
             results.add (result, Match.Score.AVERAGE);
             query.check_cancellable ();
