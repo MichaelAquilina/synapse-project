@@ -21,8 +21,20 @@
 
 namespace Synapse
 {
-  public class DevhelpPlugin: ActionPlugin
+  public class DevhelpPlugin: Object, Activatable, ActionProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private class Search: Object, Match
     {
       // from Match interface
@@ -96,14 +108,14 @@ namespace Synapse
       }
     }
     
-    public override bool handles_unknown ()
+    public bool handles_unknown ()
     {
       return has_devhelp;
     }
     
     private Regex symbol_re;
 
-    public override ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (Query query, Match match)
     {
       if (!has_devhelp || match.match_type != MatchType.UNKNOWN ||
           !(QueryFlags.ACTIONS in query.query_type))

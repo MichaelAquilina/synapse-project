@@ -31,8 +31,20 @@ namespace Synapse
     public abstract async void lock () throws DBus.Error;
   }
 
-  public class GnomeScreenSaverPlugin: DataPlugin
+  public class GnomeScreenSaverPlugin: Object, Activatable, ItemProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private class LockScreenAction: Object, Match
     {
       // for Match interface
@@ -89,7 +101,7 @@ namespace Synapse
       actions.add (new LockScreenAction ());
     }
     
-    public override async ResultSet? search (Query q) throws SearchError
+    public async ResultSet? search (Query q) throws SearchError
     {
       // we only search for actions
       if (!(QueryFlags.ACTIONS in q.query_type)) return null;

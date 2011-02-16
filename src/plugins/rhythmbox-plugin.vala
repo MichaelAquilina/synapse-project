@@ -53,8 +53,20 @@ namespace Synapse
       public abstract void play_pause (bool b) throws DBus.Error;
   }
   
-  public class RhythmboxActions: ActionPlugin
+  public class RhythmboxActions: Object, Activatable, ItemProvider, ActionProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -139,7 +151,7 @@ namespace Synapse
       {
         try {
           bool player_opened = DBusService.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
+          var conn = DBusService.get_session_bus ();
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH,
                                                           RhythmboxPlayer.INTERFACE_NAME);
@@ -197,7 +209,7 @@ namespace Synapse
       public override void do_action ()
       {
         try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
+          var conn = DBusService.get_session_bus ();
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH,
                                                           RhythmboxPlayer.INTERFACE_NAME);
@@ -220,7 +232,7 @@ namespace Synapse
       public override void do_action ()
       {
         try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
+          var conn = DBusService.get_session_bus ();
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH,
                                                           RhythmboxPlayer.INTERFACE_NAME);
@@ -249,10 +261,10 @@ namespace Synapse
         UriMatch uri = match as UriMatch;
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
         try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
+          var conn = DBusService.get_session_bus ();
           var shell = (RhythmboxShell) conn.get_object (RhythmboxShell.UNIQUE_NAME,
-                                                          RhythmboxShell.OBJECT_PATH,
-                                                          RhythmboxShell.INTERFACE_NAME);
+                                                        RhythmboxShell.OBJECT_PATH,
+                                                        RhythmboxShell.INTERFACE_NAME);
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH,
                                                           RhythmboxPlayer.INTERFACE_NAME);
@@ -296,10 +308,10 @@ namespace Synapse
         UriMatch uri = match as UriMatch;
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
         try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
+          var conn = DBusService.get_session_bus ();
           var shell = (RhythmboxShell) conn.get_object (RhythmboxShell.UNIQUE_NAME,
-                                                          RhythmboxShell.OBJECT_PATH,
-                                                          RhythmboxShell.INTERFACE_NAME);
+                                                        RhythmboxShell.OBJECT_PATH,
+                                                        RhythmboxShell.INTERFACE_NAME);
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
                                                           RhythmboxPlayer.OBJECT_PATH,
                                                           RhythmboxPlayer.INTERFACE_NAME);
@@ -343,11 +355,7 @@ namespace Synapse
       matches.add (new Next ());
     }
     
-    public override bool provides_data ()
-    {
-      return true;
-    }
-    public override async ResultSet? search (Query q) throws SearchError
+    public async ResultSet? search (Query q) throws SearchError
     {
       // we only search for actions
       if (!(QueryFlags.ACTIONS in q.query_type)) return null;
@@ -374,13 +382,8 @@ namespace Synapse
 
       return result;
     }
-    
-    public override bool handles_unknown ()
-    {
-      return false;
-    }
 
-    public override ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (Query query, Match match)
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
@@ -412,7 +415,7 @@ namespace Synapse
           }
         }
       }
-      
+
       return results;
     }
   }

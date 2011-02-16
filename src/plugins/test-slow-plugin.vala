@@ -21,8 +21,20 @@
 
 namespace Synapse
 {
-  public class TestSlowPlugin: DataPlugin
+  public class TestSlowPlugin: Object, Activatable, ItemProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private class TestResult: Object, Match
     {
       public string title { get; construct set; }
@@ -42,7 +54,7 @@ namespace Synapse
       }
     }
     
-    public override async ResultSet? search (Query q) throws SearchError
+    public async ResultSet? search (Query q) throws SearchError
     {
       Idle.add (search.callback);
       yield;
@@ -54,8 +66,8 @@ namespace Synapse
 
       q.check_cancellable ();
 
-      debug ("finished search for \"%s\"", q.query_string);
-      
+      Utils.Logger.debug (this, "finished search for \"%s\"", q.query_string);
+
       var rs = new ResultSet ();
       rs.add (new TestResult (q.query_string), 0);
 

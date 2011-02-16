@@ -51,8 +51,20 @@ namespace Synapse
       public abstract void enqueue_uri (string uri, bool prepend) throws DBus.Error;
   }
   
-  public class BansheeActions: ActionPlugin
+  public class BansheeActions: Object, Activatable, ItemProvider, ActionProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -325,11 +337,7 @@ namespace Synapse
       matches.add (new Next ());
     }
     
-    public override bool provides_data ()
-    {
-      return true;
-    }
-    public override async ResultSet? search (Query q) throws SearchError
+    public async ResultSet? search (Query q) throws SearchError
     {
       // we only search for actions
       if (!(QueryFlags.ACTIONS in q.query_type)) return null;
@@ -356,13 +364,8 @@ namespace Synapse
 
       return result;
     }
-    
-    public override bool handles_unknown ()
-    {
-      return false;
-    }
 
-    public override ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (Query query, Match match)
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();

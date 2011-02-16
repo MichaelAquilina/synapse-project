@@ -26,8 +26,21 @@
 
 namespace Synapse
 {
-  public class HybridSearchPlugin: DataPlugin
+  public class HybridSearchPlugin: Object, Activatable, ItemProvider
   {
+    public unowned DataSink data_sink { get; construct; }
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private class MatchObject: Object, Match, UriMatch
     {
       // for Match interface
@@ -96,8 +109,8 @@ namespace Synapse
     protected override void constructed ()
     {
       // FIXME: if zeitgeist-plugin available
-      unowned DataPlugin? zg_plugin;
-      zg_plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin");
+      unowned ItemProvider? zg_plugin;
+      zg_plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin") as ItemProvider;
       if (zg_plugin == null) return;
 
       zg_plugin.search_done.connect (this.zg_plugin_search_done);
@@ -459,7 +472,7 @@ namespace Synapse
 
     private string? current_query = null;
 
-    public override async ResultSet? search (Query q) throws SearchError
+    public async ResultSet? search (Query q) throws SearchError
     {
       var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
         | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
@@ -504,7 +517,7 @@ namespace Synapse
       });
 
       if (connected_to_zg &&
-          data_sink.get_plugin ("SynapseZeitgeistPlugin").enabled)
+          (data_sink.get_plugin ("SynapseZeitgeistPlugin") as ItemProvider).enabled)
       {
         // wait for results from ZeitgeistPlugin
         yield;

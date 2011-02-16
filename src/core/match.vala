@@ -85,7 +85,7 @@ namespace Synapse
     public abstract string? extended_info { get; set; }
   }
   
-  public interface SearchMatch: Match, SearchEngine
+  public interface SearchMatch: Match, SearchProvider
   {
 
   }

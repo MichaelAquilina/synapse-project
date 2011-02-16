@@ -20,8 +20,20 @@
 
 namespace Synapse
 {
-  public class CommonActions: ActionPlugin
+  public class CommonActions: Object, Activatable, ActionProvider
   {
+    public bool enabled { get; set; default = true; }
+    
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private abstract class Action: Object, Match
     {
       // from Match interface
@@ -228,25 +240,20 @@ namespace Synapse
         return parent != null && f.is_native ();
       }
     }
-    
+
     private Gee.List<Action> actions;
 
     construct
     {
       actions = new Gee.ArrayList<Action> ();
-      
+
       actions.add (new Runner ());
       actions.add (new TerminalRunner ());
       actions.add (new Opener ());
       actions.add (new OpenFolder ());
     }
-    
-    public override bool handles_unknown ()
-    {
-      return false;
-    }
 
-    public override ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (Query query, Match match)
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
@@ -278,7 +285,7 @@ namespace Synapse
           }
         }
       }
-      
+
       return results;
     }
   }

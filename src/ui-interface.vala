@@ -253,9 +253,9 @@ namespace Synapse.Gui
         return false;
       var match = focus[T.MATCH];
       var action = focus[T.ACTION];
-      if (action is SearchEngine)
+      if (action is SearchProvider)
       {
-        search_for_matches (action as SearchEngine);
+        search_for_matches (action as SearchProvider);
         return false;
       }
       /* Async execute to avoid freezes when executing a dbus action */
@@ -376,7 +376,7 @@ namespace Synapse.Gui
       update_handle_empty ();
     }
     
-    private void plugin_registered_handler (DataPlugin plugin)
+    private void plugin_registered_handler (Object plugin)
     {
       // FIXME: expose this as prop of data-sink
       if (plugin.get_type ().name () == "SynapseZeitgeistPlugin")
@@ -433,18 +433,18 @@ namespace Synapse.Gui
     
     private void update_handle_empty ()
     {
-      var plugin = data_sink.get_plugin("SynapseZeitgeistPlugin");
-      handle_empty = plugin != null && plugin.enabled;
+      var plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin");
+      handle_empty = plugin != null && (plugin as ItemProvider).enabled;
       DOWN_TO_SEE_RECENT = handle_empty ? _("...or press down key to browse recent activities") : "";
       handle_empty_updated ();
     }
     
-    private void search_for_matches (SearchEngine? search_engine = null)
+    private void search_for_matches (SearchProvider? search_provider = null)
     {
       current_cancellable.cancel ();
       current_cancellable = new Cancellable ();
       
-      if (search_engine == null) search_engine = data_sink;
+      if (search_provider == null) search_provider = data_sink;
 
       if (!search_with_empty && search[T.MATCH] == "")
       {
@@ -462,7 +462,7 @@ namespace Synapse.Gui
             return false;
         });
       }
-      search_engine.search (search[T.MATCH], qf, last_result_set, current_cancellable, _search_ready);
+      search_provider.search (search[T.MATCH], qf, last_result_set, current_cancellable, _search_ready);
     }
     
     private void _send_partial_results (ResultSet rs)
@@ -507,7 +507,7 @@ namespace Synapse.Gui
     {
       try
       {
-        results[T.MATCH] = (obj as SearchEngine).search.end (res);
+        results[T.MATCH] = (obj as SearchProvider).search.end (res);
         /* Do not write code before this line */
 
         if (!partial_result_sent)

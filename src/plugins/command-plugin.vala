@@ -21,8 +21,20 @@
 
 namespace Synapse
 {
-  public class CommandPlugin: DataPlugin
+  public class CommandPlugin: Object, Activatable, ItemProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private class CommandObject: Object, Match, ApplicationMatch
     {
       // for Match interface
@@ -123,7 +135,7 @@ namespace Synapse
       past_commands.add (co.command);
     }
 
-    public override async ResultSet? search (Query q) throws SearchError
+    public async ResultSet? search (Query q) throws SearchError
     {
       // we only search for applications
       if (!(QueryFlags.APPLICATIONS in q.query_type)) return null;

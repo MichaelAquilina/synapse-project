@@ -46,8 +46,20 @@ namespace Synapse
 </OpenSearchDescription>
 """;
 
-  public class OpenSearchPlugin: ActionPlugin
+  public class OpenSearchPlugin: Object, Activatable, ActionProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private class OpenSearchParser: Object
     {
       const MarkupParser parser =
@@ -322,12 +334,12 @@ namespace Synapse
       }
     }
     
-    public override bool handles_unknown ()
+    public bool handles_unknown ()
     {
       return true;
     }
 
-    public override ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (Query query, Match match)
     {
       if (match.match_type != MatchType.UNKNOWN)
       {

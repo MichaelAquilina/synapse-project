@@ -21,8 +21,20 @@
 
 namespace Synapse
 {
-  public class ZeitgeistPlugin: DataPlugin
+  public class ZeitgeistPlugin: Object, Activatable, ItemProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private const string UNIQUE_NAME = "org.gnome.zeitgeist.Engine";
     private class MatchObject: Object, 
       Match, UriMatch, ApplicationMatch, ExtendedInfo
@@ -504,12 +516,12 @@ namespace Synapse
       return templates;
     }
     
-    public override bool handles_empty_query ()
+    public bool handles_empty_query ()
     {
       return true;
     }
 
-    public override async ResultSet? search (Query q) throws SearchError
+    public async ResultSet? search (Query q) throws SearchError
     {
       var search_query = q.query_string.strip ();
       bool empty_query = search_query == "";
@@ -572,7 +584,7 @@ namespace Synapse
         if (!q.is_cancelled ())
         {
           // we don't care about message about being cancelled
-          warning ("Zeitgeist search failed: %s", err.message);
+          Utils.Logger.warning (this, "Zeitgeist search failed: %s", err.message);
         }
       }
 

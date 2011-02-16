@@ -21,8 +21,20 @@
 
 namespace Synapse
 {
-  public class LocatePlugin: ActionPlugin
+  public class LocatePlugin: Object, Activatable, ActionProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private class MatchObject: Object, Match, UriMatch
     {
       // for Match interface
@@ -47,7 +59,7 @@ namespace Synapse
       }
     }
 
-    private class LocateItem: Object, SearchEngine, Match, SearchMatch
+    private class LocateItem: Object, SearchProvider, Match, SearchMatch
     {
       // for Match interface
       public string title { get; construct set; }
@@ -110,7 +122,7 @@ namespace Synapse
       action = new LocateItem (this);
     }
 
-    public override bool handles_unknown ()
+    public bool handles_unknown ()
     {
       return true;
     }
@@ -187,7 +199,7 @@ namespace Synapse
       return result;
     }
 
-    public override ResultSet? find_for_match (Query q, Match match)
+    public ResultSet? find_for_match (Query q, Match match)
     {
       var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
         | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;

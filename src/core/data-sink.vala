@@ -26,7 +26,7 @@ namespace Synapse
     UNKNOWN_ERROR
   }
   
-  public interface SearchEngine : Object
+  public interface SearchProvider : Object
   {
     public abstract async Gee.List<Match> search (string query,
                                                   QueryFlags flags,
@@ -38,7 +38,7 @@ namespace Synapse
   [CCode (has_target = false)]
   public delegate void PluginRegisterFunc ();
   
-  public class DataSink : Object, SearchEngine
+  public class DataSink : Object, SearchProvider
   {
     public class PluginRegistry : Object
     {
@@ -192,8 +192,8 @@ namespace Synapse
     }
 
     private DataSinkConfiguration config;
-    private Gee.Set<DataPlugin> plugins;
-    private Gee.Set<ActionPlugin> actions;
+    private Gee.Set<ItemProvider> item_plugins;
+    private Gee.Set<ActionProvider> action_plugins;
     private uint query_id;
     // data sink will keep reference to the name cache, so others will get this
     // instance on call to get_default()
@@ -205,8 +205,8 @@ namespace Synapse
 
     construct
     {
-      plugins = new Gee.HashSet<DataPlugin> ();
-      actions = new Gee.HashSet<ActionPlugin> ();
+      item_plugins = new Gee.HashSet<ItemProvider> ();
+      action_plugins = new Gee.HashSet<ActionProvider> ();
       plugin_types = {};
       query_id = 0;
 
@@ -221,12 +221,12 @@ namespace Synapse
       initialize_caches ();
       register_static_plugin (typeof (CommonActions));
     }
-    
+
     private async void initialize_caches ()
     {
       int initialized_components = 0;
       int NUM_COMPONENTS = 2;
-      
+
       dbus_name_cache = DBusService.get_default ();
       ulong sid1 = dbus_name_cache.initialization_done.connect (() =>
       {
@@ -272,30 +272,28 @@ namespace Synapse
     private bool has_unknown_handlers = false;
     private bool plugins_loaded = false;
 
-    public signal void plugin_registered (DataPlugin plugin);
+    public signal void plugin_registered (Object plugin);
 
-    protected void register_plugin (DataPlugin plugin)
+    protected void register_plugin (Object plugin)
     {
-      if (plugin is ActionPlugin)
+      if (plugin is ActionProvider)
       {
-        ActionPlugin? action_plugin = plugin as ActionPlugin;
-        actions.add (action_plugin);
+        ActionProvider action_plugin = plugin as ActionProvider;
+        action_plugins.add (action_plugin);
         has_unknown_handlers |= action_plugin.handles_unknown ();
-        
-        if (action_plugin.provides_data ()) plugins.add (action_plugin);
       }
-      else
+      if (plugin is ItemProvider)
       {
-        plugins.add (plugin);
+        item_plugins.add (plugin as ItemProvider);
       }
-      
+
       plugin_registered (plugin);
     }
     
     private void update_has_unknown_handlers ()
     {
       has_unknown_handlers = false;
-      foreach (var action in actions)
+      foreach (var action in action_plugins)
       {
         if (action.enabled && action.handles_unknown ())
         {
@@ -305,9 +303,17 @@ namespace Synapse
       }
     }
     
-    private DataPlugin? create_plugin (Type t)
+    private Object? create_plugin (Type t)
     {
-      return Object.new (t, "data-sink", this, null) as DataPlugin;
+      var obj_class = (ObjectClass) t.class_ref ();
+      if (obj_class != null && obj_class.find_property ("data-sink") != null)
+      {
+        return Object.new (t, "data-sink", this, null);
+      }
+      else
+      {
+        return Object.new (t, null);
+      }
     }
 
     private void load_plugins ()
@@ -319,7 +325,11 @@ namespace Synapse
         PluginRegistry.PluginInfo? info = registry.get_plugin_info_for_type (t);
         bool skip = info != null && info.runnable == false;
         if (config.is_plugin_enabled (t) && !skip)
-          register_plugin (create_plugin (t));
+        {
+          var plugin = create_plugin (t);
+          register_plugin (plugin);
+          (plugin as Activatable).activate ();
+        }
       }
 
       plugins_loaded = true;
@@ -333,11 +343,11 @@ namespace Synapse
       plugin_types += plugin_type;
     }
     
-    public unowned DataPlugin? get_plugin (string name)
+    public unowned Object? get_plugin (string name)
     {
-      unowned DataPlugin? result = null;
-      
-      foreach (var plugin in plugins)
+      unowned Object? result = null;
+
+      foreach (var plugin in item_plugins)
       {
         if (plugin.get_type ().name () == name)
         {
@@ -345,18 +355,18 @@ namespace Synapse
           break;
         }
       }
-      
+
       return result;
     }
     
     public bool is_plugin_enabled (Type plugin_type)
     {
-      foreach (var plugin in plugins)
+      foreach (var plugin in item_plugins)
       {
         if (plugin.get_type () == plugin_type) return plugin.enabled;
       }
       
-      foreach (var action in actions)
+      foreach (var action in action_plugins)
       {
         if (action.get_type () == plugin_type) return action.enabled;
       }
@@ -370,20 +380,24 @@ namespace Synapse
       config.set_plugin_enabled (plugin_type, enabled);
       ConfigService.get_default ().set_config ("data-sink", "global", config);
       
-      foreach (var plugin in plugins)
+      foreach (var plugin in item_plugins)
       {
         if (plugin.get_type () == plugin_type)
         {
           plugin.enabled = enabled;
+          if (enabled) plugin.activate ();
+          else plugin.deactivate ();
           return;
         }
       }
 
-      foreach (var action in actions)
+      foreach (var action in action_plugins)
       {
         if (action.get_type () == plugin_type)
         {
           action.enabled = enabled;
+          if (enabled) action.activate ();
+          else action.deactivate ();
           update_has_unknown_handlers ();
           return;
         }
@@ -392,7 +406,9 @@ namespace Synapse
       // plugin isn't instantiated yet
       if (enabled)
       {
-        register_plugin (create_plugin (plugin_type));
+        var new_instance = create_plugin (plugin_type);
+        register_plugin (new_instance);
+        (new_instance as Activatable).activate ();
       }
     }
 
@@ -417,15 +433,16 @@ namespace Synapse
       var cancellables = new GLib.List<Cancellable> ();
 
       var current_result_set = dest_result_set ?? new ResultSet ();
-      int search_size = plugins.size;
+      int search_size = item_plugins.size;
       // FIXME: this is probably useless, if async method finishes immediately,
       // it'll call complete_in_idle
       bool waiting = false;
 
-      foreach (var data_plugin in plugins)
+      foreach (var data_plugin in item_plugins)
       {
         bool skip = !data_plugin.enabled ||
-          (query == "" && !data_plugin.handles_empty_query ());
+          (query == "" && !data_plugin.handles_empty_query ()) ||
+          !data_plugin.handles_query (q);
         if (skip)
         {
           search_size--;
@@ -439,7 +456,7 @@ namespace Synapse
         // magic comes here
         data_plugin.search.begin (q, (src_obj, res) =>
         {
-          var plugin = src_obj as DataPlugin;
+          var plugin = src_obj as ItemProvider;
           try
           {
             var results = plugin.search.end (res);
@@ -503,7 +520,7 @@ namespace Synapse
     {
       var rs = new ResultSet ();
       var q = Query (0, "", flags);
-      foreach (var action_plugin in actions)
+      foreach (var action_plugin in action_plugins)
       {
         if (!action_plugin.enabled) continue;
         if (!action_plugin.handles_unknown ()) continue;
@@ -518,7 +535,7 @@ namespace Synapse
     {
       var rs = new ResultSet ();
       var q = Query (0, query ?? "", flags);
-      foreach (var action_plugin in actions)
+      foreach (var action_plugin in action_plugins)
       {
         if (!action_plugin.enabled) continue;
         rs.add_all (action_plugin.find_for_match (q, match));

@@ -21,8 +21,20 @@
 
 namespace Synapse
 {
-  public class DesktopFilePlugin: ActionPlugin
+  public class DesktopFilePlugin: Object, Activatable, ItemProvider, ActionProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private class DesktopFileMatch: Object, Match, ApplicationMatch
     {
       // for Match interface
@@ -84,16 +96,6 @@ namespace Synapse
     static construct
     {
       register_plugin ();
-    }
-    
-    protected override bool handles_unknown ()
-    {
-      return false;
-    }
-    
-    protected override bool provides_data ()
-    {
-      return true;
     }
     
     private Gee.List<DesktopFileMatch> desktop_files;
@@ -182,12 +184,17 @@ namespace Synapse
       }
     }
 
-    public override async ResultSet? search (Query q) throws SearchError
+    public bool handles_query (Query q)
     {
       // we only search for applications
-      if (!(QueryFlags.APPLICATIONS in q.query_type)) return null;
-      if (q.query_string.strip () == "") return null;
+      if (!(QueryFlags.APPLICATIONS in q.query_type)) return false;
+      if (q.query_string.strip () == "") return false;
 
+      return true;
+    }
+
+    public async ResultSet? search (Query q) throws SearchError
+    {
       if (loading_in_progress)
       {
         // wait
@@ -278,7 +285,7 @@ namespace Synapse
     
     private Gee.Map<string, Gee.List<OpenWithAction> > mimetype_map;
 
-    public override ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (Query query, Match match)
     {
       if (match.match_type != MatchType.GENERIC_URI) return null;
 

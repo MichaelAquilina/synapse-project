@@ -20,35 +20,37 @@
 
 namespace Synapse
 {
-  public abstract class DataPlugin : Object
+  public interface Activatable : Object
   {
-    public unowned DataSink data_sink { get; construct; }
-    public bool enabled { get; set; default = true; }
+    // this property will eventually go away
+    public abstract bool enabled { get; set; default = true; }
 
+    public abstract void activate ();
+    public abstract void deactivate ();
+  }
+
+  public interface ItemProvider : Activatable
+  {
     public abstract async ResultSet? search (Query query) throws SearchError;
-
-    // weirdish kind of signal cause DataSink will be emitting it for the plugin
-    public signal void search_done (ResultSet rs, uint query_id);
+    public virtual bool handles_query (Query query)
+    {
+      return true;
+    }
     public virtual bool handles_empty_query ()
     {
       return false;
     }
+
+    // weirdish kind of signal cause DataSink will be emitting it for the plugin
+    public signal void search_done (ResultSet rs, uint query_id);
   }
-  
-  public abstract class ActionPlugin : DataPlugin
+
+  public interface ActionProvider : Activatable
   {
+    public abstract ResultSet? find_for_match (Query query, Match match);
     public virtual bool handles_unknown ()
     {
       return false;
-    }
-    public abstract ResultSet? find_for_match (Query query, Match match);
-    public virtual bool provides_data ()
-    {
-      return false;
-    }
-    public override async ResultSet? search (Query query) throws SearchError
-    {
-      assert_not_reached ();
     }
   }
 }

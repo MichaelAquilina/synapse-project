@@ -27,15 +27,27 @@ namespace Synapse
     public const string UNIQUE_NAME = "org.gnome.SessionManager";
     public const string OBJECT_PATH = "/org/gnome/SessionManager";
     public const string INTERFACE_NAME = "org.gnome.SessionManager";
-    
+
     public abstract bool can_shutdown () throws DBus.Error;
     public abstract void shutdown () throws DBus.Error;
     public abstract void request_reboot () throws DBus.Error;
     public abstract void logout (uint32 mode = 0) throws DBus.Error;
   }
-    
-  public class GnomeSessionPlugin: DataPlugin
+
+  public class GnomeSessionPlugin: Object, Activatable, ItemProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private class ShutDownAction: Object, Match
     {
       // for Match interface
@@ -184,7 +196,7 @@ namespace Synapse
       //actions.add (new ShutDownAction ());
     }
     
-    public override async ResultSet? search (Query q) throws SearchError
+    public async ResultSet? search (Query q) throws SearchError
     {
       if (!session_manager_available) return null;
      // we only search for actions

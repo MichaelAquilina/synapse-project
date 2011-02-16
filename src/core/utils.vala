@@ -101,7 +101,8 @@ namespace Synapse
         if (!initialized)
         {
           var levels = LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.LEVEL_INFO |
-            LogLevelFlags.LEVEL_CRITICAL | LogLevelFlags.LEVEL_ERROR;
+            LogLevelFlags.LEVEL_WARNING | LogLevelFlags.LEVEL_CRITICAL |
+            LogLevelFlags.LEVEL_ERROR;
           Log.set_handler ("Synapse", levels, handler);
           
           show_debug = Environment.get_variable ("SYNAPSE_DEBUG") != null;
@@ -109,7 +110,7 @@ namespace Synapse
         }
         Type obj_type = obj != null ? obj.get_type () : typeof (Logger);
         string obj_class = obj_type.name ();
-        if (obj_class.has_prefix ("Synapse")) obj_class = obj_class.offset (7);
+        if (obj_class.has_prefix ("Synapse")) obj_class = obj_class.substring (7);
         string pretty_obj = "%s[%s]%s ".printf (MAGENTA, obj_class, RESET);
         logv ("Synapse", level, pretty_obj + format, args);
       }
@@ -125,6 +126,12 @@ namespace Synapse
       {
         var args = va_list ();
         log_internal (obj, LogLevelFlags.LEVEL_DEBUG, format, args);
+      }
+
+      public static void warning (Object? obj, string format, ...)
+      {
+        var args = va_list ();
+        log_internal (obj, LogLevelFlags.LEVEL_WARNING, format, args);
       }
 
       public static void error (Object? obj, string format, ...)
@@ -145,6 +152,10 @@ namespace Synapse
         else if (level == LogLevelFlags.LEVEL_INFO)
         {
           header = @"$(BLUE)[$(cur_time) Info]$(RESET)";
+        }
+        else if (level == LogLevelFlags.LEVEL_WARNING)
+        {
+          header = @"$(RED)[$(cur_time) Warning]$(RESET)";
         }
         else if (level == LogLevelFlags.LEVEL_CRITICAL || level == LogLevelFlags.LEVEL_ERROR)
         {

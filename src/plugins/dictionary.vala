@@ -21,8 +21,20 @@
 
 namespace Synapse
 {
-  public class DictionaryPlugin: ActionPlugin
+  public class DictionaryPlugin: Object, Activatable, ActionProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private class Define: Object, Match
     {
       // from Match interface
@@ -86,12 +98,12 @@ namespace Synapse
         Environment.find_program_in_path ("gnome-dictionary") != null;
     }
     
-    public override bool handles_unknown ()
+    public bool handles_unknown ()
     {
       return has_dictionary;
     }
 
-    public override ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (Query query, Match match)
     {
       if (!has_dictionary || match.match_type != MatchType.UNKNOWN ||
           !(QueryFlags.ACTIONS in query.query_type))

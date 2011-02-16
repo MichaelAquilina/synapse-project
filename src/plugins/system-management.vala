@@ -47,8 +47,20 @@ namespace Synapse
     public abstract async bool can_stop () throws DBus.Error;
   }
 
-  public class SystemManagementPlugin: DataPlugin
+  public class SystemManagementPlugin: Object, Activatable, ItemProvider
   {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
     private abstract class SystemAction: Object, Match
     {
       // for Match interface
@@ -329,7 +341,7 @@ namespace Synapse
       actions.add (new RestartAction ());
     }
 
-    public override async ResultSet? search (Query q) throws SearchError
+    public async ResultSet? search (Query q) throws SearchError
     {
       // we only search for actions
       if (!(QueryFlags.ACTIONS in q.query_type)) return null;
