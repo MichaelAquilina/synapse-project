@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-17 01:32+0100\n"
+"POT-Creation-Date: 2011-02-17 00:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -183,356 +183,356 @@ msgstr ""
 msgid "No results."
 msgstr ""
 
-#: ../src/core/common-actions.c:1020
+#: ../src/core/common-actions.c:1027
 msgid "Run"
 msgstr ""
 
-#: ../src/core/common-actions.c:1021
+#: ../src/core/common-actions.c:1028
 msgid "Run an application, action or script"
 msgstr ""
 
-#: ../src/core/common-actions.c:1180
+#: ../src/core/common-actions.c:1187
 msgid "Run in Terminal"
 msgstr ""
 
-#: ../src/core/common-actions.c:1181
+#: ../src/core/common-actions.c:1188
 msgid "Run application or command in terminal"
 msgstr ""
 
-#: ../src/core/common-actions.c:1334
+#: ../src/core/common-actions.c:1341
 msgid "Open"
 msgstr ""
 
-#: ../src/core/common-actions.c:1335
+#: ../src/core/common-actions.c:1342
 msgid "Open using default application"
 msgstr ""
 
-#: ../src/core/common-actions.c:1469
+#: ../src/core/common-actions.c:1476
 msgid "Open folder"
 msgstr ""
 
-#: ../src/core/common-actions.c:1470
+#: ../src/core/common-actions.c:1477
 msgid "Open folder containing this file"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:2634
+#: ../src/plugins/banshee-plugin.c:2653
 msgid "Control Banshee and add items to playlists."
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:2638
+#: ../src/plugins/banshee-plugin.c:2657
 msgid "Banshee is not installed"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3654 ../src/plugins/rhythmbox-plugin.c:3704
+#: ../src/plugins/banshee-plugin.c:3672 ../src/plugins/rhythmbox-plugin.c:3722
 msgid "Play"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3655
+#: ../src/plugins/banshee-plugin.c:3673
 msgid "Start playback in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3753 ../src/plugins/rhythmbox-plugin.c:3900
+#: ../src/plugins/banshee-plugin.c:3771 ../src/plugins/rhythmbox-plugin.c:3913
 msgid "Pause"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3754
+#: ../src/plugins/banshee-plugin.c:3772
 msgid "Pause playback in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3842 ../src/plugins/rhythmbox-plugin.c:3954
+#: ../src/plugins/banshee-plugin.c:3860 ../src/plugins/rhythmbox-plugin.c:3967
 msgid "Next"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3843
+#: ../src/plugins/banshee-plugin.c:3861
 msgid "Plays the next song in Banshee's playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3931 ../src/plugins/rhythmbox-plugin.c:4043
+#: ../src/plugins/banshee-plugin.c:3949 ../src/plugins/rhythmbox-plugin.c:4048
 msgid "Previous"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3932
+#: ../src/plugins/banshee-plugin.c:3950
 msgid "Plays the previous song in Banshee's playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4020
+#: ../src/plugins/banshee-plugin.c:4038
 msgid "Enqueue in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4021
+#: ../src/plugins/banshee-plugin.c:4039
 msgid "Add the song to Banshee playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4172
+#: ../src/plugins/banshee-plugin.c:4190
 msgid "Play in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4173 ../src/plugins/rhythmbox-plugin.c:4332
+#: ../src/plugins/banshee-plugin.c:4191 ../src/plugins/rhythmbox-plugin.c:4320
 msgid "Clears the current playlist and plays the song"
 msgstr ""
 
-#: ../src/plugins/calculator-plugin.c:203
+#: ../src/plugins/calculator-plugin.c:230
 msgid "Calculator"
 msgstr ""
 
-#: ../src/plugins/calculator-plugin.c:204
-msgid "Calulate basic expressions."
+#: ../src/plugins/calculator-plugin.c:231
+msgid "Calculate basic expressions."
 msgstr ""
 
-#: ../src/plugins/calculator-plugin.c:207
+#: ../src/plugins/calculator-plugin.c:234
 msgid "bc is not installed"
 msgstr ""
 
-#: ../src/plugins/calculator-plugin.c:573
+#: ../src/plugins/calculator-plugin.c:677
 msgid "Calculate basic expressions"
 msgstr ""
 
-#: ../src/plugins/command-plugin.c:200
+#: ../src/plugins/command-plugin.c:219
 msgid "Find and execute arbitrary commands."
 msgstr ""
 
-#: ../src/plugins/command-plugin.c:689
+#: ../src/plugins/command-plugin.c:724
 msgid "Run command"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:293
+#: ../src/plugins/desktop-file-plugin.c:310
 msgid "Search for and run applications on your computer."
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1597
+#: ../src/plugins/desktop-file-plugin.c:1616
 #, c-format
 msgid "Open with %s"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1605
+#: ../src/plugins/desktop-file-plugin.c:1624
 #, c-format
 msgid "Opens current selection using %s"
 msgstr ""
 
-#: ../src/plugins/devhelp-search.c:150
+#: ../src/plugins/devhelp-search.c:170
 msgid "Search documentation using Devhelp."
 msgstr ""
 
-#: ../src/plugins/devhelp-search.c:153
+#: ../src/plugins/devhelp-search.c:173
 msgid "Devhelp is not installed"
 msgstr ""
 
-#: ../src/plugins/devhelp-search.c:379
+#: ../src/plugins/devhelp-search.c:416
 msgid "Search in Devhelp"
 msgstr ""
 
-#: ../src/plugins/devhelp-search.c:380
+#: ../src/plugins/devhelp-search.c:417
 msgid "Search documentation for this symbol"
 msgstr ""
 
-#: ../src/plugins/dictionary.c:148
+#: ../src/plugins/dictionary.c:168
 msgid "Look up definitions of words."
 msgstr ""
 
-#: ../src/plugins/dictionary.c:151
+#: ../src/plugins/dictionary.c:171
 msgid "Gnome Dictionary is not installed"
 msgstr ""
 
-#: ../src/plugins/dictionary.c:342
+#: ../src/plugins/dictionary.c:379
 msgid "Define"
 msgstr ""
 
-#: ../src/plugins/dictionary.c:343
+#: ../src/plugins/dictionary.c:380
 msgid "Look up definition in dictionary"
 msgstr ""
 
-#: ../src/plugins/directory-plugin.c:417
+#: ../src/plugins/directory-plugin.c:440
 msgid "Open commonly used directories."
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1531
+#: ../src/plugins/gnome-session-plugin.c:1551
 msgid "Log out from your session."
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1535
+#: ../src/plugins/gnome-session-plugin.c:1555
 msgid "Gnome Session Manager wasn't found"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1764
-#: ../src/plugins/system-management.c:4720
+#: ../src/plugins/gnome-session-plugin.c:1800
+#: ../src/plugins/system-management.c:4137
 msgid "Shut Down"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1765
-#: ../src/plugins/system-management.c:4721
+#: ../src/plugins/gnome-session-plugin.c:1801
+#: ../src/plugins/system-management.c:4138
 msgid "Turn your computer off"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2081
-#: ../src/plugins/system-management.c:4943
+#: ../src/plugins/gnome-session-plugin.c:2117
+#: ../src/plugins/system-management.c:4360
 msgid "Restart"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2082
-#: ../src/plugins/system-management.c:4944
+#: ../src/plugins/gnome-session-plugin.c:2118
+#: ../src/plugins/system-management.c:4361
 msgid "Restart your computer"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2398
+#: ../src/plugins/gnome-session-plugin.c:2434
 msgid "Log Out"
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:2399
+#: ../src/plugins/gnome-session-plugin.c:2435
 msgid "Close your session and return to the login screen"
 msgstr ""
 
-#: ../src/plugins/gnome-screensaver-plugin.c:733
+#: ../src/plugins/gnome-screensaver-plugin.c:753
 msgid "Lock screen of your computer."
 msgstr ""
 
-#: ../src/plugins/gnome-screensaver-plugin.c:737
+#: ../src/plugins/gnome-screensaver-plugin.c:757
 msgid "Gnome Screen Saver wasn't found"
 msgstr ""
 
-#: ../src/plugins/gnome-screensaver-plugin.c:940
+#: ../src/plugins/gnome-screensaver-plugin.c:977
 msgid "Lock Screen"
 msgstr ""
 
-#: ../src/plugins/gnome-screensaver-plugin.c:941
+#: ../src/plugins/gnome-screensaver-plugin.c:978
 msgid "Locks screen and starts screensaver."
 msgstr ""
 
-#: ../src/plugins/hybrid-search-plugin.c:552
+#: ../src/plugins/hybrid-search-plugin.c:580
 msgid ""
 "Improve results returned by the Zeitgeist plugin by looking for similar "
 "files on the filesystem."
 msgstr ""
 
-#: ../src/plugins/locate-plugin.c:307 ../src/plugins/locate-plugin.c:1375
+#: ../src/plugins/locate-plugin.c:326 ../src/plugins/locate-plugin.c:1410
 msgid "Locate"
 msgstr ""
 
-#: ../src/plugins/locate-plugin.c:308
+#: ../src/plugins/locate-plugin.c:327
 msgid "Runs locate command to find files on the filesystem."
 msgstr ""
 
-#: ../src/plugins/locate-plugin.c:311
+#: ../src/plugins/locate-plugin.c:330
 msgid "Unable to find \"locate\" binary"
 msgstr ""
 
-#: ../src/plugins/locate-plugin.c:1376
+#: ../src/plugins/locate-plugin.c:1411
 msgid "Locate files with this name on the filesystem"
 msgstr ""
 
-#: ../src/plugins/opensearch.vala:237 ../src/plugins/opensearch.c:369
+#: ../src/plugins/opensearch.vala:249 ../src/plugins/opensearch.c:388
 msgid "Search the web."
 msgstr ""
 
-#: ../src/plugins/opensearch.vala:249
+#: ../src/plugins/opensearch.vala:261
 msgid "Google"
 msgstr ""
 
-#: ../src/plugins/opensearch.vala:250
+#: ../src/plugins/opensearch.vala:262
 msgid "Search the web using google.com"
 msgstr ""
 
-#: ../src/plugins/opensearch.vala:251
+#: ../src/plugins/opensearch.vala:263
 msgid "Google Maps"
 msgstr ""
 
-#: ../src/plugins/opensearch.vala:252
+#: ../src/plugins/opensearch.vala:264
 msgid "Search using Google Maps"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:2684
+#: ../src/plugins/rhythmbox-plugin.c:2703
 msgid "Control Rhythmbox and add items to playlists."
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:2688
+#: ../src/plugins/rhythmbox-plugin.c:2707
 msgid "Rhythmbox is not installed"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3705
+#: ../src/plugins/rhythmbox-plugin.c:3723
 msgid "Start playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3901
+#: ../src/plugins/rhythmbox-plugin.c:3914
 msgid "Pause playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3955
+#: ../src/plugins/rhythmbox-plugin.c:3968
 msgid "Plays the next song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:4044
+#: ../src/plugins/rhythmbox-plugin.c:4049
 msgid "Plays the previous song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:4145
+#: ../src/plugins/rhythmbox-plugin.c:4142
 msgid "Enqueue in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:4146
+#: ../src/plugins/rhythmbox-plugin.c:4143
 msgid "Add the song to Rhythmbox playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:4331
+#: ../src/plugins/rhythmbox-plugin.c:4319
 msgid "Play in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/system-management.c:3598
+#: ../src/plugins/system-management.c:3154
 msgid "Suspend, hibernate, restart or shutdown your computer."
 msgstr ""
 
-#: ../src/plugins/system-management.c:3602
+#: ../src/plugins/system-management.c:3158
 msgid "ConsoleKit wasn't found"
 msgstr ""
 
-#: ../src/plugins/system-management.c:4118
+#: ../src/plugins/system-management.c:3691
 msgid "Suspend"
 msgstr ""
 
-#: ../src/plugins/system-management.c:4119
+#: ../src/plugins/system-management.c:3692
 msgid "Put your computer into suspend mode"
 msgstr ""
 
-#: ../src/plugins/system-management.c:4428
+#: ../src/plugins/system-management.c:3914
 msgid "Hibernate"
 msgstr ""
 
-#: ../src/plugins/system-management.c:4429
+#: ../src/plugins/system-management.c:3915
 msgid "Put your computer into hibernation mode"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:395
+#: ../src/plugins/zeitgeist-plugin.c:414
 msgid "Search various items logged by Zeitgeist."
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:399
+#: ../src/plugins/zeitgeist-plugin.c:418
 msgid "Zeitgeist is not installed"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1777
+#: ../src/plugins/zeitgeist-plugin.c:1809
 msgid "few moments ago"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1786
+#: ../src/plugins/zeitgeist-plugin.c:1818
 #, c-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1798
+#: ../src/plugins/zeitgeist-plugin.c:1830
 #, c-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1810
+#: ../src/plugins/zeitgeist-plugin.c:1842
 #, c-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1822
+#: ../src/plugins/zeitgeist-plugin.c:1854
 #, c-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"

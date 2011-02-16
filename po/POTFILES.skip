@@ -4,4 +4,5 @@ src/ui-cairo-gtk-virgilio.c
 src/ui-interface.c
 src/ui-settings.c
 src/ui-widgets.c
+src/plugins/hello-world-plugin.c
 
