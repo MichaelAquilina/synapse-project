@@ -160,6 +160,7 @@ namespace Synapse
         typeof (DirectoryPlugin),
 #if TEST_PLUGINS
         typeof (TestSlowPlugin),
+        typeof (HelloWorldPlugin),
 #endif
         typeof (DictionaryPlugin),
         typeof (DevhelpPlugin),

@@ -36,6 +36,7 @@ libplugins_la_VALASOURCES = \
 	directory-plugin.vala \
 	gnome-session-plugin.vala \
 	gnome-screensaver-plugin.vala \
+	hello-world-plugin.vala \
 	hybrid-search-plugin.vala \
 	locate-plugin.vala \
 	opensearch.vala \
