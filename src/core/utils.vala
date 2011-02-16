@@ -83,6 +83,14 @@ namespace Synapse
       return exists;
     }
     
+    public string extract_type_name (Type obj_type)
+    {
+      string obj_class = obj_type.name ();
+      if (obj_class.has_prefix ("Synapse")) return obj_class.substring (7);
+      
+      return obj_class;
+    }
+    
     public class Logger
     {
       protected const string RED = "\x1b[31m";
@@ -109,8 +117,7 @@ namespace Synapse
           initialized = true;
         }
         Type obj_type = obj != null ? obj.get_type () : typeof (Logger);
-        string obj_class = obj_type.name ();
-        if (obj_class.has_prefix ("Synapse")) obj_class = obj_class.substring (7);
+        string obj_class = extract_type_name (obj_type);
         string pretty_obj = "%s[%s]%s ".printf (MAGENTA, obj_class, RESET);
         logv ("Synapse", level, pretty_obj + format, args);
       }
