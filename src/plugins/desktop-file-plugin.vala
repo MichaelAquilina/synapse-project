@@ -143,7 +143,10 @@ namespace Synapse
       var rs = RelevancyService.get_default ();
       float popularity = rs.get_application_popularity (dfm.desktop_id);
 
-      return RelevancyService.compute_relevancy (base_relevancy, popularity);
+      int r = RelevancyService.compute_relevancy (base_relevancy, popularity);
+      Utils.Logger.debug (this, "relevancy for %s: %d", dfm.desktop_id, r);
+      
+      return r;
     }
 
     private void full_search (Query q, ResultSet results,
