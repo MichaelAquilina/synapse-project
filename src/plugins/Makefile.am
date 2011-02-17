@@ -38,6 +38,7 @@ libplugins_la_VALASOURCES = \
 	gnome-screensaver-plugin.vala \
 	hello-world-plugin.vala \
 	hybrid-search-plugin.vala \
+	launchpad-plugin.vala \
 	locate-plugin.vala \
 	opensearch.vala \
 	rhythmbox-plugin.vala \
