@@ -63,10 +63,10 @@ namespace Synapse
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
-        typeof (CommandPlugin),
-        "Command Search",
-        _ ("Find and execute arbitrary commands."),
-        "system-run",
+        typeof (LaunchpadPlugin),
+        "Launchpad",
+        _ ("Find bugs and branches on Launchpad."),
+        "applications-internet",
         register_plugin
       );
     }
