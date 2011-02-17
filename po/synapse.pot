@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-17 00:37+0100\n"
+"POT-Creation-Date: 2011-02-17 20:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr ""
 msgid "Synapse"
 msgstr ""
 
-#: ../src/synapse-main.vala:93 ../src/ui-settings.vala:317
+#: ../src/synapse-main.vala:93 ../src/ui-settings.vala:330
 msgid "Activate"
 msgstr ""
 
@@ -109,73 +109,77 @@ msgstr ""
 msgid "Disable this plugin"
 msgstr ""
 
-#: ../src/ui-settings.vala:57 ../src/ui-settings.vala:367
+#: ../src/ui-settings.vala:54
+msgid "About this plugin"
+msgstr ""
+
+#: ../src/ui-settings.vala:70 ../src/ui-settings.vala:380
 msgid "Disabled"
 msgstr ""
 
-#: ../src/ui-settings.vala:61
+#: ../src/ui-settings.vala:74
 msgid "Enabled"
 msgstr ""
 
-#: ../src/ui-settings.vala:114
+#: ../src/ui-settings.vala:127
 msgid "Synapse - Settings"
 msgstr ""
 
-#: ../src/ui-settings.vala:135
+#: ../src/ui-settings.vala:148
 msgid "Default"
 msgstr ""
 
-#: ../src/ui-settings.vala:136
+#: ../src/ui-settings.vala:149
 msgid "Mini"
 msgstr ""
 
-#: ../src/ui-settings.vala:137
+#: ../src/ui-settings.vala:150
 msgid "Dual"
 msgstr ""
 
-#: ../src/ui-settings.vala:138
+#: ../src/ui-settings.vala:151
 msgid "Virgilio"
 msgstr ""
 
-#: ../src/ui-settings.vala:227
+#: ../src/ui-settings.vala:240
 msgid "General"
 msgstr ""
 
-#: ../src/ui-settings.vala:228
+#: ../src/ui-settings.vala:241
 msgid "Plugins"
 msgstr ""
 
-#: ../src/ui-settings.vala:234
+#: ../src/ui-settings.vala:247
 msgid "Behavior & Look"
 msgstr ""
 
-#: ../src/ui-settings.vala:246
+#: ../src/ui-settings.vala:259
 msgid "Theme:"
 msgstr ""
 
 #. Autostart checkbox
-#: ../src/ui-settings.vala:251
+#: ../src/ui-settings.vala:264
 msgid "Startup on login"
 msgstr ""
 
 #. Notification icon
-#: ../src/ui-settings.vala:257
+#: ../src/ui-settings.vala:270
 msgid "Show notification icon"
 msgstr ""
 
-#: ../src/ui-settings.vala:272
+#: ../src/ui-settings.vala:285
 msgid "Shortcuts"
 msgstr ""
 
-#: ../src/ui-settings.vala:294
+#: ../src/ui-settings.vala:307
 msgid "Action"
 msgstr ""
 
-#: ../src/ui-settings.vala:311
+#: ../src/ui-settings.vala:324
 msgid "Shortcut"
 msgstr ""
 
-#: ../src/ui-settings.vala:325
+#: ../src/ui-settings.vala:338
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr ""
 
@@ -183,35 +187,35 @@ msgstr ""
 msgid "No results."
 msgstr ""
 
-#: ../src/core/common-actions.c:1027
+#: ../src/core/common-actions.c:1091
 msgid "Run"
 msgstr ""
 
-#: ../src/core/common-actions.c:1028
+#: ../src/core/common-actions.c:1092
 msgid "Run an application, action or script"
 msgstr ""
 
-#: ../src/core/common-actions.c:1187
+#: ../src/core/common-actions.c:1251
 msgid "Run in Terminal"
 msgstr ""
 
-#: ../src/core/common-actions.c:1188
+#: ../src/core/common-actions.c:1252
 msgid "Run application or command in terminal"
 msgstr ""
 
-#: ../src/core/common-actions.c:1341
+#: ../src/core/common-actions.c:1405
 msgid "Open"
 msgstr ""
 
-#: ../src/core/common-actions.c:1342
+#: ../src/core/common-actions.c:1406
 msgid "Open using default application"
 msgstr ""
 
-#: ../src/core/common-actions.c:1476
+#: ../src/core/common-actions.c:1529
 msgid "Open folder"
 msgstr ""
 
-#: ../src/core/common-actions.c:1477
+#: ../src/core/common-actions.c:1530
 msgid "Open folder containing this file"
 msgstr ""
 
@@ -299,12 +303,12 @@ msgstr ""
 msgid "Search for and run applications on your computer."
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1616
+#: ../src/plugins/desktop-file-plugin.c:1621
 #, c-format
 msgid "Open with %s"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1624
+#: ../src/plugins/desktop-file-plugin.c:1629
 #, c-format
 msgid "Opens current selection using %s"
 msgstr ""

@@ -16,6 +16,7 @@ src/plugins/directory-plugin.c
 src/plugins/gnome-session-plugin.c
 src/plugins/gnome-screensaver-plugin.c
 src/plugins/hybrid-search-plugin.c
+src/plugins/launchpad-plugin.c
 src/plugins/locate-plugin.c
 src/plugins/opensearch.vala
 src/plugins/opensearch.c
