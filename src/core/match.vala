@@ -23,6 +23,7 @@ namespace Synapse
   public enum MatchType
   {
     UNKNOWN = 0,
+    TEXT,
     APPLICATION,
     GENERIC_URI,
     ACTION,
@@ -83,6 +84,11 @@ namespace Synapse
   public interface ExtendedInfo: Match
   {
     public abstract string? extended_info { get; set; }
+  }
+  
+  public interface TextMatch: Match
+  {
+    public abstract string get_text ();
   }
   
   public interface SearchMatch: Match, SearchProvider
