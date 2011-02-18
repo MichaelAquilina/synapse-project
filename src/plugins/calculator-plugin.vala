@@ -49,9 +49,9 @@ namespace Synapse
 
       public Result (double result, string match_string)
       {
-        Object (match_type: MatchType.UNKNOWN,
-                title: "%g (%s)".printf (result, match_string),
-                description: _ ("Calculate basic expressions"),
+        Object (match_type: MatchType.TEXT,
+                title: "%g".printf (result),
+                description: "%s = %g".printf (match_string, result),
                 has_thumbnail: false, icon_name: "accessories-calculator");
       }
     }
