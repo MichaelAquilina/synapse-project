@@ -15,6 +15,7 @@ Build-Depends: debhelper (>= 7.0.50~),
  libgee-dev (>= 0.5.2),
  libjson-glib-dev (>= 0.10.0),
  libunique-dev,
+ libnotify-dev,
  libgtkhotkey-dev,
  libappindicator-dev (>= 0.0.7)
 Vcs-Bzr: http://bazaar.launchpad.net/~synapse-core/synapse-project/trunk/

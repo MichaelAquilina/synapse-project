@@ -76,7 +76,6 @@ namespace Synapse
           Regex url = new Regex ("^http(s)?://.*$"); // url
           if (url.match (complete_output))
           {
-            Utils.Logger.log (this, "got: %s", complete_output);
             return complete_output;
           }
           else
@@ -110,9 +109,13 @@ namespace Synapse
           DataInputStream pastebinit_output = new DataInputStream (read_stream);
           UnixOutputStream write_stream = new UnixOutputStream (write_fd, true);
 
-          // FIXME: does this work with 0.10.x?
+#if VALA_0_12
           yield write_stream.write_async (content.data);
           yield write_stream.close_async ();
+#else
+          yield write_stream.write_async ((void*)content, content.size (), Priority.DEFAULT);
+          yield write_stream.close_async (Priority.DEFAULT);
+#endif
 
           string? line = null;
           string complete_output = "";
@@ -128,7 +131,6 @@ namespace Synapse
           Regex url = new Regex ("^http(s)?://.*$"); // url
           if (url.match (complete_output))
           {
-            Utils.Logger.log (this, "got: %s", complete_output);
             return complete_output;
           }
           else
@@ -144,6 +146,39 @@ namespace Synapse
         return null;
       }
       
+      private void process_pastebin_result (string? url)
+      {
+        string msg;
+        if (url != null)
+        {
+          var cb = Gtk.Clipboard.get (Gdk.Atom.NONE);
+          cb.set_text (url, -1);
+
+          msg = _ ("The selection was successfully uploaded and its URL was copied to clipboard.");
+        }
+        else
+        {
+          msg = _ ("An error occurred during upload to pastebin, please check the log for more information.");
+        }
+
+        try
+        {
+          // yey for breaking API!
+          var notification = Object.new (
+            typeof (Notify.Notification),
+            summary: _ ("Synapse - Pastebin"),
+            body: msg,
+            icon_name: "synapse",
+            null) as Notify.Notification;
+          notification.set_timeout (10);
+          notification.show ();
+        }
+        catch (Error err)
+        {
+          Utils.Logger.warning (this, "%s", err.message);
+        }
+      }
+      
       public override void do_execute (Match? match)
       {
         if (match.match_type == MatchType.GENERIC_URI && match is UriMatch)
@@ -156,13 +191,21 @@ namespace Synapse
             Utils.Logger.warning (this, "Unable to get path for %s", uri_match.uri);
             return;
           }
-          pastebin_file.begin (path);
+          pastebin_file.begin (path, (obj, res) =>
+          {
+            string? url = pastebin_file.end (res);
+            process_pastebin_result (url);
+          });
         }
         else if (match.match_type == MatchType.TEXT)
         {
           TextMatch? text_match = match as TextMatch;
           string content = text_match != null ? text_match.get_text () : match.title;
-          pastebin_text.begin (content);
+          pastebin_text.begin (content, (obj, res) =>
+          {
+            string? url = pastebin_text.end (res);
+            process_pastebin_result (url);
+          });
         }
       }
       

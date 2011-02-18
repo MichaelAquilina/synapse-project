@@ -12,7 +12,7 @@ libplugins_la_VALAFLAGS = \
 	--pkg json-glib-1.0 \
 	--pkg dbus-glib-1 \
 	--pkg gio-unix-2.0 \
-	--pkg zeitgeist-1.0 \
+	--pkg libnotify \
 	--vapidir $(top_srcdir)/src/core \
 	--pkg synapse-core \
 	--vapidir $(VAPIDIR) \

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-18 01:46+0100\n"
+"POT-Creation-Date: 2011-02-18 16:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -217,6 +217,14 @@ msgstr ""
 
 #: ../src/core/common-actions.vala:209
 msgid "Open folder containing this file"
+msgstr ""
+
+#: ../src/core/common-actions.vala:248
+msgid "Copy to Clipboard"
+msgstr ""
+
+#: ../src/core/common-actions.vala:249
+msgid "Copy selection to clipboard"
 msgstr ""
 
 #: ../src/plugins/banshee-plugin.vala:73
@@ -431,7 +439,7 @@ msgid "Search using Google Maps"
 msgstr ""
 
 #: ../src/plugins/pastebin-plugin.vala:42
-#: ../src/plugins/pastebin-plugin.vala:190
+#: ../src/plugins/pastebin-plugin.vala:233
 msgid "Pastebin"
 msgstr ""
 
@@ -439,11 +447,26 @@ msgstr ""
 msgid "Pastebin selection"
 msgstr ""
 
-#: ../src/plugins/pastebin-plugin.vala:191
+#: ../src/plugins/pastebin-plugin.vala:157
+msgid ""
+"The selection was successfully uploaded and its URL was copied to clipboard."
+msgstr ""
+
+#: ../src/plugins/pastebin-plugin.vala:161
+msgid ""
+"An error occurred during upload to pastebin, please check the log for more "
+"information."
+msgstr ""
+
+#: ../src/plugins/pastebin-plugin.vala:169
+msgid "Synapse - Pastebin"
+msgstr ""
+
+#: ../src/plugins/pastebin-plugin.vala:234
 msgid "Upload files to pastebin."
 msgstr ""
 
-#: ../src/plugins/pastebin-plugin.vala:195
+#: ../src/plugins/pastebin-plugin.vala:238
 msgid "Unable to find \"pastebinit\" program"
 msgstr ""
 
