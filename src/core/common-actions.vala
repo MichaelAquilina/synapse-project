@@ -241,6 +241,59 @@ namespace Synapse
       }
     }
 
+    private class ClipboardCopy: BaseAction
+    {
+      public ClipboardCopy ()
+      {
+        Object (title: _ ("Copy to Clipboard"),
+                description: _ ("Copy selection to clipboard"),
+                icon_name: "gtk-copy", has_thumbnail: false,
+                match_type: MatchType.ACTION,
+                default_relevancy: Match.Score.AVERAGE);
+      }
+
+      public override void do_execute (Match? match)
+      {
+        var cb = Gtk.Clipboard.get (Gdk.Atom.NONE);
+        if (match.match_type == MatchType.GENERIC_URI)
+        {
+          UriMatch uri_match = match as UriMatch;
+          return_if_fail (uri_match != null);
+          
+          /*
+           // just wow, Gtk and also Vala are trying really hard to make this hard to do...
+          Gtk.TargetEntry[] no_entries = {};
+          Gtk.TargetList l = new Gtk.TargetList (no_entries);
+          l.add_uri_targets (0);
+          l.add_text_targets (0);
+          Gtk.TargetEntry te = Gtk.target_table_new_from_list (l, 2);
+          cb.set_with_data ();
+          */
+          cb.set_text (uri_match.uri, -1);
+        }
+        else if (match.match_type == MatchType.TEXT)
+        {
+          TextMatch? text_match = match as TextMatch;
+          string content = text_match != null ? text_match.get_text () : match.title;
+
+          cb.set_text (content, -1);
+        }
+      }
+
+      public override bool valid_for_match (Match match)
+      {
+        switch (match.match_type)
+        {
+          case MatchType.GENERIC_URI:
+            return true;
+          case MatchType.TEXT:
+            return true;
+          default:
+            return false;
+        }
+      }
+    }
+
     private Gee.List<BaseAction> actions;
 
     construct
@@ -251,6 +304,7 @@ namespace Synapse
       actions.add (new TerminalRunner ());
       actions.add (new Opener ());
       actions.add (new OpenFolder ());
+      actions.add (new ClipboardCopy ());
     }
 
     public ResultSet? find_for_match (Query query, Match match)
