@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-17 20:10+0100\n"
+"POT-Creation-Date: 2011-02-18 01:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -187,243 +187,230 @@ msgstr ""
 msgid "No results."
 msgstr ""
 
-#: ../src/core/common-actions.c:1091
+#: ../src/core/common-actions.vala:64
 msgid "Run"
 msgstr ""
 
-#: ../src/core/common-actions.c:1092
+#: ../src/core/common-actions.vala:65
 msgid "Run an application, action or script"
 msgstr ""
 
-#: ../src/core/common-actions.c:1251
+#: ../src/core/common-actions.vala:119
 msgid "Run in Terminal"
 msgstr ""
 
-#: ../src/core/common-actions.c:1252
+#: ../src/core/common-actions.vala:120
 msgid "Run application or command in terminal"
 msgstr ""
 
-#: ../src/core/common-actions.c:1405
+#: ../src/core/common-actions.vala:167
 msgid "Open"
 msgstr ""
 
-#: ../src/core/common-actions.c:1406
+#: ../src/core/common-actions.vala:168
 msgid "Open using default application"
 msgstr ""
 
-#: ../src/core/common-actions.c:1529
+#: ../src/core/common-actions.vala:208
 msgid "Open folder"
 msgstr ""
 
-#: ../src/core/common-actions.c:1530
+#: ../src/core/common-actions.vala:209
 msgid "Open folder containing this file"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:2653
+#: ../src/plugins/banshee-plugin.vala:73
 msgid "Control Banshee and add items to playlists."
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:2657
+#: ../src/plugins/banshee-plugin.vala:77
 msgid "Banshee is not installed"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3672 ../src/plugins/rhythmbox-plugin.c:3722
+#: ../src/plugins/banshee-plugin.vala:142
+#: ../src/plugins/rhythmbox-plugin.vala:144
 msgid "Play"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3673
+#: ../src/plugins/banshee-plugin.vala:143
 msgid "Start playback in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3771 ../src/plugins/rhythmbox-plugin.c:3913
+#: ../src/plugins/banshee-plugin.vala:170
+#: ../src/plugins/rhythmbox-plugin.vala:187
 msgid "Pause"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3772
+#: ../src/plugins/banshee-plugin.vala:171
 msgid "Pause playback in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3860 ../src/plugins/rhythmbox-plugin.c:3967
+#: ../src/plugins/banshee-plugin.vala:192
+#: ../src/plugins/rhythmbox-plugin.vala:203
 msgid "Next"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3861
+#: ../src/plugins/banshee-plugin.vala:193
 msgid "Plays the next song in Banshee's playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3949 ../src/plugins/rhythmbox-plugin.c:4048
+#: ../src/plugins/banshee-plugin.vala:215
+#: ../src/plugins/rhythmbox-plugin.vala:226
 msgid "Previous"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:3950
+#: ../src/plugins/banshee-plugin.vala:216
 msgid "Plays the previous song in Banshee's playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4038
+#: ../src/plugins/banshee-plugin.vala:239
 msgid "Enqueue in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4039
+#: ../src/plugins/banshee-plugin.vala:240
 msgid "Add the song to Banshee playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4190
+#: ../src/plugins/banshee-plugin.vala:282
 msgid "Play in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.c:4191 ../src/plugins/rhythmbox-plugin.c:4320
+#: ../src/plugins/banshee-plugin.vala:283
+#: ../src/plugins/rhythmbox-plugin.vala:299
 msgid "Clears the current playlist and plays the song"
 msgstr ""
 
-#: ../src/plugins/calculator-plugin.c:230
+#: ../src/plugins/calculator-plugin.vala:63
 msgid "Calculator"
 msgstr ""
 
-#: ../src/plugins/calculator-plugin.c:231
+#: ../src/plugins/calculator-plugin.vala:64
 msgid "Calculate basic expressions."
 msgstr ""
 
-#: ../src/plugins/calculator-plugin.c:234
+#: ../src/plugins/calculator-plugin.vala:68
 msgid "bc is not installed"
 msgstr ""
 
-#: ../src/plugins/calculator-plugin.c:677
-msgid "Calculate basic expressions"
-msgstr ""
-
-#: ../src/plugins/command-plugin.c:219
-msgid "Find and execute arbitrary commands."
-msgstr ""
-
-#: ../src/plugins/command-plugin.c:724
+#: ../src/plugins/command-plugin.vala:56
 msgid "Run command"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:310
+#: ../src/plugins/command-plugin.vala:77
+msgid "Find and execute arbitrary commands."
+msgstr ""
+
+#: ../src/plugins/desktop-file-plugin.vala:90
 msgid "Search for and run applications on your computer."
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1621
+#: ../src/plugins/desktop-file-plugin.vala:263
 #, c-format
 msgid "Open with %s"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.c:1629
+#: ../src/plugins/desktop-file-plugin.vala:265
 #, c-format
 msgid "Opens current selection using %s"
 msgstr ""
 
-#: ../src/plugins/devhelp-search.c:170
-msgid "Search documentation using Devhelp."
-msgstr ""
-
-#: ../src/plugins/devhelp-search.c:173
-msgid "Devhelp is not installed"
-msgstr ""
-
-#: ../src/plugins/devhelp-search.c:416
+#: ../src/plugins/devhelp-search.vala:67
 msgid "Search in Devhelp"
 msgstr ""
 
-#: ../src/plugins/devhelp-search.c:417
+#: ../src/plugins/devhelp-search.vala:68
 msgid "Search documentation for this symbol"
 msgstr ""
 
-#: ../src/plugins/dictionary.c:168
-msgid "Look up definitions of words."
+#: ../src/plugins/devhelp-search.vala:78
+msgid "Search documentation using Devhelp."
 msgstr ""
 
-#: ../src/plugins/dictionary.c:171
-msgid "Gnome Dictionary is not installed"
+#: ../src/plugins/devhelp-search.vala:82
+msgid "Devhelp is not installed"
 msgstr ""
 
-#: ../src/plugins/dictionary.c:379
+#: ../src/plugins/dictionary.vala:67
 msgid "Define"
 msgstr ""
 
-#: ../src/plugins/dictionary.c:380
+#: ../src/plugins/dictionary.vala:68
 msgid "Look up definition in dictionary"
 msgstr ""
 
-#: ../src/plugins/directory-plugin.c:440
+#: ../src/plugins/dictionary.vala:78
+msgid "Look up definitions of words."
+msgstr ""
+
+#: ../src/plugins/dictionary.vala:82
+msgid "Gnome Dictionary is not installed"
+msgstr ""
+
+#: ../src/plugins/directory-plugin.vala:125
 msgid "Open commonly used directories."
 msgstr ""
 
-#: ../src/plugins/gnome-session-plugin.c:1551
-msgid "Log out from your session."
-msgstr ""
-
-#: ../src/plugins/gnome-session-plugin.c:1555
-msgid "Gnome Session Manager wasn't found"
-msgstr ""
-
-#: ../src/plugins/gnome-session-plugin.c:1800
-#: ../src/plugins/system-management.c:4137
-msgid "Shut Down"
-msgstr ""
-
-#: ../src/plugins/gnome-session-plugin.c:1801
-#: ../src/plugins/system-management.c:4138
-msgid "Turn your computer off"
-msgstr ""
-
-#: ../src/plugins/gnome-session-plugin.c:2117
-#: ../src/plugins/system-management.c:4360
-msgid "Restart"
-msgstr ""
-
-#: ../src/plugins/gnome-session-plugin.c:2118
-#: ../src/plugins/system-management.c:4361
-msgid "Restart your computer"
-msgstr ""
-
-#: ../src/plugins/gnome-session-plugin.c:2434
-msgid "Log Out"
-msgstr ""
-
-#: ../src/plugins/gnome-session-plugin.c:2435
-msgid "Close your session and return to the login screen"
-msgstr ""
-
-#: ../src/plugins/gnome-screensaver-plugin.c:753
-msgid "Lock screen of your computer."
-msgstr ""
-
-#: ../src/plugins/gnome-screensaver-plugin.c:757
-msgid "Gnome Screen Saver wasn't found"
-msgstr ""
-
-#: ../src/plugins/gnome-screensaver-plugin.c:977
+#: ../src/plugins/gnome-screensaver-plugin.vala:60
 msgid "Lock Screen"
 msgstr ""
 
-#: ../src/plugins/gnome-screensaver-plugin.c:978
+#: ../src/plugins/gnome-screensaver-plugin.vala:61
 msgid "Locks screen and starts screensaver."
 msgstr ""
 
-#: ../src/plugins/hybrid-search-plugin.c:580
-msgid ""
-"Improve results returned by the Zeitgeist plugin by looking for similar "
-"files on the filesystem."
+#: ../src/plugins/gnome-screensaver-plugin.vala:83
+msgid "Lock screen of your computer."
 msgstr ""
 
-#: ../src/plugins/locate-plugin.c:326 ../src/plugins/locate-plugin.c:1410
+#: ../src/plugins/gnome-screensaver-plugin.vala:87
+msgid "Gnome Screen Saver wasn't found"
+msgstr ""
+
+#: ../src/plugins/hybrid-search-plugin.vala:86
+msgid "Improve results returned by the Zeitgeist plugin by looking "
+msgstr ""
+
+#: ../src/plugins/launchpad-plugin.vala:68
+msgid "Find bugs and branches on Launchpad."
+msgstr ""
+
+#: ../src/plugins/launchpad-plugin.vala:119
+#, c-format
+msgid "Launchpad: Bazaar branches for %s"
+msgstr ""
+
+#: ../src/plugins/launchpad-plugin.vala:126
+#, c-format
+msgid "Launchpad: Series %s for Project %s"
+msgstr ""
+
+#: ../src/plugins/launchpad-plugin.vala:133
+#, c-format
+msgid "Launchpad: Bazaar branch %s"
+msgstr ""
+
+#: ../src/plugins/launchpad-plugin.vala:148
+#, c-format
+msgid "Launchpad: Bug #%s"
+msgstr ""
+
+#: ../src/plugins/locate-plugin.vala:94 ../src/plugins/locate-plugin.vala:104
 msgid "Locate"
 msgstr ""
 
-#: ../src/plugins/locate-plugin.c:327
-msgid "Runs locate command to find files on the filesystem."
-msgstr ""
-
-#: ../src/plugins/locate-plugin.c:330
-msgid "Unable to find \"locate\" binary"
-msgstr ""
-
-#: ../src/plugins/locate-plugin.c:1411
+#: ../src/plugins/locate-plugin.vala:95
 msgid "Locate files with this name on the filesystem"
 msgstr ""
 
-#: ../src/plugins/opensearch.vala:249 ../src/plugins/opensearch.c:388
+#: ../src/plugins/locate-plugin.vala:105
+msgid "Runs locate command to find files on the filesystem."
+msgstr ""
+
+#: ../src/plugins/locate-plugin.vala:109
+msgid "Unable to find \"locate\" binary"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:249
 msgid "Search the web."
 msgstr ""
 
@@ -443,102 +430,135 @@ msgstr ""
 msgid "Search using Google Maps"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:2703
+#: ../src/plugins/pastebin-plugin.vala:42
+#: ../src/plugins/pastebin-plugin.vala:190
+msgid "Pastebin"
+msgstr ""
+
+#: ../src/plugins/pastebin-plugin.vala:43
+msgid "Pastebin selection"
+msgstr ""
+
+#: ../src/plugins/pastebin-plugin.vala:191
+msgid "Upload files to pastebin."
+msgstr ""
+
+#: ../src/plugins/pastebin-plugin.vala:195
+msgid "Unable to find \"pastebinit\" program"
+msgstr ""
+
+#: ../src/plugins/rhythmbox-plugin.vala:75
 msgid "Control Rhythmbox and add items to playlists."
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:2707
+#: ../src/plugins/rhythmbox-plugin.vala:79
 msgid "Rhythmbox is not installed"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3723
+#: ../src/plugins/rhythmbox-plugin.vala:145
 msgid "Start playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3914
+#: ../src/plugins/rhythmbox-plugin.vala:188
 msgid "Pause playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:3968
+#: ../src/plugins/rhythmbox-plugin.vala:204
 msgid "Plays the next song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:4049
+#: ../src/plugins/rhythmbox-plugin.vala:227
 msgid "Plays the previous song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:4142
+#: ../src/plugins/rhythmbox-plugin.vala:251
 msgid "Enqueue in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:4143
+#: ../src/plugins/rhythmbox-plugin.vala:252
 msgid "Add the song to Rhythmbox playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.c:4319
+#: ../src/plugins/rhythmbox-plugin.vala:298
 msgid "Play in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/system-management.c:3154
-msgid "Suspend, hibernate, restart or shutdown your computer."
-msgstr ""
-
-#: ../src/plugins/system-management.c:3158
-msgid "ConsoleKit wasn't found"
-msgstr ""
-
-#: ../src/plugins/system-management.c:3691
+#: ../src/plugins/system-management.vala:87
 msgid "Suspend"
 msgstr ""
 
-#: ../src/plugins/system-management.c:3692
+#: ../src/plugins/system-management.vala:88
 msgid "Put your computer into suspend mode"
 msgstr ""
 
-#: ../src/plugins/system-management.c:3914
+#: ../src/plugins/system-management.vala:145
 msgid "Hibernate"
 msgstr ""
 
-#: ../src/plugins/system-management.c:3915
+#: ../src/plugins/system-management.vala:146
 msgid "Put your computer into hibernation mode"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:414
-msgid "Search various items logged by Zeitgeist."
+#: ../src/plugins/system-management.vala:203
+msgid "Shut Down"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:418
-msgid "Zeitgeist is not installed"
+#: ../src/plugins/system-management.vala:204
+msgid "Turn your computer off"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1809
+#: ../src/plugins/system-management.vala:261
+msgid "Restart"
+msgstr ""
+
+#: ../src/plugins/system-management.vala:262
+msgid "Restart your computer"
+msgstr ""
+
+#: ../src/plugins/system-management.vala:320
+msgid "Suspend, hibernate, restart or shutdown your computer."
+msgstr ""
+
+#: ../src/plugins/system-management.vala:324
+msgid "ConsoleKit wasn't found"
+msgstr ""
+
+#: ../src/plugins/zeitgeist-plugin.vala:146
 msgid "few moments ago"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1818
+#: ../src/plugins/zeitgeist-plugin.vala:151
 #, c-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1830
+#: ../src/plugins/zeitgeist-plugin.vala:156
 #, c-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1842
+#: ../src/plugins/zeitgeist-plugin.vala:161
 #, c-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.c:1854
+#: ../src/plugins/zeitgeist-plugin.vala:166
 #, c-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
 msgstr[0] ""
 msgstr[1] ""
+
+#: ../src/plugins/zeitgeist-plugin.vala:180
+msgid "Search various items logged by Zeitgeist."
+msgstr ""
+
+#: ../src/plugins/zeitgeist-plugin.vala:184
+msgid "Zeitgeist is not installed"
+msgstr ""

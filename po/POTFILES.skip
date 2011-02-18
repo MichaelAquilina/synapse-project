@@ -4,5 +4,23 @@ src/ui-cairo-gtk-virgilio.c
 src/ui-interface.c
 src/ui-settings.c
 src/ui-widgets.c
+src/core/common-actions.c
+src/plugins/banshee-plugin.c
+src/plugins/calculator-plugin.c
+src/plugins/command-plugin.c
+src/plugins/desktop-file-plugin.c
+src/plugins/devhelp-search.c
+src/plugins/dictionary.c
+src/plugins/directory-plugin.c
+src/plugins/gnome-screensaver-plugin.c
+src/plugins/gnome-session-plugin.c
 src/plugins/hello-world-plugin.c
+src/plugins/hybrid-search-plugin.c
+src/plugins/launchpad-plugin.c
+src/plugins/locate-plugin.c
+src/plugins/opensearch.c
+src/plugins/pastebin-plugin.c
+src/plugins/rhythmbox-plugin.c
+src/plugins/system-management.c
+src/plugins/zeitgeist-plugin.c
 
