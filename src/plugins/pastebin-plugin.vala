@@ -1,0 +1,242 @@
+/*
+ * Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
+ *
+ * Authored by Michal Hruby <michal.mhr@gmail.com>
+ *
+ */
+
+namespace Synapse
+{
+  public class PastebinPlugin: Object, Activatable, ActionProvider
+  {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
+    private class PastebinAction: BaseAction
+    {
+      public PastebinAction ()
+      {
+        Object (title: _ ("Pastebin"),
+                description: _ ("Pastebin selection"),
+                match_type: MatchType.ACTION,
+                icon_name: "document-send", has_thumbnail: false,
+                default_relevancy: Match.Score.AVERAGE);
+      }
+      
+      private async string? pastebin_file (string path)
+      {
+        string[] argv = {"pastebinit", "-i", path};
+
+        try
+        {
+          Pid pid;
+          int read_fd;
+
+          Process.spawn_async_with_pipes (null, argv, null,
+                                          SpawnFlags.SEARCH_PATH,
+                                          null, out pid, null, out read_fd);
+
+          UnixInputStream read_stream = new UnixInputStream (read_fd, true);
+          DataInputStream pastebinit_output = new DataInputStream (read_stream);
+
+          string? line = null;
+          string complete_output = "";
+          do
+          {
+            line = yield pastebinit_output.read_line_async (Priority.DEFAULT_IDLE);
+            if (line != null)
+            {
+              complete_output += line;
+            }
+          } while (line != null);
+          
+          Regex url = new Regex ("^http(s)?://.*$"); // url
+          if (url.match (complete_output))
+          {
+            Utils.Logger.log (this, "got: %s", complete_output);
+            return complete_output;
+          }
+          else
+          {
+            throw new IOError.INVALID_DATA (complete_output);
+          }
+        }
+        catch (Error err)
+        {
+          Utils.Logger.warning (this, "%s", err.message);
+        }
+        
+        return null;
+      }
+
+      private async string? pastebin_text (string content)
+      {
+        string[] argv = {"pastebinit"};
+        
+        try
+        {
+          Pid pid;
+          int read_fd;
+          int write_fd;
+
+          Process.spawn_async_with_pipes (null, argv, null,
+                                          SpawnFlags.SEARCH_PATH,
+                                          null, out pid, out write_fd, out read_fd);
+
+          UnixInputStream read_stream = new UnixInputStream (read_fd, true);
+          DataInputStream pastebinit_output = new DataInputStream (read_stream);
+          UnixOutputStream write_stream = new UnixOutputStream (write_fd, true);
+
+          // FIXME: does this work with 0.10.x?
+          yield write_stream.write_async (content.data);
+          yield write_stream.close_async ();
+
+          string? line = null;
+          string complete_output = "";
+          do
+          {
+            line = yield pastebinit_output.read_line_async (Priority.DEFAULT_IDLE);
+            if (line != null)
+            {
+              complete_output += line;
+            }
+          } while (line != null);
+          
+          Regex url = new Regex ("^http(s)?://.*$"); // url
+          if (url.match (complete_output))
+          {
+            Utils.Logger.log (this, "got: %s", complete_output);
+            return complete_output;
+          }
+          else
+          {
+            throw new IOError.INVALID_DATA (complete_output);
+          }
+        }
+        catch (Error err)
+        {
+          Utils.Logger.warning (this, "%s", err.message);
+        }
+        
+        return null;
+      }
+      
+      public override void do_execute (Match? match)
+      {
+        if (match.match_type == MatchType.GENERIC_URI && match is UriMatch)
+        {
+          var uri_match = match as UriMatch;
+          var f = File.new_for_uri (uri_match.uri);
+          string path = f.get_path ();
+          if (path == null)
+          {
+            Utils.Logger.warning (this, "Unable to get path for %s", uri_match.uri);
+            return;
+          }
+          pastebin_file.begin (path);
+        }
+        else if (match.match_type == MatchType.TEXT)
+        {
+          TextMatch? text_match = match as TextMatch;
+          string content = text_match != null ? text_match.get_text () : match.title;
+          pastebin_text.begin (content);
+        }
+      }
+      
+      public override bool valid_for_match (Match match)
+      {
+        switch (match.match_type)
+        {
+          case MatchType.TEXT:
+            return true;
+          case MatchType.GENERIC_URI:
+            var um = match as UriMatch;
+            var f = File.new_for_uri (um.uri);
+            if (f.get_path () == null) return false;
+            return g_content_type_is_a (um.mime_type, "text/*");
+          default:
+            return false;
+        }
+      }
+    }
+
+    static void register_plugin ()
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (LocatePlugin),
+        _ ("Pastebin"),
+        _ ("Upload files to pastebin."),
+        "document-send",
+        register_plugin,
+        Environment.find_program_in_path ("pastebinit") != null,
+        _ ("Unable to find \"pastebinit\" program")
+      );
+    }
+
+    static construct
+    {
+      register_plugin ();
+    }
+
+    PastebinAction action;
+
+    construct
+    {
+      action = new PastebinAction ();
+    }
+
+    public ResultSet? find_for_match (Query q, Match match)
+    {
+      if (!action.valid_for_match (match)) return null;
+
+      // strip query
+      q.query_string = q.query_string.strip ();
+      bool query_empty = q.query_string == "";
+
+      var results = new ResultSet ();
+
+      if (query_empty)
+      {
+        results.add (action, action.default_relevancy);
+      }
+      else
+      {
+        var matchers = Query.get_matchers_for_query (q.query_string, 0,
+          RegexCompileFlags.CASELESS);
+        foreach (var matcher in matchers)
+        {
+          if (matcher.key.match (action.title))
+          {
+            results.add (action, matcher.value);
+            break;
+          }
+        }
+      }
+
+      return results;
+    }
+  }
+}

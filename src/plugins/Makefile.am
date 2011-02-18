@@ -41,6 +41,7 @@ libplugins_la_VALASOURCES = \
 	launchpad-plugin.vala \
 	locate-plugin.vala \
 	opensearch.vala \
+	pastebin-plugin.vala \
 	rhythmbox-plugin.vala \
 	test-slow-plugin.vala \
 	system-management.vala \

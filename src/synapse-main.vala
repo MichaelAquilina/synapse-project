@@ -158,6 +158,7 @@ namespace Synapse
         typeof (RhythmboxActions),
         typeof (BansheeActions),
         typeof (DirectoryPlugin),
+        typeof (LaunchpadPlugin),
 #if TEST_PLUGINS
         typeof (TestSlowPlugin),
         typeof (HelloWorldPlugin),
@@ -166,7 +167,7 @@ namespace Synapse
         typeof (DevhelpPlugin),
         typeof (OpenSearchPlugin),
         typeof (CalculatorPlugin),
-        typeof (LaunchpadPlugin)
+        typeof (PastebinPlugin)
       };
       foreach (Type t in plugin_types)
       {
