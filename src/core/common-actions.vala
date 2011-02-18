@@ -20,6 +20,29 @@
 
 namespace Synapse
 {
+  public abstract class BaseAction: Object, Match
+  {
+    // from Match interface
+    public string title { get; construct set; }
+    public string description { get; set; }
+    public string icon_name { get; construct set; }
+    public bool has_thumbnail { get; construct set; }
+    public string thumbnail_path { get; construct set; }
+    public MatchType match_type { get; construct set; }
+
+    public int default_relevancy { get; set; }
+    public bool notify_match { get; set; default = true; }
+
+    public abstract bool valid_for_match (Match match);
+
+    public abstract void do_execute (Match? match);
+    public void execute (Match? match)
+    {
+      do_execute (match);
+      if (notify_match) match.executed ();
+    }
+  }
+
   public class CommonActions: Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
@@ -34,30 +57,7 @@ namespace Synapse
       
     }
 
-    private abstract class Action: Object, Match
-    {
-      // from Match interface
-      public string title { get; construct set; }
-      public string description { get; set; }
-      public string icon_name { get; construct set; }
-      public bool has_thumbnail { get; construct set; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-      
-      public int default_relevancy { get; set; }
-      public bool notify_match { get; set; default = true; }
-
-      public abstract bool valid_for_match (Match match);
-      // stupid Vala...
-      public abstract void execute_internal (Match? match);
-      public void execute (Match? match)
-      {
-        execute_internal (match);
-        if (notify_match) match.executed ();
-      }
-    }
-    
-    private class Runner: Action
+    private class Runner: BaseAction
     {
       public Runner ()
       {
@@ -68,7 +68,7 @@ namespace Synapse
                 default_relevancy: Match.Score.EXCELLENT);
       }
 
-      public override void execute_internal (Match? match)
+      public override void do_execute (Match? match)
       {
         if (match.match_type == MatchType.APPLICATION)
         {
@@ -112,7 +112,7 @@ namespace Synapse
       }
     }
 
-    private class TerminalRunner: Action
+    private class TerminalRunner: BaseAction
     {
       public TerminalRunner ()
       {
@@ -123,7 +123,7 @@ namespace Synapse
                 default_relevancy: Match.Score.BELOW_AVERAGE);
       }
 
-      public override void execute_internal (Match? match)
+      public override void do_execute (Match? match)
       {
         if (match.match_type == MatchType.APPLICATION)
         {
@@ -160,7 +160,7 @@ namespace Synapse
       }
     }
     
-    private class Opener: Action
+    private class Opener: BaseAction
     {
       public Opener ()
       {
@@ -171,7 +171,7 @@ namespace Synapse
                 default_relevancy: Match.Score.GOOD);
       }
 
-      public override void execute_internal (Match? match)
+      public override void do_execute (Match? match)
       {
         UriMatch uri_match = match as UriMatch;
         return_if_fail (uri_match != null);
@@ -201,7 +201,7 @@ namespace Synapse
       }
     }
 
-    private class OpenFolder: Action
+    private class OpenFolder: BaseAction
     {
       public OpenFolder ()
       {
@@ -212,7 +212,7 @@ namespace Synapse
                 default_relevancy: Match.Score.AVERAGE);
       }
 
-      public override void execute_internal (Match? match)
+      public override void do_execute (Match? match)
       {
         UriMatch uri_match = match as UriMatch;
         return_if_fail (uri_match != null);
@@ -241,11 +241,11 @@ namespace Synapse
       }
     }
 
-    private Gee.List<Action> actions;
+    private Gee.List<BaseAction> actions;
 
     construct
     {
-      actions = new Gee.ArrayList<Action> ();
+      actions = new Gee.ArrayList<BaseAction> ();
 
       actions.add (new Runner ());
       actions.add (new TerminalRunner ());
