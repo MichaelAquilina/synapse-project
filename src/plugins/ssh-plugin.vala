@@ -3,7 +3,7 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -33,11 +33,12 @@ namespace Synapse
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (SshPlugin),
-	"SSH", // Plugin title
+		"SSH", // Plugin title
         _ ("Connect to host with SSH"), // description
         "terminal",	// icon name
         register_plugin, // reference to this function
-        Environment.find_program_in_path ("ssh") != null, // true if user's system has all required components which the plugin needs
+		// true if user's system has all required components which the plugin needs
+        (Environment.find_program_in_path ("ssh") != null),
         _ ("ssh is not installed") // error message
       );
     }
@@ -59,8 +60,9 @@ namespace Synapse
         try
         {
           AppInfo ai = AppInfo.create_from_commandline (
-            "gnome-terminal -e \"ssh %s\"".printf (match.title),
-            "ssh", 0);
+			  "ssh %s".printf (match.title), // cmdline
+			  "ssh", // app name
+			  AppInfoCreateFlags.NEEDS_TERMINAL);
           ai.launch (null, new Gdk.AppLaunchContext ());
         }
         catch (Error err)
@@ -106,7 +108,12 @@ namespace Synapse
     {
       return has_ssh;
     }
-    
+
+    public bool handles_query (Query query)
+    {
+      // we will only search in the "Actions" category (that includes "All" as well)
+      return (QueryFlags.ACTIONS in query.query_type);
+    }
 
     public ResultSet? find_for_match (Query query, Match match)
     {
