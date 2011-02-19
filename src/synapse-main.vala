@@ -167,6 +167,7 @@ namespace Synapse
         typeof (DevhelpPlugin),
         typeof (OpenSearchPlugin),
         typeof (CalculatorPlugin),
+        typeof (SshPlugin),
         typeof (PastebinPlugin)
       };
       foreach (Type t in plugin_types)
