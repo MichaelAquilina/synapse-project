@@ -206,6 +206,17 @@ namespace Synapse
 
       return RelevancyService.compute_relevancy (base_relevancy, pop);
     }
+    
+    private static void update_min_max (string uri, ref long minimum, ref long maximum)
+    {
+#if VALA_0_12
+      long len = uri.length;
+#else
+      long len = (long) uri.size ();
+#endif
+      if (len > maximum) maximum = len;
+      if (len < minimum) minimum = len;
+    }
 
     private string interesting_attributes =
       string.join (",", FILE_ATTRIBUTE_STANDARD_TYPE,
@@ -217,7 +228,7 @@ namespace Synapse
     private async void process_results (string query,
                                         Zeitgeist.ResultSet events,
                                         Cancellable cancellable,
-                                        ResultSet results,
+                                        ResultSet real_results,
                                         bool local_only)
     {
       Gee.Set<string> uris = new Gee.HashSet<string> ();
@@ -227,11 +238,18 @@ namespace Synapse
         MatcherFlags.NO_FUZZY | MatcherFlags.NO_PARTIAL,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
 
+      // temp results
+      var results = new ResultSet ();
+      long minimum = long.MAX;
+      long maximum = 0;
+
       foreach (var event in events)
       {
         if (event.num_subjects () <= 0) continue;
         var subject = event.get_subject (0);
         unowned string uri = subject.get_uri ();
+        if (uri == null || uri == "") continue;
+        // make sure we don't add the same uri twice
         if (!(uri in uris))
         {
           int relevancy_penalty = Match.Score.URI_PENALTY;
@@ -239,6 +257,7 @@ namespace Synapse
           string? icon = null;
           uris.add (uri);
           var f = File.new_for_uri (uri);
+          // this screws up gio, we better skip it
           if (f.get_uri_scheme () == "data") continue;
           if (f.is_native ())
           {
@@ -271,13 +290,18 @@ namespace Synapse
           {
             continue;
           }
-          else
+          else // non native (mostly remote uris)
           {
             relevancy_penalty += Match.Score.INCREMENT_SMALL;
             unowned string mimetype = subject.get_mimetype ();
             if (mimetype != null && mimetype != "")
             {
               icon = g_content_type_get_icon (mimetype).to_string ();
+            }
+            // we want to increase relevancy of shorter URL, so we'll do this
+            if (uri.has_prefix ("http"))
+            {
+              update_min_max (uri, ref minimum, ref maximum);
             }
           }
           var match_obj = new MatchObject (event,
@@ -295,6 +319,26 @@ namespace Synapse
             }
           }
           if (!match_found) results.add (match_obj, Match.Score.POOR + Match.Score.INCREMENT_MINOR);
+        }
+      }
+      
+      foreach (var entry in results.entries)
+      {
+        var mo = entry.key as MatchObject;
+        if (mo.uri != null && mo.uri.has_prefix ("http") && minimum != maximum)
+        {
+#if VALA_0_12
+          long len = mo.uri.length;
+#else
+          long len = (long) mo.uri.size ();
+#endif
+          float mult = (len - minimum) / (float)(maximum - minimum);
+          int adjusted_relevancy = entry.value - (int)(mult * Match.Score.INCREMENT_MINOR);
+          real_results.add (mo, adjusted_relevancy);
+        }
+        else
+        {
+          real_results.add (mo, entry.value);
         }
       }
     }
