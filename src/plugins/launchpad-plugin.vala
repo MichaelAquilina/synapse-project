@@ -83,7 +83,7 @@ namespace Synapse
     {
       try
       {
-        bug_regex = new Regex ("(?:bug|lp|#):?\\s*#?\\s*(\\d+)$", RegexCompileFlags.OPTIMIZE);
+        bug_regex = new Regex ("(?:bug|lp|#):?\\s*#?\\s*(\\d+)$", RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
         branch_regex = new Regex ("lp:(~?[a-z]+[+-/_a-z0-9]*)", RegexCompileFlags.OPTIMIZE);
       }
       catch (RegexError err)
