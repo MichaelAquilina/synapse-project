@@ -78,8 +78,8 @@ synapse_SOURCES = $(synapse_VALASOURCES:.vala=.c)
 
 $(GENERATED_C_FILES): synapse_vala.stamp
 
-synapse_vala.stamp: $(addprefix $(srcdir)/,$(synapse_VALASOURCES))
-	$(AM_V_VALA)$(VALAC) $(synapse_VALAFLAGS) $(VALAFLAGS) -C $^
+synapse_vala.stamp: $(addprefix $(srcdir)/,$(synapse_VALASOURCES)) Makefile
+	$(AM_V_VALA)$(VALAC) $(synapse_VALAFLAGS) $(VALAFLAGS) -C $(filter %.vala %.c,$^)
 	$(AM_V_at)touch $@
 
 DISTCLEANFILES = $(GENERATED_C_FILES) synapse_vala.stamp

@@ -43,8 +43,8 @@ libsynapsecore_la_SOURCES = \
 	$(libsynapsecore_la_VALASOURCES:.vala=.c) \
 	$(NULL)
 
-synapse-core.vapi synapse-core.vala.stamp: $(libsynapsecore_la_VALASOURCES)
-	$(AM_V_VALA)$(VALAC) $(libsynapsecore_la_VALAFLAGS) -C -H synapse-core.h --library synapse-core --gir SynapseCore-1.0.gir $^
+synapse-core.vapi synapse-core.vala.stamp: $(libsynapsecore_la_VALASOURCES) Makefile
+	$(AM_V_VALA)$(VALAC) $(libsynapsecore_la_VALAFLAGS) -C -H synapse-core.h --library synapse-core --gir SynapseCore-1.0.gir $(filter %.vala %.c,$^)
 	touch $@
 
 BUILT_SOURCES = synapse-core.vala.stamp
@@ -59,5 +59,6 @@ DISTCLEANFILES = \
 	synapse-core.vala.stamp \
 	synapse-core.vapi \
 	synapse-core.h \
+	SynapseCore-1.0.gir \
 	$(NULL)
 
