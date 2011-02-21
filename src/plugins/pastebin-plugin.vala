@@ -158,7 +158,7 @@ namespace Synapse
         }
         else
         {
-          msg = _ ("An error occurred during upload to pastebin, please check the log for more information.");
+          msg = _ ("An error occurred during upload, please check the log for more information.");
         }
 
         try
