@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2011 Antono Vasiljev <self@antono.info>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,134 +19,183 @@
  *
  */
 
+using Gee;
+
 namespace Synapse
 {
-  public class SshPlugin: Object, Activatable, ActionProvider
+  public class SshPlugin: Object, Activatable, ActionProvider, ItemProvider
   {
     public bool enabled { get; set; default = true; }
 
-    public void activate () { }
+    private Connect   action;
+    private bool      has_ssh;
+    private Regex     host_re;
+    private ArrayList<string> hosts;
 
-    public void deactivate () { }
+    static construct {
+      register_plugin ();
+    }
 
-    static void register_plugin ()
-    {
+    construct {
+      hosts 	= parse_ssh_config ();
+      action    = new Connect ();
+      has_ssh   = (Environment.find_program_in_path ("ssh") != null) && (hosts.size > 0);
+    }
+    
+    public void activate () {}
+    public void deactivate () {}
+    
+    static void register_plugin () {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (SshPlugin),
-		"SSH", // Plugin title
+    		"SSH", // Plugin title
         _ ("Connect to host with SSH"), // description
         "terminal",	// icon name
         register_plugin, // reference to this function
-		// true if user's system has all required components which the plugin needs
+    		// true if user's system has all required components which the plugin needs
         (Environment.find_program_in_path ("ssh") != null),
         _ ("ssh is not installed") // error message
       );
     }
+    
+    private ArrayList<string> parse_ssh_config () {
+      var file = File.new_for_path (Environment.get_home_dir () + "/.ssh/config");
+      var list = new ArrayList<string> ();
+      
+      if (!file.query_exists ()) {
+        stderr.printf ("File '%s' doesn't exist.\n", file.get_path ());
+        return list;
+      }
 
-    private class Connect: Object, Match
-    {
-      // from Match interface
-      public string title { get; construct set; }
-      public string description { get; set; }
-      public string icon_name { get; construct set; }
-      public bool has_thumbnail { get; construct set; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-      
-      public int default_relevancy { get; set; default = 0; }
-      
-      public void execute (Match? match)
-      {
-        try
-        {
-          AppInfo ai = AppInfo.create_from_commandline (
-			  "ssh %s".printf (match.title), // cmdline
-			  "ssh", // app name
-			  AppInfoCreateFlags.NEEDS_TERMINAL);
-          ai.launch (null, new Gdk.AppLaunchContext ());
+      try {
+        var dis = new DataInputStream (file.read ());
+        
+        Regex host_key_re = new Regex("(HostName|Host)", RegexCompileFlags.OPTIMIZE);
+        Regex comment_re  = new Regex("#.*$", RegexCompileFlags.OPTIMIZE);
+        
+        string line;
+        
+        while ((line = dis.read_line (null)) != null) {
+          line = comment_re.replace(line, -1, 0, "");
+          if (host_key_re.match(line)) {
+            line = host_key_re.replace(line, -1, 0, "");
+            foreach (var host in line.split(" ")) {
+              if (host != "") {
+                // TODO: get rid of longer empty strings
+                stdout.printf ("host added: '%s'\n", host);
+                list.add(host);
+              }
+            }
+          }
         }
-        catch (Error err)
-        {
+      } catch (Error e) {
+        error ("%s", e.message);
+      }
+      return list;
+    }
+
+    // Connect Action
+    private class Connect : Object, Match {
+      // from Match interface
+      public string title             { get; construct set; }
+      public string description       { get; set; }
+      public string icon_name         { get; construct set; }
+      public bool   has_thumbnail     { get; construct set; }
+      public string thumbnail_path    { get; construct set; }
+      public int    default_relevancy { get; set; default = 0; }      
+      public MatchType match_type 	  { get; construct set; }
+      
+      public void execute (Match? match) {
+        try {
+          AppInfo.create_from_commandline ("ssh %s".printf (match.title),
+            "ssh", AppInfoCreateFlags.NEEDS_TERMINAL)
+              .launch (null, new Gdk.AppLaunchContext ());
+        } catch (Error err) {
           warning ("%s", err.message);
         }
       }
       
-      public Connect ()
-      {
-        Object (title: _("Connect with SSH"),
-                description: _("Connect with SSH"),
+      public Connect () {
+      	Object (title: _("Connect with SSH"),
+                description: _("Connect to remote host with SSH"),
                 has_thumbnail: false, icon_name: "terminal");
       }
     }
     
-
-    static construct
-    {
-      register_plugin ();
+    public bool handles_query (Query query) {
+      return (QueryFlags.ACTIONS in query.query_type ||
+        QueryFlags.INTERNET in query.query_type);
     }
 
-    private Connect action;
-    private bool has_ssh;
-    private Regex host_re;
+    public async ResultSet? search (Query query) throws SearchError {    
+      var results = new ResultSet ();
 
-    construct
-    {
-      action  = new Connect ();
-      has_ssh = Environment.find_program_in_path ("ssh") != null;
-
-      try
-      {        
-        host_re = new Regex ("^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\\-]*[A-Za-z0-9])$", RegexCompileFlags.OPTIMIZE);
+      foreach (var host in hosts) {
+        if (host.has_prefix(query.query_string)) {
+          results.add (new SshHost (host), Match.Score.AVERAGE);
+        }
       }
-      catch (Error err)
-      {
-        warning ("%s", err.message);
+ 
+      query.check_cancellable ();
+      
+      if (results.size > 0) {
+        return results;
+      } else {
+        return null;
       }
     }
     
-    public bool handles_unknown ()
-    {
-      return has_ssh;
-    }
-
-    public bool handles_query (Query query)
-    {
-      // we will only search in the "Actions" category (that includes "All" as well)
-      return (QueryFlags.ACTIONS in query.query_type);
-    }
-
-    public ResultSet? find_for_match (Query query, Match match)
-    {
-      if (!has_ssh || match.match_type != MatchType.UNKNOWN ||
-          !(QueryFlags.ACTIONS in query.query_type))
-      {
-        return null;
+    private class SshHost : Object, Match {
+      public string title           { get; construct set; }
+      public string description     { get; set; }
+      public string icon_name       { get; construct set; }
+      public bool   has_thumbnail   { get; construct set; }
+      public string thumbnail_path  { get; construct set; }
+      public MatchType match_type   { get; construct set; }
+ 
+      public void execute (Match? match) {
+        try {
+          AppInfo ai = AppInfo.create_from_commandline (
+            "ssh %s".printf (this.title),
+            "ssh", AppInfoCreateFlags.NEEDS_TERMINAL);
+          ai.launch (null, new Gdk.AppLaunchContext ());
+        } catch (Error err) {
+          warning ("%s", err.message);
+        }
       }
+
+      public SshHost (string host_name) {
+        Object (
+          match_type: MatchType.ACTION,
+          title: host_name,
+          description: _("Connect with SSH"),
+          has_thumbnail: false, icon_name: "terminal"
+        );
+      }
+    }
+
+    public ResultSet? find_for_match (Query query, Match match) {
+      if (!has_ssh) return null;
 
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
 
-      if (query_empty)
-      {
+      if (query_empty) {
         int relevancy = action.default_relevancy;
         if (host_re.match (match.title)) relevancy += Match.Score.INCREMENT_SMALL;
         results.add (action, relevancy);
-      }
-      else
-      {
-        var matchers = Query.get_matchers_for_query (query.query_string, 0,
-          RegexCompileFlags.CASELESS);
-        foreach (var matcher in matchers)
-        {
-          if (matcher.key.match (action.title))
-          {
+      } else {
+        var matchers = Query.get_matchers_for_query (query.query_string, 0, RegexCompileFlags.CASELESS);
+        foreach (var matcher in matchers) {
+          if (matcher.key.match (action.title)) {
             results.add (action, matcher.value);
             break;
           }
         }
       }
-
       return results;
     }
   }
 }
+
+// vim: expandtab softtabsstop tabstop=2
