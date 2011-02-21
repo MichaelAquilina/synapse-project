@@ -145,12 +145,13 @@ namespace Synapse
       // while we don't install proper plugin .so files, we'll do it this way
       Type[] plugin_types =
       {
-        typeof (DesktopFilePlugin),
-#if HAVE_ZEITGEIST
-        typeof (ZeitgeistPlugin),
+#if TEST_PLUGINS
+        typeof (TestSlowPlugin),
+        typeof (HelloWorldPlugin),
 #endif
+        // item providing plugins
+        typeof (DesktopFilePlugin),
         typeof (HybridSearchPlugin),
-        typeof (LocatePlugin),
         typeof (GnomeSessionPlugin),
         typeof (GnomeScreenSaverPlugin),
         typeof (SystemManagementPlugin),
@@ -159,15 +160,19 @@ namespace Synapse
         typeof (BansheeActions),
         typeof (DirectoryPlugin),
         typeof (LaunchpadPlugin),
-#if TEST_PLUGINS
-        typeof (TestSlowPlugin),
-        typeof (HelloWorldPlugin),
+        typeof (CalculatorPlugin),
+#if HAVE_ZEITGEIST
+        typeof (ZeitgeistPlugin),
 #endif
-        typeof (DictionaryPlugin),
+#if HAVE_LIBREST
+        typeof (ImgUrPlugin),
+#endif
+        // action-only plugins
         typeof (DevhelpPlugin),
         typeof (OpenSearchPlugin),
-        typeof (CalculatorPlugin),
-        typeof (PastebinPlugin)
+        typeof (LocatePlugin),
+        typeof (PastebinPlugin),
+        typeof (DictionaryPlugin)
       };
       foreach (Type t in plugin_types)
       {

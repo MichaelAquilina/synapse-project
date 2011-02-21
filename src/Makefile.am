@@ -50,6 +50,12 @@ synapse_CFLAGS += $(APP_INDICATOR_CFLAGS)
 synapse_LDADD += $(APP_INDICATOR_LIBS)
 endif
 
+if HAVE_LIBREST
+synapse_VALAFLAGS += --pkg rest-0.6 -D HAVE_LIBREST
+synapse_CFLAGS += $(REST_CFLAGS)
+synapse_LDADD += $(REST_LIBS)
+endif
+
 if HAVE_ZEITGEIST
 synapse_VALAFLAGS += --pkg zeitgeist-1.0 -D HAVE_ZEITGEIST
 synapse_CFLAGS += $(ZEITGEIST_CFLAGS)

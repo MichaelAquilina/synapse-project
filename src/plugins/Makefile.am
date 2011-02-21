@@ -54,6 +54,13 @@ libplugins_la_CFLAGS += $(ZEITGEIST_CFLAGS)
 libplugins_la_LIBADD += $(ZEITGEIST_LIBS)
 endif
 
+if HAVE_LIBREST
+libplugins_la_VALASOURCES += imgur-plugin.vala
+libplugins_la_VALAFLAGS += --pkg rest-0.6 -D HAVE_LIBREST
+libplugins_la_CFLAGS += $(REST_CFLAGS)
+libplugins_la_LIBADD += $(REST_LIBS)
+endif
+
 libplugins_la_SOURCES = \
 	$(libplugins_la_VALASOURCES:.vala=.c) \
 	$(NULL)

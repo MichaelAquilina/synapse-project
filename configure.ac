@@ -68,6 +68,11 @@ PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   )
 
 
+AC_ARG_ENABLE(librest,
+              AS_HELP_STRING([--enable-librest[=@<:@no/auto/yes@:>@]],[Build support for plugins using librest ]),
+              [enable_librest=$enableval],
+              [enable_librest="auto"])
+
 AC_ARG_ENABLE(indicator,
               AS_HELP_STRING([--enable-indicator[=@<:@no/auto/yes@:>@]],[Build support for application indicators ]),
               [enable_indicator=$enableval],
@@ -104,6 +109,20 @@ if test "x$enable_indicator" = "xyes" ; then
 fi
 AM_CONDITIONAL(HAVE_INDICATOR, test "x$enable_indicator" = "xyes")
 
+if test "x$enable_librest" = "xauto" ; then
+	PKG_CHECK_EXISTS([rest-0.6],
+	                 enable_librest="yes",
+	                 enable_librest="no")
+fi
+
+if test "x$enable_librest" = "xyes" ; then
+	PKG_CHECK_EXISTS([rest-0.6],,
+	                 AC_MSG_ERROR([rest-0.6 is not installed]))
+	PKG_CHECK_MODULES(REST, rest-0.6)
+	AC_DEFINE(HAVE_LIBREST, 1, [Have librest])
+fi
+AM_CONDITIONAL(HAVE_LIBREST, test "x$enable_librest" = "xyes")
+
 dnl Expansions
 AS_AC_EXPAND([PKGDATADIR], [$datadir/$PACKAGE_NAME])
 AS_AC_EXPAND([DATADIR], [$datadir])
@@ -135,6 +154,7 @@ ${PACKAGE}-${VERSION}
     Zeitgeist support:  ${enable_zeitgeist}
 
   Optional dependencies
+    Rest-0.6:           ${enable_librest}
     AppIndicator:       ${enable_indicator}
 
 EOF
