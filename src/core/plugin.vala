@@ -29,6 +29,11 @@ namespace Synapse
     public abstract void deactivate ();
   }
 
+  public interface Configurable : Object
+  {
+    public abstract Gtk.Widget create_config_widget ();
+  }
+
   public interface ItemProvider : Activatable
   {
     public abstract async ResultSet? search (Query query) throws SearchError;
