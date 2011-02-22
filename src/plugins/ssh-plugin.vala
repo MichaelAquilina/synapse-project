@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2011 Antono Vasiljev <self@antono.info>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,22 +29,24 @@ namespace Synapse
 
     private Connect   action;
     private bool      has_ssh;
-    private Regex     host_re;
     private ArrayList<string> hosts;
 
     static construct {
       register_plugin ();
     }
 
-    construct {
-      hosts 	= parse_ssh_config ();
-      action    = new Connect ();
-      has_ssh   = (Environment.find_program_in_path ("ssh") != null) && (hosts.size > 0);
+    public void activate () {
+
+      action  = new Connect ();
+
+      with_ssh_hosts ((ssh_hosts) => {
+        hosts   = ssh_hosts;
+        has_ssh = (Environment.find_program_in_path ("ssh") != null) && (ssh_hosts.size > 0);
+      });
     }
-    
-    public void activate () {}
+
     public void deactivate () {}
-    
+
     static void register_plugin () {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (SshPlugin),
@@ -57,24 +59,27 @@ namespace Synapse
         _ ("ssh is not installed") // error message
       );
     }
-    
-    private ArrayList<string> parse_ssh_config () {
+
+    delegate void Configurator(ArrayList<string> hosts);
+
+    private async void with_ssh_hosts (Configurator configurator) {
       var file = File.new_for_path (Environment.get_home_dir () + "/.ssh/config");
       var list = new ArrayList<string> ();
-      
+
       if (!file.query_exists ()) {
         stderr.printf ("File '%s' doesn't exist.\n", file.get_path ());
-        return list;
+        return;
       }
 
       try {
         var dis = new DataInputStream (file.read ());
-        
+
+        // TODO: match key boundary
         Regex host_key_re = new Regex("(HostName|Host)", RegexCompileFlags.OPTIMIZE);
         Regex comment_re  = new Regex("#.*$", RegexCompileFlags.OPTIMIZE);
-        
+
         string line;
-        
+
         while ((line = dis.read_line (null)) != null) {
           line = comment_re.replace(line, -1, 0, "");
           if (host_key_re.match(line)) {
@@ -82,7 +87,8 @@ namespace Synapse
             foreach (var host in line.split(" ")) {
               if (host != "") {
                 // TODO: get rid of longer empty strings
-                stdout.printf ("host added: '%s'\n", host);
+                // TODO: no dupes
+                stdout.printf("host added: %s\n", host);
                 list.add(host);
               }
             }
@@ -91,7 +97,7 @@ namespace Synapse
       } catch (Error e) {
         error ("%s", e.message);
       }
-      return list;
+      configurator(list);
     }
 
     // Connect Action
@@ -102,9 +108,9 @@ namespace Synapse
       public string icon_name         { get; construct set; }
       public bool   has_thumbnail     { get; construct set; }
       public string thumbnail_path    { get; construct set; }
-      public int    default_relevancy { get; set; default = 0; }      
+      public int    default_relevancy { get; set; default = 0; }
       public MatchType match_type 	  { get; construct set; }
-      
+
       public void execute (Match? match) {
         try {
           AppInfo.create_from_commandline ("ssh %s".printf (match.title),
@@ -114,37 +120,34 @@ namespace Synapse
           warning ("%s", err.message);
         }
       }
-      
+
       public Connect () {
       	Object (title: _("Connect with SSH"),
                 description: _("Connect to remote host with SSH"),
                 has_thumbnail: false, icon_name: "terminal");
       }
     }
-    
+
     public bool handles_query (Query query) {
       return (QueryFlags.ACTIONS in query.query_type ||
         QueryFlags.INTERNET in query.query_type);
     }
 
-    public async ResultSet? search (Query query) throws SearchError {    
+    public async ResultSet? search (Query query) throws SearchError {
       var results = new ResultSet ();
 
       foreach (var host in hosts) {
         if (host.has_prefix(query.query_string)) {
+          // TODO: add better score if exact match
           results.add (new SshHost (host), Match.Score.AVERAGE);
         }
       }
- 
+
       query.check_cancellable ();
-      
-      if (results.size > 0) {
-        return results;
-      } else {
-        return null;
-      }
+
+      return results;
     }
-    
+
     private class SshHost : Object, Match {
       public string title           { get; construct set; }
       public string description     { get; set; }
@@ -152,7 +155,7 @@ namespace Synapse
       public bool   has_thumbnail   { get; construct set; }
       public string thumbnail_path  { get; construct set; }
       public MatchType match_type   { get; construct set; }
- 
+
       public void execute (Match? match) {
         try {
           AppInfo ai = AppInfo.create_from_commandline (
@@ -181,9 +184,7 @@ namespace Synapse
       var results = new ResultSet ();
 
       if (query_empty) {
-        int relevancy = action.default_relevancy;
-        if (host_re.match (match.title)) relevancy += Match.Score.INCREMENT_SMALL;
-        results.add (action, relevancy);
+        results.add (action, action.default_relevancy);
       } else {
         var matchers = Query.get_matchers_for_query (query.query_string, 0, RegexCompileFlags.CASELESS);
         foreach (var matcher in matchers) {
@@ -199,3 +200,4 @@ namespace Synapse
 }
 
 // vim: expandtab softtabsstop tabstop=2
+
