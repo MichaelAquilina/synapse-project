@@ -71,8 +71,7 @@ namespace Synapse
       bool exists;
       try
       {
-        var fi = yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_TYPE,
-                                           0, 0, null);
+        yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_TYPE, 0, 0, null);
         exists = true;
       }
       catch (Error err)
