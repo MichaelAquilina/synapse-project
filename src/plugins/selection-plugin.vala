@@ -97,7 +97,7 @@ namespace Synapse
       {
         this.content = content;
         string chugged = content.chug ();
-        string shortened = chugged.substring (0, int.min (chugged.length, 100));
+        string shortened = chugged.substring (0, int.min ((int)chugged.length, 100));
         description = shortened.replace ("\n", " ");
       }
     }

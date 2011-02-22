@@ -317,6 +317,7 @@ namespace Synapse
               update_min_max (uri, ref minimum, ref maximum);
             }
           }
+
           var match_obj = new MatchObject (event,
                                            thumbnail_path,
                                            icon);

@@ -56,10 +56,10 @@ namespace Synapse
       box.pack_start (label);
       box.pack_start (proceed_button, true, false);
 
+      /*
       HashTable<string, string>? step1_result = null;
 
       // i'm quite sure this leaks as hell, but it works :)
-      /*
       authorize_button.clicked.connect (() =>
       {
         authorize_button.hide ();
