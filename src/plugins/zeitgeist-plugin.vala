@@ -27,7 +27,8 @@ namespace Synapse
 
     public void activate ()
     {
-      
+      zg_log = new Zeitgeist.Log ();
+      zg_index = new Zeitgeist.Index ();
     }
 
     public void deactivate ()
@@ -128,7 +129,7 @@ namespace Synapse
         this.uri = subject.get_uri ();
 
         var dfs = DesktopFileService.get_default ();
-        var dfi = dfs.get_desktop_file_for_id (uri.offset (14));
+        var dfi = dfs.get_desktop_file_for_id (uri.substring (14));
 
         this.title = dfi.name;
         this.icon_name = dfi.icon_name;
@@ -195,8 +196,6 @@ namespace Synapse
 
     construct
     {
-      zg_log = new Zeitgeist.Log ();
-      zg_index = new Zeitgeist.Index ();
     }
 
     private int compute_relevancy (string uri, int base_relevancy)
@@ -285,6 +284,20 @@ namespace Synapse
               if (cancellable.is_cancelled ()) return;
               else continue; // file doesn't exist
             }
+          }
+          else if (uri.has_prefix ("note://tomboy/"))
+          {
+            // special case tomboy notes - we need to make sure the notes weren't deleted
+            string note_filename = uri.substring (14) + ".note";
+            string note_path = Path.build_filename (Environment.get_user_data_dir (),
+                                                    "tomboy", note_filename);
+            var note_f = File.new_for_path (note_path);
+            bool exists = yield Utils.query_exists_async (note_f);
+            
+            if (cancellable.is_cancelled ()) return;
+            else if (!exists) continue;
+            
+            icon = g_content_type_get_icon ("application/x-note").to_string ();
           }
           else if (local_only)
           {
@@ -402,7 +415,7 @@ namespace Synapse
           else if (is_application)
           {
             var dfs = DesktopFileService.get_default ();
-            if (dfs.get_desktop_file_for_id (uri.offset (14)) == null) continue;
+            if (dfs.get_desktop_file_for_id (uri.substring (14)) == null) continue;
           }
           else
           {
