@@ -43,6 +43,7 @@ libplugins_la_VALASOURCES = \
 	opensearch.vala \
 	pastebin-plugin.vala \
 	rhythmbox-plugin.vala \
+	selection-plugin.vala \
 	test-slow-plugin.vala \
 	system-management.vala \
 	$(NULL)

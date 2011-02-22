@@ -161,6 +161,7 @@ namespace Synapse
         typeof (DirectoryPlugin),
         typeof (LaunchpadPlugin),
         typeof (CalculatorPlugin),
+        typeof (SelectionPlugin),
 #if HAVE_ZEITGEIST
         typeof (ZeitgeistPlugin),
 #endif
