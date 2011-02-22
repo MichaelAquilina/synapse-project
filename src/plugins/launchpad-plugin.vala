@@ -58,7 +58,7 @@ namespace Synapse
 
       HashTable<string, string>? step1_result = null;
 
-      // i'm quite sure this leaks as hell
+      // i'm quite sure this leaks as hell, but it works :)
       /*
       authorize_button.clicked.connect (() =>
       {
