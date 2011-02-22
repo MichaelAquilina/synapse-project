@@ -229,8 +229,6 @@ namespace Synapse
     
     private async void process_directories (Gee.Collection<string>? dirs)
     {
-      if (dirs == null) return;
-      
       if (home_dir_uri == null)
       {
         var home_dir = Environment.get_home_dir ();
@@ -245,6 +243,8 @@ namespace Synapse
           home_dir_uri = "file:///home/";
         }
       }
+
+      if (dirs == null) return;
 
       foreach (var dir in dirs)
       {
