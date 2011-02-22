@@ -16,11 +16,13 @@ src/plugins/gnome-screensaver-plugin.c
 src/plugins/gnome-session-plugin.c
 src/plugins/hello-world-plugin.c
 src/plugins/hybrid-search-plugin.c
+src/plugins/imgur-plugin.c
 src/plugins/launchpad-plugin.c
 src/plugins/locate-plugin.c
 src/plugins/opensearch.c
 src/plugins/pastebin-plugin.c
 src/plugins/rhythmbox-plugin.c
+src/plugins/selection-plugin.c
 src/plugins/system-management.c
 src/plugins/zeitgeist-plugin.c
 
