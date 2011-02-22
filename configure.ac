@@ -109,16 +109,23 @@ if test "x$enable_indicator" = "xyes" ; then
 fi
 AM_CONDITIONAL(HAVE_INDICATOR, test "x$enable_indicator" = "xyes")
 
+REST_PKG_NAME=rest-0.7
 if test "x$enable_librest" = "xauto" ; then
-	PKG_CHECK_EXISTS([rest-0.6],
+	PKG_CHECK_EXISTS([$REST_PKG_NAME],
 	                 enable_librest="yes",
 	                 enable_librest="no")
+	if test "x$enable_librest" = "xno" ; then
+		REST_PKG_NAME=rest-0.6
+		PKG_CHECK_EXISTS([$REST_PKG_NAME],
+		                 enable_librest="yes",
+		                 enable_librest="no")
+	fi
 fi
 
 if test "x$enable_librest" = "xyes" ; then
-	PKG_CHECK_EXISTS([rest-0.6],,
-	                 AC_MSG_ERROR([rest-0.6 is not installed]))
-	PKG_CHECK_MODULES(REST, rest-0.6)
+	PKG_CHECK_EXISTS([$REST_PKG_NAME],,
+	                 AC_MSG_ERROR([$REST_PKG_NAME is not installed]))
+	PKG_CHECK_MODULES(REST, $REST_PKG_NAME)
 	AC_DEFINE(HAVE_LIBREST, 1, [Have librest])
 fi
 AM_CONDITIONAL(HAVE_LIBREST, test "x$enable_librest" = "xyes")
@@ -154,7 +161,7 @@ ${PACKAGE}-${VERSION}
     Zeitgeist support:  ${enable_zeitgeist}
 
   Optional dependencies
-    Rest-0.6:           ${enable_librest}
+    Rest:               ${enable_librest} (${REST_PKG_NAME})
     AppIndicator:       ${enable_indicator}
 
 EOF
