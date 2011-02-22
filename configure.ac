@@ -1,5 +1,5 @@
-AC_INIT([synapse], [0.2.3])
-AC_DEFINE(RELEASE_NAME, "Adenosine triphosphate", "Codename of this release")
+AC_INIT([synapse], [0.2.4])
+AC_DEFINE(RELEASE_NAME, "Anandamide", "Codename of this release")
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([.])
