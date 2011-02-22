@@ -34,6 +34,10 @@ namespace Synapse
     public bool notify_match { get; set; default = true; }
 
     public abstract bool valid_for_match (Match match);
+    public virtual int get_relevancy_for_match (Match match)
+    {
+      return default_relevancy;
+    }
 
     public abstract void do_execute (Match? match);
     public void execute (Match? match)
@@ -292,6 +296,17 @@ namespace Synapse
             return false;
         }
       }
+      
+      public override int get_relevancy_for_match (Match match)
+      {
+        TextMatch? text_match = match as TextMatch;
+        if (text_match != null && text_match.text_origin == TextOrigin.CLIPBOARD)
+        {
+          return Match.Score.BELOW_AVERAGE;
+        }
+        
+        return default_relevancy;
+      }
     }
 
     private Gee.List<BaseAction> actions;
@@ -318,7 +333,7 @@ namespace Synapse
         {
           if (action.valid_for_match (match))
           {
-            results.add (action, action.default_relevancy);
+            results.add (action, action.get_relevancy_for_match (match));
           }
         }
       }

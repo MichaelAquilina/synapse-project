@@ -86,8 +86,15 @@ namespace Synapse
     public abstract string? extended_info { get; set; }
   }
   
+  public enum TextOrigin
+  {
+    UNKNOWN,
+    CLIPBOARD
+  }
+  
   public interface TextMatch: Match
   {
+    public abstract TextOrigin text_origin { get; set; }
     public abstract string get_text ();
   }
   
