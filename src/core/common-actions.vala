@@ -302,7 +302,7 @@ namespace Synapse
         TextMatch? text_match = match as TextMatch;
         if (text_match != null && text_match.text_origin == TextOrigin.CLIPBOARD)
         {
-          return Match.Score.BELOW_AVERAGE;
+          return 0;
         }
         
         return default_relevancy;
