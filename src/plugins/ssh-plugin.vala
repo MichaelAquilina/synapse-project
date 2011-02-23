@@ -25,20 +25,19 @@ namespace Synapse
 {
   public class SshPlugin: Object, Activatable, ActionProvider, ItemProvider
   {
-    public bool enabled { get; set; default = true; }
-
+    public  bool enabled { get; set; default = true; }
     private Connect   action;
     private bool      has_ssh;
     private ArrayList<string> hosts;
 
-    static construct {
+    static construct
+    {
       register_plugin ();
     }
 
-    public void activate () {
-
+    public void activate ()
+    {
       action  = new Connect ();
-
       with_ssh_hosts ((ssh_hosts) => {
         hosts   = ssh_hosts;
         has_ssh = (Environment.find_program_in_path ("ssh") != null) && (ssh_hosts.size > 0);
@@ -47,7 +46,8 @@ namespace Synapse
 
     public void deactivate () {}
 
-    static void register_plugin () {
+    static void register_plugin ()
+    {
       DataSink.PluginRegistry.get_default ().register_plugin (
         typeof (SshPlugin),
     		"SSH", // Plugin title
@@ -62,16 +62,19 @@ namespace Synapse
 
     delegate void Configurator(ArrayList<string> hosts);
 
-    private async void with_ssh_hosts (Configurator configurator) {
+    private async void with_ssh_hosts (Configurator configurator)
+    {
       var file = File.new_for_path (Environment.get_home_dir () + "/.ssh/config");
       var list = new ArrayList<string> ();
 
-      if (!file.query_exists ()) {
+      if (!file.query_exists ())
+      {
         stderr.printf ("File '%s' doesn't exist.\n", file.get_path ());
         return;
       }
 
-      try {
+      try
+      {
         var dis = new DataInputStream (file.read ());
 
         // TODO: match key boundary
@@ -80,28 +83,35 @@ namespace Synapse
 
         string line;
 
-        while ((line = dis.read_line (null)) != null) {
+        while ((line = dis.read_line (null)) != null)
+        {
           line = comment_re.replace(line, -1, 0, "");
-          if (host_key_re.match(line)) {
+          if (host_key_re.match(line))
+          {
             line = host_key_re.replace(line, -1, 0, "");
-            foreach (var host in line.split(" ")) {
-              if (host != "") {
+            foreach (var host in line.split(" "))
+            {
+              if (host != "")
+              {
                 // TODO: get rid of longer empty strings
                 // TODO: no dupes
-                stdout.printf("host added: %s\n", host);
+                Utils.Logger.debug(this, "host added: %s\n", host);
                 list.add(host);
               }
             }
           }
         }
-      } catch (Error e) {
+      }
+      catch (Error e)
+      {
         error ("%s", e.message);
       }
       configurator(list);
     }
 
     // Connect Action
-    private class Connect : Object, Match {
+    private class Connect : Object, Match
+    {
       // from Match interface
       public string title             { get; construct set; }
       public string description       { get; set; }
@@ -111,33 +121,42 @@ namespace Synapse
       public int    default_relevancy { get; set; default = 0; }
       public MatchType match_type 	  { get; construct set; }
 
-      public void execute (Match? match) {
-        try {
+      public void execute (Match? match)
+      {
+        try
+        {
           AppInfo.create_from_commandline ("ssh %s".printf (match.title),
             "ssh", AppInfoCreateFlags.NEEDS_TERMINAL)
               .launch (null, new Gdk.AppLaunchContext ());
-        } catch (Error err) {
+        }
+        catch (Error err)
+        {
           warning ("%s", err.message);
         }
       }
 
-      public Connect () {
+      public Connect ()
+      {
       	Object (title: _("Connect with SSH"),
                 description: _("Connect to remote host with SSH"),
                 has_thumbnail: false, icon_name: "terminal");
       }
     }
 
-    public bool handles_query (Query query) {
+    public bool handles_query (Query query)
+    {
       return (QueryFlags.ACTIONS in query.query_type ||
         QueryFlags.INTERNET in query.query_type);
     }
 
-    public async ResultSet? search (Query query) throws SearchError {
+    public async ResultSet? search (Query query) throws SearchError
+    {
       var results = new ResultSet ();
 
-      foreach (var host in hosts) {
-        if (host.has_prefix(query.query_string)) {
+      foreach (var host in hosts)
+      {
+        if (host.has_prefix(query.query_string))
+        {
           // TODO: add better score if exact match
           results.add (new SshHost (host), Match.Score.AVERAGE);
         }
@@ -148,7 +167,8 @@ namespace Synapse
       return results;
     }
 
-    private class SshHost : Object, Match {
+    private class SshHost : Object, Match
+    {
       public string title           { get; construct set; }
       public string description     { get; set; }
       public string icon_name       { get; construct set; }
@@ -156,39 +176,51 @@ namespace Synapse
       public string thumbnail_path  { get; construct set; }
       public MatchType match_type   { get; construct set; }
 
-      public void execute (Match? match) {
-        try {
+      public void execute (Match? match)
+      {
+        try
+        {
           AppInfo ai = AppInfo.create_from_commandline (
             "ssh %s".printf (this.title),
             "ssh", AppInfoCreateFlags.NEEDS_TERMINAL);
           ai.launch (null, new Gdk.AppLaunchContext ());
-        } catch (Error err) {
+        }
+        catch (Error err)
+        {
           warning ("%s", err.message);
         }
       }
 
-      public SshHost (string host_name) {
+      public SshHost (string host_name)
+      {
         Object (
           match_type: MatchType.ACTION,
           title: host_name,
           description: _("Connect with SSH"),
-          has_thumbnail: false, icon_name: "terminal"
+          has_thumbnail: false,
+          icon_name: "terminal"
         );
       }
     }
 
-    public ResultSet? find_for_match (Query query, Match match) {
+    public ResultSet? find_for_match (Query query, Match match)
+    {
       if (!has_ssh) return null;
 
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
 
-      if (query_empty) {
+      if (query_empty)
+      {
         results.add (action, action.default_relevancy);
-      } else {
+      }
+      else
+      {
         var matchers = Query.get_matchers_for_query (query.query_string, 0, RegexCompileFlags.CASELESS);
-        foreach (var matcher in matchers) {
-          if (matcher.key.match (action.title)) {
+        foreach (var matcher in matchers)
+        {
+          if (matcher.key.match (action.title))
+          {
             results.add (action, matcher.value);
             break;
           }
