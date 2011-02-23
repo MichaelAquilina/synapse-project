@@ -235,7 +235,7 @@ namespace Synapse
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
-        typeof (LocatePlugin),
+        typeof (ImgUrPlugin),
         _ ("Imgur"),
         _ ("Share images using imgur."),
         "document-send",
