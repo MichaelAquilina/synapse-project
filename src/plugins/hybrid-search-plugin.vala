@@ -213,7 +213,7 @@ namespace Synapse
       }
       catch (Error err)
       {
-        warning ("Unable to parse ~/%s", RECENT_XML_NAME);
+        Utils.Logger.warning (this, "Unable to parse ~/%s", RECENT_XML_NAME);
       }
 
       initialization_done = true;
@@ -413,7 +413,7 @@ namespace Synapse
         }
         catch (Error err)
         {
-          warning ("%s", err.message);
+          Utils.Logger.warning (this, "%s", err.message);
         }
 
         var rel_srv = RelevancyService.get_default ();
