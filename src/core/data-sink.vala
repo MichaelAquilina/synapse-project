@@ -412,6 +412,9 @@ namespace Synapse
       }
     }
 
+    [Signal (detailed = true)]
+    public signal void search_done (ResultSet rs, uint query_id);
+
     public async Gee.List<Match> search (string query,
                                          QueryFlags flags,
                                          ResultSet? dest_result_set,
@@ -460,7 +463,7 @@ namespace Synapse
           try
           {
             var results = plugin.search.end (res);
-            plugin.search_done (results, q.query_id);
+            this.search_done[plugin.get_type ().name ()] (results, q.query_id);
             current_result_set.add_all (results);
           }
           catch (SearchError err)

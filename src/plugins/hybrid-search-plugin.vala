@@ -103,18 +103,11 @@ namespace Synapse
       analyze_recent_documents ();
     }
     
-    private bool connected_to_zg = false;
     private bool initialization_done = false;
 
     protected override void constructed ()
     {
-      // FIXME: if zeitgeist-plugin available
-      unowned ItemProvider? zg_plugin;
-      zg_plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin") as ItemProvider;
-      if (zg_plugin == null) return;
-
-      zg_plugin.search_done.connect (this.zg_plugin_search_done);
-      connected_to_zg = true;
+      data_sink.search_done["SynapseZeitgeistPlugin"].connect (this.zg_plugin_search_done);
     }
 
     private const string RECENT_XML_NAME = ".recently-used.xbel";
@@ -516,8 +509,7 @@ namespace Synapse
         Idle.add (search.callback); // FIXME: this could cause issues
       });
 
-      if (connected_to_zg &&
-          (data_sink.get_plugin ("SynapseZeitgeistPlugin") as ItemProvider).enabled)
+      if ((data_sink.get_plugin ("SynapseZeitgeistPlugin") as ItemProvider).enabled)
       {
         // wait for results from ZeitgeistPlugin
         yield;

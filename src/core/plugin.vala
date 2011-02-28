@@ -45,9 +45,6 @@ namespace Synapse
     {
       return false;
     }
-
-    // weirdish kind of signal cause DataSink will be emitting it for the plugin
-    public signal void search_done (ResultSet rs, uint query_id);
   }
 
   public interface ActionProvider : Activatable
