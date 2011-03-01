@@ -421,15 +421,18 @@ namespace Synapse
             {
               if (original_rs == null || !original_rs.contains_uri (fi.uri))
               {
+                bool done_io = false;
                 if (!fi.is_initialized ())
                 {
                   yield fi.initialize ();
+                  done_io = true;
                 }
                 else if (fi.match_obj != null && fi.file_type in q.query_type)
                 {
                   // make sure the file still exists (could be deleted by now)
                   bool exists = yield fi.exists ();
                   if (!exists) break;
+                  done_io = true;
                 }
                 // file info is now initialized
                 if (fi.match_obj != null && fi.file_type in q.query_type)
@@ -440,6 +443,11 @@ namespace Synapse
                     RelevancyService.compute_relevancy (base_relevancy, pop));
                   num_results++;
                 }
+
+                // the HashMap might have changed, if it did iterator.next ()
+                // will fail and we'll crash
+                // this here should prevent it, but it still needs more elegant fix
+                if (done_io) q.check_cancellable ();
               }
               break;
             }
@@ -465,14 +473,23 @@ namespace Synapse
 
     private string? current_query = null;
 
-    public async ResultSet? search (Query q) throws SearchError
+    public bool handles_query (Query query)
     {
+      // we search everything but ACTIONS and APPLICATIONS
       var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
         | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
       // FIXME: APPLICATIONS?
-      var common_flags = q.query_type & our_results;
+      var common_flags = query.query_type & our_results;
+
+      return common_flags != 0;
+    }
+
+    private bool processing_query = false;
+
+    public async ResultSet? search (Query q) throws SearchError
+    {
       // ignore short searches
-      if (common_flags == 0 || q.query_string.length <= 1) return null;
+      if (q.query_string.length <= 1) return null;
 
       // FIXME: what about deleting one character?
       if (current_query != null && !q.query_string.has_prefix (current_query))
@@ -525,41 +542,61 @@ namespace Synapse
       {
         Timeout.add (250, search.callback);
         yield;
-      }
-
-      // process results from the zeitgeist plugin
-      current_level_uris = uris.size;
-      if (current_level_uris > 0)
-      {
-        yield process_uris (uris);
         q.check_cancellable ();
       }
-      hit_level++;
 
-      // we weren't cancelled and we should have some directories and hits
-      if (hit_level > 1 && q.query_string.length >= 3)
+      // we need a sort-of-a-lock here to prevent updating of the file caches
+      // by multiple queries at the same time
+      while (processing_query)
       {
-        // we want [current_level_uris / last_level_uris > 0.66]
-        if (current_level_uris * 3 > 2 * last_level_uris)
+        Timeout.add (250, search.callback);
+        yield;
+        q.check_cancellable ();
+      }
+      processing_query = true;
+
+      try
+      {
+        // process results from the zeitgeist plugin
+        current_level_uris = uris.size;
+        if (current_level_uris > 0)
         {
-          var directories = get_most_likely_dirs ();
-          /*if (!directories.is_empty)
-          {
-            debug ("we're in level: %d and we'd crawl these dirs >\n%s",
-                   hit_level, string.joinv ("; ", directories.to_array ()));
-          }*/
-          yield process_directories (directories);
+          // extracts directories from the uris and updates directory_hits
+          yield process_uris (uris);
           q.check_cancellable ();
         }
+        hit_level++;
+
+        // we weren't cancelled and we should have some directories and hits
+        if (hit_level > 1 && q.query_string.length >= 3)
+        {
+          // we want [current_level_uris / last_level_uris > 0.66]
+          if (current_level_uris * 3 > 2 * last_level_uris)
+          {
+            var directories = get_most_likely_dirs ();
+            /*if (!directories.is_empty)
+            {
+              debug ("we're in level: %d and we'd crawl these dirs >\n%s",
+                     hit_level, string.joinv ("; ", directories.to_array ()));
+            }*/
+            yield process_directories (directories);
+            q.check_cancellable ();
+          }
+        }
+
+        // directory contents are updated now, we can take a look if any
+        // files match our query
+
+        // FIXME: run this sooner, it doesn't need to wait for the signal
+        var result = yield get_extra_results (q, original_rs, null);
+        return result;
+      }
+      finally
+      {
+        processing_query = false;
       }
 
-      // directory contents are updated now, we can take a look if any
-      // files match our query
-
-      // FIXME: run this sooner, it doesn't need to wait for the signal
-      var result = yield get_extra_results (q, original_rs, null);
-
-      return result;
+      return null;
     }
   }
 }
