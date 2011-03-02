@@ -66,7 +66,7 @@ namespace Synapse
 
       if (!file.query_exists ())
       {
-        stderr.printf ("File '%s' doesn't exist.\n", file.get_path ());
+        Utils.Logger.warning (this, ("File '%s' doesn't exist.\n", file.get_path ());
       }
 
       try
