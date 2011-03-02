@@ -64,11 +64,6 @@ namespace Synapse
 
       hosts = new ArrayList<string> ();
 
-      if (!file.query_exists ())
-      {
-        Utils.Logger.warning (this, ("File '%s' doesn't exist.\n", file.get_path ());
-      }
-
       try
       {
         var dis = new DataInputStream (file.read ());
@@ -79,10 +74,10 @@ namespace Synapse
 
         string line;
 
-        while ((line = dis.read_line (null)) != null)
+        while ((line = yield dis.read_line_async ()) != null)
         {
           line = comment_re.replace(line, -1, 0, "");
-          if (host_key_re.match(line))
+          if (host_key_re.match (line))
           {
             line = host_key_re.replace(line, -1, 0, "");
             foreach (var host in line.split(" "))
@@ -100,7 +95,7 @@ namespace Synapse
       }
       catch (Error e)
       {
-        error ("%s", e.message);
+        Utils.Logger.warning (this, "%s: %s", file.get_path(), e.message);
       }
     }
 
