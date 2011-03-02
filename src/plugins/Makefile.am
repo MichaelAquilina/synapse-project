@@ -44,6 +44,7 @@ libplugins_la_VALASOURCES = \
 	opensearch.vala \
 	pastebin-plugin.vala \
 	rhythmbox-plugin.vala \
+	selection-plugin.vala \
 	test-slow-plugin.vala \
 	system-management.vala \
 	$(NULL)
@@ -55,12 +56,19 @@ libplugins_la_CFLAGS += $(ZEITGEIST_CFLAGS)
 libplugins_la_LIBADD += $(ZEITGEIST_LIBS)
 endif
 
+if HAVE_LIBREST
+libplugins_la_VALASOURCES += imgur-plugin.vala
+libplugins_la_VALAFLAGS += --pkg rest-fix -D HAVE_LIBREST
+libplugins_la_CFLAGS += $(REST_CFLAGS)
+libplugins_la_LIBADD += $(REST_LIBS)
+endif
+
 libplugins_la_SOURCES = \
 	$(libplugins_la_VALASOURCES:.vala=.c) \
 	$(NULL)
 
-plugins.vapi plugins.vala.stamp: $(libplugins_la_VALASOURCES)
-	$(AM_V_VALA)$(VALAC) $(libplugins_la_VALAFLAGS) -C -H plugins.h --library plugins $^
+plugins.vapi plugins.vala.stamp: $(libplugins_la_VALASOURCES) Makefile
+	$(AM_V_VALA)$(VALAC) $(libplugins_la_VALAFLAGS) -C -H plugins.h --library plugins $(filter %.vala %.c,$^)
 	touch $@
 
 BUILT_SOURCES = plugins.vala.stamp

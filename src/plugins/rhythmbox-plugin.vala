@@ -59,7 +59,16 @@ namespace Synapse
 
     public void activate ()
     {
+      actions = new Gee.ArrayList<RhythmboxAction> ();
+      matches = new Gee.ArrayList<RhythmboxControlMatch> ();
       
+      actions.add (new PlayNow());
+      actions.add (new AddToPlaylist());
+      
+      matches.add (new Play ());
+      matches.add (new Pause ());
+      matches.add (new Previous ());
+      matches.add (new Next ());
     }
 
     public void deactivate ()
@@ -149,7 +158,8 @@ namespace Synapse
 
       public override void do_action ()
       {
-        try {
+        try
+        {
           bool player_opened = DBusService.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
           var conn = DBusService.get_session_bus ();
           var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
@@ -160,18 +170,25 @@ namespace Synapse
           {
             /* Try to play 10 times = 5 seconds waiting for RB to start */
             int i = 0;
-            Timeout.add (500, ()=>{
+            Timeout.add (500, () =>
+            {
               ++i;
-              if (i <= 10 && !player.get_playing ())
+              try
               {
-                player.play_pause (true);
-                return true;
+                if (i <= 10 && !player.get_playing ())
+                {
+                  player.play_pause (true);
+                  return true;
+                }
               }
+              catch (Error err) { }
               return false;
             });
           }
-        } catch (DBus.Error e) {
-          stderr.printf ("Rythmbox is not available.\n%s", e.message);
+        }
+        catch (DBus.Error e)
+        {
+          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
         }
       }
 
@@ -343,16 +360,6 @@ namespace Synapse
 
     construct
     {
-      actions = new Gee.ArrayList<RhythmboxAction> ();
-      matches = new Gee.ArrayList<RhythmboxControlMatch> ();
-      
-      actions.add (new PlayNow());
-      actions.add (new AddToPlaylist());
-      
-      matches.add (new Play ());
-      matches.add (new Pause ());
-      matches.add (new Previous ());
-      matches.add (new Next ());
     }
     
     public async ResultSet? search (Query q) throws SearchError

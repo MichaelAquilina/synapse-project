@@ -1,5 +1,5 @@
-AC_INIT([synapse], [0.2.3])
-AC_DEFINE(RELEASE_NAME, "Adenosine triphosphate", "Codename of this release")
+AC_INIT([synapse], [0.2.5])
+AC_DEFINE(RELEASE_NAME, "Anandamide", "Codename of this release")
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([.])
@@ -68,6 +68,11 @@ PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   )
 
 
+AC_ARG_ENABLE(librest,
+              AS_HELP_STRING([--enable-librest[=@<:@no/auto/yes@:>@]],[Build support for plugins using librest ]),
+              [enable_librest=$enableval],
+              [enable_librest="auto"])
+
 AC_ARG_ENABLE(indicator,
               AS_HELP_STRING([--enable-indicator[=@<:@no/auto/yes@:>@]],[Build support for application indicators ]),
               [enable_indicator=$enableval],
@@ -104,6 +109,27 @@ if test "x$enable_indicator" = "xyes" ; then
 fi
 AM_CONDITIONAL(HAVE_INDICATOR, test "x$enable_indicator" = "xyes")
 
+REST_PKG_NAME=rest-0.7
+if test "x$enable_librest" = "xauto" ; then
+	PKG_CHECK_EXISTS([$REST_PKG_NAME],
+	                 enable_librest="yes",
+	                 enable_librest="no")
+	if test "x$enable_librest" = "xno" ; then
+		REST_PKG_NAME=rest-0.6
+		PKG_CHECK_EXISTS([$REST_PKG_NAME],
+		                 enable_librest="yes",
+		                 enable_librest="no")
+	fi
+fi
+
+if test "x$enable_librest" = "xyes" ; then
+	PKG_CHECK_EXISTS([$REST_PKG_NAME],,
+	                 AC_MSG_ERROR([$REST_PKG_NAME is not installed]))
+	PKG_CHECK_MODULES(REST, $REST_PKG_NAME)
+	AC_DEFINE(HAVE_LIBREST, 1, [Have librest])
+fi
+AM_CONDITIONAL(HAVE_LIBREST, test "x$enable_librest" = "xyes")
+
 dnl Expansions
 AS_AC_EXPAND([PKGDATADIR], [$datadir/$PACKAGE_NAME])
 AS_AC_EXPAND([DATADIR], [$datadir])
@@ -135,6 +161,7 @@ ${PACKAGE}-${VERSION}
     Zeitgeist support:  ${enable_zeitgeist}
 
   Optional dependencies
+    Rest:               ${enable_librest} (${REST_PKG_NAME})
     AppIndicator:       ${enable_indicator}
 
 EOF

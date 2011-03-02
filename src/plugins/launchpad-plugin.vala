@@ -21,18 +21,211 @@
 
 namespace Synapse
 {
-  public class LaunchpadPlugin: Object, Activatable, ItemProvider
+  public class LaunchpadPlugin: Object, Activatable, ItemProvider //, Configurable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
+    private LaunchpadAuthObject? auth_object;
+
     public void activate ()
     {
-      
+      //auth_object = new LaunchpadAuthObject ();
     }
 
     public void deactivate ()
     {
+      auth_object = null;
+    }
+    
+    public Gtk.Widget create_config_widget ()
+    {
+      var box = new Gtk.VBox (false, 0);
+      box.show ();
+
+      var authorize_button = new Gtk.Button.with_label (_("Authorize with Launchpad"));
+      authorize_button.show ();
+      box.pack_start (authorize_button, true, false);
       
+      var spinner = new Gtk.Spinner ();
+      box.pack_start (spinner);
+
+      var label = new Gtk.Label (_ ("Please press the Finish button once you login to Launchpad with your web browser"));
+      label.set_width_chars (40);
+      label.set_line_wrap (true);
+      var proceed_button = new Gtk.Button.with_label (_ ("Finish authorization"));
+      box.pack_start (label);
+      box.pack_start (proceed_button, true, false);
+
+      /*
+      HashTable<string, string>? step1_result = null;
+
+      // i'm quite sure this leaks as hell, but it works :)
+      authorize_button.clicked.connect (() =>
+      {
+        authorize_button.hide ();
+        spinner.show ();
+        spinner.start ();
+        auth_object.auth_step1.begin ((obj, res) =>
+        {
+          // FIXME: handle error
+          step1_result = auth_object.auth_step1.end (res);
+          auth_object.auth_step2 (step1_result.lookup ("oauth_token"));
+          Timeout.add_seconds (5, () =>
+          {
+            spinner.hide ();
+            spinner.stop ();
+            label.show ();
+            proceed_button.show ();
+
+            return false;
+          });
+        });
+      });
+
+      proceed_button.clicked.connect (() =>
+      {
+        proceed_button.hide ();
+        label.hide ();
+        spinner.show ();
+        spinner.start ();
+        auth_object.auth_step3.begin (step1_result.lookup ("oauth_token"),
+                                      step1_result.lookup ("oauth_token_secret"),
+                                      (obj, res) =>
+        {
+          spinner.hide ();
+          try
+          {
+            var step3_result = auth_object.auth_step3.end (res);
+            Utils.Logger.log (this, "token: %s", step3_result.lookup ("oauth_token"));
+            Utils.Logger.log (this, "token_secret: %s", step3_result.lookup ("oauth_token_secret"));
+
+            label.set_text (_ ("Successfully authenticated"));
+          }
+          catch (Error e)
+          {
+            label.set_text (_ ("Authentication failed") + " (%s)".printf (e.message));
+          }
+          
+          label.show ();
+        });
+      });
+      */
+
+      return box;
+    }
+
+    private class LaunchpadAuthObject: Object
+    {
+      const string CONSUMER_KEY = "Synapse.LaunchpadPlugin";
+/*
+      private Rest.Proxy proxy;
+
+      protected HashTable<string, string> parse_form_reply (string payload)
+      {
+        var ht = new HashTable<string, string> (str_hash, str_equal);
+
+        string[] parameters = payload.split ("&");
+        foreach (unowned string p in parameters)
+        {
+          string[] parameter = p.split ("=", 2);
+          ht.insert (parameter[0], parameter[1]);
+        }
+
+        return ht;
+      }
+      
+      private class Credentials: ConfigObject
+      {
+        public string token { get; set; default = ""; }
+        public string token_secret { get; set; default = ""; }
+      }
+
+      private Credentials creds;
+
+      construct
+      {
+        // make sure we keep a ref to this, otherwise it'll crash when the call
+        // finishes
+        proxy = new Rest.Proxy ("https://launchpad.net/", false);
+        
+        creds = ConfigService.get_default ().bind_config (
+          "plugins", "launchpad-plugin", typeof (Credentials)
+        ) as Credentials;
+      }
+      
+      public bool is_authenticated ()
+      {
+        return creds.token != "" && creds.token_secret != "";
+      }
+      
+      public void get_tokens (out string token, out string token_secret)
+      {
+        token = creds.token;
+        token_secret = creds.token_secret;
+      }
+      
+      public async HashTable<string, string> auth_step1 () throws Error
+      {
+        Error? err = null;
+
+        var call = proxy.new_call ();
+
+        call.set_method ("POST");
+        call.set_function ("+request-token");
+        call.add_param ("oauth_consumer_key", CONSUMER_KEY);
+        call.add_param ("oauth_signature_method", "PLAINTEXT");
+        call.add_param ("oauth_signature", "&");
+
+        call.run_async ((call_obj, error, obj) =>
+        {
+          err = error;
+          auth_step1.callback ();
+        }, this);
+        yield;
+
+        if (err != null) throw err;
+
+        // the reply should have oauth_token & oauth_token_secret
+        var result = parse_form_reply (call.get_payload ());
+        return result;
+      }
+      
+      public void auth_step2 (string oauth_token)
+      {
+        // https://launchpad.net/+authorize-token?oauth_token={oauth_token}
+        CommonActions.open_uri ("https://launchpad.net/+authorize-token?oauth_token=" + oauth_token);
+      }
+      
+      public async HashTable<string, string> auth_step3 (string oauth_token,
+                                                         string token_secret) throws Error
+      {
+        Error? err = null;
+
+        var call = proxy.new_call ();
+        call.set_method ("POST");
+        call.set_function ("+access-token");
+        call.add_param ("oauth_token", oauth_token);
+        call.add_param ("oauth_consumer_key", CONSUMER_KEY);
+        call.add_param ("oauth_signature_method", "PLAINTEXT");
+        call.add_param ("oauth_signature", "&" + token_secret);
+
+        call.run_async ((call_obj, error, obj) =>
+        {
+          err = error;
+          auth_step1.callback ();
+        }, this);
+        yield;
+
+        if (err != null) throw err;
+
+        // the reply should have new oauth_token & oauth_token_secret
+        var result = parse_form_reply (call.get_payload ());
+        creds.token = result.lookup ("oauth_token") ?? "";
+        creds.token_secret = result.lookup ("oauth_token_secret") ?? "";
+
+        return result;
+      }
+*/
     }
 
     private class LaunchpadObject: Object, Match, UriMatch
@@ -83,7 +276,7 @@ namespace Synapse
     {
       try
       {
-        bug_regex = new Regex ("(?:bug|lp|#):?\\s*#?\\s*(\\d+)$", RegexCompileFlags.OPTIMIZE);
+        bug_regex = new Regex ("(?:bug|lp|#):?\\s*#?\\s*(\\d+)$", RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
         branch_regex = new Regex ("lp:(~?[a-z]+[+-/_a-z0-9]*)", RegexCompileFlags.OPTIMIZE);
       }
       catch (RegexError err)
@@ -153,6 +346,11 @@ namespace Synapse
 
       q.check_cancellable ();
       return result;
+    }
+    
+    public ResultSet? find_for_match (Query query, Match match)
+    {
+      return null;
     }
   }
 }

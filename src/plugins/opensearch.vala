@@ -52,7 +52,8 @@ namespace Synapse
 
     public void activate ()
     {
-      
+      actions = new Gee.ArrayList<SearchAction> ();
+      load_xmls.begin ();
     }
 
     public void deactivate ()
@@ -179,7 +180,9 @@ namespace Synapse
       {
         try
         {
-          AppInfo.launch_default_for_uri (get_query_url (match.title),
+          string what = (match is TextMatch) ?
+            (match as TextMatch).get_text () : match.title;
+          AppInfo.launch_default_for_uri (get_query_url (what),
                                           new Gdk.AppLaunchContext ());
         }
         catch (Error err)
@@ -271,9 +274,6 @@ namespace Synapse
     {
       var cs = ConfigService.get_default ();
       config = (Config) cs.get_config ("plugins", "opensearch", typeof (Config));
-
-      actions = new Gee.ArrayList<SearchAction> ();
-      load_xmls.begin ();
     }
     
     private async void load_xmls ()
@@ -341,7 +341,8 @@ namespace Synapse
 
     public ResultSet? find_for_match (Query query, Match match)
     {
-      if (match.match_type != MatchType.UNKNOWN)
+      if (match.match_type != MatchType.UNKNOWN &&
+          match.match_type != MatchType.TEXT)
       {
         return null;
       }

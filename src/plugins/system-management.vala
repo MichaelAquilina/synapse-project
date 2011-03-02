@@ -28,10 +28,12 @@ namespace Synapse
     public const string OBJECT_PATH = "/org/freedesktop/UPower";
     public const string INTERFACE_NAME = "org.freedesktop.UPower";
 
-    public abstract void hibernate () throws DBus.Error;
-    public abstract void suspend () throws DBus.Error;
+    public abstract async void hibernate () throws DBus.Error;
+    public abstract async void suspend () throws DBus.Error;
     public abstract async bool hibernate_allowed () throws DBus.Error;
     public abstract async bool suspend_allowed () throws DBus.Error;
+    
+    public abstract async void about_to_sleep () throws DBus.Error;
   }
 
   [DBus (name = "org.freedesktop.ConsoleKit.Manager")]
@@ -118,8 +120,8 @@ namespace Synapse
       {
         return allowed;
       }
-
-      public override void do_action ()
+      
+      private async void do_suspend ()
       {
         try
         {
@@ -129,12 +131,24 @@ namespace Synapse
                                    UPowerObject.OBJECT_PATH,
                                    UPowerObject.INTERFACE_NAME);
 
-          dbus_interface.suspend ();
+          yield dbus_interface.about_to_sleep ();
+          // yea kinda nasty
+          GnomeScreenSaverPlugin.lock_screen ();
+          // wait 2 seconds
+          Timeout.add (2000, do_suspend.callback);
+          yield;
+
+          yield dbus_interface.suspend ();
         }
         catch (DBus.Error err)
         {
           warning ("%s", err.message);
         }
+      }
+
+      public override void do_action ()
+      {
+        do_suspend.begin ();
       }
     }
 
@@ -176,8 +190,8 @@ namespace Synapse
       {
         return allowed;
       }
-
-      public override void do_action ()
+      
+      private async void do_hibernate ()
       {
         try
         {
@@ -187,12 +201,23 @@ namespace Synapse
                                    UPowerObject.OBJECT_PATH,
                                    UPowerObject.INTERFACE_NAME);
 
+          yield dbus_interface.about_to_sleep ();
+          // yea kinda nasty
+          GnomeScreenSaverPlugin.lock_screen ();
+          // wait 2 seconds
+          Timeout.add (2000, do_hibernate.callback);
+          yield;
           dbus_interface.hibernate ();
         }
         catch (DBus.Error err)
         {
           warning ("%s", err.message);
         }
+      }
+
+      public override void do_action ()
+      {
+        do_hibernate.begin ();
       }
     }
 

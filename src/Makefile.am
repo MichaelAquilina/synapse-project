@@ -50,6 +50,12 @@ synapse_CFLAGS += $(APP_INDICATOR_CFLAGS)
 synapse_LDADD += $(APP_INDICATOR_LIBS)
 endif
 
+if HAVE_LIBREST
+synapse_VALAFLAGS += -D HAVE_LIBREST
+synapse_CFLAGS += $(REST_CFLAGS)
+synapse_LDADD += $(REST_LIBS)
+endif
+
 if HAVE_ZEITGEIST
 synapse_VALAFLAGS += --pkg zeitgeist-1.0 -D HAVE_ZEITGEIST
 synapse_CFLAGS += $(ZEITGEIST_CFLAGS)
@@ -78,8 +84,8 @@ synapse_SOURCES = $(synapse_VALASOURCES:.vala=.c)
 
 $(GENERATED_C_FILES): synapse_vala.stamp
 
-synapse_vala.stamp: $(addprefix $(srcdir)/,$(synapse_VALASOURCES))
-	$(AM_V_VALA)$(VALAC) $(synapse_VALAFLAGS) $(VALAFLAGS) -C $^
+synapse_vala.stamp: $(addprefix $(srcdir)/,$(synapse_VALASOURCES)) Makefile
+	$(AM_V_VALA)$(VALAC) $(synapse_VALAFLAGS) $(VALAFLAGS) -C $(filter %.vala %.c,$^)
 	$(AM_V_at)touch $@
 
 DISTCLEANFILES = $(GENERATED_C_FILES) synapse_vala.stamp

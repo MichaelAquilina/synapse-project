@@ -129,6 +129,7 @@ namespace Synapse.Gui
       on_composited_changed (window);
       window.composited_changed.connect (on_composited_changed);
       window.key_press_event.connect (key_press_event);
+      window.delete_event.connect (window.hide_on_delete);
 
       im_context = new IMMulticontext ();
       im_context.set_use_preedit (false);

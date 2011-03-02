@@ -158,7 +158,7 @@ namespace Synapse
         }
         else
         {
-          msg = _ ("An error occurred during upload to pastebin, please check the log for more information.");
+          msg = _ ("An error occurred during upload, please check the log for more information.");
         }
 
         try
@@ -229,7 +229,7 @@ namespace Synapse
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
-        typeof (LocatePlugin),
+        typeof (PastebinPlugin),
         _ ("Pastebin"),
         _ ("Upload files to pastebin."),
         "document-send",

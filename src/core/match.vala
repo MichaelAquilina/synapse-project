@@ -34,21 +34,21 @@ namespace Synapse
   {
     public enum Score
     {
-      INCREMENT_MINOR = 200,
-      INCREMENT_SMALL = 500,
-      INCREMENT_MEDIUM = 1000,
-      INCREMENT_LARGE = 2000,
-      URI_PENALTY = 1500,
+      INCREMENT_MINOR = 2000,
+      INCREMENT_SMALL = 5000,
+      INCREMENT_MEDIUM = 10000,
+      INCREMENT_LARGE = 20000,
+      URI_PENALTY = 15000,
 
-      POOR = 5000,
-      BELOW_AVERAGE = 6000,
-      AVERAGE = 7000,
-      ABOVE_AVERAGE = 7500,
-      GOOD = 8000,
-      VERY_GOOD = 8500,
-      EXCELLENT = 9000,
+      POOR = 50000,
+      BELOW_AVERAGE = 60000,
+      AVERAGE = 70000,
+      ABOVE_AVERAGE = 75000,
+      GOOD = 80000,
+      VERY_GOOD = 85000,
+      EXCELLENT = 90000,
 
-      HIGHEST = 10000
+      HIGHEST = 100000
     }
     
     // properties
@@ -61,7 +61,7 @@ namespace Synapse
 
     public virtual void execute (Match? match)
     {
-      warning ("%s.execute () is not implemented", this.get_type ().name ());
+      Utils.Logger.error (this, "execute () is not implemented");
     }
     
     public signal void executed ();
@@ -86,8 +86,15 @@ namespace Synapse
     public abstract string? extended_info { get; set; }
   }
   
+  public enum TextOrigin
+  {
+    UNKNOWN,
+    CLIPBOARD
+  }
+  
   public interface TextMatch: Match
   {
+    public abstract TextOrigin text_origin { get; set; }
     public abstract string get_text ();
   }
   

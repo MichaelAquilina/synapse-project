@@ -27,7 +27,8 @@ namespace Synapse
 
     public void activate ()
     {
-      
+      zg_log = new Zeitgeist.Log ();
+      zg_index = new Zeitgeist.Index ();
     }
 
     public void deactivate ()
@@ -128,7 +129,7 @@ namespace Synapse
         this.uri = subject.get_uri ();
 
         var dfs = DesktopFileService.get_default ();
-        var dfi = dfs.get_desktop_file_for_id (uri.offset (14));
+        var dfi = dfs.get_desktop_file_for_id (uri.substring (14));
 
         this.title = dfi.name;
         this.icon_name = dfi.icon_name;
@@ -195,8 +196,6 @@ namespace Synapse
 
     construct
     {
-      zg_log = new Zeitgeist.Log ();
-      zg_index = new Zeitgeist.Index ();
     }
 
     private int compute_relevancy (string uri, int base_relevancy)
@@ -205,6 +204,17 @@ namespace Synapse
       float pop = rs.get_uri_popularity (uri);
 
       return RelevancyService.compute_relevancy (base_relevancy, pop);
+    }
+    
+    private static void update_min_max (string uri, ref long minimum, ref long maximum)
+    {
+#if VALA_0_12
+      long len = uri.length;
+#else
+      long len = (long) uri.size ();
+#endif
+      if (len > maximum) maximum = len;
+      if (len < minimum) minimum = len;
     }
 
     private string interesting_attributes =
@@ -217,7 +227,7 @@ namespace Synapse
     private async void process_results (string query,
                                         Zeitgeist.ResultSet events,
                                         Cancellable cancellable,
-                                        ResultSet results,
+                                        ResultSet real_results,
                                         bool local_only)
     {
       Gee.Set<string> uris = new Gee.HashSet<string> ();
@@ -227,11 +237,18 @@ namespace Synapse
         MatcherFlags.NO_FUZZY | MatcherFlags.NO_PARTIAL,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
 
+      // temp results
+      var results = new ResultSet ();
+      long minimum = long.MAX;
+      long maximum = 0;
+
       foreach (var event in events)
       {
         if (event.num_subjects () <= 0) continue;
         var subject = event.get_subject (0);
         unowned string uri = subject.get_uri ();
+        if (uri == null || uri == "") continue;
+        // make sure we don't add the same uri twice
         if (!(uri in uris))
         {
           int relevancy_penalty = Match.Score.URI_PENALTY;
@@ -239,6 +256,7 @@ namespace Synapse
           string? icon = null;
           uris.add (uri);
           var f = File.new_for_uri (uri);
+          // this screws up gio, we better skip it
           if (f.get_uri_scheme () == "data") continue;
           if (f.is_native ())
           {
@@ -267,11 +285,25 @@ namespace Synapse
               else continue; // file doesn't exist
             }
           }
+          else if (uri.has_prefix ("note://tomboy/"))
+          {
+            // special case tomboy notes - we need to make sure the notes weren't deleted
+            string note_filename = uri.substring (14) + ".note";
+            string note_path = Path.build_filename (Environment.get_user_data_dir (),
+                                                    "tomboy", note_filename);
+            var note_f = File.new_for_path (note_path);
+            bool exists = yield Utils.query_exists_async (note_f);
+            
+            if (cancellable.is_cancelled ()) return;
+            else if (!exists) continue;
+            
+            icon = g_content_type_get_icon ("application/x-note").to_string ();
+          }
           else if (local_only)
           {
             continue;
           }
-          else
+          else // non native (mostly remote uris)
           {
             relevancy_penalty += Match.Score.INCREMENT_SMALL;
             unowned string mimetype = subject.get_mimetype ();
@@ -279,7 +311,13 @@ namespace Synapse
             {
               icon = g_content_type_get_icon (mimetype).to_string ();
             }
+            // we want to increase relevancy of shorter URL, so we'll do this
+            if (uri.has_prefix ("http"))
+            {
+              update_min_max (uri, ref minimum, ref maximum);
+            }
           }
+
           var match_obj = new MatchObject (event,
                                            thumbnail_path,
                                            icon);
@@ -295,6 +333,26 @@ namespace Synapse
             }
           }
           if (!match_found) results.add (match_obj, Match.Score.POOR + Match.Score.INCREMENT_MINOR);
+        }
+      }
+      
+      foreach (var entry in results.entries)
+      {
+        var mo = entry.key as MatchObject;
+        if (mo.uri != null && mo.uri.has_prefix ("http") && minimum != maximum)
+        {
+#if VALA_0_12
+          long len = mo.uri.length;
+#else
+          long len = (long) mo.uri.size ();
+#endif
+          float mult = (len - minimum) / (float)(maximum - minimum);
+          int adjusted_relevancy = entry.value - (int)(mult * Match.Score.INCREMENT_MINOR);
+          real_results.add (mo, adjusted_relevancy);
+        }
+        else
+        {
+          real_results.add (mo, entry.value);
         }
       }
     }
@@ -358,7 +416,7 @@ namespace Synapse
           else if (is_application)
           {
             var dfs = DesktopFileService.get_default ();
-            if (dfs.get_desktop_file_for_id (uri.offset (14)) == null) continue;
+            if (dfs.get_desktop_file_for_id (uri.substring (14)) == null) continue;
           }
           else
           {

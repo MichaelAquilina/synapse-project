@@ -34,6 +34,10 @@ namespace Synapse
     public bool notify_match { get; set; default = true; }
 
     public abstract bool valid_for_match (Match match);
+    public virtual int get_relevancy_for_match (Match match)
+    {
+      return default_relevancy;
+    }
 
     public abstract void do_execute (Match? match);
     public void execute (Match? match)
@@ -174,18 +178,29 @@ namespace Synapse
       public override void do_execute (Match? match)
       {
         UriMatch uri_match = match as UriMatch;
-        return_if_fail (uri_match != null);
-        var f = File.new_for_uri (uri_match.uri);
-        try
+
+        if (uri_match != null)
         {
-          var app_info = f.query_default_handler (null);
-          List<File> files = new List<File> ();
-          files.prepend (f);
-          app_info.launch (files, new Gdk.AppLaunchContext ());
+          CommonActions.open_uri (uri_match.uri);
         }
-        catch (Error err)
+        else if (file_path.match (match.title))
         {
-          Utils.Logger.warning (this, "%s", err.message);
+          File f;
+          if (match.title.has_prefix ("~"))
+          {
+            f = File.new_for_path (Path.build_filename (Environment.get_home_dir (),
+                                                        match.title.substring (1),
+                                                        null));
+          }
+          else
+          {
+            f = File.new_for_path (match.title);
+          }
+          CommonActions.open_uri (f.get_uri ());
+        }
+        else
+        {
+          CommonActions.open_uri (match.title);
         }
       }
 
@@ -195,8 +210,26 @@ namespace Synapse
         {
           case MatchType.GENERIC_URI:
             return true;
+          case MatchType.UNKNOWN:
+            return web_uri.match (match.title) || file_path.match (match.title);
           default:
             return false;
+        }
+      }
+      
+      private Regex web_uri;
+      private Regex file_path;
+      
+      construct
+      {
+        try
+        {
+          web_uri = new Regex ("^(ftp|http(s)?)://[^.]+\\.[^.]+", RegexCompileFlags.OPTIMIZE);
+          file_path = new Regex ("^(/|~/)[^/]+", RegexCompileFlags.OPTIMIZE);
+        }
+        catch (Error err)
+        {
+          Utils.Logger.warning (this, "%s", err.message);
         }
       }
     }
@@ -292,6 +325,17 @@ namespace Synapse
             return false;
         }
       }
+      
+      public override int get_relevancy_for_match (Match match)
+      {
+        TextMatch? text_match = match as TextMatch;
+        if (text_match != null && text_match.text_origin == TextOrigin.CLIPBOARD)
+        {
+          return 0;
+        }
+        
+        return default_relevancy;
+      }
     }
 
     private Gee.List<BaseAction> actions;
@@ -318,7 +362,7 @@ namespace Synapse
         {
           if (action.valid_for_match (match))
           {
-            results.add (action, action.default_relevancy);
+            results.add (action, action.get_relevancy_for_match (match));
           }
         }
       }

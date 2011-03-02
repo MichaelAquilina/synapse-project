@@ -29,6 +29,9 @@ namespace Synapse.Gui
     class PluginTileObject: UI.Widgets.AbstractTileObject
     {
       public DataSink.PluginRegistry.PluginInfo pi { get; construct set; }
+      
+      public signal void configure ();
+
       public PluginTileObject (DataSink.PluginRegistry.PluginInfo info)
       {
         GLib.Object (name: info.title,
@@ -59,6 +62,21 @@ namespace Synapse.Gui
           Synapse.CommonActions.open_uri (address);
         });
         add_user_button (help_button);
+        
+        if (pi.plugin_type.is_a (typeof (Synapse.Configurable)))
+        {
+          var config_button = new Gtk.Button ();
+          config_button.set_image (
+            new Gtk.Image.from_stock (Gtk.STOCK_PREFERENCES,
+                                      Gtk.IconSize.SMALL_TOOLBAR));
+          config_button.set_tooltip_markup (_("Configure plugin"));
+          config_button.clicked.connect (() =>
+          {
+            this.configure ();
+          });
+          
+          add_user_button (config_button);
+        }
       }
 
       public void update_state (bool enabled)
@@ -178,6 +196,23 @@ namespace Synapse.Gui
           PluginTileObject pto = tile_obj as PluginTileObject;
           pto.update_state (!tile_obj.enabled);
           data_sink.set_plugin_enabled (pto.pi.plugin_type, tile_obj.enabled);
+        });
+        
+        tile.configure.connect ((tile_obj) =>
+        {
+          PluginTileObject pto = tile_obj as PluginTileObject;
+          var plugin = data_sink.get_plugin (pto.pi.plugin_type.name ()) as Configurable;
+          return_if_fail (plugin != null);
+
+          var widget = plugin.create_config_widget ();
+          var dialog = new Gtk.Dialog.with_buttons (_("Configure plugin"),
+                                                    this,
+                                                    Gtk.DialogFlags.MODAL | Gtk.DialogFlags.NO_SEPARATOR,
+                                                    Gtk.STOCK_CLOSE, null);
+          dialog.set_default_size (300, 200);
+          (dialog.get_content_area () as Gtk.Container).add (widget);
+          dialog.run ();
+          dialog.destroy ();
         });
       }
     }

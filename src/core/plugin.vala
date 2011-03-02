@@ -29,6 +29,11 @@ namespace Synapse
     public abstract void deactivate ();
   }
 
+  public interface Configurable : Object
+  {
+    public abstract Gtk.Widget create_config_widget ();
+  }
+
   public interface ItemProvider : Activatable
   {
     public abstract async ResultSet? search (Query query) throws SearchError;
@@ -40,9 +45,6 @@ namespace Synapse
     {
       return false;
     }
-
-    // weirdish kind of signal cause DataSink will be emitting it for the plugin
-    public signal void search_done (ResultSet rs, uint query_id);
   }
 
   public interface ActionProvider : Activatable

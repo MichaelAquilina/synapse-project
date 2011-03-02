@@ -143,17 +143,9 @@ namespace Synapse
       config = (Config) cs.get_config ("plugins", "directory-plugin", typeof (Config));
     }
     
-    private bool connected_to_zg = false;
-
     protected override void constructed ()
     {
-      // FIXME: if zeitgeist-plugin available
-      unowned ItemProvider? zg_plugin;
-      zg_plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin") as ItemProvider;
-      if (zg_plugin == null) return;
-
-      zg_plugin.search_done.connect (this.zg_plugin_search_done);
-      connected_to_zg = true;
+      data_sink.search_done["SynapseZeitgeistPlugin"].connect (this.zg_plugin_search_done);
     }
     
     private bool xdg_indexed = false;
@@ -229,8 +221,6 @@ namespace Synapse
     
     private async void process_directories (Gee.Collection<string>? dirs)
     {
-      if (dirs == null) return;
-      
       if (home_dir_uri == null)
       {
         var home_dir = Environment.get_home_dir ();
@@ -245,6 +235,8 @@ namespace Synapse
           home_dir_uri = "file:///home/";
         }
       }
+
+      if (dirs == null) return;
 
       foreach (var dir in dirs)
       {
@@ -285,8 +277,7 @@ namespace Synapse
         Idle.add (search.callback);
       });
 
-      if (connected_to_zg &&
-          (data_sink.get_plugin ("SynapseZeitgeistPlugin") as ItemProvider).enabled)
+      if ((data_sink.get_plugin ("SynapseZeitgeistPlugin") as ItemProvider).enabled)
       {
         // wait for results from ZeitgeistPlugin
         yield;

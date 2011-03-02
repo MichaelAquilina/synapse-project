@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-18 16:05+0100\n"
+"POT-Creation-Date: 2011-02-22 22:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr ""
 msgid "Synapse"
 msgstr ""
 
-#: ../src/synapse-main.vala:93 ../src/ui-settings.vala:330
+#: ../src/synapse-main.vala:93 ../src/ui-settings.vala:365
 msgid "Activate"
 msgstr ""
 
@@ -97,89 +97,93 @@ msgstr ""
 msgid "...or press down key to browse recent activities"
 msgstr ""
 
-#: ../src/ui-settings.vala:45
+#: ../src/ui-settings.vala:48
 msgid "Status"
 msgstr ""
 
-#: ../src/ui-settings.vala:47
+#: ../src/ui-settings.vala:50
 msgid "Enable this plugin"
 msgstr ""
 
-#: ../src/ui-settings.vala:48
+#: ../src/ui-settings.vala:51
 msgid "Disable this plugin"
 msgstr ""
 
-#: ../src/ui-settings.vala:54
+#: ../src/ui-settings.vala:57
 msgid "About this plugin"
 msgstr ""
 
-#: ../src/ui-settings.vala:70 ../src/ui-settings.vala:380
+#: ../src/ui-settings.vala:72 ../src/ui-settings.vala:208
+msgid "Configure plugin"
+msgstr ""
+
+#: ../src/ui-settings.vala:88 ../src/ui-settings.vala:415
 msgid "Disabled"
 msgstr ""
 
-#: ../src/ui-settings.vala:74
+#: ../src/ui-settings.vala:92
 msgid "Enabled"
 msgstr ""
 
-#: ../src/ui-settings.vala:127
+#: ../src/ui-settings.vala:145
 msgid "Synapse - Settings"
 msgstr ""
 
-#: ../src/ui-settings.vala:148
+#: ../src/ui-settings.vala:166
 msgid "Default"
 msgstr ""
 
-#: ../src/ui-settings.vala:149
+#: ../src/ui-settings.vala:167
 msgid "Mini"
 msgstr ""
 
-#: ../src/ui-settings.vala:150
+#: ../src/ui-settings.vala:168
 msgid "Dual"
 msgstr ""
 
-#: ../src/ui-settings.vala:151
+#: ../src/ui-settings.vala:169
 msgid "Virgilio"
 msgstr ""
 
-#: ../src/ui-settings.vala:240
+#: ../src/ui-settings.vala:275
 msgid "General"
 msgstr ""
 
-#: ../src/ui-settings.vala:241
+#: ../src/ui-settings.vala:276
 msgid "Plugins"
 msgstr ""
 
-#: ../src/ui-settings.vala:247
+#: ../src/ui-settings.vala:282
 msgid "Behavior & Look"
 msgstr ""
 
-#: ../src/ui-settings.vala:259
+#: ../src/ui-settings.vala:294
 msgid "Theme:"
 msgstr ""
 
 #. Autostart checkbox
-#: ../src/ui-settings.vala:264
+#: ../src/ui-settings.vala:299
 msgid "Startup on login"
 msgstr ""
 
 #. Notification icon
-#: ../src/ui-settings.vala:270
+#: ../src/ui-settings.vala:305
 msgid "Show notification icon"
 msgstr ""
 
-#: ../src/ui-settings.vala:285
+#: ../src/ui-settings.vala:320
 msgid "Shortcuts"
 msgstr ""
 
-#: ../src/ui-settings.vala:307
+#: ../src/ui-settings.vala:342
 msgid "Action"
 msgstr ""
 
-#: ../src/ui-settings.vala:324
+#: ../src/ui-settings.vala:359
 msgid "Shortcut"
 msgstr ""
 
-#: ../src/ui-settings.vala:338
+#: ../src/ui-settings.vala:373
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr ""
 
@@ -187,43 +191,43 @@ msgstr ""
 msgid "No results."
 msgstr ""
 
-#: ../src/core/common-actions.vala:64
+#: ../src/core/common-actions.vala:68
 msgid "Run"
 msgstr ""
 
-#: ../src/core/common-actions.vala:65
+#: ../src/core/common-actions.vala:69
 msgid "Run an application, action or script"
 msgstr ""
 
-#: ../src/core/common-actions.vala:119
+#: ../src/core/common-actions.vala:123
 msgid "Run in Terminal"
 msgstr ""
 
-#: ../src/core/common-actions.vala:120
+#: ../src/core/common-actions.vala:124
 msgid "Run application or command in terminal"
 msgstr ""
 
-#: ../src/core/common-actions.vala:167
+#: ../src/core/common-actions.vala:171
 msgid "Open"
 msgstr ""
 
-#: ../src/core/common-actions.vala:168
+#: ../src/core/common-actions.vala:172
 msgid "Open using default application"
 msgstr ""
 
-#: ../src/core/common-actions.vala:208
+#: ../src/core/common-actions.vala:241
 msgid "Open folder"
 msgstr ""
 
-#: ../src/core/common-actions.vala:209
+#: ../src/core/common-actions.vala:242
 msgid "Open folder containing this file"
 msgstr ""
 
-#: ../src/core/common-actions.vala:248
+#: ../src/core/common-actions.vala:281
 msgid "Copy to Clipboard"
 msgstr ""
 
-#: ../src/core/common-actions.vala:249
+#: ../src/core/common-actions.vala:282
 msgid "Copy selection to clipboard"
 msgstr ""
 
@@ -236,7 +240,7 @@ msgid "Banshee is not installed"
 msgstr ""
 
 #: ../src/plugins/banshee-plugin.vala:142
-#: ../src/plugins/rhythmbox-plugin.vala:144
+#: ../src/plugins/rhythmbox-plugin.vala:153
 msgid "Play"
 msgstr ""
 
@@ -245,7 +249,7 @@ msgid "Start playback in Banshee"
 msgstr ""
 
 #: ../src/plugins/banshee-plugin.vala:170
-#: ../src/plugins/rhythmbox-plugin.vala:187
+#: ../src/plugins/rhythmbox-plugin.vala:204
 msgid "Pause"
 msgstr ""
 
@@ -254,7 +258,7 @@ msgid "Pause playback in Banshee"
 msgstr ""
 
 #: ../src/plugins/banshee-plugin.vala:192
-#: ../src/plugins/rhythmbox-plugin.vala:203
+#: ../src/plugins/rhythmbox-plugin.vala:220
 msgid "Next"
 msgstr ""
 
@@ -263,7 +267,7 @@ msgid "Plays the next song in Banshee's playlist"
 msgstr ""
 
 #: ../src/plugins/banshee-plugin.vala:215
-#: ../src/plugins/rhythmbox-plugin.vala:226
+#: ../src/plugins/rhythmbox-plugin.vala:243
 msgid "Previous"
 msgstr ""
 
@@ -284,7 +288,7 @@ msgid "Play in Banshee"
 msgstr ""
 
 #: ../src/plugins/banshee-plugin.vala:283
-#: ../src/plugins/rhythmbox-plugin.vala:299
+#: ../src/plugins/rhythmbox-plugin.vala:316
 msgid "Clears the current playlist and plays the song"
 msgstr ""
 
@@ -366,11 +370,11 @@ msgstr ""
 msgid "Locks screen and starts screensaver."
 msgstr ""
 
-#: ../src/plugins/gnome-screensaver-plugin.vala:83
+#: ../src/plugins/gnome-screensaver-plugin.vala:88
 msgid "Lock screen of your computer."
 msgstr ""
 
-#: ../src/plugins/gnome-screensaver-plugin.vala:87
+#: ../src/plugins/gnome-screensaver-plugin.vala:92
 msgid "Gnome Screen Saver wasn't found"
 msgstr ""
 
@@ -378,26 +382,72 @@ msgstr ""
 msgid "Improve results returned by the Zeitgeist plugin by looking "
 msgstr ""
 
-#: ../src/plugins/launchpad-plugin.vala:68
+#: ../src/plugins/imgur-plugin.vala:50
+msgid "Upload to imgur"
+msgstr ""
+
+#: ../src/plugins/imgur-plugin.vala:51
+msgid "Upload selection to imgur image sharer"
+msgstr ""
+
+#: ../src/plugins/imgur-plugin.vala:171
+#: ../src/plugins/pastebin-plugin.vala:157
+msgid ""
+"The selection was successfully uploaded and its URL was copied to clipboard."
+msgstr ""
+
+#: ../src/plugins/imgur-plugin.vala:175
+#: ../src/plugins/pastebin-plugin.vala:161
+msgid ""
+"An error occurred during upload, please check the log for more information."
+msgstr ""
+
+#: ../src/plugins/imgur-plugin.vala:183
+msgid "Synapse - Imgur"
+msgstr ""
+
+#: ../src/plugins/imgur-plugin.vala:239
+msgid "Imgur"
+msgstr ""
+
+#: ../src/plugins/imgur-plugin.vala:240
+msgid "Share images using imgur."
+msgstr ""
+
+#: ../src/plugins/launchpad-plugin.vala:45
+msgid "Authorize with Launchpad"
+msgstr ""
+
+#: ../src/plugins/launchpad-plugin.vala:52
+msgid ""
+"Please press the Finish button once you login to Launchpad with your web "
+"browser"
+msgstr ""
+
+#: ../src/plugins/launchpad-plugin.vala:55
+msgid "Finish authorization"
+msgstr ""
+
+#: ../src/plugins/launchpad-plugin.vala:261
 msgid "Find bugs and branches on Launchpad."
 msgstr ""
 
-#: ../src/plugins/launchpad-plugin.vala:119
+#: ../src/plugins/launchpad-plugin.vala:312
 #, c-format
 msgid "Launchpad: Bazaar branches for %s"
 msgstr ""
 
-#: ../src/plugins/launchpad-plugin.vala:126
+#: ../src/plugins/launchpad-plugin.vala:319
 #, c-format
 msgid "Launchpad: Series %s for Project %s"
 msgstr ""
 
-#: ../src/plugins/launchpad-plugin.vala:133
+#: ../src/plugins/launchpad-plugin.vala:326
 #, c-format
 msgid "Launchpad: Bazaar branch %s"
 msgstr ""
 
-#: ../src/plugins/launchpad-plugin.vala:148
+#: ../src/plugins/launchpad-plugin.vala:341
 #, c-format
 msgid "Launchpad: Bug #%s"
 msgstr ""
@@ -418,23 +468,23 @@ msgstr ""
 msgid "Unable to find \"locate\" binary"
 msgstr ""
 
-#: ../src/plugins/opensearch.vala:249
+#: ../src/plugins/opensearch.vala:252
 msgid "Search the web."
 msgstr ""
 
-#: ../src/plugins/opensearch.vala:261
+#: ../src/plugins/opensearch.vala:264
 msgid "Google"
 msgstr ""
 
-#: ../src/plugins/opensearch.vala:262
+#: ../src/plugins/opensearch.vala:265
 msgid "Search the web using google.com"
 msgstr ""
 
-#: ../src/plugins/opensearch.vala:263
+#: ../src/plugins/opensearch.vala:266
 msgid "Google Maps"
 msgstr ""
 
-#: ../src/plugins/opensearch.vala:264
+#: ../src/plugins/opensearch.vala:267
 msgid "Search using Google Maps"
 msgstr ""
 
@@ -445,17 +495,6 @@ msgstr ""
 
 #: ../src/plugins/pastebin-plugin.vala:43
 msgid "Pastebin selection"
-msgstr ""
-
-#: ../src/plugins/pastebin-plugin.vala:157
-msgid ""
-"The selection was successfully uploaded and its URL was copied to clipboard."
-msgstr ""
-
-#: ../src/plugins/pastebin-plugin.vala:161
-msgid ""
-"An error occurred during upload to pastebin, please check the log for more "
-"information."
 msgstr ""
 
 #: ../src/plugins/pastebin-plugin.vala:169
@@ -470,118 +509,131 @@ msgstr ""
 msgid "Unable to find \"pastebinit\" program"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:75
+#: ../src/plugins/rhythmbox-plugin.vala:84
 msgid "Control Rhythmbox and add items to playlists."
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:79
+#: ../src/plugins/rhythmbox-plugin.vala:88
 msgid "Rhythmbox is not installed"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:145
+#: ../src/plugins/rhythmbox-plugin.vala:154
 msgid "Start playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:188
+#: ../src/plugins/rhythmbox-plugin.vala:205
 msgid "Pause playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:204
+#: ../src/plugins/rhythmbox-plugin.vala:221
 msgid "Plays the next song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:227
+#: ../src/plugins/rhythmbox-plugin.vala:244
 msgid "Plays the previous song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:251
+#: ../src/plugins/rhythmbox-plugin.vala:268
 msgid "Enqueue in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:252
+#: ../src/plugins/rhythmbox-plugin.vala:269
 msgid "Add the song to Rhythmbox playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:298
+#: ../src/plugins/rhythmbox-plugin.vala:315
 msgid "Play in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/system-management.vala:87
+#: ../src/plugins/selection-plugin.vala:55
+msgid "Selection"
+msgstr ""
+
+#. plugin title
+#: ../src/plugins/selection-plugin.vala:56
+msgid "Provides actions for currently selected text."
+msgstr ""
+
+#: ../src/plugins/selection-plugin.vala:81
+msgid "Selected text"
+msgstr ""
+
+#: ../src/plugins/system-management.vala:89
 msgid "Suspend"
 msgstr ""
 
-#: ../src/plugins/system-management.vala:88
+#: ../src/plugins/system-management.vala:90
 msgid "Put your computer into suspend mode"
 msgstr ""
 
-#: ../src/plugins/system-management.vala:145
+#: ../src/plugins/system-management.vala:159
 msgid "Hibernate"
 msgstr ""
 
-#: ../src/plugins/system-management.vala:146
+#: ../src/plugins/system-management.vala:160
 msgid "Put your computer into hibernation mode"
 msgstr ""
 
-#: ../src/plugins/system-management.vala:203
+#: ../src/plugins/system-management.vala:228
 msgid "Shut Down"
 msgstr ""
 
-#: ../src/plugins/system-management.vala:204
+#: ../src/plugins/system-management.vala:229
 msgid "Turn your computer off"
 msgstr ""
 
-#: ../src/plugins/system-management.vala:261
+#: ../src/plugins/system-management.vala:286
 msgid "Restart"
 msgstr ""
 
-#: ../src/plugins/system-management.vala:262
+#: ../src/plugins/system-management.vala:287
 msgid "Restart your computer"
 msgstr ""
 
-#: ../src/plugins/system-management.vala:320
+#: ../src/plugins/system-management.vala:345
 msgid "Suspend, hibernate, restart or shutdown your computer."
 msgstr ""
 
-#: ../src/plugins/system-management.vala:324
+#: ../src/plugins/system-management.vala:349
 msgid "ConsoleKit wasn't found"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:146
+#: ../src/plugins/zeitgeist-plugin.vala:147
 msgid "few moments ago"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:151
+#: ../src/plugins/zeitgeist-plugin.vala:152
 #, c-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:156
+#: ../src/plugins/zeitgeist-plugin.vala:157
 #, c-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:161
+#: ../src/plugins/zeitgeist-plugin.vala:162
 #, c-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:166
+#: ../src/plugins/zeitgeist-plugin.vala:167
 #, c-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:180
+#: ../src/plugins/zeitgeist-plugin.vala:181
 msgid "Search various items logged by Zeitgeist."
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:184
+#: ../src/plugins/zeitgeist-plugin.vala:185
 msgid "Zeitgeist is not installed"
 msgstr ""
