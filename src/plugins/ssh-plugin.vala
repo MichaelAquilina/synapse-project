@@ -25,7 +25,7 @@ namespace Synapse
 {
   public class SshPlugin: Object, Activatable, ActionProvider, ItemProvider
   {
-    public  bool enabled { get; set; default = true; }
+    public  bool      enabled { get; set; default = true; }
     private Connect   action;
     private bool      has_ssh;
     private ArrayList<string> hosts;
@@ -38,10 +38,8 @@ namespace Synapse
     public void activate ()
     {
       action  = new Connect ();
-      with_ssh_hosts ((ssh_hosts) => {
-        hosts   = ssh_hosts;
-        has_ssh = (Environment.find_program_in_path ("ssh") != null) && (ssh_hosts.size > 0);
-      });
+      has_ssh = (Environment.find_program_in_path ("ssh") != null);
+      parse_ssh_config.begin();
     }
 
     public void deactivate () {}
@@ -60,17 +58,15 @@ namespace Synapse
       );
     }
 
-    delegate void Configurator(ArrayList<string> hosts);
-
-    private async void with_ssh_hosts (Configurator configurator)
+    private async void parse_ssh_config ()
     {
       var file = File.new_for_path (Environment.get_home_dir () + "/.ssh/config");
-      var list = new ArrayList<string> ();
+
+      hosts = new ArrayList<string> ();
 
       if (!file.query_exists ())
       {
         stderr.printf ("File '%s' doesn't exist.\n", file.get_path ());
-        return;
       }
 
       try
@@ -96,7 +92,7 @@ namespace Synapse
                 // TODO: get rid of longer empty strings
                 // TODO: no dupes
                 Utils.Logger.debug(this, "host added: %s\n", host);
-                list.add(host);
+                hosts.add(host);
               }
             }
           }
@@ -106,7 +102,6 @@ namespace Synapse
       {
         error ("%s", e.message);
       }
-      configurator(list);
     }
 
     // Connect Action
