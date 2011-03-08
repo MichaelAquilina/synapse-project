@@ -23,7 +23,7 @@ using Gee;
 
 namespace Synapse
 {
-  public class SshPlugin: Object, Activatable, ActionProvider, ItemProvider
+  public class SshPlugin: Object, Activatable, ItemProvider
   {
     public  bool      enabled { get; set; default = true; }
     private Connect   action;
@@ -191,32 +191,6 @@ namespace Synapse
           icon_name: "terminal"
         );
       }
-    }
-
-    public ResultSet? find_for_match (Query query, Match match)
-    {
-      if (!has_ssh) return null;
-
-      bool query_empty = query.query_string == "";
-      var results = new ResultSet ();
-
-      if (query_empty)
-      {
-        results.add (action, action.default_relevancy);
-      }
-      else
-      {
-        var matchers = Query.get_matchers_for_query (query.query_string, 0, RegexCompileFlags.CASELESS);
-        foreach (var matcher in matchers)
-        {
-          if (matcher.key.match (action.title))
-          {
-            results.add (action, matcher.value);
-            break;
-          }
-        }
-      }
-      return results;
     }
   }
 }
