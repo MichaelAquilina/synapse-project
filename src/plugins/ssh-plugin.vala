@@ -26,7 +26,6 @@ namespace Synapse
   public class SshPlugin: Object, Activatable, ItemProvider
   {
     public  bool      enabled { get; set; default = true; }
-    private Connect   action;
     private bool      has_ssh;
     private ArrayList<string> hosts;
 
@@ -37,7 +36,6 @@ namespace Synapse
 
     public void activate ()
     {
-      action  = new Connect ();
       has_ssh = (Environment.find_program_in_path ("ssh") != null);
       parse_ssh_config.begin();
     }
@@ -96,40 +94,6 @@ namespace Synapse
       catch (Error e)
       {
         Utils.Logger.warning (this, "%s: %s", file.get_path(), e.message);
-      }
-    }
-
-    // Connect Action
-    private class Connect : Object, Match
-    {
-      // from Match interface
-      public string title             { get; construct set; }
-      public string description       { get; set; }
-      public string icon_name         { get; construct set; }
-      public bool   has_thumbnail     { get; construct set; }
-      public string thumbnail_path    { get; construct set; }
-      public int    default_relevancy { get; set; default = 0; }
-      public MatchType match_type 	  { get; construct set; }
-
-      public void execute (Match? match)
-      {
-        try
-        {
-          AppInfo.create_from_commandline ("ssh %s".printf (match.title),
-            "ssh", AppInfoCreateFlags.NEEDS_TERMINAL)
-              .launch (null, new Gdk.AppLaunchContext ());
-        }
-        catch (Error err)
-        {
-          warning ("%s", err.message);
-        }
-      }
-
-      public Connect ()
-      {
-      	Object (title: _("Connect with SSH"),
-                description: _("Connect to remote host with SSH"),
-                has_thumbnail: false, icon_name: "terminal");
       }
     }
 
