@@ -37,7 +37,7 @@ AC_STDC_HEADERS
 dnl ==============================================
 dnl Check for Vala
 dnl ==============================================
-AM_PROG_VALAC([0.10.2])
+AM_PROG_VALAC([0.10.4])
 if test "x$VALAC" = "x"; then
 	AC_MSG_ERROR([You need Vala compiler])
 fi
