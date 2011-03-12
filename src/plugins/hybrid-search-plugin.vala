@@ -484,7 +484,23 @@ namespace Synapse
       return common_flags != 0;
     }
 
-    private bool processing_query = false;
+    public bool processing_query { get; private set; default = false; }
+
+    private async void wait_for_processing_finished ()
+    {
+      while (processing_query)
+      {
+        ulong sig_id;
+        sig_id = this.notify["processing-query"].connect (() =>
+        {
+          if (processing_query) return;
+          wait_for_processing_finished.callback ();
+        });
+        yield;
+
+        SignalHandler.disconnect (this, sig_id);
+      }
+    }
 
     public async ResultSet? search (Query q) throws SearchError
     {
@@ -549,8 +565,8 @@ namespace Synapse
       // by multiple queries at the same time
       while (processing_query)
       {
-        Timeout.add (250, search.callback);
-        yield;
+        // FIXME: the while isn't really necessary, but let's be safe
+        yield wait_for_processing_finished ();
         q.check_cancellable ();
       }
       processing_query = true;
