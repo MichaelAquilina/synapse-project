@@ -628,7 +628,7 @@ namespace Synapse
         }
         else
         {
-          string[] words = Regex.split_simple ("\\s+|\\.+", search_query);
+          string[] words = Regex.split_simple ("\\s+|\\.+(?!\\d)", search_query);
           search_query = "(%s*)".printf (string.joinv ("* ", words));
           rs = yield zg_index.search (search_query,
                                       new Zeitgeist.TimeRange (int64.MIN, int64.MAX),
