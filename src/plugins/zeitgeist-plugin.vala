@@ -324,7 +324,14 @@ namespace Synapse
           bool match_found = false;
           foreach (var matcher in matchers)
           {
-            if (matcher.key.match (match_obj.title))
+            string? adjusted_title = null;
+            if (uri.has_prefix ("http"))
+            {
+              // FIXME: uri unescape?
+              adjusted_title = "%s (%s)".printf (match_obj.title, uri);
+            }
+
+            if (matcher.key.match (adjusted_title ?? match_obj.title))
             {
               int relevancy = compute_relevancy (uri, matcher.value - relevancy_penalty);
               results.add (match_obj, relevancy);
@@ -348,6 +355,7 @@ namespace Synapse
 #endif
           float mult = (len - minimum) / (float)(maximum - minimum);
           int adjusted_relevancy = entry.value - (int)(mult * Match.Score.INCREMENT_MINOR);
+          if (mo.uri.str ("?") != null) adjusted_relevancy -= Match.Score.INCREMENT_SMALL;
           real_results.add (mo, adjusted_relevancy);
         }
         else
@@ -620,7 +628,7 @@ namespace Synapse
         }
         else
         {
-          string[] words = Regex.split_simple ("\\s+", search_query);
+          string[] words = Regex.split_simple ("\\s+|\\.+", search_query);
           search_query = "(%s*)".printf (string.joinv ("* ", words));
           rs = yield zg_index.search (search_query,
                                       new Zeitgeist.TimeRange (int64.MIN, int64.MAX),
