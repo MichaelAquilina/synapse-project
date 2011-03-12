@@ -32,6 +32,7 @@ libplugins_la_VALASOURCES = \
 	command-plugin.vala \
 	desktop-file-plugin.vala \
 	devhelp-search.vala \
+	ssh-plugin.vala \
 	dictionary.vala \
 	directory-plugin.vala \
 	gnome-session-plugin.vala \
