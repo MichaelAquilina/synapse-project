@@ -1,4 +1,4 @@
-AC_INIT([synapse], [0.2.5])
+AC_INIT([synapse], [0.2.4.1])
 AC_DEFINE(RELEASE_NAME, "Anandamide", "Codename of this release")
 
 AC_CONFIG_MACRO_DIR([m4])
