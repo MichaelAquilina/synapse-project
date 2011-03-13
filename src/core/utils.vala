@@ -33,7 +33,12 @@ namespace Synapse
       GLib.get_charset (out charset);
       try
       {
-        result = GLib.convert (input, input.length,
+#if VALA_0_12
+        ssize_t input_len = input.length;
+#else
+        ssize_t input_len = input.size ();
+#endif
+        result = GLib.convert (input, input_len,
                                "US-ASCII//TRANSLIT", charset);
         // no need to waste cpu cycles if the input is the same
         if (input == result) return null;
