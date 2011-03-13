@@ -23,6 +23,7 @@ src/plugins/opensearch.c
 src/plugins/pastebin-plugin.c
 src/plugins/rhythmbox-plugin.c
 src/plugins/selection-plugin.c
+src/plugins/ssh-plugin.c
 src/plugins/system-management.c
 src/plugins/zeitgeist-plugin.c
 
