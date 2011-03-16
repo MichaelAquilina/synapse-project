@@ -185,6 +185,16 @@ namespace Synapse.Gui
       return move_selection (T.MATCH, delta);
     }
     
+    /* Those methods moves the selection to "index" position */
+    protected void set_selection_action (int index)
+    {
+      set_selection (T.ACTION, index);
+    }
+    protected void set_selection_match (int index)
+    {
+      set_selection (T.MATCH, index);
+    }
+    
     /**
      * This method can be called to reset the search.
      * @param notify if true, visual update matches and actions in the UI
@@ -429,6 +439,23 @@ namespace Synapse.Gui
       else
         focus_action (focus_index[t], focus[t]);
       return true;
+    }
+    
+    private void set_selection (T t, int index)
+    {
+      if (results[t] == null || results[t].size == 0 || 
+          index < 0 || index >= results[t].size || 
+          focus_index[t] == index)
+        return;
+      focus_index[t] = index;
+      focus[t] = results[t].get (focus_index[t]);
+      if (t == T.MATCH)
+      {
+        focus_match (focus_index[t], focus[t]);
+        search_for_actions ();
+      }
+      else
+        focus_action (focus_index[t], focus[t]);
     }
     
     private void update_handle_empty ()

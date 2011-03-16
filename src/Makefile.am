@@ -71,6 +71,7 @@ synapse_VALASOURCES = \
 	ui-cairo-gtk-virgilio.vala \
 	ui-interface.vala \
 	ui-widgets.vala \
+	ui-widgets-matchlistview.vala \
 	ui-utils.vala \
 	ui-settings.vala \
 	ui-inspector.vala \
