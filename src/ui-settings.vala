@@ -167,6 +167,7 @@ namespace Synapse.Gui
       themes["mini"] = Theme (_("Mini"), "", typeof (SynapseWindowMini));
       themes["dual"] = Theme (_("Dual"), "", typeof (SynapseWindowTwoLines));
       themes["virgilio"] = Theme (_("Virgilio"), "", typeof (SynapseWindowVirgilio));
+      themes["doish"] = Theme (_("Do-ish"), "", typeof (SynapseWindowDoish));
 
       selected_theme = config.ui_type;
     }

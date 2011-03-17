@@ -1192,7 +1192,7 @@ namespace Synapse.Gui
       var ctx = new Cairo.Context (this.cached_surface);
 
       Pango.cairo_update_context (ctx, layout.get_context ());
-      ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, StateType.NORMAL);
+      ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, this.get_state ());
       ctx.set_operator (Cairo.Operator.OVER);
       string s;
       for (int i = 0; i < texts.size; i++)

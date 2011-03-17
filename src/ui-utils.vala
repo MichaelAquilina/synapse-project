@@ -348,7 +348,9 @@ namespace Synapse.Gui
       {
         NORMAL,
         LIGHTER,
+        LIGHTEST,
         DARKER,
+        DARKEST,
         INVERTED
       }
 
@@ -363,6 +365,18 @@ namespace Synapse.Gui
           colormap.clear ();
         });
       }
+      
+      public void get_color_colorized (ref double red, ref double green, ref double blue,
+                                       StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      {
+        Color col = get_color_from_map (t, st, mod);
+        double r = red, g = green, b = blue;
+        Color.colorize (&r, &g, &b, col.r, col.g, col.b);
+        red = r;
+        green = g;
+        blue = b;
+      }
+      
 			private Color get_color_from_map (StyleType t, Gtk.StateType st, Mod mod)
 			{
 				Color col;
@@ -477,6 +491,12 @@ namespace Synapse.Gui
            	case Mod.DARKER:
            		shade (ref this.r, ref this.g, ref this.b, 0.92);
            		break;
+           	case Mod.LIGHTEST:
+            	shade (ref this.r, ref this.g, ref this.b, 1.2);
+            	break;
+           	case Mod.DARKEST:
+           		shade (ref this.r, ref this.g, ref this.b, 0.8);
+           		break;
             default:
               break;
           }
@@ -496,12 +516,25 @@ namespace Synapse.Gui
 	        return l < 0.40;
         }
         
+        public static void colorize (double *r, double *g, double *b,
+                                     double cr, double cg, double cb)
+        {
+          if (!(*r == *g && *g == *b)) return; //nothing to do
+          murrine_rgb_to_hls (r, g, b);
+          murrine_rgb_to_hls (&cr, &cg, &cb);
+          
+          *r = cr;
+          *b = *b * 0.25 + cb * 0.85;
+          *g = *g * 0.4 + cg * 0.6;
+          
+          murrine_hls_to_rgb (r, g, b);
+        }        
         /* RGB / HLS utils - from Murrine gtk-engine:
          * Copyright (C) 2006-2007-2008-2009 Andrea Cimitan
          */
-        private static void murrine_rgb_to_hls (double *r,
-								                                double *g,
-								                                double *b)
+        public static void murrine_rgb_to_hls (double *r,
+								                               double *g,
+								                               double *b)
         {
 	        double min;
 	        double max;
@@ -571,9 +604,9 @@ namespace Synapse.Gui
 	        *b = s;
         }
 
-        private static void murrine_hls_to_rgb (double *h,
-								                                double *l,
-								                                double *s)
+        public static void murrine_hls_to_rgb (double *h,
+								                               double *l,
+								                               double *s)
         {
 	        double hue;
 	        double lightness;

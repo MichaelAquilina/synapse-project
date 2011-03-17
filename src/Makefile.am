@@ -66,6 +66,7 @@ synapse_VALASOURCES = \
 	synapse-main.vala \
 	ui-cairo-gtk-base.vala \
 	ui-cairo-gtk.vala \
+	ui-cairo-gtk-doish.vala \
 	ui-cairo-gtk-mini.vala \
 	ui-cairo-gtk-two-lines.vala \
 	ui-cairo-gtk-virgilio.vala \

@@ -304,7 +304,7 @@ namespace Synapse.Gui
     
     public bool use_base_colors
     {
-      get; set; default = false;
+      get; set; default = true;
     }
     
     public int min_visible_rows
