@@ -132,7 +132,7 @@ namespace Synapse.Gui
     protected override int calculate_row_height ()
     {
       string s = "%s\n%s".printf (title_markup, description_markup);
-      Markup.printf_escaped (s, "OA", "OA");
+      Markup.printf_escaped (s, " &#21271;", " &#21271;");
       var layout = this.get_layout ();
       layout.set_markup (s, -1);
       int width = 0, height = 0;

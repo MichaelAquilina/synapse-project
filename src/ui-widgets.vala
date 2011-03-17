@@ -1601,64 +1601,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class UniLabel : Gtk.Label
-  {
-    private int cached_height;
-    
-    construct
-    {
-      cached_height = -1;
-    }
-    
-    protected override void size_request (out Gtk.Requisition req)
-    {
-      base.size_request (out req);
-      if (this.cached_height > 0) req.height = this.cached_height;
-    }
-    
-    private string delete_unichars (string str)
-    {
-      // This function will replace all text with "A"
-      string str2 = ">%s".printf (str);
-      try {
-        var regex = new Regex ("\\>[^\\<]*");
-        str2 = regex.replace (str2, -1, 0, ">A");
-      } catch (RegexError e) {}
-      str2 = str2.substring (1);
-      return str2;
-    }
-    
-    private void update_cached_height (string str)
-    {
-      var normalized_string = this.delete_unichars (str);
-      Pango.Layout layout = this.get_layout ();
-      layout.context_changed ();
-      layout.set_markup (normalized_string, -1);
-      Pango.Rectangle logical;
-      layout.get_extents (null, out logical);
-      this.cached_height = logical.height / Pango.SCALE + (2 * this.ypad);
-    }
-    
-    public new void set_markup (string str)
-    {
-      if (this.is_realized ()) update_cached_height (str);
-      base.set_markup (str);
-    }
-    
-    public new void set_text (string str)
-    {
-      if (this.is_realized ()) {
-        string s = "A";
-        base.set_text (s);
-        Gtk.Requisition req = {0, 0};
-        base.size_request (out req);
-        this.cached_height = req.height;
-      }
-      base.set_text (str);
-    }
-  }
-
-  public class ShrinkingLabel: UniLabel
+  public class ShrinkingLabel: Gtk.Label
   {
     private const double STEP = 1.0466351393921056; // (1.2)^1/4
     
