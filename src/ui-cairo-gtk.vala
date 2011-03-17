@@ -188,6 +188,10 @@ namespace Synapse.Gui
       
       results_match = new ResultBox (UI_WIDTH - 2);
       results_action = new ResultBox (UI_WIDTH - 2);
+      results_match.get_match_list_view ().selected_index_changed.connect (this.set_selection_match);
+      results_action.get_match_list_view ().selected_index_changed.connect (this.set_selection_action);
+      results_match.get_match_list_view ().fire_item.connect (command_execute);
+      results_action.get_match_list_view ().fire_item.connect (command_execute);
       results_container.add (results_match);
       results_container.add (results_action);
 

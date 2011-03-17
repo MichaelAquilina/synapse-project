@@ -257,6 +257,19 @@ namespace Synapse.Gui
       }
     }
     
+    public void command_execute ()
+    {
+      if (execute ())
+      {
+        hide ();
+      }
+      else
+      {
+        searching_for_matches = true;
+        searching_for_changed ();
+      }
+    }
+    
     protected virtual bool key_press_event (Gdk.EventKey event)
     {
       /* Check for text input */
@@ -289,13 +302,7 @@ namespace Synapse.Gui
           searching_for_changed ();
           break;
         case CommandTypes.EXECUTE:
-          if (execute ())
-            hide ();
-          else
-          {
-            searching_for_matches = true;
-            searching_for_changed ();
-          }
+          command_execute ();
           break;
         case CommandTypes.SEARCH_DELETE_CHAR:
           search_delete_char ();

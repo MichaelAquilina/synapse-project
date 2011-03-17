@@ -164,6 +164,7 @@ namespace Synapse.Gui
         list_view_matches.min_visible_rows = 5;
         list_view_matches.use_base_colors = false;
         list_view_matches.selected_index_changed.connect (this.set_selection_match);
+        list_view_matches.fire_item.connect (command_execute);
         //TODO: fire item
         container_for_matches.pack_start (list_view_matches, false);
       }
@@ -180,6 +181,7 @@ namespace Synapse.Gui
         list_view_actions.min_visible_rows = 5;
         list_view_actions.use_base_colors = false;
         list_view_actions.selected_index_changed.connect (this.set_selection_action);
+        list_view_actions.fire_item.connect (command_execute);
         //TODO: fire item
 
         thumb_icon = new NamedIcon ();

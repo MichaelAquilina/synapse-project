@@ -248,7 +248,7 @@ namespace Synapse.Gui
   {
     /* Animation stuffs */
     private uint tid;
-    private static const int ANIM_TIMEOUT = 1000 / 25;
+    private static const int ANIM_TIMEOUT = 1000 / 26;
     public bool animation_enabled {
       get; set; default = true;
     }
@@ -583,6 +583,11 @@ namespace Synapse.Gui
       this.queue_draw ();
     }
     
+    public int get_list_size ()
+    {
+      return this.items == null ? 0 : this.items.size;
+    }
+    
     public override bool expose_event (Gdk.EventExpose event)
     {
       if (this.items == null || this.items.size == 0) return true;
@@ -664,7 +669,7 @@ namespace Synapse.Gui
     
     // Fired when user changes selection interacting with the list
     public signal void selected_index_changed (int new_index);
-    public signal void fire_item (int index);
+    public signal void fire_item ();
     
     private int dragdrop_target_item = 0;
     public override bool button_press_event (Gdk.EventButton event)
@@ -681,16 +686,16 @@ namespace Synapse.Gui
       
       if (this.selection_enabled)
       {
-        if (this.select_index == this.dragdrop_target_item)
+        if (event.type == event.type.2BUTTON_PRESS &&
+            this.select_index == this.dragdrop_target_item)
         {
-          this.select_index = this.dragdrop_target_item;
-          this.update_target_offsets ();
-          this.fire_item (this.select_index);
+          this.set_indexes (this.dragdrop_target_item, this.dragdrop_target_item);
+          this.fire_item ();
+          return true; //Fire item! So we don't need to drag things! 
         }
         else
         {
-          this.select_index = this.dragdrop_target_item;
-          this.update_target_offsets ();
+          this.set_indexes (this.dragdrop_target_item, this.dragdrop_target_item);
           this.selected_index_changed (this.select_index);
         }
       }
@@ -730,6 +735,115 @@ namespace Synapse.Gui
       return_if_fail (um != null);
       selection_data.set_text (um.title, -1);
       selection_data.set_uris ({um.uri});
+    }
+  }
+  
+  public class ResultBox: EventBox
+  {
+    private const int VISIBLE_RESULTS = 5;
+    private const int ICON_SIZE = 36;
+    private int mwidth;
+    private int nrows;
+
+    private VBox vbox;
+    private HBox status_box;
+    
+    private Utils.ColorHelper ch;
+    
+    public ResultBox (int width, int nrows = 5)
+    {
+      this.mwidth = width;
+      this.nrows = nrows;
+      this.set_has_window (false);
+      ch = new Utils.ColorHelper (this);
+      build_ui();
+    }
+
+		private MatchListView view;
+		private MatchViewRenderer rend;
+		private Label status;
+		
+		public override bool expose_event (Gdk.EventExpose event)
+		{
+        var ctx = Gdk.cairo_create (this.get_window ());
+        ctx.set_operator (Cairo.Operator.OVER);
+        ctx.translate (this.allocation.x, this.allocation.y);
+        ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
+        ctx.clip ();
+        ctx.set_source_rgba (1, 0, 0, 1);
+        ctx.paint ();
+        /* Prepare bg's colors using GtkStyle */
+        Pattern pat = new Pattern.linear(0, 0, 0, this.allocation.height);
+
+        double status_bar_pct = 15.0 / this.allocation.height;
+        ch.add_color_stop_rgba (pat, 1.0 - status_bar_pct, 0.95, ch.StyleType.BASE, StateType.NORMAL);
+        ch.add_color_stop_rgba (pat, 1.0 - 0.85 * status_bar_pct, 0.95, ch.StyleType.BG, StateType.NORMAL);
+        ch.add_color_stop_rgba (pat, 1.0, 0.95, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
+        /* Prepare and draw top bg's rect */
+        ctx.set_source (pat);
+        ctx.paint ();
+
+        /* Propagate Expose */               
+        this.propagate_expose (this.get_child(), event);
+        
+        return true;
+    }
+    
+    public MatchListView get_match_list_view ()
+    {
+      return this.view;
+    }
+
+    public override void size_request (out Requisition requisition)
+    {
+      vbox.size_request (out requisition);
+      requisition.width = int.max (requisition.width, this.mwidth);
+    }
+
+    private void build_ui()
+    {
+      rend = new MatchViewRenderer ();
+      view = new MatchListView (rend);
+      view.min_visible_rows = this.nrows;
+      
+      vbox = new VBox (false, 0);
+      vbox.border_width = 0;
+      this.add (vbox);
+      vbox.pack_start (view);
+      status_box = new HBox (false, 0);
+      status_box.set_size_request (-1, 15);
+      vbox.pack_start (status_box, false);
+      status = new Label (null);
+      status.set_alignment (0, 0);
+      status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
+      var logo = new Label (null);
+      logo.set_alignment (1, 0);
+      logo.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
+      status_box.pack_start (status, false, false, 10);
+      status_box.pack_start (new Label (null), true, false);
+      status_box.pack_start (logo, false, false, 10);
+    }
+
+    public void update_matches (Gee.List<Synapse.Match>? rs)
+    {
+      if (rs != null)
+      {
+        foreach (Synapse.Match m in rs)
+        {
+          m.description = Utils.replace_home_path_with (m.description, _("Home"), " > ");
+        }
+      }
+      view.set_list (rs);
+      if (rs==null || rs.size == 0)
+        status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
+      else
+        status.set_markup (Markup.printf_escaped (_("<b>1 of %d</b>"), view.get_list_size ()));
+    }
+    
+    public void move_selection_to_index (int i)
+    {
+      view.set_indexes (i, i);
+      status.set_markup (Markup.printf_escaped (_("<b>%d of %d</b>"), i + 1, view.get_list_size ()));
     }
   }
 }
