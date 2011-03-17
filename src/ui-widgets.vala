@@ -1601,7 +1601,39 @@ namespace Synapse.Gui
     }
   }
 
-  public class ShrinkingLabel: Gtk.Label
+  public class UniLabel : Gtk.Label
+  {
+    construct
+    {
+
+    }
+    protected override void size_request (out Gtk.Requisition req)
+    {
+      base.size_request (out req);
+
+      var lay = this.get_layout ();
+      var attrs = lay.get_attributes ();
+      Pango.AttrIterator iter = attrs.get_iterator ();
+      double scale = 1.0;
+      do
+      {
+        unowned Pango.Attribute? attr = iter.get (Pango.AttrType.SCALE);
+        if (attr != null)
+        {
+          unowned Pango.AttrFloat a = (Pango.AttrFloat) attr;
+          scale = double.max (scale, a.value);
+        }
+      } while (iter.next ());
+
+      unowned Pango.Context context = lay.get_context ();
+      unowned Pango.FontMetrics metrics = context.get_metrics (this.style.font_desc, context.get_language ());
+      req.height = this.ypad * 2 + (int) ((((int)((metrics.get_ascent () + metrics.get_descent ())) + 512) >> 10) * scale);
+      
+      //debug ("Req: %d", req.height);
+    }
+  }
+
+  public class ShrinkingLabel: UniLabel
   {
     private const double STEP = 1.0466351393921056; // (1.2)^1/4
     
