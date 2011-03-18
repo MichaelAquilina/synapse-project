@@ -473,7 +473,7 @@ namespace Synapse.Gui
         action_label.set_markup (Utils.markup_string_with_search (action.title,
                                  searching_for_matches ? 
                                  "" : get_action_search (), size));
-        if (!searching_for_matches) description_label.set_text (get_description_markup (action.description));
+        if (!searching_for_matches) description_label.set_markup (get_description_markup (action.description));
       }
       results_action.move_selection_to_index (index);
     }
