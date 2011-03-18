@@ -466,6 +466,28 @@ namespace Synapse.Gui
       return true;
     }
   }
+  public class SensitiveNamedIcon: Gtk.EventBox
+  {
+    private NamedIcon _icon;
+    public NamedIcon icon {get {return this._icon;}}
+
+    public SensitiveNamedIcon ()
+    {
+      this.above_child = false;
+      this.visible_window = false;
+      this.set_has_window (false);
+      
+      this._icon = new NamedIcon ();
+      this.add (this._icon);
+      this.icon.show ();
+    }
+    
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      this.propagate_expose (this.get_child (), event);
+      return true;
+    }
+  }
   public class NamedIcon: Gtk.Image
   {
     public string not_found_name {get; set; default = "unknown";}
@@ -476,7 +498,7 @@ namespace Synapse.Gui
     public int update_timeout {get; set; default = -1;}
     public bool stop_prev_timeout {get; set; default = false;}
     public bool glow {get; set; default = false;}
-    public NamedIcon ()
+    construct
     {
       current = "";
       current_size = IconSize.DIALOG;

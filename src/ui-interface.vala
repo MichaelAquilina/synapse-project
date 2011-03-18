@@ -255,6 +255,11 @@ namespace Synapse.Gui
       search_for_matches ();
     }
     
+    protected bool has_match_results ()
+    {
+      return results[T.MATCH] != null && results[T.MATCH].size > 0;
+    }
+    
     /* This method should be called when user wants to execute the current match */
     /* returns false if there's no valid match/action to execute */
     protected bool execute ()

@@ -30,7 +30,7 @@ namespace Synapse.Gui
   public class SynapseWindowDoish : GtkCairoBase
   {
     /* Main UI shared components */
-    protected NamedIcon match_icon = null;
+    protected SensitiveNamedIcon match_icon = null;
     protected Label match_label = null;
     protected Label description_label = null;
     protected NamedIcon action_icon = null;
@@ -116,14 +116,15 @@ namespace Synapse.Gui
       /* Icon Container */
       var icon_hbox = new HBox (true, 0);
       container_top.pack_start (icon_hbox, false, true, 5);
-      match_icon = new NamedIcon ();
-      match_icon.set_size_request (ICON_SIZE, ICON_SIZE);
-      match_icon.set_pixel_size (ICON_SIZE);
+      match_icon = new SensitiveNamedIcon ();
+      this.make_draggable (match_icon);
+      match_icon.icon.set_size_request (ICON_SIZE, ICON_SIZE);
+      match_icon.icon.set_pixel_size (ICON_SIZE);
       action_icon = new NamedIcon ();
       action_icon.set_size_request (ICON_SIZE, ICON_SIZE);
       action_icon.set_pixel_size (ICON_SIZE);
       
-      match_icon.set_icon_name ("Synapse", Gtk.IconSize.DIALOG);
+      match_icon.icon.set_icon_name ("Synapse", Gtk.IconSize.DIALOG);
       action_icon.set_icon_name ("Synapse", Gtk.IconSize.DIALOG);
       
       icon_hbox.pack_start (match_icon, false, false);
@@ -415,11 +416,11 @@ namespace Synapse.Gui
               get_description_markup (menuthrobber.active ? SEARCHING : NO_RESULTS)
             );
           }
-          match_icon.set_icon_name ("search", IconSize.DIALOG);
+          match_icon.icon.set_icon_name ("search", IconSize.DIALOG);
         }
         else
         {
-          match_icon.set_icon_name ("search", IconSize.DIALOG);
+          match_icon.icon.set_icon_name ("search", IconSize.DIALOG);
           match_label.set_markup (
                 Markup.printf_escaped ("<span size=\"%s\">%s</span>",
                                        size, " "));
@@ -431,9 +432,9 @@ namespace Synapse.Gui
       else
       {
         if (match.has_thumbnail)
-          match_icon.set_icon_name (match.thumbnail_path, IconSize.DIALOG);
+          match_icon.icon.set_icon_name (match.thumbnail_path, IconSize.DIALOG);
         else
-          match_icon.set_icon_name (match.icon_name, IconSize.DIALOG);
+          match_icon.icon.set_icon_name (match.icon_name, IconSize.DIALOG);
 
         match_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), size, true));
         description_label.set_markup (get_description_markup (match.description));
