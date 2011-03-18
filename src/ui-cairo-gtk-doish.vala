@@ -44,8 +44,8 @@ namespace Synapse.Gui
 
     private const int PADDING = 10; // assinged to container_top's border width
     private const int BORDER_RADIUS = 20;
-    private const int UI_WIDTH = 400; // height is dynamic
-    private const int ICON_SIZE = 128;
+    private const int UI_WIDTH = 500; // height is dynamic
+    private const int ICON_SIZE = 160;
     private const int LABEL_SEPARATOR = 20;
     private const int LABEL_SIZE = (UI_WIDTH - LABEL_SEPARATOR * 3) /2;
     private const int IL_DIFFERENCE = ( LABEL_SIZE - ICON_SIZE ) / 2;
@@ -393,7 +393,7 @@ namespace Synapse.Gui
     }
     protected override void focus_match ( int index, Match? match )
     {
-      string size = "small";
+      string size = "medium";
       if (match == null)
       {
         /* Show default stuff */
@@ -451,7 +451,7 @@ namespace Synapse.Gui
     }
     protected override void focus_action ( int index, Match? action )
     {
-      string size = "small";
+      string size = "medium";
       if (action == null)
       {
         action_icon.set_sensitive (false);
