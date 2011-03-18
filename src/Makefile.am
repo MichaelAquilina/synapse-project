@@ -73,6 +73,7 @@ synapse_VALASOURCES = \
 	ui-interface.vala \
 	ui-widgets.vala \
 	ui-widgets-matchlistview.vala \
+	ui-icon-cache-service.vala \
 	ui-utils.vala \
 	ui-settings.vala \
 	ui-inspector.vala \

@@ -44,8 +44,8 @@ namespace Synapse.Gui
 
     private const int PADDING = 10; // assinged to container_top's border width
     private const int BORDER_RADIUS = 20;
-    private const int UI_WIDTH = 500; // height is dynamic
-    private const int ICON_SIZE = 160;
+    private const int UI_WIDTH = 420; // height is dynamic
+    private const int ICON_SIZE = 128;
     private const int LABEL_SEPARATOR = 20;
     private const int LABEL_SIZE = (UI_WIDTH - LABEL_SEPARATOR * 3) /2;
     private const int IL_DIFFERENCE = ( LABEL_SIZE - ICON_SIZE ) / 2;
@@ -463,7 +463,7 @@ namespace Synapse.Gui
         else
         {
           action_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), size));
-          description_label.set_text (NO_RESULTS);
+          description_label.set_text (get_description_markup (NO_RESULTS));
         }
       }
       else
@@ -473,7 +473,7 @@ namespace Synapse.Gui
         action_label.set_markup (Utils.markup_string_with_search (action.title,
                                  searching_for_matches ? 
                                  "" : get_action_search (), size));
-        if (!searching_for_matches) description_label.set_text (action.description);
+        if (!searching_for_matches) description_label.set_text (get_description_markup (action.description));
       }
       results_action.move_selection_to_index (index);
     }

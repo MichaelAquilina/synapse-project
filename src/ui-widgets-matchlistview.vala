@@ -359,25 +359,15 @@ namespace Synapse.Gui
         ctx.rectangle (0, 0, pixel_size, pixel_size);
         ctx.clip ();
         if (name == null || name == "") name = "unknown";
-        try {
-          var icon = GLib.Icon.new_for_string(name);
-          if (icon == null) throw new WidgetError.ICON_NOT_FOUND ("GLib Icon not found");
 
-          Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, pixel_size, Gtk.IconLookupFlags.FORCE_SIZE);
-          if (iconinfo == null) throw new WidgetError.ICON_NOT_FOUND ("Icon not found in theme");
+        var icon_pixbuf = IconCacheService.get_default ().get_icon (name, pixel_size);
+        if (icon_pixbuf == null) return;
 
-          Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
-          if (icon_pixbuf == null) throw new WidgetError.ICON_NOT_FOUND ("Cannot load icon pixbuf");
-
-          Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 0, 0);
-          if (with_alpha == 1.0)
-            ctx.paint ();
-          else
-            ctx.paint_with_alpha (with_alpha);
-        } catch (GLib.Error err) { 
-          if (name == "unknown") return; //error on drawing unknown WTF!!
-          draw_icon_in_position (ctx, "unknown", pixel_size, with_alpha);
-        }
+        Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 0, 0);
+        if (with_alpha == 1.0)
+          ctx.paint ();
+        else
+          ctx.paint_with_alpha (with_alpha);
       }
       
       construct

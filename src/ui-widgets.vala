@@ -508,25 +508,23 @@ namespace Synapse.Gui
     }
     public override bool expose_event (Gdk.EventExpose event)
     {
-      if (glow)
-      {
-        var ctx = Gdk.cairo_create (this.window);
-        ctx.set_operator (Cairo.Operator.OVER);
+      if (current == null || current == "") return true;
+      var ctx = Gdk.cairo_create (this.window);
+      ctx.set_operator (Cairo.Operator.OVER);
 
-        /* Prepare bg's colors using GtkStyle */
-        double xc = this.allocation.x + this.allocation.width / 2;
-        double yc = this.allocation.y + this.allocation.height / 2;
-        double rad = double.min ( this.allocation.height, this.allocation.width ) / 2.0;
-        Pattern pat = new Pattern.radial (xc, yc, 0, xc, yc, rad);
-        ch.add_color_stop_rgba (pat, 0.7, 1.0, ch.StyleType.BASE, StateType.SELECTED);
-        ch.add_color_stop_rgba (pat, 1, 0, ch.StyleType.BASE, StateType.SELECTED);
-        /* Prepare and draw top bg's rect */
-        ctx.rectangle (xc - rad, yc - rad, 2*rad, 2*rad);
-        ctx.set_source (pat);
-        ctx.clip ();
-        ctx.paint ();
-      }
-      return base.expose_event (event);
+      ctx.translate (this.allocation.x, this.allocation.y);
+      ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
+      ctx.clip ();
+
+      Gdk.Pixbuf icon_pixbuf = IconCacheService.get_default ().get_icon (current, pixel_size);
+      if (icon_pixbuf == null) return true;
+
+      Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 
+          (this.allocation.width - icon_pixbuf.get_width ()) / 2, 
+          (this.allocation.height - icon_pixbuf.get_height ()) / 2);
+      ctx.paint ();
+
+      return true;
     }
     public new void clear ()
     {
