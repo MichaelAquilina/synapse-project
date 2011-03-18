@@ -452,7 +452,10 @@ namespace Synapse.Gui
     }
     public Type get_current_theme ()
     {
-      return themes[selected_theme].tclass;
+      if (themes.has_key (selected_theme))
+        return themes[selected_theme].tclass;
+      else
+        return themes["default"].tclass;
     }
 
     public signal void theme_selected (Type theme);
