@@ -422,6 +422,7 @@ namespace Synapse.Gui
       // Add our window to get mouse events
       this.above_child = true;
       this.visible_window = false;
+      this.set_has_window (false);
       this.set_events (Gdk.EventMask.BUTTON_PRESS_MASK |
                        Gdk.EventMask.SCROLL_MASK);
       
