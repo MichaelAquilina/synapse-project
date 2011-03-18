@@ -36,7 +36,7 @@ namespace Synapse
 #if VALA_0_12
         ssize_t input_len = input.length;
 #else
-        ssize_t input_len = input.size ();
+        ssize_t input_len = (ssize_t) input.size ();
 #endif
         result = GLib.convert (input, input_len,
                                "US-ASCII//TRANSLIT", charset);
