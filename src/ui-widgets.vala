@@ -466,20 +466,20 @@ namespace Synapse.Gui
       return true;
     }
   }
-  public class SensitiveNamedIcon: Gtk.EventBox
+  public class SensitiveWidget: Gtk.EventBox
   {
-    private NamedIcon _icon;
-    public NamedIcon icon {get {return this._icon;}}
+    private Widget _widget;
+    public Widget widget {get {return this._widget;}}
 
-    public SensitiveNamedIcon ()
+    public SensitiveWidget (Widget widget)
     {
       this.above_child = false;
       this.visible_window = false;
       this.set_has_window (false);
       
-      this._icon = new NamedIcon ();
-      this.add (this._icon);
-      this.icon.show ();
+      this._widget = widget;
+      this.add (this._widget);
+      this._widget.show ();
     }
     
     public override bool expose_event (Gdk.EventExpose event)

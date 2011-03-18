@@ -123,7 +123,10 @@ namespace Synapse.Gui
             (match_icon, ContainerOverlayed.Position.MAIN);
       match_icon_container_overlayed.set_widget_in_position 
             (match_icon_thumb, ContainerOverlayed.Position.BOTTOM_LEFT);
-      top_hbox.pack_start (match_icon_container_overlayed, false);
+
+      var sensitive = new SensitiveWidget (match_icon_container_overlayed);
+      this.make_draggable (sensitive);
+      top_hbox.pack_start (sensitive, false);
       
       /* VBox to push down the right area */
       var top_right_vbox = new VBox (false, 0);

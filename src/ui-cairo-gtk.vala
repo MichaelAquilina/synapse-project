@@ -114,7 +114,9 @@ namespace Synapse.Gui
             (match_icon_thumb, ContainerOverlayed.Position.BOTTOM_LEFT);
       match_icon_container_overlayed.set_widget_in_position 
             (action_icon, ContainerOverlayed.Position.BOTTOM_RIGHT);
-      container_top.pack_start (match_icon_container_overlayed, false);
+      var sensitive = new SensitiveWidget (match_icon_container_overlayed);
+      this.make_draggable (sensitive);
+      container_top.pack_start (sensitive, false);
       
       /* Throbber */
       throbber = new Throbber ();
