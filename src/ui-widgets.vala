@@ -847,7 +847,7 @@ namespace Synapse.Gui
                                 this.allocation.y,
                                 this.allocation.x,
                                 this.allocation.y + this.allocation.height);
-      if (entered)
+      if (entered || this.get_state () == StateType.SELECTED)
       {
         ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.SELECTED);
       }

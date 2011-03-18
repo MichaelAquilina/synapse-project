@@ -101,6 +101,7 @@ namespace Synapse.Gui
       var categories_hbox = new HBox (false, 0);
       container_top.pack_start (categories_hbox, false, true, 0);
       menuthrobber = new MenuThrobber ();
+      menuthrobber.set_state (StateType.SELECTED);
       menu = (MenuButton) menuthrobber;
       menuthrobber.set_size_request (22, 22);
       menuthrobber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
@@ -423,8 +424,8 @@ namespace Synapse.Gui
                 Markup.printf_escaped ("<span size=\"%s\">%s</span>",
                                        size, " "));
           description_label.set_markup (
-            Markup.printf_escaped ("<span size=\"small\">%s</span>",
-                                   TYPE_TO_SEARCH));
+            Markup.printf_escaped ("<span size=\"small\">%s (%s)</span>",
+                                   TYPE_TO_SEARCH, DOWN_TO_SEE_RECENT));
         }
       }
       else
