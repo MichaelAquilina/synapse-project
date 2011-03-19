@@ -392,6 +392,12 @@ namespace Synapse.Gui
       else
         menuthrobber.active = false;
     }
+    
+    private string get_down_to_see_recent ()
+    {
+      if (DOWN_TO_SEE_RECENT == "") return TYPE_TO_SEARCH;
+      return "%s (%s)".printf (TYPE_TO_SEARCH, DOWN_TO_SEE_RECENT);
+    }
     protected override void focus_match ( int index, Match? match )
     {
       string size = "medium";
@@ -427,8 +433,8 @@ namespace Synapse.Gui
                 Markup.printf_escaped ("<span size=\"%s\">%s</span>",
                                        size, " "));
           description_label.set_markup (
-            Markup.printf_escaped ("<span size=\"small\">%s (%s)</span>",
-                                   TYPE_TO_SEARCH, DOWN_TO_SEE_RECENT));
+            Markup.printf_escaped ("<span size=\"small\">%s</span>",
+                                   get_down_to_see_recent ()));
         }
       }
       else
@@ -447,8 +453,8 @@ namespace Synapse.Gui
     {
       if (description_label != null && is_in_initial_status ())
         description_label.set_markup (
-            Markup.printf_escaped ("<span size=\"small\">%s (%s)</span>",
-                                   TYPE_TO_SEARCH, DOWN_TO_SEE_RECENT));
+            Markup.printf_escaped ("<span size=\"small\">%s</span>",
+                                   get_down_to_see_recent ()));
     }
     protected override void focus_action ( int index, Match? action )
     {
