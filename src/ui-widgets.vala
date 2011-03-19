@@ -151,6 +151,7 @@ namespace Synapse.Gui
       Widget t = widgets[pos1];
       widgets[pos1] = widgets[pos2];
       widgets[pos2] = t;
+      this.queue_resize ();
     }
 
     public override void add (Widget widget)
