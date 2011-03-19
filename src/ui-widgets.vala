@@ -493,19 +493,13 @@ namespace Synapse.Gui
     public string not_found_name {get; set; default = "unknown";}
     private string current;
     private IconSize current_size;
-    private uint tid; //for timer
-    private Utils.ColorHelper ch;
-    public int update_timeout {get; set; default = -1;}
-    public bool stop_prev_timeout {get; set; default = false;}
-    public bool glow {get; set; default = false;}
+
     construct
     {
       current = "";
       current_size = IconSize.DIALOG;
-      tid = 0;
-      ch = new Utils.ColorHelper (this);
-      this.notify["glow"].connect (this.queue_draw);
     }
+
     public override bool expose_event (Gdk.EventExpose event)
     {
       if (current == null || current == "") return true;
@@ -528,19 +522,14 @@ namespace Synapse.Gui
     }
     public new void clear ()
     {
-      if (tid != 0)
-      {
-        Source.remove (tid);
-        tid = 0;
-      }
       current = "";
-      base.clear ();
+      this.queue_draw ();
     }
     public void set_icon_name (string? name, IconSize size)
     {
       if (name == null)
         name = "";
-      if (name == current)
+      if (name == current && name != "")
         return;
       else
       {
@@ -550,48 +539,7 @@ namespace Synapse.Gui
         }
         current = name;
         current_size = size;
-        if (update_timeout <= 0)
-        {
-          real_update_image ();
-        }
-        else
-        {
-          if (tid != 0 && stop_prev_timeout)
-          {
-            Source.remove (tid);
-            tid = 0;
-          }
-          if (tid == 0)
-          {
-            base.clear ();
-            tid = Timeout.add (update_timeout,
-              () => {tid = 0; real_update_image (); return false;}
-            );
-          }
-        }
-      }
-    }
-    private void real_update_image ()
-    {
-      try
-      {
-        var icon = GLib.Icon.new_for_string (current);
-        //make sure that it exist in the icon theme
-        var iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, 32, 0);
-        if (iconinfo == null)
-          throw new WidgetError.ICON_NOT_FOUND ("Requested icon could not be found.");
-        this.set_from_gicon (icon, current_size);
-      }
-      catch (Error err)
-      {
-        if (current != not_found_name)
-        {
-          if (not_found_name == "")
-            this.clear ();
-          else
-            this.set_from_icon_name (not_found_name, current_size);
-          current = not_found_name;
-        }
+        this.queue_draw ();
       }
     }
   }

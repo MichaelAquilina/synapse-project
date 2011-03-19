@@ -108,7 +108,7 @@ namespace Synapse.Gui
       flag_selector.set_state (Gtk.StateType.SELECTED);
       
       var spacer = new Label ("");
-      spacer.set_size_request (22,1);
+      spacer.set_size_request (19,1);
       categories_hbox.pack_start (spacer, false);
       categories_hbox.pack_start (flag_selector);
       categories_hbox.pack_start (menuthrobber, false);
@@ -122,6 +122,7 @@ namespace Synapse.Gui
       match_icon.set_size_request (ICON_SIZE, ICON_SIZE);
       match_icon.set_pixel_size (ICON_SIZE);
       action_icon = new NamedIcon ();
+      action_icon.not_found_name = "";
       action_icon.set_size_request (ICON_SIZE, ICON_SIZE);
       action_icon.set_pixel_size (ICON_SIZE);
       
@@ -140,14 +141,14 @@ namespace Synapse.Gui
       match_label.set_alignment (0.5f, 0.0f);
       match_label.set_state (Gtk.StateType.SELECTED);
       match_label.set_size_request (LABEL_SIZE, -1);
-      match_label.xpad = 2;
+      match_label.xpad = 5;
       action_label = new Label ("");
       action_label.single_line_mode = true;
       action_label.ellipsize = Pango.EllipsizeMode.END;
       action_label.set_alignment (0.5f, 0.0f);
       action_label.set_state (Gtk.StateType.SELECTED);
       action_label.set_size_request (LABEL_SIZE, -1);
-      action_label.xpad = 2;
+      action_label.xpad = 5;
       
       labels_hbox.pack_start (match_label, false, false);
       labels_hbox.pack_start (action_label, false, false);
@@ -454,8 +455,7 @@ namespace Synapse.Gui
       string size = "medium";
       if (action == null)
       {
-        action_icon.set_sensitive (false);
-        action_icon.set_icon_name ("system-run", IconSize.DIALOG);
+        action_icon.set_icon_name ("", IconSize.DIALOG);
         if (searching_for_matches)
           action_label.set_markup (
                 Markup.printf_escaped ("<span size=\"%s\">%s</span>",
@@ -468,7 +468,6 @@ namespace Synapse.Gui
       }
       else
       {
-        action_icon.set_sensitive (true);
         action_icon.set_icon_name (action.icon_name, IconSize.DIALOG);
         action_label.set_markup (Utils.markup_string_with_search (action.title,
                                  searching_for_matches ? 
