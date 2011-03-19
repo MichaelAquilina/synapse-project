@@ -257,6 +257,86 @@ namespace Synapse.Gui
       }
     }
     
+    protected void make_draggable (EventBox obj)
+    {
+      obj.set_events (obj.get_events () | Gdk.EventMask.BUTTON_PRESS_MASK);
+      // D&D
+      Gtk.drag_source_set (obj, Gdk.ModifierType.BUTTON1_MASK, {}, 
+                               Gdk.DragAction.ASK | 
+                               Gdk.DragAction.COPY | 
+                               Gdk.DragAction.MOVE | 
+                               Gdk.DragAction.LINK);
+      obj.button_press_event.connect (this.draggable_clicked);
+      obj.drag_data_get.connect (this.draggable_get);
+    }
+    
+    private void draggable_get (Widget w, Gdk.DragContext context, SelectionData selection_data, uint info, uint time_)
+    {
+      /* Set datas on drop */
+      Match m;
+      int i;
+      this.get_match_focus (out i, out m);
+
+      UriMatch? um = m as UriMatch;
+      return_if_fail (um != null);
+      selection_data.set_text (um.title, -1);
+      selection_data.set_uris ({um.uri});
+    }
+    
+    private bool draggable_clicked (Gtk.Widget w, Gdk.EventButton event)
+    {
+      var tl = new TargetList ({});
+      if (!has_match_results ())
+      {
+        Gtk.drag_source_set_target_list (w, tl);
+        Gtk.drag_source_set_icon_stock (w, Gtk.STOCK_MISSING_IMAGE);
+        return false;
+      }
+      Match m;
+      int i;
+      this.get_match_focus (out i, out m);
+
+      UriMatch? um = m as UriMatch;
+      if (um == null)
+      {
+        Gtk.drag_source_set_target_list (w, tl);
+        Gtk.drag_source_set_icon_stock (w, Gtk.STOCK_MISSING_IMAGE);
+        return false;
+      }
+
+      tl.add_text_targets (0);
+      tl.add_uri_targets (1);
+      Gtk.drag_source_set_target_list (w, tl);
+      
+      try {
+        var icon = GLib.Icon.new_for_string (um.icon_name);
+        if (icon == null) return false;
+
+        Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, 48, Gtk.IconLookupFlags.FORCE_SIZE);
+        if (iconinfo == null) return false;
+
+        Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
+        if (icon_pixbuf == null) return false;
+        
+        Gtk.drag_source_set_icon_pixbuf (w, icon_pixbuf);
+      }
+      catch (GLib.Error err) {}
+      return false;
+    }
+    
+    public void command_execute ()
+    {
+      if (execute ())
+      {
+        hide ();
+      }
+      else
+      {
+        searching_for_matches = true;
+        searching_for_changed ();
+      }
+    }
+    
     protected virtual bool key_press_event (Gdk.EventKey event)
     {
       /* Check for text input */
@@ -289,13 +369,7 @@ namespace Synapse.Gui
           searching_for_changed ();
           break;
         case CommandTypes.EXECUTE:
-          if (execute ())
-            hide ();
-          else
-          {
-            searching_for_matches = true;
-            searching_for_changed ();
-          }
+          command_execute ();
           break;
         case CommandTypes.SEARCH_DELETE_CHAR:
           search_delete_char ();
@@ -418,12 +492,14 @@ namespace Synapse.Gui
       if (window.visible)
       {
         hide ();
+        //Utils.unpresent_window (window); // unstable code needs fixing
         return;
       }
       show ();
       window.present_with_time (timestamp);
       window.get_window ().raise ();
       window.get_window ().focus (timestamp);
+      //Utils.present_window (window); // unstable code needs fixing
     }    
     protected override void set_throbber_visible (bool visible)
     {

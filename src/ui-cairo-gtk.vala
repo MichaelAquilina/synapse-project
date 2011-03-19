@@ -101,8 +101,6 @@ namespace Synapse.Gui
       match_icon_container_overlayed = new ContainerOverlayed();
       match_icon_thumb = new NamedIcon();
       match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
-      match_icon_thumb.update_timeout = 400;
-      match_icon_thumb.stop_prev_timeout = true;
       match_icon = new NamedIcon ();
       match_icon.set_alignment (0.0f, 0.5f);
       match_icon.set_pixel_size (ICON_SIZE);
@@ -114,7 +112,9 @@ namespace Synapse.Gui
             (match_icon_thumb, ContainerOverlayed.Position.BOTTOM_LEFT);
       match_icon_container_overlayed.set_widget_in_position 
             (action_icon, ContainerOverlayed.Position.BOTTOM_RIGHT);
-      container_top.pack_start (match_icon_container_overlayed, false);
+      var sensitive = new SensitiveWidget (match_icon_container_overlayed);
+      this.make_draggable (sensitive);
+      container_top.pack_start (sensitive, false);
       
       /* Throbber */
       throbber = new Throbber ();
@@ -188,6 +188,10 @@ namespace Synapse.Gui
       
       results_match = new ResultBox (UI_WIDTH - 2);
       results_action = new ResultBox (UI_WIDTH - 2);
+      results_match.get_match_list_view ().selected_index_changed.connect (this.set_selection_match);
+      results_action.get_match_list_view ().selected_index_changed.connect (this.set_selection_action);
+      results_match.get_match_list_view ().fire_item.connect (command_execute);
+      results_action.get_match_list_view ().fire_item.connect (command_execute);
       results_container.add (results_match);
       results_container.add (results_action);
 

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by Alberto Aldegheri <albyrock87+dev@gmail.com>
- *             Michal Hruby <michal.mhr@gmail.com>
+ *
  *
  */
 
@@ -27,32 +27,28 @@ using Synapse.Gui.Utils;
 
 namespace Synapse.Gui
 {
-  public class SynapseWindowTwoLines : GtkCairoBase
+  public class SynapseWindowDoish : GtkCairoBase
   {
     /* Main UI shared components */
     protected NamedIcon match_icon = null;
-    protected NamedIcon match_icon_thumb = null;
-    protected ShrinkingLabel match_label = null;
-    protected Label match_label_description = null;
+    protected Label match_label = null;
+    protected Label description_label = null;
     protected NamedIcon action_icon = null;
-    protected ShrinkingLabel action_label = null;
-    protected HBox top_hbox = null;
-    protected FakeInput fake_input_match = null;
-    protected FakeInput fake_input_action = null;
-    protected Label top_spacer = null;
+    protected Label action_label = null;
     protected VBox container = null;
     protected VBox container_top = null;
-    protected ContainerOverlayed match_icon_container_overlayed = null;
     protected ResultBox results_match = null;
     protected ResultBox results_action = null;
     protected HSelectionContainer results_container = null;
     protected MenuThrobber menuthrobber = null;
 
-    private const int UI_WIDTH = 600; // height is dynamic
-    private const int PADDING = 8; // assinged to container_top's border width
+    private const int PADDING = 10; // assinged to container_top's border width
     private const int BORDER_RADIUS = 20;
-    private const int ICON_SIZE = 172;
-    private const int ACTION_ICON_SIZE = 48;
+    private const int UI_WIDTH = 420; // height is dynamic
+    private const int ICON_SIZE = 128;
+    private const int LABEL_SEPARATOR = 20;
+    private const int LABEL_SIZE = (UI_WIDTH - LABEL_SEPARATOR * 3) /2;
+    private const int IL_DIFFERENCE = ( LABEL_SIZE - ICON_SIZE ) / 2;
     
     /* STATUS */
     private bool list_visible = true;
@@ -67,7 +63,7 @@ namespace Synapse.Gui
       visual_update_search_for ();
     }
 
-    ~SynapseWindowTwoLines ()
+    ~SynapseWindowDoish ()
     {
       window.destroy ();
     }
@@ -75,8 +71,8 @@ namespace Synapse.Gui
     protected override void build_ui ()
     {
       container = new VBox (false, 0);
-      window.add (container);
-
+      window.add (container); 
+      
       /* ==> Top container */
       container_top = new VBox (false, 0);
       container_top.set_size_request (UI_WIDTH, -1);
@@ -85,8 +81,8 @@ namespace Synapse.Gui
       results_container = new HSelectionContainer (null, 0);
       results_container.set_separator_visible (false);
       
-      results_match = new ResultBox (450);
-      results_action = new ResultBox (450);
+      results_match = new ResultBox (UI_WIDTH - 4);
+      results_action = new ResultBox (UI_WIDTH - 4);
       results_match.get_match_list_view ().selected_index_changed.connect (this.set_selection_match);
       results_action.get_match_list_view ().selected_index_changed.connect (this.set_selection_action);
       results_match.get_match_list_view ().fire_item.connect (this.command_execute);
@@ -94,107 +90,83 @@ namespace Synapse.Gui
       results_container.add (results_match);
       results_container.add (results_action);
       var hbox_result_box = new HBox (true, 0);
+      hbox_result_box.border_width = 0;
       hbox_result_box.pack_start (results_container,false,false);
       /* <== Pack */
       container.pack_start (container_top);
       container.pack_start (hbox_result_box,false);
-
-      /* Top Hbox */
-      top_hbox = new HBox (false, 0);
-      /* Match Description */
-      match_label_description = new Label (null);
-      match_label_description.set_alignment (0, 0);
-      match_label_description.set_ellipsize (Pango.EllipsizeMode.END); 
-      match_label_description.set_line_wrap (true);
-      match_label_description.xpad = 6;
-      /* Packing Top Hbox with Match Desctiption into Top VBox*/
-      container_top.pack_start (top_hbox);
       
-      /* Match Icon packed into Top HBox */
-      match_icon_container_overlayed = new ContainerOverlayed();
-      match_icon_thumb = new NamedIcon();
-      match_icon_thumb.set_pixel_size (ICON_SIZE / 2);
+      /* Categories - Throbber and menu */ //#0C71D6
+      var categories_hbox = new HBox (false, 0);
+      container_top.pack_start (categories_hbox, false, true, 0);
+      menuthrobber = new MenuThrobber ();
+      menuthrobber.set_state (StateType.SELECTED);
+      menu = (MenuButton) menuthrobber;
+      menuthrobber.set_size_request (22, 22);
+      menuthrobber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+      flag_selector.set_state (Gtk.StateType.SELECTED);
+      
+      var spacer = new Label ("");
+      spacer.set_size_request (19,1);
+      categories_hbox.pack_start (spacer, false);
+      categories_hbox.pack_start (flag_selector);
+      categories_hbox.pack_start (menuthrobber, false);
+      
+      /* Icon Container */
+      var icon_hbox = new HBox (true, 0);
+      container_top.pack_start (icon_hbox, false, true, 5);
       match_icon = new NamedIcon ();
+      var match_icon_sensitive = new SensitiveWidget (match_icon);
+      this.make_draggable (match_icon_sensitive);
       match_icon.set_size_request (ICON_SIZE, ICON_SIZE);
       match_icon.set_pixel_size (ICON_SIZE);
-      match_icon_container_overlayed.set_widget_in_position 
-            (match_icon, ContainerOverlayed.Position.MAIN);
-      match_icon_container_overlayed.set_widget_in_position 
-            (match_icon_thumb, ContainerOverlayed.Position.BOTTOM_LEFT);
-
-      var sensitive = new SensitiveWidget (match_icon_container_overlayed);
-      this.make_draggable (sensitive);
-      top_hbox.pack_start (sensitive, false);
-      
-      /* VBox to push down the right area */
-      var top_right_vbox = new VBox (false, 0);
-      top_hbox.pack_start (top_right_vbox);
-      /* Top Spacer */
-      top_spacer = new Label(null);
-      /* flag_selector */
-      flag_selector = new HTextSelector();
-      foreach (string s in this.categories)
-      {
-        flag_selector.add_text (s);
-      }
-      flag_selector.selected = 3;
-
-      /* Throbber and menu */
-      menuthrobber = new MenuThrobber ();
-      menu = (MenuButton) menuthrobber;
-      menuthrobber.set_size_request (ACTION_ICON_SIZE, 22);
-      menuthrobber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
-      /* HBox for titles and action icon */
-      var right_hbox = new HBox (false, 0);
-      /* HBox for menuthrobber and flag_selector */
-      var topright_hbox = new HBox (false, 0);
-      
-      {
-        var vbox = new VBox (false, 0);
-        vbox.pack_start (flag_selector);
-        vbox.pack_start (new Gtk.HSeparator (), false);
-        topright_hbox.pack_start (vbox);
-      }
-      topright_hbox.pack_start (menuthrobber, false);
-
-      top_right_vbox.pack_start (top_spacer, true);
-      top_right_vbox.pack_start (topright_hbox, false);
-      top_right_vbox.pack_start (right_hbox, false);
-      top_right_vbox.pack_start (match_label_description, false);
-      
-      /* Titles box and Action icon*/
-      var labels_hbox = new VBox (false, 0);
       action_icon = new NamedIcon ();
-      action_icon.set_pixel_size (ACTION_ICON_SIZE);
-      action_icon.set_alignment (0.5f, 0.5f);
-      action_icon.set_size_request (ACTION_ICON_SIZE, ACTION_ICON_SIZE);
-
-      fake_input_action = new FakeInput ();
-      fake_input_match = new FakeInput ();
-      fake_input_action.left_padding = fake_input_match.left_padding = 6;
-      fake_input_action.right_padding = fake_input_match.right_padding = 6;
-      fake_input_action.bottom_padding = 3;
+      action_icon.not_found_name = "";
+      action_icon.set_size_request (ICON_SIZE, ICON_SIZE);
+      action_icon.set_pixel_size (ICON_SIZE);
       
-      right_hbox.pack_start (labels_hbox);
-      right_hbox.pack_start (action_icon, false);
+      match_icon.set_icon_name ("Synapse", Gtk.IconSize.DIALOG);
+      action_icon.set_icon_name ("Synapse", Gtk.IconSize.DIALOG);
       
-      match_label = new ShrinkingLabel ();
-      match_label.set_alignment (0.0f, 0.5f);
-      match_label.set_ellipsize (Pango.EllipsizeMode.END);
-      match_label.xpad = 10;
-      match_label.ypad = 3;
-
-      action_label = new ShrinkingLabel ();
-      action_label.set_alignment (1.0f, 0.5f);
-      match_label.set_ellipsize (Pango.EllipsizeMode.START);
-      action_label.xpad = 10;
-      action_label.ypad = 3;
+      icon_hbox.pack_start (match_icon_sensitive, false, false);
+      icon_hbox.pack_start (action_icon, false, false);
       
-      fake_input_action.add (action_label);
-      fake_input_match.add (match_label);
+      /* Match Label container */
+      var labels_hbox = new HBox (true, 0);
+      container_top.pack_start (labels_hbox, false, true, 0);
+      match_label = new Label ("");
+      match_label.single_line_mode = true;
+      match_label.ellipsize = Pango.EllipsizeMode.END;
+      match_label.set_alignment (0.5f, 0.0f);
+      match_label.set_state (Gtk.StateType.SELECTED);
+      match_label.set_size_request (LABEL_SIZE, -1);
+      match_label.xpad = 5;
+      action_label = new Label ("");
+      action_label.single_line_mode = true;
+      action_label.ellipsize = Pango.EllipsizeMode.END;
+      action_label.set_alignment (0.5f, 0.0f);
+      action_label.set_state (Gtk.StateType.SELECTED);
+      action_label.set_size_request (LABEL_SIZE, -1);
+      action_label.xpad = 5;
       
-      labels_hbox.pack_start (fake_input_match, false);
-      labels_hbox.pack_start (fake_input_action, false);
+      labels_hbox.pack_start (match_label, false, false);
+      labels_hbox.pack_start (action_label, false, false);
+      
+      spacer = new Label ("");
+      spacer.set_size_request (1, 14);
+      container_top.pack_start (spacer, false, false, 0);
+      
+      description_label = new Label ("Find the difference!! - Is this really Gnome-Do?");
+      description_label.single_line_mode = true;
+      description_label.ellipsize = Pango.EllipsizeMode.END;
+      description_label.set_alignment (0.5f, 1.0f);
+      description_label.ypad = 0;
+      description_label.set_state (Gtk.StateType.SELECTED);
+      container_top.pack_start (description_label, false, true, 0);
+      
+      spacer = new Label ("");
+      spacer.set_size_request (1, SHADOW_SIZE);
+      container_top.pack_start (spacer, false, false, 0);
       
       container.show_all ();
     }
@@ -208,16 +180,13 @@ namespace Synapse.Gui
     {
       if (searching_for_matches)
       {
-        fake_input_match.input_alpha = 1.0;
-        fake_input_action.input_alpha = 0.1;
         results_container.select (0);
       }
       else
       {
-        fake_input_match.input_alpha = 0.1;
-        fake_input_action.input_alpha = 1.0;
         results_container.select (1);
       }
+      window.queue_draw ();
     }
 
     protected override void on_composited_changed (Widget w)
@@ -243,21 +212,16 @@ namespace Synapse.Gui
       ctx.set_operator (Cairo.Operator.SOURCE);
       if (composited)
       {
-        int spacing = top_spacer.allocation.height;
-        Utils.cairo_rounded_rect (ctx, SHADOW_SIZE, SHADOW_SIZE,
-                                       ICON_SIZE + PADDING * 2,
-                                       ICON_SIZE, BORDER_RADIUS);
-        ctx.fill ();
-        Utils.cairo_rounded_rect (ctx, 0, spacing,
+        Utils.cairo_rounded_rect (ctx, 0, 0,
                                        container_top.allocation.width + SHADOW_SIZE * 2, 
-                                       container_top.allocation.height + SHADOW_SIZE * 2 - spacing,
+                                       container_top.allocation.height + SHADOW_SIZE * 2,
                                        BORDER_RADIUS);
         ctx.fill ();
         if (list_visible)
         {
           results_container.size_request (out req);
               
-          ctx.rectangle ((w - req.width) / 2,
+          ctx.rectangle (SHADOW_SIZE + BORDER_RADIUS,
                          container_top.allocation.height,
                          req.width,
                          h - container_top.allocation.height);
@@ -275,67 +239,101 @@ namespace Synapse.Gui
     
     protected virtual bool expose_event (Widget widget, Gdk.EventExpose event) {
       bool comp = widget.is_composited ();
-      var ctx = Gdk.cairo_create (widget.window);
+      Cairo.Context ctx = Gdk.cairo_create (widget.window);
       ctx.set_operator (Operator.CLEAR);
       ctx.paint ();
       ctx.set_operator (Operator.OVER);
-      ctx.translate (0.5, 0.5);
-      double w = container_top.allocation.width - 1;
-      double h = container_top.allocation.height - 1;
+      double w = container_top.allocation.width;
+      double h = container_top.allocation.height - SHADOW_SIZE;
       double x = container_top.allocation.x;
       double y = container_top.allocation.y;
+      
+      double r = 0, b = 0, g = 0;
       if (comp)
       {
-        int spacing = top_spacer.allocation.height;
-        y += spacing;
-        h -= spacing;
-        double r = 0, b = 0, g = 0;
-        //draw black shadow
-        Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
-                                          r, g, b, SHADOW_SIZE);
-        // border
-        _cairo_path_for_main (ctx, comp, x, y, w, h);
-        ctx.set_source_rgba (r, g, b, 0.6);
-        ctx.set_line_width (1);
-        ctx.stroke ();
+        // shadow
         if (this.list_visible)
         {
           //draw shadow
-          Utils.cairo_make_shadow_for_rect (ctx, results_container.allocation.x,
-                                                 results_container.allocation.y,
-                                                 results_container.allocation.width,
-                                                 results_container.allocation.height,
-                                                 0, r, g, b, SHADOW_SIZE);
+          var sp = SHADOW_SIZE + BORDER_RADIUS;
           ctx.rectangle (results_container.allocation.x,
-                         results_container.allocation.y,
+                         results_container.allocation.y - sp,
                          results_container.allocation.width,
-                         results_container.allocation.height);
-          ctx.set_source_rgba (r, g, b, 0.6);
-          ctx.set_line_width (2.5);
-          ctx.stroke ();
+                         results_container.allocation.height + sp);
+          ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, StateType.NORMAL);
+          ctx.fill ();
+          ctx.translate (0.5, 0.5);
+          Utils.cairo_make_shadow_for_rect (ctx, results_container.allocation.x,
+                                                 results_container.allocation.y - sp,
+                                                 results_container.allocation.width,
+                                                 results_container.allocation.height + sp,
+                                                 0, r, g, b, SHADOW_SIZE);
+          ctx.translate (-0.5, -0.5);
         }
+        Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
+                                          r, g, b, SHADOW_SIZE);
       }
       ctx.save ();
+      // pattern
       Pattern pat = new Pattern.linear(0, y, 0, y+h);
-      ch.add_color_stop_rgba (pat, 0, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.LIGHTER);
-      ch.add_color_stop_rgba (pat, 0.75, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
-      ch.add_color_stop_rgba (pat, 1, 0.97, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
-
+      r = g = b = 0.15;
+      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
+      pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
+      r = g = b = 0.5;
+      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
+      pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
       _cairo_path_for_main (ctx, comp, x, y, w, h);
       ctx.set_source (pat);
       ctx.set_operator (Operator.SOURCE);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();
-      if (!comp)
-      {
-        //border for non composited
-        ctx.set_operator (Operator.OVER);
-        _cairo_path_for_main (ctx, comp, x, y, w, h);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, StateType.NORMAL);
-        ctx.set_line_width (3.5);
-        ctx.stroke (); 
-      }
+      
+      // icon bgs
+       
+      ctx.save ();
+      Utils.cairo_rounded_rect (ctx, this.match_icon.allocation.x - IL_DIFFERENCE,
+                                     this.match_icon.allocation.y - 6,
+                                     LABEL_SIZE,
+                                     this.match_label.allocation.y -
+                                          this.match_icon.allocation.y +
+                                          this.match_label.allocation.height + 12,
+                                     BORDER_RADIUS / 2);
+      ch.set_source_rgba (ctx, this.searching_for_matches ? 0.3 : 0.08, ch.StyleType.FG, StateType.SELECTED);
+      ctx.clip ();
+      ctx.paint ();
+      ctx.restore ();
+      ctx.save ();
+      Utils.cairo_rounded_rect (ctx, this.action_icon.allocation.x - IL_DIFFERENCE,
+                                     this.action_icon.allocation.y - 6,
+                                     LABEL_SIZE,
+                                     this.action_label.allocation.y -
+                                          this.action_icon.allocation.y +
+                                          this.action_label.allocation.height + 12,
+                                     BORDER_RADIUS / 2);
+      ch.set_source_rgba (ctx, !this.searching_for_matches ? 0.3 : 0.08, ch.StyleType.FG, StateType.SELECTED);
+      ctx.clip ();
+      ctx.paint ();
+      ctx.restore ();
+      
+      // top light      
+      ctx.save ();
+      _cairo_path_for_main (ctx, comp, x, y, w, h);
+      ctx.clip ();
+      ctx.set_operator (Operator.OVER);
+      ctx.new_path ();
+      ctx.move_to (x, y);
+      ctx.rel_line_to (0.0, h / 3.0);
+      ctx.rel_curve_to (w / 4.0, -h / 10.0, w / 4.0 * 3.0, -h / 10.0, w, 0.0);
+      ctx.rel_line_to (0.0, -h / 3.0);
+      ctx.close_path ();
+      pat = new Pattern.linear (0, y + h / 10.0, 0, y + h / 3.0);
+      ch.add_color_stop_rgba (pat, 0.0, 0.0, ch.StyleType.FG, StateType.SELECTED);
+      ch.add_color_stop_rgba (pat, 1.0, 0.4, ch.StyleType.FG, StateType.SELECTED);
+      ctx.set_source (pat);
+      ctx.clip ();
+      ctx.paint ();
+      ctx.restore ();
       /* Propagate Expose */               
       Bin c = (widget is Bin) ? (Bin) widget : null;
       if (c != null)
@@ -378,11 +376,11 @@ namespace Synapse.Gui
     private string get_description_markup (string s)
     {
       // FIXME: i18n
-      if (s == "") return "<span size=\"medium\"> </span>";
+      if (s == "") return "<span size=\"small\"> </span>";
 
       return Utils.markup_string_with_search (Utils.replace_home_path_with (s, "Home", " > "),
                                              get_match_search (),
-                                             "medium");
+                                             "small");
     }
 
     /* UI INTERFACE IMPLEMENTATION */
@@ -393,9 +391,15 @@ namespace Synapse.Gui
       else
         menuthrobber.active = false;
     }
+    
+    private string get_down_to_see_recent ()
+    {
+      if (DOWN_TO_SEE_RECENT == "") return TYPE_TO_SEARCH;
+      return "%s (%s)".printf (TYPE_TO_SEARCH, DOWN_TO_SEE_RECENT);
+    }
     protected override void focus_match ( int index, Match? match )
     {
-      string size = "x-large";
+      string size = "medium";
       if (match == null)
       {
         /* Show default stuff */
@@ -404,73 +408,76 @@ namespace Synapse.Gui
           if (is_searching_for_recent ())
           {
             match_label.set_markup (
-            Markup.printf_escaped ("<span size=\"x-large\">%s</span>",
-                                   TYPE_TO_SEARCH));
-            match_label_description.set_markup (
+                Markup.printf_escaped ("<span size=\"%s\">%s</span>",
+                                       size, " "));
+            description_label.set_markup (
               get_description_markup (menuthrobber.active ? SEARCHING : NO_RECENT_ACTIVITIES)
             );
           }
           else
           {
-            match_label.set_markup (Utils.markup_string_with_search ("", get_match_search (), size));
-            match_label_description.set_markup (
+            match_label.set_markup (
+                Markup.printf_escaped ("<span size=\"%s\">%s</span>",
+                                       size, get_match_search ()));
+            description_label.set_markup (
               get_description_markup (menuthrobber.active ? SEARCHING : NO_RESULTS)
             );
           }
           match_icon.set_icon_name ("search", IconSize.DIALOG);
-          match_icon_thumb.clear ();
         }
         else
         {
           match_icon.set_icon_name ("search", IconSize.DIALOG);
-          match_icon_thumb.clear ();
           match_label.set_markup (
-            Markup.printf_escaped ("<span size=\"x-large\">%s</span>",
-                                   TYPE_TO_SEARCH));
-          match_label_description.set_markup (
-            Markup.printf_escaped ("<span size=\"medium\">%s</span>",
-                                   DOWN_TO_SEE_RECENT));
+                Markup.printf_escaped ("<span size=\"%s\">%s</span>",
+                                       size, " "));
+          description_label.set_markup (
+            Markup.printf_escaped ("<span size=\"small\">%s</span>",
+                                   get_down_to_see_recent ()));
         }
       }
       else
       {
-        match_icon.set_icon_name (match.icon_name, IconSize.DIALOG);
         if (match.has_thumbnail)
-          match_icon_thumb.set_icon_name (match.thumbnail_path, IconSize.DIALOG);
+          match_icon.set_icon_name (match.thumbnail_path, IconSize.DIALOG);
         else
-          match_icon_thumb.clear ();
+          match_icon.set_icon_name (match.icon_name, IconSize.DIALOG);
 
         match_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), size, true));
-        match_label_description.set_markup (get_description_markup (match.description));
+        description_label.set_markup (get_description_markup (match.description));
       }
       results_match.move_selection_to_index (index);
     }
     protected override void handle_empty_updated ()
     {
-      if (match_label_description != null && is_in_initial_status ())
-        match_label_description.set_markup (
-            Markup.printf_escaped ("<span size=\"medium\">%s</span>",
-                                   DOWN_TO_SEE_RECENT));
+      if (description_label != null && is_in_initial_status ())
+        description_label.set_markup (
+            Markup.printf_escaped ("<span size=\"small\">%s</span>",
+                                   get_down_to_see_recent ()));
     }
     protected override void focus_action ( int index, Match? action )
     {
-      string size = "x-large";
+      string size = "medium";
       if (action == null)
       {
-        action_icon.set_sensitive (false);
-        action_icon.set_icon_name ("system-run", IconSize.DIALOG);
+        action_icon.set_icon_name ("", IconSize.DIALOG);
         if (searching_for_matches)
-          action_label.set_markup (Utils.markup_string_with_search (" ", "", size));
+          action_label.set_markup (
+                Markup.printf_escaped ("<span size=\"%s\">%s</span>",
+                                       size, " "));
         else
+        {
           action_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), size));
+          description_label.set_text (get_description_markup (NO_RESULTS));
+        }
       }
       else
       {
-        action_icon.set_sensitive (true);
         action_icon.set_icon_name (action.icon_name, IconSize.DIALOG);
         action_label.set_markup (Utils.markup_string_with_search (action.title,
                                  searching_for_matches ? 
                                  "" : get_action_search (), size));
+        if (!searching_for_matches) description_label.set_markup (get_description_markup (action.description));
       }
       results_action.move_selection_to_index (index);
     }

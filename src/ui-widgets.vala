@@ -30,718 +30,11 @@ namespace Synapse.Gui
     ICON_NOT_FOUND,
     UNKNOWN
   }
+  
   public class UIWidgetsConfig : ConfigObject
   {
     public bool animation_enabled { get; set; default = true; }
     public bool extended_info_enabled { get; set; default = true; }
-  }
-  public class MatchRenderer : ListView.Renderer
-  {
-    // the size of Match and Action icons
-    public int icon_size {get; set; default = 32;}
-    // top and bottom row's padding
-    public int cell_vpadding {get; set; default = 2;}
-    // left and right padding on each component of the row
-    public int cell_hpadding {get; set; default = 3;}
-    //hilight matched text into selected match's title
-    public bool hilight_on_selected {get; set; default = false;}
-    //shows the pattern after the title if hilight doesn't match the title
-    public bool show_pattern_in_hilight {get; set; default = false;}
-    //shows extended info when present (ie "xx minutes ago")
-    public bool show_extended_info {get; set; default = true;}
-    //hides extended info on selected row if present
-    public bool hide_extended_on_selected {get; set; default = false;}
-    //overlay action icon to the text, or reserve space for action icon shrinking labels
-    public bool overlay_action {get; set; default = false;}
-    //the string pattern to use in the hilight
-    public string pattern {get; set; default = "";}
-    //the Action match to use to retrive the action icon to show
-    public Match action {get; set; default = null;}
-    //the markup of the title
-    public string title_markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>";}
-    //the markup of the description
-    public string description_markup {get; set; default = "<span size=\"small\">%s</span>";}
-    //the markup of the extended info **extend info is already inserted into description markup**
-    public string extended_info_markup {get; set; default = "%s";}
-
-    private Label label;
-    private Pango.Layout layout;
-    private Requisition precalc_req;
-    private Gtk.TextDirection rtl;
-    private int text_height;
-    
-    public MatchRenderer ()
-    {
-      ch = null;
-      text_height = 0;
-      rtl = Gtk.TextDirection.LTR;
-      precalc_req = {400, icon_size + cell_hpadding * 2};
-      label = new Label (null);
-      layout = label.create_pango_layout (null);
-      layout.set_ellipsize (Pango.EllipsizeMode.END);
-      on_style_set.connect (layout_changed);
-      this.notify["icon-size"].connect (size_changed);
-      this.notify["cell-vpadding"].connect (size_changed);
-      this.notify["cell-hpadding"].connect (size_changed);
-      this.notify["title-markup"].connect (size_changed);
-      this.notify["description-markup"].connect (size_changed);
-      
-      var config = (UIWidgetsConfig) ConfigService.get_default ().get_config ("ui", "widgets", typeof (UIWidgetsConfig));
-      show_extended_info = config.extended_info_enabled;
-    }
-    private void size_changed ()
-    {
-      calc_requisition ();
-      this.request_redraw ();
-    }
-    private void layout_changed ()
-    {
-      Gtk.Style s = Gtk.rc_get_style (label);
-      label.style = s;
-      rtl = label.get_default_direction ();
-      layout.set_ellipsize (Pango.EllipsizeMode.END);
-      Utils.update_layout_rtl (layout, rtl);
-      calc_requisition ();
-      this.request_redraw ();
-    }
-
-    public void set_width_request (int w)
-    {
-      this.precalc_req.width = w;
-    }
-    private void calc_requisition ()
-    {
-      string s = "%s\n%s".printf (title_markup, description_markup);
-      Markup.printf_escaped (s, " ", " ");
-      layout.set_markup (s, -1);
-      int width = 0, height = 0;
-      layout.get_pixel_size (out width, out height);
-      this.text_height = height;
-      height += cell_hpadding * 2;
-      this.precalc_req.height = int.max (height, icon_size + cell_hpadding * 2);
-    }
-    private void draw_icon (Cairo.Context ctx, Match m, int x, int y)
-    {
-      ctx.save ();
-      ctx.translate (x, y);
-      draw_icon_in_position (ctx, m.icon_name, icon_size);
-      ctx.restore ();
-    }
-    private void draw_action (Cairo.Context ctx, int x, int y, double selected_fill_pct)
-    {
-      if (selected_fill_pct < 0.9) return;
-      if (selected_fill_pct < 1.0) selected_fill_pct /= 3.0;
-      ctx.save ();
-      ctx.translate (x, y);
-      draw_icon_in_position (ctx, action.icon_name, icon_size, selected_fill_pct);
-      ctx.restore ();
-    }
-    private void draw_icon_in_position (Cairo.Context ctx, string? name, int pixel_size, double with_alpha = 1.0)
-    {
-      ctx.rectangle (0, 0, pixel_size, pixel_size);
-      ctx.clip ();
-      if (name == null || name == "") name = "unknown";
-      try {
-        var icon = GLib.Icon.new_for_string(name);
-        if (icon == null) throw new WidgetError.ICON_NOT_FOUND ("GLib Icon not found");
-
-        Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, pixel_size, Gtk.IconLookupFlags.FORCE_SIZE);
-        if (iconinfo == null) throw new WidgetError.ICON_NOT_FOUND ("Icon not found in theme");
-
-        Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
-        if (icon_pixbuf == null) throw new WidgetError.ICON_NOT_FOUND ("Cannot load icon pixbuf");
-
-        Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 0, 0);
-        if (with_alpha == 1.0)
-          ctx.paint ();
-        else
-          ctx.paint_with_alpha (with_alpha);
-      } catch (GLib.Error err) { 
-        if (name == "unknown") return; //error on drawing unknown WTF!!
-        draw_icon_in_position (ctx, "unknown", pixel_size, with_alpha);
-      }
-    }
-    private void draw_text (Cairo.Context ctx, Match m, int x, int y, int width, Gtk.StateType state, bool use_base, double selected_fill_pct)
-    {
-      ctx.save ();
-      ctx.translate (x, y);
-      ctx.rectangle (0, 0, width, text_height);
-      ctx.clip ();
-      
-      bool selected = (state == Gtk.StateType.SELECTED);
-
-      var styletype = ch.StyleType.FG;
-      if (use_base || selected) styletype = ch.StyleType.TEXT;
-      
-      if (selected && selected_fill_pct < 1.0)
-      {
-        double r = 0, g = 0, b = 0;
-        ch.get_rgb_from_mix (styletype, Gtk.StateType.NORMAL, ch.Mod.NORMAL,
-                             styletype, Gtk.StateType.SELECTED, ch.Mod.NORMAL,
-                             selected_fill_pct, out r, out g, out b);
-        ctx.set_source_rgba (r, g, b, 1.0);
-      }
-      else ch.set_source_rgba (ctx, 1.0, styletype, state);
-
-      string s = "";
-      /* ----------------------- draw title --------------------- */
-      if (hilight_on_selected && selected && selected_fill_pct == 1.0)
-      {
-        s = title_markup.printf (Utils.markup_string_with_search (m.title, pattern, "", show_pattern_in_hilight));
-      }
-      else
-      {
-        s = Markup.printf_escaped (title_markup, m.title);
-      }
-      layout.set_markup (s, -1);
-      layout.set_width (Pango.SCALE * width);
-      Pango.cairo_show_layout (ctx, layout);
-
-      bool has_extended_info = show_extended_info && (m is ExtendedInfo);
-      if (hide_extended_on_selected && selected) has_extended_info = false;
-      int width_for_description = width - cell_hpadding;
-      
-      /* ----------------- draw extended info ------------------- */
-      if (has_extended_info)
-      {
-        ctx.save ();
-        s = Markup.printf_escaped (extended_info_markup, (m as ExtendedInfo).extended_info ?? "");
-        s = description_markup.printf (s);
-        layout.set_markup (s, -1);
-        layout.set_width (Pango.SCALE * width_for_description);
-        int w = 0, h = 0;
-        layout.get_pixel_size (out w, out h);
-        
-        width_for_description -= w;
-        
-        if (rtl == Gtk.TextDirection.RTL) 
-          ctx.translate (0, text_height - h);
-        else
-          ctx.translate (width - w, text_height - h);
-        Pango.cairo_show_layout (ctx, layout);
-        ctx.restore ();
-      }
-      
-      /* ------------------ draw description --------------------- */
-      s = Markup.printf_escaped (description_markup, m.description);
-
-      layout.set_markup (s, -1);
-      layout.set_width (Pango.SCALE * width_for_description);
-      int w = 0, h = 0;
-      layout.get_pixel_size (out w, out h);
-      
-      if (rtl == Gtk.TextDirection.RTL) 
-        ctx.translate (width - width_for_description, text_height - h);
-      else
-        ctx.translate (0, text_height - h);
-
-      Pango.cairo_show_layout (ctx, layout);
-      ctx.restore ();
-    }
-    public override void render (Cairo.Context ctx, Requisition req, Gtk.StateType state, bool use_base, double selected_fill_pct, void* obj)
-    {
-      if (obj == null)
-        return;
-      Match m = (Match) obj;
-      /* _____   ____________________________   _____
-        |     | |                            | |     |
-        |     | |____________________________| |     |
-        |_____| |____|__________________|____| |_____|
-      */
-      ctx.set_operator (Cairo.Operator.OVER);
-      //rtl = Gtk.TextDirection.RTL; // <-- uncomment to test RTL
-      bool has_action = false;
-      if (state == Gtk.StateType.SELECTED && action != null) has_action = true;
-
-      int x = 0, y = 0;
-      int text_width = req.width - cell_hpadding * 4 - icon_size;
-      if (has_action && !overlay_action) text_width = text_width - cell_hpadding * 2 - icon_size;
-
-      if (rtl != Gtk.TextDirection.RTL)
-      {
-        /* Match Icon */
-        x = cell_hpadding;
-        y = (req.height - icon_size) / 2;
-        draw_icon (ctx, m, x, y);
-
-        /* Title and description */
-        x += icon_size + cell_hpadding * 2;
-        y = (req.height - text_height) / 2;
-        draw_text (ctx, m, x, y, text_width, state, use_base, selected_fill_pct);
-
-        /* Action Icon */
-        if (has_action)
-        {
-          y = (req.height - icon_size) / 2;
-          draw_action (ctx, req.width - cell_hpadding - icon_size, y, selected_fill_pct);
-        }
-      }
-      else
-      {
-        /* Match Icon */
-        x = req.width - cell_hpadding - icon_size;
-        y = (req.height - icon_size) / 2;
-        draw_icon (ctx, m, x, y);
-
-        /* Title and description */
-        x = x - cell_hpadding * 2 - text_width;
-        y = (req.height - text_height) / 2;
-        draw_text (ctx, m, x, y, text_width, state, use_base, selected_fill_pct);
-        
-        /* Action Icon */
-        if (has_action)
-        {
-          y = (req.height - icon_size) / 2;
-          draw_action (ctx, cell_hpadding, y, selected_fill_pct);
-        }
-      }
-    }
-    public override void size_request (out Requisition requisition)
-    {
-      requisition.width = precalc_req.width;
-      requisition.height = precalc_req.height;
-    }
-  }
-
-  public class ListView<T>: Gtk.Label
-  {
-    public abstract class Renderer: GLib.Object
-    {
-      /* Render ojb at state on ctx with req.width and req.height */
-      public abstract void render (Cairo.Context ctx, Requisition req, Gtk.StateType state,
-                                   bool use_base, double selected_fill_pct, void* obj);
-      public abstract void size_request (out Requisition requisition);
-      public signal void request_redraw ();
-      public signal void on_style_set ();
-      
-      protected Utils.ColorHelper ch;
-      public void set_color_helper (Utils.ColorHelper colorhelper)
-      {
-        this.ch = colorhelper;
-      }
-    }
-    public enum ScrollMode
-    {
-      TOP,
-      MIDDLE,
-      BOTTOM,
-      TOP_FORCED,
-      MIDDLE_FORCED,
-      BOTTOM_FORCED
-    }
-    /* Sets the scroll mode **not all scroll modes are implemented** */
-    public ScrollMode scroll_mode {get; set; default = ScrollMode.MIDDLE;}
-    /* Sets if ListView has to paint the style[BASE] background */
-    public bool use_base_background {get; set; default = true;}
-    /* Enable or disable the animation */
-    public bool animation_enabled {get; set; default = true;}
-    /* If Inihibit focus is true, the selection is not painted */
-    public void set_inhibit_focus (bool b)
-    {
-      inhibit_focus = b;
-      queue_draw ();
-    }
-    /* Selects a row */
-    public int selected {
-      get {
-        return selected_index;
-      }
-      set {
-        queue_draw ();
-        if (selected_index == value || data == null || value >= data.size) return;
-        selected_index = value;
-        update_voffsets ();
-      }
-    }
-    /* Specify the minimum visible rows (size_request depends on this) */
-    public int min_visible_rows {
-      get {
-        return min_rows;
-      }
-      set {
-        if (min_rows == value || value < 1) return;
-        min_rows = value;
-        queue_resize ();
-      }
-    }
-    /* Set a new list **Warning: The list is not copied** */
-    public void set_list (Gee.List<T>? new_data)
-    {
-      data = new_data;
-      if (new_data==null || scrollto >= new_data.size)
-      {
-        scrollto = 0;
-        selection_voffset = 0;
-        current_voffset = 0;
-        selected_index = -1;
-      }
-      this.queue_draw ();
-    }
-    /* Adds a data to the list */
-    public void add_data (T obj)
-    {
-      if (data == null)
-      {
-        data = new Gee.ArrayList<T> ();
-        current_voffset = 0;
-        selection_voffset = 0;
-        scrollto = 0;
-      }
-      data.add (obj);
-      this.queue_draw ();
-    }
-    /* Clears the list */
-    public void clear ()
-    {
-      data = null;
-      scrollto = 0;
-      selection_voffset = 0;
-      current_voffset = 0;
-      selected_index = -1;
-      this.queue_draw ();
-    }
-    /* Scrolls to row. */
-    public void scroll_to (int index)
-    {
-      if (data == null || index < 0 || index >= data.size)
-      {
-        scrollto = 0;
-        return;
-      }
-      scrollto = index;
-      update_voffsets ();
-    }
-    
-    private Utils.ColorHelper ch;
-    private Gee.List<T> data;
-    private Renderer renderer;
-    private int min_rows;
-    private int scrollto;
-    private int selected_index; //for now only single selection mode
-    private bool inhibit_focus = false;
-    private static const int FPS = 24;
-    private static const int ANIM_TIMEOUT = 1000 / FPS;
-    
-    public ListView (ListView.Renderer rend)
-    {
-      min_rows = 1;
-      selected_index = -1;
-      selection_voffset = 0;
-      scrollto = 0;
-      data = null;
-      this.renderer = rend;
-      this.renderer.on_style_set ();
-      renderer.request_redraw.connect (()=>{
-        this.queue_resize ();
-        this.queue_draw ();
-      });
-
-      ch = new Utils.ColorHelper (this);
-      rend.set_color_helper (ch);
-
-      this.style_set.connect (()=>{
-        this.renderer.on_style_set ();
-      });
-      this.show.connect (()=>{
-        scroll_to (scrollto);
-      });
-      this.realize.connect (()=>{
-        scroll_to (scrollto);
-      });
-      this.notify["scroll-mode"].connect (()=>{scroll_to (scrollto);});
-      
-      var config = (UIWidgetsConfig) ConfigService.get_default ().get_config ("ui", "widgets", typeof (UIWidgetsConfig));
-      animation_enabled = config.animation_enabled;
-    }
-    public override void size_request (out Requisition requisition)
-    {
-      renderer.size_request (out requisition);
-      requisition.height *= min_rows;
-    }
-    public override void size_allocate (Gdk.Rectangle allocation)
-    {
-      base.size_allocate (allocation);
-      if (!animation_enabled || tid == 0)
-        update_current_voffset ();
-      this.queue_draw ();
-    }
-    
-    private uint tid = 0;
-    private int current_voffset = 0;
-    private int selection_voffset = 0;
-    private void update_voffsets ()
-    {
-      if (!animation_enabled)
-      {
-        update_current_voffset ();
-      }
-      else
-      {
-        if (tid == 0)
-        {
-          tid = Timeout.add (ANIM_TIMEOUT, ()=>{
-            return update_current_voffset ();
-          });
-        }
-      }
-    }
-    private bool update_current_voffset ()
-    {
-      Requisition req = {0, 0};
-      renderer.size_request (out req);
-      // don't animate if this is not allocated
-      if (this.allocation.height <= 1)
-      {
-        current_voffset = 0;
-        selection_voffset = 0;
-        tid = 0;
-        return false;
-      }
-      int target = 0, selection_target = 0;
-      switch (scroll_mode)
-      {
-        //TODO: other layouts -> TOP, TOP_FORCED, etc
-        case ScrollMode.TOP_FORCED:
-          target = (int) (-scrollto * req.height);
-          break;
-        case ScrollMode.MIDDLE:
-          target = (int) (this.allocation.height / 2 - req.height / 2 - scrollto * req.height);
-          if (target > 0)
-            target = 0;
-          else if (data != null)
-          {
-            if (data.size * req.height + target < this.allocation.height)
-              target = this.allocation.height - (data.size * req.height);
-          }
-          if (target > 0)
-            target = 0;
-          break;
-        default: //ScrollMode.MIDDLE_FORCED
-          target = (int) (this.allocation.height / 2 - req.height / 2 - scrollto * req.height);
-          break;
-      }
-      if (selected_index >= 0)
-      {
-        selection_target = target + req.height * selected_index;
-      }
-      else
-        selection_target = 0;
-      if (!animation_enabled || !this.is_realized())
-      {
-        current_voffset = target;
-        selection_voffset = selection_target;
-        queue_draw ();
-        tid = 0;
-        return false;
-      }
-      if (target == current_voffset && selection_target == selection_voffset)
-      {
-        tid = 0;
-        queue_draw ();
-        return false; // stop animation
-      }
-      if (target != current_voffset)
-      {
-        int inc = (int) Math.fabs (target - current_voffset);
-        if (inc < 4.0)
-        {
-          current_voffset = target;
-        }
-        else
-        {
-          inc = int.max (1, inc / 2);
-          current_voffset += target > current_voffset ? inc : - inc;
-        }
-      }
-      if (selection_target != selection_voffset)
-      {
-        int inc = (int) Math.fabs (selection_target - selection_voffset) / 2;
-        inc = int.max (1, inc);
-        selection_voffset += selection_target > selection_voffset ? inc : - inc;
-      }
-      queue_draw ();
-      return true;
-    }
-    public int get_list_size ()
-    {
-      if (data == null) return 0;
-      return data.size;
-    }
-    public override bool expose_event (Gdk.EventExpose event)
-    {
-      var ctx = Gdk.cairo_create (this.window);
-      ctx.set_operator (Cairo.Operator.OVER);
-      ctx.translate (this.allocation.x, this.allocation.y);
-      double w = this.allocation.width;
-      double h = this.allocation.height;
-      ctx.rectangle (0, 0, w, h);
-      ctx.clip ();
-
-      ctx.set_font_options (this.get_screen().get_font_options());
-
-      if (use_base_background)
-      {
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
-        ctx.paint ();
-      }
-      
-      if (data == null || data.size < 1) return true;
-      
-      Requisition req = {0, 0};
-      renderer.size_request (out req);
-      req.height = int.max (1, req.height);
-      req.width = (int)w; //use allocation width
-      
-      if (!inhibit_focus && selected_index >= 0 && 
-          ( (0 <= selection_voffset <= h) || 
-            (0 <= (selection_voffset+req.height) <= h)
-          )
-         )
-      {
-        bool had_focus = Gtk.WidgetFlags.HAS_FOCUS in this.get_flags ();
-        // fool theme engine to use proper bg color
-        if (!had_focus) this.set_flags (Gtk.WidgetFlags.HAS_FOCUS);
-        Gtk.paint_flat_box (this.style, event.window, StateType.SELECTED,
-                            ShadowType.NONE, event.area, this, "cell_odd",
-                            this.allocation.x, this.allocation.y + selection_voffset, req.width, req.height);
-        if (!had_focus) this.unset_flags (Gtk.WidgetFlags.HAS_FOCUS);
-      }
-
-      int rows_to_process = (int)(h / req.height) * 2;
-      int i = (- current_voffset) / req.height - rows_to_process / 4;
-      if (i < 0)
-        i = 0;
-      rows_to_process += i;
-      double y1, y2;
-      //Timer t = new Timer ();
-      for (; i < rows_to_process && i < data.size; i++)
-      {
-        y1 = req.height * i + current_voffset;
-        y2 = y1 + req.height;
-        render_row_at (ctx, i, y1, h, req, ( 0 <= y1 < h ) || ( 0 <= y2 < h ));
-      }
-      //double elap = t.elapsed ();
-      //stderr.printf ("timer %.3f\n", elap);
-      return true;
-    }
-
-    private void render_row_at (Cairo.Context ctx, int row, double y, double h, Requisition req, bool required_now)
-    {
-      if (!required_now) return;
-      ctx.save ();
-      ctx.rectangle (0, double.max (0, y), req.width, double.min (req.height, h - y));
-      ctx.clip ();
-      ctx.translate (0, y);
-      double pct = 1.0;
-      if (selected_index == row) pct -= double.min (1.0 , (Math.fabs (y - selection_voffset) / req.height));
-
-      renderer.render (ctx, req, 
-                       !inhibit_focus && selected_index == row ? 
-                       Gtk.StateType.SELECTED : Gtk.StateType.NORMAL,
-                       use_base_background, pct, data.get (row));
-      ctx.restore ();
-    }
-  }
-  /* Result List stuff */
-  public class ResultBox: EventBox
-  {
-    private const int VISIBLE_RESULTS = 5;
-    private const int ICON_SIZE = 36;
-    private int mwidth;
-    private int nrows;
-
-    private VBox vbox;
-    private HBox status_box;
-    
-    private Utils.ColorHelper ch;
-    
-    public ResultBox (int width, int nrows = 5)
-    {
-      this.mwidth = width;
-      this.nrows = nrows;
-      ch = new Utils.ColorHelper (this);
-      build_ui();
-    }
-
-		private ListView<Match> view;
-		private MatchRenderer rend;
-		private Label status;
-		
-		private bool on_expose (Widget w, Gdk.EventExpose event) {
-        var ctx = Gdk.cairo_create (w.window);
-        /* Clear Stage */
-        ctx.set_operator (Cairo.Operator.CLEAR);
-        ctx.paint ();
-        ctx.set_operator (Cairo.Operator.OVER);
-
-        /* Prepare bg's colors using GtkStyle */
-        Pattern pat = new Pattern.linear(0, 0, 0, w.allocation.height);
-
-        double status_bar_pct = 15.0 / w.allocation.height;
-        ch.add_color_stop_rgba (pat, 1.0 - status_bar_pct, 0.95, ch.StyleType.BASE, StateType.NORMAL);
-        ch.add_color_stop_rgba (pat, 1.0 - 0.85 * status_bar_pct, 0.95, ch.StyleType.BG, StateType.NORMAL);
-        ch.add_color_stop_rgba (pat, 1.0, 0.95, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
-        /* Prepare and draw top bg's rect */
-        ctx.rectangle (0, 0, w.allocation.width, w.allocation.height);
-        ctx.set_source (pat);
-        ctx.fill ();
-
-        /* Propagate Expose */               
-        Bin c = (w is Bin) ? (Bin) w : null;
-        if (c != null)
-          c.propagate_expose (this.get_child(), event);
-        
-        return true;
-    }
-
-    private void build_ui()
-    {
-      rend = new MatchRenderer ();
-      rend.set_width_request (this.mwidth);
-      view = new ListView<Match> (rend);
-      view.min_visible_rows = this.nrows;
-      
-      vbox = new VBox (false, 0);
-      this.expose_event.connect (on_expose);
-      vbox.border_width = 0;
-      this.add (vbox);
-      vbox.pack_start (view);
-      status_box = new HBox (false, 0);
-      status_box.set_size_request (-1, 15);
-      vbox.pack_start (status_box, false);
-      status = new Label (null);
-      status.set_alignment (0, 0);
-      status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
-      var logo = new Label (null);
-      logo.set_alignment (1, 0);
-      logo.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
-      status_box.pack_start (status, false, false, 10);
-      status_box.pack_start (new Label (null), true, false);
-      status_box.pack_start (logo, false, false, 10);
-    }
-
-    public void update_matches (Gee.List<Synapse.Match>? rs)
-    {
-      if (rs != null)
-      {
-        foreach (Synapse.Match m in rs)
-        {
-          m.description = Utils.replace_home_path_with (m.description, _("Home"), " > ");
-        }
-      }
-      view.set_list (rs);
-      if (rs==null || rs.size == 0)
-        status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
-      else
-        status.set_markup (Markup.printf_escaped (_("<b>1 of %d</b>"), view.get_list_size ()));
-    }
-    public void move_selection_to_index (int i)
-    {
-      if (view.get_list_size () == 0) return;
-      view.scroll_to (i);
-      view.selected = i;
-      status.set_markup (Markup.printf_escaped (_("<b>%d of %d</b>"), i + 1, view.get_list_size ()));
-    }
   }
 
 
@@ -858,6 +151,7 @@ namespace Synapse.Gui
       Widget t = widgets[pos1];
       widgets[pos1] = widgets[pos2];
       widgets[pos2] = t;
+      this.queue_resize ();
     }
 
     public override void add (Widget widget)
@@ -1173,61 +467,70 @@ namespace Synapse.Gui
       return true;
     }
   }
+  public class SensitiveWidget: Gtk.EventBox
+  {
+    private Widget _widget;
+    public Widget widget {get {return this._widget;}}
+
+    public SensitiveWidget (Widget widget)
+    {
+      this.above_child = false;
+      this.visible_window = false;
+      this.set_has_window (false);
+      
+      this._widget = widget;
+      this.add (this._widget);
+      this._widget.show ();
+    }
+    
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      this.propagate_expose (this.get_child (), event);
+      return true;
+    }
+  }
   public class NamedIcon: Gtk.Image
   {
     public string not_found_name {get; set; default = "unknown";}
     private string current;
     private IconSize current_size;
-    private uint tid; //for timer
-    private Utils.ColorHelper ch;
-    public int update_timeout {get; set; default = -1;}
-    public bool stop_prev_timeout {get; set; default = false;}
-    public bool glow {get; set; default = false;}
-    public NamedIcon ()
+
+    construct
     {
       current = "";
       current_size = IconSize.DIALOG;
-      tid = 0;
-      ch = new Utils.ColorHelper (this);
-      this.notify["glow"].connect (this.queue_draw);
     }
+
     public override bool expose_event (Gdk.EventExpose event)
     {
-      if (glow)
-      {
-        var ctx = Gdk.cairo_create (this.window);
-        ctx.set_operator (Cairo.Operator.OVER);
+      if (current == null || current == "") return true;
+      var ctx = Gdk.cairo_create (this.window);
+      ctx.set_operator (Cairo.Operator.OVER);
 
-        /* Prepare bg's colors using GtkStyle */
-        double xc = this.allocation.x + this.allocation.width / 2;
-        double yc = this.allocation.y + this.allocation.height / 2;
-        double rad = double.min ( this.allocation.height, this.allocation.width ) / 2.0;
-        Pattern pat = new Pattern.radial (xc, yc, 0, xc, yc, rad);
-        ch.add_color_stop_rgba (pat, 0.7, 1.0, ch.StyleType.BASE, StateType.SELECTED);
-        ch.add_color_stop_rgba (pat, 1, 0, ch.StyleType.BASE, StateType.SELECTED);
-        /* Prepare and draw top bg's rect */
-        ctx.rectangle (xc - rad, yc - rad, 2*rad, 2*rad);
-        ctx.set_source (pat);
-        ctx.clip ();
-        ctx.paint ();
-      }
-      return base.expose_event (event);
+      ctx.translate (this.allocation.x, this.allocation.y);
+      ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
+      ctx.clip ();
+
+      Gdk.Pixbuf icon_pixbuf = IconCacheService.get_default ().get_icon (current, pixel_size);
+      if (icon_pixbuf == null) return true;
+
+      Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 
+          (this.allocation.width - icon_pixbuf.get_width ()) / 2, 
+          (this.allocation.height - icon_pixbuf.get_height ()) / 2);
+      ctx.paint ();
+
+      return true;
     }
     public new void clear ()
     {
-      if (tid != 0)
-      {
-        Source.remove (tid);
-        tid = 0;
-      }
       current = "";
-      base.clear ();
+      this.queue_draw ();
     }
     public void set_icon_name (string? name, IconSize size)
     {
       if (name == null)
         name = "";
-      if (name == current)
+      if (name == current && name != "")
         return;
       else
       {
@@ -1237,48 +540,7 @@ namespace Synapse.Gui
         }
         current = name;
         current_size = size;
-        if (update_timeout <= 0)
-        {
-          real_update_image ();
-        }
-        else
-        {
-          if (tid != 0 && stop_prev_timeout)
-          {
-            Source.remove (tid);
-            tid = 0;
-          }
-          if (tid == 0)
-          {
-            base.clear ();
-            tid = Timeout.add (update_timeout,
-              () => {tid = 0; real_update_image (); return false;}
-            );
-          }
-        }
-      }
-    }
-    private void real_update_image ()
-    {
-      try
-      {
-        var icon = GLib.Icon.new_for_string (current);
-        //make sure that it exist in the icon theme
-        var iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, 32, 0);
-        if (iconinfo == null)
-          throw new WidgetError.ICON_NOT_FOUND ("Requested icon could not be found.");
-        this.set_from_gicon (icon, current_size);
-      }
-      catch (Error err)
-      {
-        if (current != not_found_name)
-        {
-          if (not_found_name == "")
-            this.clear ();
-          else
-            this.set_from_icon_name (not_found_name, current_size);
-          current = not_found_name;
-        }
+        this.queue_draw ();
       }
     }
   }
@@ -1554,7 +816,7 @@ namespace Synapse.Gui
                                 this.allocation.y,
                                 this.allocation.x,
                                 this.allocation.y + this.allocation.height);
-      if (entered)
+      if (entered || this.get_state () == StateType.SELECTED)
       {
         ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.SELECTED);
       }
@@ -1899,7 +1161,7 @@ namespace Synapse.Gui
       var ctx = new Cairo.Context (this.cached_surface);
 
       Pango.cairo_update_context (ctx, layout.get_context ());
-      ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, StateType.NORMAL);
+      ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, this.get_state ());
       ctx.set_operator (Cairo.Operator.OVER);
       string s;
       for (int i = 0; i < texts.size; i++)
