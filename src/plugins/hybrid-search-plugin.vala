@@ -542,7 +542,7 @@ namespace Synapse
         Idle.add (search.callback); // FIXME: this could cause issues
       });
 
-      if ((data_sink.get_plugin ("SynapseZeitgeistPlugin") as ItemProvider).enabled)
+      if (data_sink.is_plugin_enabled (Type.from_name ("SynapseZeitgeistPlugin")))
       {
         // wait for results from ZeitgeistPlugin
         yield;
