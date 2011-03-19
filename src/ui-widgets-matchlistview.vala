@@ -674,6 +674,7 @@ namespace Synapse.Gui
     private int dragdrop_target_item = 0;
     public override bool button_press_event (Gdk.EventButton event)
     {
+      if (this.tid != 0) return true;
       this.dragdrop_target_item = get_item_at_pos ((int)event.y);
       var tl = new TargetList ({});
       
