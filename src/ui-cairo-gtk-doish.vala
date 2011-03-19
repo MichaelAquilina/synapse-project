@@ -79,7 +79,6 @@ namespace Synapse.Gui
       container_top.border_width = PADDING;
       /* ==> Result box */
       results_container = new HSelectionContainer (null, 0);
-      results_container.border_width = 2;
       results_container.set_separator_visible (false);
       
       results_match = new ResultBox (UI_WIDTH - 4);
@@ -91,7 +90,7 @@ namespace Synapse.Gui
       results_container.add (results_match);
       results_container.add (results_action);
       var hbox_result_box = new HBox (true, 0);
-      hbox_result_box.border_width = 2;
+      hbox_result_box.border_width = 0;
       hbox_result_box.pack_start (results_container,false,false);
       /* <== Pack */
       container.pack_start (container_top);
@@ -244,8 +243,8 @@ namespace Synapse.Gui
       ctx.set_operator (Operator.CLEAR);
       ctx.paint ();
       ctx.set_operator (Operator.OVER);
-      double w = container_top.allocation.width - 1;
-      double h = container_top.allocation.height - 1 - SHADOW_SIZE;
+      double w = container_top.allocation.width;
+      double h = container_top.allocation.height - SHADOW_SIZE;
       double x = container_top.allocation.x;
       double y = container_top.allocation.y;
       

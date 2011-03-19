@@ -312,6 +312,8 @@ namespace Synapse.Gui
       get; set; default = 5;
     }
     
+    private bool inhibit_move;
+    
     public enum Behavior
     {
       TOP,
@@ -405,12 +407,13 @@ namespace Synapse.Gui
     public MatchListView (MatchViewRendererBase mr)
     {
       ch = new Utils.ColorHelper (this);
+      inhibit_move = false;
       renderer = mr;
       // Add the renderer to screen as a child, this way it will receive all events.
       mr.show ();
       mr.set_parent (this);
       // Add our window to get mouse events
-      this.above_child = true;
+      this.above_child = false;
       this.visible_window = false;
       this.set_has_window (false);
       this.set_events (Gdk.EventMask.BUTTON_PRESS_MASK |
@@ -494,6 +497,7 @@ namespace Synapse.Gui
         this.queue_draw ();
         return false;
       }
+      if (inhibit_move) return false;
       bool needs_animation = false;
       if (this.offset != this.toffset)
       {
@@ -570,6 +574,7 @@ namespace Synapse.Gui
       this.items = list;
       this.select_index = selected_index;
       this.goto_index = targetted_index;
+      inhibit_move = false;
       this.update_target_offsets ();
       this.queue_draw ();
     }
@@ -587,6 +592,7 @@ namespace Synapse.Gui
       ctx.translate (this.allocation.x, this.allocation.y);
       ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
       ctx.clip ();
+      //return true;
       ctx.set_operator (Cairo.Operator.OVER);
       
       if (this.use_base_colors)
@@ -611,6 +617,8 @@ namespace Synapse.Gui
           // fool theme engine to use proper bg color
           if (!had_focus) this.set_flags (Gtk.WidgetFlags.HAS_FOCUS);
           ypos = int.max (this.soffset, 0) + this.allocation.y;
+          event.area.x = this.allocation.x;
+          event.area.width = this.allocation.width;
           Gtk.paint_flat_box (this.style, event.window, StateType.SELECTED,
                               ShadowType.NONE, event.area, this, "cell_odd",
                               this.allocation.x, ypos,
@@ -650,6 +658,7 @@ namespace Synapse.Gui
     public override bool scroll_event (Gdk.EventScroll event)
     {
       if (this.items == null) return true;
+      inhibit_move = false;
       int k = 1;
       if (event.direction == event.direction.UP) k = this.goto_index == 0 ? 0 : -1;
 
@@ -686,8 +695,17 @@ namespace Synapse.Gui
         }
         else
         {
+          this.inhibit_move = true;
           this.set_indexes (this.dragdrop_target_item, this.dragdrop_target_item);
           this.selected_index_changed (this.select_index);
+          Timeout.add (Gtk.Settings.get_default ().gtk_double_click_time ,()=>{
+            if (inhibit_move)
+            {
+              inhibit_move = false;
+              update_current_offsets ();
+            }
+            return false;
+          });
         }
       }
 
@@ -746,6 +764,8 @@ namespace Synapse.Gui
       this.mwidth = width;
       this.nrows = nrows;
       this.set_has_window (false);
+      this.above_child = false;
+      this.visible_window = false;
       ch = new Utils.ColorHelper (this);
       build_ui();
     }
