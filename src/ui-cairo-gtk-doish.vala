@@ -299,7 +299,7 @@ namespace Synapse.Gui
                                      this.match_label.allocation.y -
                                           this.match_icon.allocation.y +
                                           this.match_label.allocation.height + 12,
-                                     BORDER_RADIUS);
+                                     BORDER_RADIUS / 2);
       ch.set_source_rgba (ctx, this.searching_for_matches ? 0.3 : 0.08, ch.StyleType.FG, StateType.SELECTED);
       ctx.clip ();
       ctx.paint ();
@@ -311,7 +311,7 @@ namespace Synapse.Gui
                                      this.action_label.allocation.y -
                                           this.action_icon.allocation.y +
                                           this.action_label.allocation.height + 12,
-                                     BORDER_RADIUS);
+                                     BORDER_RADIUS / 2);
       ch.set_source_rgba (ctx, !this.searching_for_matches ? 0.3 : 0.08, ch.StyleType.FG, StateType.SELECTED);
       ctx.clip ();
       ctx.paint ();

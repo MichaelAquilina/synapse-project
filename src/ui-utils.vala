@@ -719,6 +719,56 @@ namespace Synapse.Gui
         }
       }
     }
+    /* Code from Gnome-Do */
+    public static void present_window (Gtk.Window window)
+    {
+      window.present ();
+      window.window.raise ();
+      int i = 0;
+      Timeout.add (100, ()=>{
+        if (i >= 100)
+          return false;
+        ++i;
+        return !try_grab_window (window);
+      });
+    }
+    /* Code from Gnome-Do */
+    public static void unpresent_window (Gtk.Window window)
+    {
+      uint time;
+      time = Gtk.get_current_event_time();
+
+      Gdk.pointer_ungrab (time);
+      Gdk.keyboard_ungrab (time);
+      Gtk.grab_remove (window);
+    }
+    /* Code from Gnome-Do */
+    private static bool try_grab_window (Gtk.Window window)
+    {
+      uint time = Gtk.get_current_event_time();
+      if (Gdk.pointer_grab (window.get_window(),
+            true,
+            Gdk.EventMask.BUTTON_PRESS_MASK |
+            Gdk.EventMask.BUTTON_RELEASE_MASK |
+            Gdk.EventMask.POINTER_MOTION_MASK,
+            null,
+            null,
+            time) == Gdk.GrabStatus.SUCCESS)
+      {
+        if (Gdk.keyboard_grab (window.get_window(), true, time) == Gdk.GrabStatus.SUCCESS) {
+          time = Gtk.get_current_event_time();
+          Gdk.pointer_ungrab (time);
+          Gdk.keyboard_ungrab (time);
+          Gtk.grab_add (window);
+          return true;
+        } else {
+          Gdk.pointer_ungrab (time);
+          return false;
+        }
+      }
+      return false;
+    }
+
   }
 }
 

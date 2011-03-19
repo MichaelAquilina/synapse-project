@@ -492,12 +492,14 @@ namespace Synapse.Gui
       if (window.visible)
       {
         hide ();
+        //Utils.unpresent_window (window); // unstable code needs fixing
         return;
       }
       show ();
       window.present_with_time (timestamp);
       window.get_window ().raise ();
       window.get_window ().focus (timestamp);
+      //Utils.present_window (window); // unstable code needs fixing
     }    
     protected override void set_throbber_visible (bool visible)
     {

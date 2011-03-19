@@ -641,7 +641,7 @@ namespace Synapse.Gui
       
       return true;
     }
-    
+
     private int get_item_at_pos (int y)
     {
       return (this.offset + y) / this.row_height;
