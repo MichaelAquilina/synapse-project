@@ -4,6 +4,8 @@ src/ui-cairo-gtk-virgilio.c
 src/ui-interface.c
 src/ui-settings.c
 src/ui-widgets.c
+src/ui-widgets-matchlistview.c
+src/ui-icon-cache-service.c
 src/core/common-actions.c
 src/plugins/banshee-plugin.c
 src/plugins/calculator-plugin.c
