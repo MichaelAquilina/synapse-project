@@ -592,7 +592,6 @@ namespace Synapse.Gui
       ctx.translate (this.allocation.x, this.allocation.y);
       ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
       ctx.clip ();
-      //return true;
       ctx.set_operator (Cairo.Operator.OVER);
       
       if (this.use_base_colors)
@@ -782,8 +781,6 @@ namespace Synapse.Gui
         ctx.translate (this.allocation.x, this.allocation.y);
         ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
         ctx.clip ();
-        ctx.set_source_rgba (1, 0, 0, 1);
-        ctx.paint ();
         /* Prepare bg's colors using GtkStyle */
         Pattern pat = new Pattern.linear(0, 0, 0, this.allocation.height);
 

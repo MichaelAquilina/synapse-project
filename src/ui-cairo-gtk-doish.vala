@@ -254,21 +254,20 @@ namespace Synapse.Gui
         // shadow
         if (this.list_visible)
         {
-          //draw shadow
+          //draw shadow for match list
           var sp = SHADOW_SIZE + BORDER_RADIUS;
+          Utils.cairo_make_shadow_for_rect (ctx, results_container.allocation.x,
+                                                 results_container.allocation.y - sp,
+                                                 results_container.allocation.width,
+                                                 results_container.allocation.height + sp,
+                                                 0, r, g, b, SHADOW_SIZE);
+          //draw background for match list
           ctx.rectangle (results_container.allocation.x,
                          results_container.allocation.y - sp,
                          results_container.allocation.width,
                          results_container.allocation.height + sp);
           ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, StateType.NORMAL);
           ctx.fill ();
-          ctx.translate (0.5, 0.5);
-          Utils.cairo_make_shadow_for_rect (ctx, results_container.allocation.x,
-                                                 results_container.allocation.y - sp,
-                                                 results_container.allocation.width,
-                                                 results_container.allocation.height + sp,
-                                                 0, r, g, b, SHADOW_SIZE);
-          ctx.translate (-0.5, -0.5);
         }
         Utils.cairo_make_shadow_for_rect (ctx, x, y, w, h, BORDER_RADIUS,
                                           r, g, b, SHADOW_SIZE);
