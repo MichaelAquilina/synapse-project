@@ -437,7 +437,13 @@ namespace Synapse
                 // file info is now initialized
                 if (fi.match_obj != null && fi.file_type in q.query_type)
                 {
-                  int base_relevancy = matcher.value - Match.Score.URI_PENALTY;
+                  //Does match only the path, use base_relevancy like ZG plugin does for non-matched
+                  int base_relevancy = Match.Score.POOR + Match.Score.INCREMENT_MINOR;
+                  if (matcher.key.match (fi.match_obj.title))
+                  {
+                    //Matches title! Great news!
+                    base_relevancy = matcher.value - Match.Score.URI_PENALTY;
+                  }
                   float pop = rel_srv.get_uri_popularity (fi.uri);
                   results.add (fi.match_obj, 
                     RelevancyService.compute_relevancy (base_relevancy, pop));
