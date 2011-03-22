@@ -84,6 +84,7 @@ namespace Synapse
         settings.present_with_time (timestamp);
         settings.get_window ().raise ();
         settings.get_window ().focus (timestamp);
+        ui.hide ();
       });
     }
     

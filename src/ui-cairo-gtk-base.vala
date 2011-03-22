@@ -34,6 +34,42 @@ namespace Synapse
        widget_class "*SynapseWindow*" style : highest "synapse" 
        and set your custom colors
     */
+    construct
+    {
+      this.set_events (this.get_events () | Gdk.EventMask.BUTTON_PRESS_MASK);
+    }
+    
+    public override bool button_press_event (Gdk.EventButton event)
+    {
+      int x = (int)event.x_root;
+      int y = (int)event.y_root;
+      int rx, ry;
+      this.get_window ().get_root_origin (out rx, out ry);
+
+      if (!Gui.Utils.is_point_in_mask (this, x - rx, y - ry)) this.vanish ();
+
+      return false;
+    }
+    
+    public virtual signal void summon ()
+    {
+      //Synapse.Utils.Logger.log (this, "Summon");
+      this.show ();
+      Gui.Utils.present_window (this);
+    }
+    
+    public virtual signal void vanish ()
+    {
+      //Synapse.Utils.Logger.log (this, "Vanish");
+      Gui.Utils.unpresent_window (this);
+      this.hide ();
+    }
+    
+    public void force_grab ()
+    {
+      //Synapse.Utils.Logger.log (this, "ForceGrab");
+      Gui.Utils.present_window (this);
+    }
   }
 }
 
@@ -86,7 +122,7 @@ namespace Synapse.Gui
     
     protected const int SHADOW_SIZE = 12; // shadow preferred size
 
-    protected Window window = null;
+    protected Synapse.Window window = null;
     protected MenuButton menu = null;
     protected Throbber throbber = null;
     protected HTextSelector flag_selector = null;
@@ -100,17 +136,17 @@ namespace Synapse.Gui
     construct
     {
       window = new Synapse.Window ();
+      window.set_app_paintable (true);
       window.skip_taskbar_hint = true;
       window.skip_pager_hint = true;
       window.set_position (WindowPosition.CENTER);
       window.set_decorated (false);
       window.set_resizable (false);
-      window.set_type_hint (Gdk.WindowTypeHint.DIALOG);
+      window.set_type_hint (Gdk.WindowTypeHint.SPLASHSCREEN);
       window.set_keep_above (true);
       window.window_state_event.connect (on_window_state_event);
-      window.notify["is-active"].connect (()=>{
-        Idle.add (check_focus);
-      });
+
+      window.vanish.connect (this.hide_and_reset);
       
       ch = new Utils.ColorHelper (window);
       
@@ -124,6 +160,12 @@ namespace Synapse.Gui
 
       /* Build UI */
       build_ui ();
+      
+      if (menu != null)
+      {
+        menu.get_menu ().show.connect (window.force_grab);
+        menu.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+      }
 
       Utils.ensure_transparent_bg (window);
       on_composited_changed (window);
@@ -153,15 +195,6 @@ namespace Synapse.Gui
         window.set_keep_above (true);
       }
 
-      return false;
-    }
-    
-    private bool check_focus ()
-    {
-      if (!window.is_active && (menu == null || !menu.is_menu_visible ()))
-      {
-        hide ();
-      }
       return false;
     }
 
@@ -228,12 +261,12 @@ namespace Synapse.Gui
 
     protected virtual void hide_and_reset ()
     {
-      window.hide ();
       searching_for_matches = true;
       show_list (false);
       flag_selector.selected = 3;
       reset_search ();
       searching_for_changed ();
+      //Synapse.Utils.Logger.log (this, "hide and reset");
     }
 
     protected virtual void clear_search_or_hide_pressed ()
@@ -253,7 +286,7 @@ namespace Synapse.Gui
       }
       else
       {
-        hide ();
+        window.vanish ();
       }
     }
     
@@ -328,7 +361,7 @@ namespace Synapse.Gui
     {
       if (execute ())
       {
-        hide ();
+        window.vanish ();
       }
       else
       {
@@ -480,26 +513,21 @@ namespace Synapse.Gui
       show_list (true);
       Utils.move_window_to_center (window);
       show_list (false);
-      window.show ();
+      window.summon ();
       set_input_mask ();
     }
     public override void hide ()
     {
-      hide_and_reset ();
+      window.vanish ();
     }
     public override void show_hide_with_time (uint32 timestamp)
     {
       if (window.visible)
       {
         hide ();
-        //Utils.unpresent_window (window); // unstable code needs fixing
         return;
       }
       show ();
-      window.present_with_time (timestamp);
-      window.get_window ().raise ();
-      window.get_window ().focus (timestamp);
-      //Utils.present_window (window); // unstable code needs fixing
     }    
     protected override void set_throbber_visible (bool visible)
     {

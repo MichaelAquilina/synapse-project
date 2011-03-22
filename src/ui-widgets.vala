@@ -770,6 +770,12 @@ namespace Synapse.Gui
       
       menu.show_all ();
     }
+    
+    public Gtk.Menu get_menu ()
+    {
+      return menu;
+    }
+    
     public override void enter ()
     {
       entered = true;

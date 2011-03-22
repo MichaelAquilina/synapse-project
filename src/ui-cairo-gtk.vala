@@ -156,7 +156,6 @@ namespace Synapse.Gui
       /* MenuThrobber item */
       menu = new MenuButton ();
       menu.button_scale = 1.0;
-      menu.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       menu.set_size_request (10, 10);
       {
         var main_vbox = new VBox (false, 0);

@@ -140,7 +140,6 @@ namespace Synapse.Gui
 
       /* Menu item */
       menu = new MenuButton ();
-      menu.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       menu.button_scale = 1.0;
       menu.set_size_request (10, 20);
       {
