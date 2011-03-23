@@ -135,15 +135,17 @@ namespace Synapse.Gui
     private Gee.Map<string, Theme?> themes;
     private bool autostart;
     private unowned DataSink data_sink;
+    private unowned KeyComboConfig key_combo_config;
     private Gtk.ListStore model;
     private UIConfig config;
     
     public bool indicator_active { get { return config.show_indicator; } }
 
-    public SettingsWindow (DataSink data_sink)
+    public SettingsWindow (DataSink data_sink, KeyComboConfig key_combo_config)
     {
       this.title = _("Synapse - Settings");
       this.data_sink = data_sink;
+      this.key_combo_config = key_combo_config;
       this.set_position (WindowPosition.CENTER);
       this.set_size_request (500, 450);
       this.resizable = false;
@@ -238,27 +240,47 @@ namespace Synapse.Gui
       init_general_options ();
     }
     
+    private string [,] key_combos = { //activate has to stay in first position!
+        {"activate", _("Activate")},
+        {"execute", _("Execute")},
+        {"execute-without-hide", _("Execute without hiding")},
+        {"alternative-delete-char", _("Alternative Delete")},
+        {"next-match", _("Next Result")},
+        {"prev-match", _("Previous Result")},
+        {"first-match", _("First Result")},
+        {"last-match", _("Last Result")},
+        {"next-match_page", _("Next 5 Results")},
+        {"prev-match_page", _("Previous 5 Results")},
+        {"next-category", _("Next Category")},
+        {"prev-category", _("Previous Category")},
+        {"next-search-type", _("Next Pane")},
+        {"prev-search-type", _("Previous Pane")},
+        {"paste", _("Paste")}
+      };
+
     private UI.Widgets.TileView tile_view;
-
-    private static string? get_name_from_key (uint keyval, Gdk.ModifierType mods)
+    
+    private int check_keybinding_in_use (int for_index, string keyname)
     {
-      unowned string keyname = Gdk.keyval_name (Gdk.keyval_to_lower (keyval));
-      if (keyname == null) return null;
-      
-      string res = "";
-      if (Gdk.ModifierType.SHIFT_MASK in mods) res += "<Shift>";
-      if (Gdk.ModifierType.CONTROL_MASK in mods) res += "<Control>";
-      if (Gdk.ModifierType.MOD1_MASK in mods) res += "<Alt>";
-      if (Gdk.ModifierType.MOD2_MASK in mods) res += "<Mod2>";
-      if (Gdk.ModifierType.MOD3_MASK in mods) res += "<Mod3>";
-      if (Gdk.ModifierType.MOD4_MASK in mods) res += "<Mod4>";
-      if (Gdk.ModifierType.MOD5_MASK in mods) res += "<Mod5>";
-      if (Gdk.ModifierType.META_MASK in mods) res += "<Meta>";
-      if (Gdk.ModifierType.SUPER_MASK in mods) res += "<Super>";
-      if (Gdk.ModifierType.HYPER_MASK in mods) res += "<Hyper>";
-
-      res += keyname;
-      return res;
+      string combo;
+      for (int j = 0; j < key_combos.length[0]; j++)
+      {
+        if (j == for_index) continue; //key already setted
+        key_combo_config.get (key_combos[j, 0], out combo);
+        if (combo == keyname)
+        {
+          string cannot_bind = _("Shortcut already in use");
+          cannot_bind = "%s: \"%s\"".printf (cannot_bind, keyname);
+          Synapse.Utils.Logger.warning (this, cannot_bind);
+          var d = new Gtk.MessageDialog (this, 0, MessageType.ERROR, 
+                                         ButtonsType.CLOSE,
+                                         "%s", cannot_bind);
+          d.run ();
+          d.destroy ();
+          return j;
+        }
+      }
+      return -1;
     }
     
     private void build_ui ()
@@ -349,21 +371,46 @@ namespace Synapse.Gui
       (ren as CellRendererAccel).accel_edited.connect (
         (a, path, accel_key, accel_mods, keycode) =>
       {
-        string? keyname = get_name_from_key (accel_key, accel_mods);
-        this.set_keybinding (keyname ?? "");
+        string? keyname = KeyComboConfig.get_name_from_key (accel_key, accel_mods);
+
+        int index = path.to_int ();
+        if (index == 0) // Activate
+        {
+          if (check_keybinding_in_use (index, keyname) >= 0) return;
+          this.set_keybinding (keyname ?? "");
+          key_combo_config.set (key_combos[index, 0], keyname ?? "");
+          key_combo_config.update_bindings ();
+          return;
+        }
+        if (keyname == null) return;
+        // check if already in use
+        if (check_keybinding_in_use (index, keyname) >= 0) return;
+        // update config
+        key_combo_config.set (key_combos[index, 0], keyname);
+        key_combo_config.update_bindings ();
+        // update UI
+        Gtk.TreeIter iter;
+        model.get_iter_from_string (out iter, path);
+        model.set (iter, 1, keyname);
       });
       (ren as CellRendererAccel).accel_cleared.connect (
         (a, path) =>
       {
-        this.set_keybinding ("");
+        int index = path.to_int ();
+        if (index == 0) this.set_keybinding ("");
       });
       col = new TreeViewColumn.with_attributes (_("Shortcut"), ren, "text",1);
       treeview.append_column (col);
 
       // add the actual item
-      Gtk.TreeIter iter;
-      model.append (out iter);
-      model.set (iter, 0, _("Activate"));
+      for (int j = 0; j < key_combos.length[0]; j++)
+      {
+        Gtk.TreeIter iter;
+        model.append (out iter);
+        string combo;
+        key_combo_config.get (key_combos[j, 0], out combo);
+        model.set (iter, 0, key_combos[j, 1], 1, combo);
+      }
       
       /* Add info */
       

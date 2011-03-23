@@ -34,6 +34,42 @@ namespace Synapse
        widget_class "*SynapseWindow*" style : highest "synapse" 
        and set your custom colors
     */
+    construct
+    {
+      this.set_events (this.get_events () | Gdk.EventMask.BUTTON_PRESS_MASK);
+    }
+    
+    public override bool button_press_event (Gdk.EventButton event)
+    {
+      int x = (int)event.x_root;
+      int y = (int)event.y_root;
+      int rx, ry;
+      this.get_window ().get_root_origin (out rx, out ry);
+
+      if (!Gui.Utils.is_point_in_mask (this, x - rx, y - ry)) this.vanish ();
+
+      return false;
+    }
+    
+    public virtual signal void summon ()
+    {
+      //Synapse.Utils.Logger.log (this, "Summon");
+      this.show ();
+      Gui.Utils.present_window (this);
+    }
+    
+    public virtual signal void vanish ()
+    {
+      //Synapse.Utils.Logger.log (this, "Vanish");
+      Gui.Utils.unpresent_window (this);
+      this.hide ();
+    }
+    
+    public void force_grab ()
+    {
+      //Synapse.Utils.Logger.log (this, "ForceGrab");
+      Gui.Utils.present_window (this);
+    }
   }
 }
 
@@ -86,7 +122,7 @@ namespace Synapse.Gui
     
     protected const int SHADOW_SIZE = 12; // shadow preferred size
 
-    protected Window window = null;
+    protected Synapse.Window window = null;
     protected MenuButton menu = null;
     protected Throbber throbber = null;
     protected HTextSelector flag_selector = null;
@@ -100,17 +136,17 @@ namespace Synapse.Gui
     construct
     {
       window = new Synapse.Window ();
+      window.set_app_paintable (true);
       window.skip_taskbar_hint = true;
       window.skip_pager_hint = true;
       window.set_position (WindowPosition.CENTER);
       window.set_decorated (false);
       window.set_resizable (false);
-      window.set_type_hint (Gdk.WindowTypeHint.DIALOG);
+      window.set_type_hint (Gdk.WindowTypeHint.SPLASHSCREEN);
       window.set_keep_above (true);
       window.window_state_event.connect (on_window_state_event);
-      window.notify["is-active"].connect (()=>{
-        Idle.add (check_focus);
-      });
+
+      window.vanish.connect (this.hide_and_reset);
       
       ch = new Utils.ColorHelper (window);
       
@@ -124,6 +160,12 @@ namespace Synapse.Gui
 
       /* Build UI */
       build_ui ();
+      
+      if (menu != null)
+      {
+        menu.get_menu ().show.connect (window.force_grab);
+        menu.settings_clicked.connect (()=>{this.show_settings_clicked ();});
+      }
 
       Utils.ensure_transparent_bg (window);
       on_composited_changed (window);
@@ -153,15 +195,6 @@ namespace Synapse.Gui
         window.set_keep_above (true);
       }
 
-      return false;
-    }
-    
-    private bool check_focus ()
-    {
-      if (!window.is_active && (menu == null || !menu.is_menu_visible ()))
-      {
-        hide ();
-      }
       return false;
     }
 
@@ -228,12 +261,12 @@ namespace Synapse.Gui
 
     protected virtual void hide_and_reset ()
     {
-      window.hide ();
       searching_for_matches = true;
       show_list (false);
       flag_selector.selected = 3;
       reset_search ();
       searching_for_changed ();
+      //Synapse.Utils.Logger.log (this, "hide and reset");
     }
 
     protected virtual void clear_search_or_hide_pressed ()
@@ -253,7 +286,7 @@ namespace Synapse.Gui
       }
       else
       {
-        hide ();
+        window.vanish ();
       }
     }
     
@@ -328,7 +361,7 @@ namespace Synapse.Gui
     {
       if (execute ())
       {
-        hide ();
+        window.vanish ();
       }
       else
       {
@@ -339,137 +372,137 @@ namespace Synapse.Gui
     
     protected virtual bool key_press_event (Gdk.EventKey event)
     {
-      /* Check for text input */
-      if (im_context.filter_keypress (event)) return true;
-
-      /* Check for Paste command Ctrl+V */
-      if ((event.state & Gdk.ModifierType.CONTROL_MASK) != 0 && 
-          (Gdk.keyval_to_lower (event.keyval) == (uint)'v'))
+      /* Check for commands */
+      KeyComboConfig.Commands command = 
+        this.key_combo_config.get_command_from_eventkey (event);
+      if (command != command.INVALID_COMMAND)
       {
-        var display = window.get_display ();
-        var clipboard = Clipboard.get_for_display (display, Gdk.SELECTION_CLIPBOARD);
-        // Get text from clipboard
-        string text = clipboard.wait_for_text ();
-        if (searching_for_matches)
-          set_match_search (get_match_search () + text);
-        else
-          set_action_search (get_action_search () + text);
-        search_string_changed ();
+        switch (command)
+        {
+          case KeyComboConfig.Commands.EXECUTE_WITHOUT_HIDE:
+            execute ();
+            searching_for_matches = true;
+            searching_for_changed ();
+            break;
+          case KeyComboConfig.Commands.EXECUTE:
+            command_execute ();
+            break;
+          case KeyComboConfig.Commands.SEARCH_DELETE_CHAR:
+            search_delete_char ();
+            break;
+          case KeyComboConfig.Commands.CLEAR_SEARCH_OR_HIDE:
+            clear_search_or_hide_pressed ();
+            break;
+          case KeyComboConfig.Commands.PREV_CATEGORY:
+            flag_selector.select_prev ();
+            if (!searching_for_matches)
+            {
+              searching_for_matches = true;
+              searching_for_changed ();
+            }
+            update_query_flags (this.categories_query[flag_selector.selected]);
+            break;
+          case KeyComboConfig.Commands.NEXT_CATEGORY:
+            flag_selector.select_next ();
+            if (!searching_for_matches)
+            {
+              searching_for_matches = true;
+              searching_for_changed ();
+            }
+            update_query_flags (this.categories_query[flag_selector.selected]);
+            break;
+          case KeyComboConfig.Commands.FIRST_RESULT:
+            bool b = true;
+            if (searching_for_matches)
+              b = select_first_last_match (true);
+            else
+              b = select_first_last_action (true);
+            if (!b) show_list (false);
+            break;
+          case KeyComboConfig.Commands.LAST_RESULT:
+            show_list (true);
+            if (searching_for_matches)
+              select_first_last_match (false);
+            else
+              select_first_last_action (false);
+            break;
+          case KeyComboConfig.Commands.PREV_RESULT:
+            bool b = true;
+            if (searching_for_matches)
+              b = move_selection_match (-1);
+            else
+              b = move_selection_action (-1);
+            if (!b) show_list (false);
+            break;
+          case KeyComboConfig.Commands.PREV_PAGE:
+            bool b = true;
+            if (searching_for_matches)
+              b = move_selection_match (-5);
+            else
+              b = move_selection_action (-5);
+            if (!b) show_list (false);
+            break;
+          case KeyComboConfig.Commands.NEXT_RESULT:
+            if (can_handle_empty () && is_in_initial_status ())
+            {
+              show_list (true);
+              search_for_empty ();
+              return true;
+            }
+            if (show_list (true)) return true;
+            if (searching_for_matches)
+              move_selection_match (1);
+            else
+              move_selection_action (1);
+            break;
+          case KeyComboConfig.Commands.NEXT_PAGE:
+            if (show_list (true)) return true;
+            if (searching_for_matches)
+              move_selection_match (5);
+            else
+              move_selection_action (5);
+            break;
+          case KeyComboConfig.Commands.SWITCH_SEARCH_TYPE:
+            if (searching_for_matches && 
+                  (
+                    get_match_results () == null || get_match_results ().size == 0 ||
+                    (get_action_search () == "" && (get_action_results () == null || get_action_results ().size == 0))
+                  )
+                )
+              return true;
+            searching_for_matches = !searching_for_matches;
+            searching_for_changed ();
+            if (searching_for_matches)
+            {
+              focus_current_match ();
+            }
+            else
+            {
+              focus_current_action ();
+            }
+            break;
+          case KeyComboConfig.Commands.ACTIVATE:
+            this.hide ();
+            break;
+          case KeyComboConfig.Commands.PASTE:
+            var display = window.get_display ();
+            var clipboard = Clipboard.get_for_display (display, Gdk.SELECTION_CLIPBOARD);
+            // Get text from clipboard
+            string text = clipboard.wait_for_text ();
+            if (searching_for_matches)
+              set_match_search (get_match_search () + text);
+            else
+              set_action_search (get_action_search () + text);
+            search_string_changed ();
+            break;
+          default:
+            //debug ("im_context didn't filter...");
+            break;
+        }
         return true;
       }
-
-      /* Check for commands */
-      CommandTypes command = get_command_from_key_event (event);
-
-      switch (command)
-      {
-        case CommandTypes.EXECUTE_WITHOUT_HIDE:
-          execute ();
-          searching_for_matches = true;
-          searching_for_changed ();
-          break;
-        case CommandTypes.EXECUTE:
-          command_execute ();
-          break;
-        case CommandTypes.SEARCH_DELETE_CHAR:
-          search_delete_char ();
-          break;
-        case CommandTypes.CLEAR_SEARCH_OR_HIDE:
-          clear_search_or_hide_pressed ();
-          break;
-        case CommandTypes.PREV_CATEGORY:
-          flag_selector.select_prev ();
-          if (!searching_for_matches)
-          {
-            searching_for_matches = true;
-            searching_for_changed ();
-          }
-          update_query_flags (this.categories_query[flag_selector.selected]);
-          break;
-        case CommandTypes.NEXT_CATEGORY:
-          flag_selector.select_next ();
-          if (!searching_for_matches)
-          {
-            searching_for_matches = true;
-            searching_for_changed ();
-          }
-          update_query_flags (this.categories_query[flag_selector.selected]);
-          break;
-        case CommandTypes.FIRST_RESULT:
-          bool b = true;
-          if (searching_for_matches)
-            b = select_first_last_match (true);
-          else
-            b = select_first_last_action (true);
-          if (!b) show_list (false);
-          break;
-        case CommandTypes.LAST_RESULT:
-          show_list (true);
-          if (searching_for_matches)
-            select_first_last_match (false);
-          else
-            select_first_last_action (false);
-          break;
-        case CommandTypes.PREV_RESULT:
-          bool b = true;
-          if (searching_for_matches)
-            b = move_selection_match (-1);
-          else
-            b = move_selection_action (-1);
-          if (!b) show_list (false);
-          break;
-        case CommandTypes.PREV_PAGE:
-          bool b = true;
-          if (searching_for_matches)
-            b = move_selection_match (-5);
-          else
-            b = move_selection_action (-5);
-          if (!b) show_list (false);
-          break;
-        case CommandTypes.NEXT_RESULT:
-          if (can_handle_empty () && is_in_initial_status ())
-          {
-            show_list (true);
-            search_for_empty ();
-            return true;
-          }
-          if (show_list (true)) return true;
-          if (searching_for_matches)
-            move_selection_match (1);
-          else
-            move_selection_action (1);
-          break;
-        case CommandTypes.NEXT_PAGE:
-          if (show_list (true)) return true;
-          if (searching_for_matches)
-            move_selection_match (5);
-          else
-            move_selection_action (5);
-          break;
-        case CommandTypes.SWITCH_SEARCH_TYPE:
-          if (searching_for_matches && 
-                (
-                  get_match_results () == null || get_match_results ().size == 0 ||
-                  (get_action_search () == "" && (get_action_results () == null || get_action_results ().size == 0))
-                )
-              )
-            return true;
-          searching_for_matches = !searching_for_matches;
-          searching_for_changed ();
-          if (searching_for_matches)
-          {
-            focus_current_match ();
-          }
-          else
-          {
-            focus_current_action ();
-          }
-          break;
-        default:
-          //debug ("im_context didn't filter...");
-          break;
-      }
-
+      /* Check for text input */
+      im_context.filter_keypress (event);
       return true;
     }
 
@@ -480,26 +513,21 @@ namespace Synapse.Gui
       show_list (true);
       Utils.move_window_to_center (window);
       show_list (false);
-      window.show ();
+      window.summon ();
       set_input_mask ();
     }
     public override void hide ()
     {
-      hide_and_reset ();
+      window.vanish ();
     }
     public override void show_hide_with_time (uint32 timestamp)
     {
       if (window.visible)
       {
         hide ();
-        //Utils.unpresent_window (window); // unstable code needs fixing
         return;
       }
       show ();
-      window.present_with_time (timestamp);
-      window.get_window ().raise ();
-      window.get_window ().focus (timestamp);
-      //Utils.present_window (window); // unstable code needs fixing
     }    
     protected override void set_throbber_visible (bool visible)
     {

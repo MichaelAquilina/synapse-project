@@ -719,6 +719,25 @@ namespace Synapse.Gui
         }
       }
     }
+    
+    public static bool is_point_in_mask (Gtk.Widget w, int x, int y)
+    {
+      if (x < 0 || y < 0 || x >= w.allocation.width || y >= w.allocation.height) return false;
+      if (!w.is_composited ()) return true;
+      
+      // create an image surface to hold the rendered window
+      Cairo.ImageSurface mask = new Cairo.ImageSurface (Cairo.Format.ARGB32, w.allocation.width, w.allocation.height);
+      Cairo.Context cr = new Cairo.Context (mask);
+      cr.set_operator (Cairo.Operator.SOURCE);
+      // copy the window content into the mask
+      Cairo.Context ctx = Gdk.cairo_create (w.window);
+      cr.set_source_surface (ctx.get_target (), 0 ,0);
+      cr.paint ();
+      // check if the point alpha is != 0
+      uchar *data = mask.get_data ();
+      return data[3 + x * 4 + mask.get_stride () * y] != 0;
+    }
+
     /* Code from Gnome-Do */
     public static void present_window (Gtk.Window window)
     {
@@ -756,9 +775,6 @@ namespace Synapse.Gui
             time) == Gdk.GrabStatus.SUCCESS)
       {
         if (Gdk.keyboard_grab (window.get_window(), true, time) == Gdk.GrabStatus.SUCCESS) {
-          time = Gtk.get_current_event_time();
-          Gdk.pointer_ungrab (time);
-          Gdk.keyboard_ungrab (time);
           Gtk.grab_add (window);
           return true;
         } else {

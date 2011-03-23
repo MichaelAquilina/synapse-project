@@ -143,7 +143,6 @@ namespace Synapse.Gui
       menuthrobber = new MenuThrobber ();
       menu = (MenuButton) menuthrobber;
       menuthrobber.set_size_request (ACTION_ICON_SIZE, 22);
-      menuthrobber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
       /* HBox for titles and action icon */
       var right_hbox = new HBox (false, 0);
       /* HBox for menuthrobber and flag_selector */

@@ -133,7 +133,6 @@ namespace Synapse.Gui
         menuthrobber = new MenuThrobber ();
         menu = (MenuButton) menuthrobber;
         menuthrobber.set_size_request (24, 24);
-        menuthrobber.settings_clicked.connect (()=>{this.show_settings_clicked ();});
         
         var left_spacer = new Label (null);
         left_spacer.set_size_request (24, 24);
@@ -344,7 +343,7 @@ namespace Synapse.Gui
       list_view_matches.min_visible_rows = 1;
       update_match_result_list (null, 0, null);
       update_search_label ();
-      window.show ();
+      window.summon ();
     }
 
     protected override void focus_match ( int index, Match? match )
