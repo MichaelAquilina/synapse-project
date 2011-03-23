@@ -76,9 +76,9 @@ namespace Synapse.Gui
           this.cmd = cmd;
           this.mods = mods;
         }
-        public static int compare (ModCmd a, ModCmd b)
+        public static int compare (void* a, void* b)
         {
-          return (int)a.mods - (int)b.mods;
+          return (int)(((ModCmd)a).mods) - (int)(((ModCmd)b).mods);
         }
       }
  
@@ -102,7 +102,7 @@ namespace Synapse.Gui
           list = map.get (keyval);
         }
         list.add (new ModCmd (mods, cmd));
-        list.sort ((GLib.CompareFunc)ModCmd.compare);
+        list.sort (ModCmd.compare);
       }
       
       public Commands get_command_for_keycombo (uint keyval, Gdk.ModifierType mods)
