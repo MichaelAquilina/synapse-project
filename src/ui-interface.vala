@@ -51,6 +51,7 @@ namespace Synapse.Gui
     public string execute { get; set; default = "Return"; }
     public string execute_without_hide { get; set; default = "<Shift>Return"; }
     public string delete_char { get; set; default = "BackSpace"; }
+    public string alternative_delete_char { get; set; default = "Delete"; }
     public string next_match { get; set; default = "Down"; }
     public string prev_match { get; set; default = "Up"; }
     public string first_match { get; set; default = "Home"; }
@@ -158,6 +159,8 @@ namespace Synapse.Gui
       name_to_key_mod (execute_without_hide, out keyval, out mods);
       kcs.set_keycombo_command (keyval, mods, Commands.EXECUTE_WITHOUT_HIDE);
       name_to_key_mod (delete_char, out keyval, out mods);
+      kcs.set_keycombo_command (keyval, mods, Commands.SEARCH_DELETE_CHAR);
+      name_to_key_mod (alternative_delete_char, out keyval, out mods);
       kcs.set_keycombo_command (keyval, mods, Commands.SEARCH_DELETE_CHAR);
       name_to_key_mod (next_match, out keyval, out mods);
       kcs.set_keycombo_command (keyval, mods, Commands.NEXT_RESULT);

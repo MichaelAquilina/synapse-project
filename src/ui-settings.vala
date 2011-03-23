@@ -135,15 +135,17 @@ namespace Synapse.Gui
     private Gee.Map<string, Theme?> themes;
     private bool autostart;
     private unowned DataSink data_sink;
+    private unowned KeyComboConfig key_combo_config;
     private Gtk.ListStore model;
     private UIConfig config;
     
     public bool indicator_active { get { return config.show_indicator; } }
 
-    public SettingsWindow (DataSink data_sink)
+    public SettingsWindow (DataSink data_sink, KeyComboConfig key_combo_config)
     {
       this.title = _("Synapse - Settings");
       this.data_sink = data_sink;
+      this.key_combo_config = key_combo_config;
       this.set_position (WindowPosition.CENTER);
       this.set_size_request (500, 450);
       this.resizable = false;
@@ -238,6 +240,24 @@ namespace Synapse.Gui
       init_general_options ();
     }
     
+    private string [,] key_combos = { //activate has to stay in first position!
+        {"activate", _("Activate")},
+        {"execute", _("Execute")},
+        {"execute-without-hide", _("Execute without hiding")},
+        {"alternative-delete-char", _("Alternative Delete")},
+        {"next-match", _("Next Result")},
+        {"prev-match", _("Previous Result")},
+        {"first-match", _("First Result")},
+        {"last-match", _("Last Result")},
+        {"next-match_page", _("Next 5 Results")},
+        {"prev-match_page", _("Previous 5 Results")},
+        {"next-category", _("Next Category")},
+        {"prev-category", _("Previous Category")},
+        {"next-search-type", _("Next Pane")},
+        {"prev-search-type", _("Previous Pane")},
+        {"paste", _("Paste")}
+      };
+
     private UI.Widgets.TileView tile_view;
     
     private void build_ui ()
@@ -329,20 +349,61 @@ namespace Synapse.Gui
         (a, path, accel_key, accel_mods, keycode) =>
       {
         string? keyname = KeyComboConfig.get_name_from_key (accel_key, accel_mods);
-        this.set_keybinding (keyname ?? "");
+
+        int index = path.to_int ();
+        if (index == 0) // Activate
+        {
+          this.set_keybinding (keyname ?? "");
+          key_combo_config.set (key_combos[index, 0], keyname ?? "");
+          key_combo_config.update_bindings ();
+          return;
+        }
+        if (keyname == null) return;
+        // check if already in use
+        string combo;
+        for (int j = 0; j < key_combos.length[0]; j++)
+        {
+          if (j == index) return; //key already setted
+          key_combo_config.get (key_combos[j, 0], out combo);
+          if (combo == keyname)
+          {
+            string cannot_bind = _("Shortcut already in use");
+            cannot_bind = "%s: \"%s\"".printf (cannot_bind, keyname);
+            Synapse.Utils.Logger.warning (this, cannot_bind);
+            var d = new Gtk.MessageDialog (this, 0, MessageType.ERROR, 
+                                           ButtonsType.CLOSE,
+                                           "%s", cannot_bind);
+            d.run ();
+            d.destroy ();
+            return;
+          }
+        }
+        // update config
+        key_combo_config.set (key_combos[index, 0], keyname);
+        key_combo_config.update_bindings ();
+        // update UI
+        Gtk.TreeIter iter;
+        model.get_iter_from_string (out iter, path);
+        model.set (iter, 1, keyname);
       });
       (ren as CellRendererAccel).accel_cleared.connect (
         (a, path) =>
       {
-        this.set_keybinding ("");
+        int index = path.to_int ();
+        if (index == 0) this.set_keybinding ("");
       });
       col = new TreeViewColumn.with_attributes (_("Shortcut"), ren, "text",1);
       treeview.append_column (col);
 
       // add the actual item
-      Gtk.TreeIter iter;
-      model.append (out iter);
-      model.set (iter, 0, _("Activate"));
+      for (int j = 0; j < key_combos.length[0]; j++)
+      {
+        Gtk.TreeIter iter;
+        model.append (out iter);
+        string combo;
+        key_combo_config.get (key_combos[j, 0], out combo);
+        model.set (iter, 0, key_combos[j, 1], 1, combo);
+      }
       
       /* Add info */
       

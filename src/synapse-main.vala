@@ -56,10 +56,10 @@ namespace Synapse
       ui = null;
       config = ConfigService.get_default ();
       data_sink = new DataSink ();
-      key_combo_config = (Gui.KeyComboConfig) config.get_config ("ui", "shortcuts", typeof (Gui.KeyComboConfig));
+      key_combo_config = (Gui.KeyComboConfig) config.bind_config ("ui", "shortcuts", typeof (Gui.KeyComboConfig));
       key_combo_config.update_bindings ();
       register_plugins ();
-      settings = new SettingsWindow (data_sink);
+      settings = new SettingsWindow (data_sink, key_combo_config);
       settings.keybinding_changed.connect (this.change_keyboard_shortcut);
       
       bind_keyboard_shortcut ();
