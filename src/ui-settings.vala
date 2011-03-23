@@ -239,27 +239,6 @@ namespace Synapse.Gui
     }
     
     private UI.Widgets.TileView tile_view;
-
-    private static string? get_name_from_key (uint keyval, Gdk.ModifierType mods)
-    {
-      unowned string keyname = Gdk.keyval_name (Gdk.keyval_to_lower (keyval));
-      if (keyname == null) return null;
-      
-      string res = "";
-      if (Gdk.ModifierType.SHIFT_MASK in mods) res += "<Shift>";
-      if (Gdk.ModifierType.CONTROL_MASK in mods) res += "<Control>";
-      if (Gdk.ModifierType.MOD1_MASK in mods) res += "<Alt>";
-      if (Gdk.ModifierType.MOD2_MASK in mods) res += "<Mod2>";
-      if (Gdk.ModifierType.MOD3_MASK in mods) res += "<Mod3>";
-      if (Gdk.ModifierType.MOD4_MASK in mods) res += "<Mod4>";
-      if (Gdk.ModifierType.MOD5_MASK in mods) res += "<Mod5>";
-      if (Gdk.ModifierType.META_MASK in mods) res += "<Meta>";
-      if (Gdk.ModifierType.SUPER_MASK in mods) res += "<Super>";
-      if (Gdk.ModifierType.HYPER_MASK in mods) res += "<Hyper>";
-
-      res += keyname;
-      return res;
-    }
     
     private void build_ui ()
     {
@@ -349,7 +328,7 @@ namespace Synapse.Gui
       (ren as CellRendererAccel).accel_edited.connect (
         (a, path, accel_key, accel_mods, keycode) =>
       {
-        string? keyname = get_name_from_key (accel_key, accel_mods);
+        string? keyname = KeyComboConfig.get_name_from_key (accel_key, accel_mods);
         this.set_keybinding (keyname ?? "");
       });
       (ren as CellRendererAccel).accel_cleared.connect (

@@ -372,137 +372,137 @@ namespace Synapse.Gui
     
     protected virtual bool key_press_event (Gdk.EventKey event)
     {
-      /* Check for text input */
-      if (im_context.filter_keypress (event)) return true;
-
-      /* Check for Paste command Ctrl+V */
-      if ((event.state & Gdk.ModifierType.CONTROL_MASK) != 0 && 
-          (Gdk.keyval_to_lower (event.keyval) == (uint)'v'))
+      /* Check for commands */
+      KeyComboConfig.Commands command = 
+        this.key_combo_config.get_command_from_eventkey (event);
+      if (command != command.INVALID_COMMAND)
       {
-        var display = window.get_display ();
-        var clipboard = Clipboard.get_for_display (display, Gdk.SELECTION_CLIPBOARD);
-        // Get text from clipboard
-        string text = clipboard.wait_for_text ();
-        if (searching_for_matches)
-          set_match_search (get_match_search () + text);
-        else
-          set_action_search (get_action_search () + text);
-        search_string_changed ();
+        switch (command)
+        {
+          case KeyComboConfig.Commands.EXECUTE_WITHOUT_HIDE:
+            execute ();
+            searching_for_matches = true;
+            searching_for_changed ();
+            break;
+          case KeyComboConfig.Commands.EXECUTE:
+            command_execute ();
+            break;
+          case KeyComboConfig.Commands.SEARCH_DELETE_CHAR:
+            search_delete_char ();
+            break;
+          case KeyComboConfig.Commands.CLEAR_SEARCH_OR_HIDE:
+            clear_search_or_hide_pressed ();
+            break;
+          case KeyComboConfig.Commands.PREV_CATEGORY:
+            flag_selector.select_prev ();
+            if (!searching_for_matches)
+            {
+              searching_for_matches = true;
+              searching_for_changed ();
+            }
+            update_query_flags (this.categories_query[flag_selector.selected]);
+            break;
+          case KeyComboConfig.Commands.NEXT_CATEGORY:
+            flag_selector.select_next ();
+            if (!searching_for_matches)
+            {
+              searching_for_matches = true;
+              searching_for_changed ();
+            }
+            update_query_flags (this.categories_query[flag_selector.selected]);
+            break;
+          case KeyComboConfig.Commands.FIRST_RESULT:
+            bool b = true;
+            if (searching_for_matches)
+              b = select_first_last_match (true);
+            else
+              b = select_first_last_action (true);
+            if (!b) show_list (false);
+            break;
+          case KeyComboConfig.Commands.LAST_RESULT:
+            show_list (true);
+            if (searching_for_matches)
+              select_first_last_match (false);
+            else
+              select_first_last_action (false);
+            break;
+          case KeyComboConfig.Commands.PREV_RESULT:
+            bool b = true;
+            if (searching_for_matches)
+              b = move_selection_match (-1);
+            else
+              b = move_selection_action (-1);
+            if (!b) show_list (false);
+            break;
+          case KeyComboConfig.Commands.PREV_PAGE:
+            bool b = true;
+            if (searching_for_matches)
+              b = move_selection_match (-5);
+            else
+              b = move_selection_action (-5);
+            if (!b) show_list (false);
+            break;
+          case KeyComboConfig.Commands.NEXT_RESULT:
+            if (can_handle_empty () && is_in_initial_status ())
+            {
+              show_list (true);
+              search_for_empty ();
+              return true;
+            }
+            if (show_list (true)) return true;
+            if (searching_for_matches)
+              move_selection_match (1);
+            else
+              move_selection_action (1);
+            break;
+          case KeyComboConfig.Commands.NEXT_PAGE:
+            if (show_list (true)) return true;
+            if (searching_for_matches)
+              move_selection_match (5);
+            else
+              move_selection_action (5);
+            break;
+          case KeyComboConfig.Commands.SWITCH_SEARCH_TYPE:
+            if (searching_for_matches && 
+                  (
+                    get_match_results () == null || get_match_results ().size == 0 ||
+                    (get_action_search () == "" && (get_action_results () == null || get_action_results ().size == 0))
+                  )
+                )
+              return true;
+            searching_for_matches = !searching_for_matches;
+            searching_for_changed ();
+            if (searching_for_matches)
+            {
+              focus_current_match ();
+            }
+            else
+            {
+              focus_current_action ();
+            }
+            break;
+          case KeyComboConfig.Commands.ACTIVATE:
+            this.hide ();
+            break;
+          case KeyComboConfig.Commands.PASTE:
+            var display = window.get_display ();
+            var clipboard = Clipboard.get_for_display (display, Gdk.SELECTION_CLIPBOARD);
+            // Get text from clipboard
+            string text = clipboard.wait_for_text ();
+            if (searching_for_matches)
+              set_match_search (get_match_search () + text);
+            else
+              set_action_search (get_action_search () + text);
+            search_string_changed ();
+            break;
+          default:
+            //debug ("im_context didn't filter...");
+            break;
+        }
         return true;
       }
-
-      /* Check for commands */
-      CommandTypes command = get_command_from_key_event (event);
-
-      switch (command)
-      {
-        case CommandTypes.EXECUTE_WITHOUT_HIDE:
-          execute ();
-          searching_for_matches = true;
-          searching_for_changed ();
-          break;
-        case CommandTypes.EXECUTE:
-          command_execute ();
-          break;
-        case CommandTypes.SEARCH_DELETE_CHAR:
-          search_delete_char ();
-          break;
-        case CommandTypes.CLEAR_SEARCH_OR_HIDE:
-          clear_search_or_hide_pressed ();
-          break;
-        case CommandTypes.PREV_CATEGORY:
-          flag_selector.select_prev ();
-          if (!searching_for_matches)
-          {
-            searching_for_matches = true;
-            searching_for_changed ();
-          }
-          update_query_flags (this.categories_query[flag_selector.selected]);
-          break;
-        case CommandTypes.NEXT_CATEGORY:
-          flag_selector.select_next ();
-          if (!searching_for_matches)
-          {
-            searching_for_matches = true;
-            searching_for_changed ();
-          }
-          update_query_flags (this.categories_query[flag_selector.selected]);
-          break;
-        case CommandTypes.FIRST_RESULT:
-          bool b = true;
-          if (searching_for_matches)
-            b = select_first_last_match (true);
-          else
-            b = select_first_last_action (true);
-          if (!b) show_list (false);
-          break;
-        case CommandTypes.LAST_RESULT:
-          show_list (true);
-          if (searching_for_matches)
-            select_first_last_match (false);
-          else
-            select_first_last_action (false);
-          break;
-        case CommandTypes.PREV_RESULT:
-          bool b = true;
-          if (searching_for_matches)
-            b = move_selection_match (-1);
-          else
-            b = move_selection_action (-1);
-          if (!b) show_list (false);
-          break;
-        case CommandTypes.PREV_PAGE:
-          bool b = true;
-          if (searching_for_matches)
-            b = move_selection_match (-5);
-          else
-            b = move_selection_action (-5);
-          if (!b) show_list (false);
-          break;
-        case CommandTypes.NEXT_RESULT:
-          if (can_handle_empty () && is_in_initial_status ())
-          {
-            show_list (true);
-            search_for_empty ();
-            return true;
-          }
-          if (show_list (true)) return true;
-          if (searching_for_matches)
-            move_selection_match (1);
-          else
-            move_selection_action (1);
-          break;
-        case CommandTypes.NEXT_PAGE:
-          if (show_list (true)) return true;
-          if (searching_for_matches)
-            move_selection_match (5);
-          else
-            move_selection_action (5);
-          break;
-        case CommandTypes.SWITCH_SEARCH_TYPE:
-          if (searching_for_matches && 
-                (
-                  get_match_results () == null || get_match_results ().size == 0 ||
-                  (get_action_search () == "" && (get_action_results () == null || get_action_results ().size == 0))
-                )
-              )
-            return true;
-          searching_for_matches = !searching_for_matches;
-          searching_for_changed ();
-          if (searching_for_matches)
-          {
-            focus_current_match ();
-          }
-          else
-          {
-            focus_current_action ();
-          }
-          break;
-        default:
-          //debug ("im_context didn't filter...");
-          break;
-      }
-
+      /* Check for text input */
+      im_context.filter_keypress (event);
       return true;
     }
 
