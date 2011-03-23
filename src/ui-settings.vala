@@ -260,6 +260,29 @@ namespace Synapse.Gui
 
     private UI.Widgets.TileView tile_view;
     
+    private int check_keybinding_in_use (int for_index, string keyname)
+    {
+      string combo;
+      for (int j = 0; j < key_combos.length[0]; j++)
+      {
+        if (j == for_index) continue; //key already setted
+        key_combo_config.get (key_combos[j, 0], out combo);
+        if (combo == keyname)
+        {
+          string cannot_bind = _("Shortcut already in use");
+          cannot_bind = "%s: \"%s\"".printf (cannot_bind, keyname);
+          Synapse.Utils.Logger.warning (this, cannot_bind);
+          var d = new Gtk.MessageDialog (this, 0, MessageType.ERROR, 
+                                         ButtonsType.CLOSE,
+                                         "%s", cannot_bind);
+          d.run ();
+          d.destroy ();
+          return j;
+        }
+      }
+      return -1;
+    }
+    
     private void build_ui ()
     {
       var main_vbox = new VBox (false, 12);
@@ -353,6 +376,7 @@ namespace Synapse.Gui
         int index = path.to_int ();
         if (index == 0) // Activate
         {
+          if (check_keybinding_in_use (index, keyname) >= 0) return;
           this.set_keybinding (keyname ?? "");
           key_combo_config.set (key_combos[index, 0], keyname ?? "");
           key_combo_config.update_bindings ();
@@ -360,24 +384,7 @@ namespace Synapse.Gui
         }
         if (keyname == null) return;
         // check if already in use
-        string combo;
-        for (int j = 0; j < key_combos.length[0]; j++)
-        {
-          if (j == index) return; //key already setted
-          key_combo_config.get (key_combos[j, 0], out combo);
-          if (combo == keyname)
-          {
-            string cannot_bind = _("Shortcut already in use");
-            cannot_bind = "%s: \"%s\"".printf (cannot_bind, keyname);
-            Synapse.Utils.Logger.warning (this, cannot_bind);
-            var d = new Gtk.MessageDialog (this, 0, MessageType.ERROR, 
-                                           ButtonsType.CLOSE,
-                                           "%s", cannot_bind);
-            d.run ();
-            d.destroy ();
-            return;
-          }
-        }
+        if (check_keybinding_in_use (index, keyname) >= 0) return;
         // update config
         key_combo_config.set (key_combos[index, 0], keyname);
         key_combo_config.update_bindings ();
