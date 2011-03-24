@@ -20,23 +20,81 @@
 
 namespace Synapse
 {
+  /* ------ QueryFlags tree & binary representation -------
+  
+  APPLICATIONS
+  ACTIONS
+  FILES
+  |- AUDIO
+  |- |- Album
+  |- |- Artist
+  |- |- Track
+  |- VIDEO
+  |- DOCUMENTS
+  |- IMAGES
+  FOLDER
+  INTERNET
+  |- WEB PAGE
+  |- CONTACTS
+  UNCATEGORIZED ??
+  
+  
+  0|1 1 1 1 1 1 1 1 1 1 1|0 0 0 0 0 0 0 0 0 0 0 0 0|0 0 0 0 0 0 0 | GENERAL CATEGORY MASK (11bit)
+  0|0 0 0 0 0 0 0 0 0 0 0|1 1 1 1 1 1 1 1 1 1 1 1 1|0 0 0 0 0 0 0 | CATEGORY MASK (13bit)
+  0|0 0 0 0 0 0 0 0 0 0 0|0 0 0 0 0 0 0 0 0 0 0 0 0|1 1 1 1 1 1 1 | SUB-CATEGORY MASK (7bit)
+
+  1|X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X | REMOTE
+  0|X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X | LOCAL
+
+  X|0 0 0 0 0 0 0 0 0 0 1|X X X X X X X X X X X X X X X X X X X X | APPLICATIONS
+  X|0 0 0 0 0 0 0 0 0 1 0|X X X X X X X X X X X X X X X X X X X X | ACTIONS
+  X|0 0 0 0 0 0 0 0 1 0 0|X X X X X X X X X X X X X X X X X X X X | FILES
+  X|0 0 0 0 0 0 0 1 0 0 0|X X X X X X X X X X X X X X X X X X X X | FOLDERS
+  X|0 0 0 0 0 0 1 0 0 0 0|X X X X X X X X X X X X X X X X X X X X | INTERNET
+
+  X|1 0 0 0 0 0 0 0 0 0 0|X X X X X X X X X X X X X X X X X X X X | UNCATEGORIZED
+
+  X|0 0 0 0 0 0 0 0 1 0 0|0 0 0 0 0 0 0 0 0 0 0 0 1|X X X X X X X | AUDIO
+  X|0 0 0 0 0 0 0 0 1 0 0|0 0 0 0 0 0 0 0 0 0 0 1 0|X X X X X X X | VIDEO
+  X|0 0 0 0 0 0 0 0 1 0 0|0 0 0 0 0 0 0 0 0 0 1 0 0|X X X X X X X | DOCUMENTS
+  X|0 0 0 0 0 0 0 0 1 0 0|0 0 0 0 0 0 0 0 0 1 0 0 0|X X X X X X X | IMAGES
+
+  X|0 0 0 0 0 0 0 1 0 0 0|0 0 0 0 0 0 0 0 0 0 0 0 1|X X X X X X X | WEB PAGE
+  X|0 0 0 0 0 0 0 1 0 0 0|0 0 0 0 0 0 0 0 0 0 0 1 0|X X X X X X X | CONTACTS
+  */
   [Flags]
   public enum QueryFlags
   {
-    INCLUDE_REMOTE  = 1 << 0,
+    GENERAL_CATEGORY_MASK = 0x7FF  << (7 + 13),
+    CATEGORY_MASK         = 0x1FFF << 7,
+    SUB_CATEGORY_MASK     = 0x7F   << 0,
+    INCLUDE_REMOTE        = 1      << 31,
+    
+    ALL                   = QueryFlags.GENERAL_CATEGORY_MASK |
+                            QueryFlags.CATEGORY_MASK |
+                            QueryFlags.SUB_CATEGORY_MASK |
+                            QueryFlags.INCLUDE_REMOTE,
 
-    APPLICATIONS    = 1 << 1,
-    ACTIONS         = 1 << 2,
-    AUDIO           = 1 << 3,
-    VIDEO           = 1 << 4,
-    DOCUMENTS       = 1 << 5,
-    IMAGES          = 1 << 6,
-    INTERNET        = 1 << 7,
+    LOCAL_CONTENT         = QueryFlags.ALL ^ QueryFlags.INCLUDE_REMOTE,
+    
+    APPLICATIONS          = 1 << 20 | QueryFlags.CATEGORY_MASK | QueryFlags.SUB_CATEGORY_MASK,
+    ACTIONS               = 1 << 21 | QueryFlags.CATEGORY_MASK | QueryFlags.SUB_CATEGORY_MASK,
+    FILES                 = 1 << 22 | QueryFlags.CATEGORY_MASK | QueryFlags.SUB_CATEGORY_MASK,
+    FOLDERS               = 1 << 23 | QueryFlags.CATEGORY_MASK | QueryFlags.SUB_CATEGORY_MASK,
+    INTERNET              = 1 << 24 | QueryFlags.CATEGORY_MASK | QueryFlags.SUB_CATEGORY_MASK | QueryFlags.INCLUDE_REMOTE,
+    
+    UNCATEGORIZED         = 1 << 30 | QueryFlags.CATEGORY_MASK | QueryFlags.SUB_CATEGORY_MASK,
 
-    UNCATEGORIZED   = 1 << 15,
+    AUDIO                 = (QueryFlags.FILES & QueryFlags.GENERAL_CATEGORY_MASK) |
+                            1 << 7  | QueryFlags.SUB_CATEGORY_MASK,
+    VIDEO                 = (QueryFlags.FILES & QueryFlags.GENERAL_CATEGORY_MASK) |
+                            1 << 8  | QueryFlags.SUB_CATEGORY_MASK,
+    DOCUMENTS             = (QueryFlags.FILES & QueryFlags.GENERAL_CATEGORY_MASK) |
+                            1 << 9  | QueryFlags.SUB_CATEGORY_MASK,
+    IMAGES                = (QueryFlags.FILES & QueryFlags.GENERAL_CATEGORY_MASK) |
+                            1 << 10 | QueryFlags.SUB_CATEGORY_MASK,
 
-    ALL           = 0xFF | QueryFlags.UNCATEGORIZED,
-    LOCAL_CONTENT = ALL ^ QueryFlags.INCLUDE_REMOTE
+    NONE = 0
   }
   
   [Flags]
