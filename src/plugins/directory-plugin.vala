@@ -258,7 +258,7 @@ namespace Synapse
 
     public async ResultSet? search (Query q) throws SearchError
     {
-      if (!(QueryFlags.UNCATEGORIZED in q.query_type)) return null;
+      if (!(QueryFlags.FOLDERS in q.query_type)) return null;
       
       Gee.Collection<string>? directories = null;
       uint query_id = q.query_id;

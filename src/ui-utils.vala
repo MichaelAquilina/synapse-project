@@ -742,6 +742,7 @@ namespace Synapse.Gui
     public static void present_window (Gtk.Window window)
     {
       window.present ();
+      if (Synapse.UILauncher.is_debug) return;
       window.window.raise ();
       int i = 0;
       Timeout.add (100, ()=>{
@@ -754,6 +755,7 @@ namespace Synapse.Gui
     /* Code from Gnome-Do */
     public static void unpresent_window (Gtk.Window window)
     {
+      if (Synapse.UILauncher.is_debug) return;
       uint time;
       time = Gtk.get_current_event_time();
 

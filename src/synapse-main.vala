@@ -28,11 +28,16 @@ namespace Synapse
   public class UILauncher: GLib.Object
   {
     private static bool is_startup = false;
+    public static bool is_debug = false;
     const OptionEntry[] options =
     {
       {
         "startup", 's', 0, OptionArg.NONE,
         out is_startup, "Startup mode (hide the UI until activated).", ""
+      },
+      {
+        "debug", 'd', 0, OptionArg.NONE,
+        out is_startup, "Debug mode (UI doesn't grab the focus).", ""
       },
       {
         null
