@@ -36,7 +36,7 @@ namespace Synapse
 
     UNCATEGORIZED   = 1 << 15,
 
-    ALL           = 0xFF | QueryFlags.UNCATEGORIZED,
+    ALL           = 0xFFFF,
     LOCAL_CONTENT = ALL ^ QueryFlags.INCLUDE_REMOTE
   }
   

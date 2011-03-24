@@ -67,6 +67,7 @@ namespace Synapse.Gui
     public string[] list {
       get; set; default = {
         Category.name_query_to_string ( _("Actions"), QueryFlags.ACTIONS ),
+        Category.name_query_to_string ( _("Places"), QueryFlags.FOLDERS ),
         Category.name_query_to_string ( _("Audio"), QueryFlags.AUDIO ),
         Category.name_query_to_string ( _("Applications"), QueryFlags.APPLICATIONS ),
         Category.name_query_to_string ( _("All"), QueryFlags.ALL ),

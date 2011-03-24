@@ -259,7 +259,7 @@ namespace Synapse
     public async ResultSet? search (Query q) throws SearchError
     {
       if (!(QueryFlags.FOLDERS in q.query_type)) return null;
-      
+
       Gee.Collection<string>? directories = null;
       uint query_id = q.query_id;
       // wait for our signal or cancellable
@@ -267,7 +267,7 @@ namespace Synapse
       {
         if (q_id != query_id) return;
         // let's mine directories ZG is aware of
-        directories = extract_directories (rs);
+        if (rs != null) directories = extract_directories (rs);
         search.callback ();
       });
       ulong canc_sig_id = CancellableFix.connect (q.cancellable, () =>
