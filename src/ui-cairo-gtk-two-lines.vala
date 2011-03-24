@@ -131,13 +131,6 @@ namespace Synapse.Gui
       top_hbox.pack_start (top_right_vbox);
       /* Top Spacer */
       top_spacer = new Label(null);
-      /* flag_selector */
-      flag_selector = new HTextSelector();
-      foreach (string s in this.categories)
-      {
-        flag_selector.add_text (s);
-      }
-      flag_selector.selected = 3;
 
       /* Throbber and menu */
       menuthrobber = new MenuThrobber ();

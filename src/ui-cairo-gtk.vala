@@ -135,14 +135,6 @@ namespace Synapse.Gui
         fakeinput.add (hbox);
       }
       
-      /* Query flag selector  */
-      flag_selector = new HTextSelector();
-      foreach (string s in this.categories)
-      {
-        flag_selector.add_text (s);
-      }
-      flag_selector.selected = 3;
-      
       /* Description */
       main_label_description = new ShrinkingLabel ();
       main_label_description.set_alignment (0.0f, 1.0f);

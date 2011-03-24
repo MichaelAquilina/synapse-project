@@ -43,6 +43,7 @@ namespace Synapse
     private SettingsWindow settings;
     private DataSink data_sink;
     private Gui.KeyComboConfig key_combo_config;
+    private Gui.CategoryConfig category_config;
     private GtkHotkey.Info? hotkey;
     private ConfigService config;
 #if HAVE_INDICATOR
@@ -57,6 +58,7 @@ namespace Synapse
       config = ConfigService.get_default ();
       data_sink = new DataSink ();
       key_combo_config = (Gui.KeyComboConfig) config.bind_config ("ui", "shortcuts", typeof (Gui.KeyComboConfig));
+      category_config = (Gui.CategoryConfig) config.bind_config ("ui", "categories", typeof (Gui.CategoryConfig));
       key_combo_config.update_bindings ();
       register_plugins ();
       settings = new SettingsWindow (data_sink, key_combo_config);
@@ -78,7 +80,9 @@ namespace Synapse
     
     private void init_ui (Type t)
     {
-      ui = GLib.Object.new (t, "data-sink", data_sink, "key-combo-config", key_combo_config) as UIInterface;
+      ui = GLib.Object.new (t, "data-sink", data_sink,
+                               "key-combo-config", key_combo_config,
+                               "category-config", category_config) as UIInterface;
       ui.show_settings_clicked.connect (()=>{
         settings.show ();
         uint32 timestamp = Gtk.get_current_event_time ();

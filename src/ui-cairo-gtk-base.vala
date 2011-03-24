@@ -97,29 +97,7 @@ namespace Synapse.Gui
        - protected override void on_composited_changed (Widget w)   //w is window
        - protected virtual void set_input_mask () {}
     */
-    protected string[] categories =
-    {
-      _("Actions"),
-      _("Audio"),
-      _("Applications"),
-      _("All"),
-      _("Documents"),
-      _("Images"),
-      _("Video"),
-      _("Internet")
-    };
-    protected QueryFlags[] categories_query =
-    {
-      QueryFlags.ACTIONS,
-      QueryFlags.AUDIO,
-      QueryFlags.APPLICATIONS,
-      QueryFlags.ALL,
-      QueryFlags.DOCUMENTS,
-      QueryFlags.IMAGES,
-      QueryFlags.VIDEO,
-      QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
-    };
-    
+
     protected const int SHADOW_SIZE = 12; // shadow preferred size
 
     protected Synapse.Window window = null;
@@ -152,11 +130,11 @@ namespace Synapse.Gui
       
       /* Query flag selector  */
       flag_selector = new HTextSelector();
-      foreach (string s in this.categories)
+      foreach (CategoryConfig.Category c in this.category_config.categories)
       {
-        flag_selector.add_text (s);
+        flag_selector.add_text (c.name);
       }
-      flag_selector.selected = 3;
+      flag_selector.selected = this.category_config.default_category_index;
 
       /* Build UI */
       build_ui ();
@@ -263,7 +241,7 @@ namespace Synapse.Gui
     {
       searching_for_matches = true;
       show_list (false);
-      flag_selector.selected = 3;
+      flag_selector.selected = this.category_config.default_category_index;
       reset_search ();
       searching_for_changed ();
       //Synapse.Utils.Logger.log (this, "hide and reset");
@@ -400,7 +378,7 @@ namespace Synapse.Gui
               searching_for_matches = true;
               searching_for_changed ();
             }
-            update_query_flags (this.categories_query[flag_selector.selected]);
+            update_query_flags (this.category_config.categories.get (flag_selector.selected).flags);
             break;
           case KeyComboConfig.Commands.NEXT_CATEGORY:
             flag_selector.select_next ();
@@ -409,7 +387,7 @@ namespace Synapse.Gui
               searching_for_matches = true;
               searching_for_changed ();
             }
-            update_query_flags (this.categories_query[flag_selector.selected]);
+            update_query_flags (this.category_config.categories.get (flag_selector.selected).flags);
             break;
           case KeyComboConfig.Commands.FIRST_RESULT:
             bool b = true;
