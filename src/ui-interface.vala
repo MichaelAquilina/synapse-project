@@ -67,7 +67,7 @@ namespace Synapse.Gui
     public string[] list {
       get; set; default = {
         Category.name_query_to_string ( _("Actions"), QueryFlags.ACTIONS ),
-        Category.name_query_to_string ( _("Places"), QueryFlags.FOLDERS ),
+        Category.name_query_to_string ( _("Folders"), QueryFlags.FOLDERS ),
         Category.name_query_to_string ( _("Audio"), QueryFlags.AUDIO ),
         Category.name_query_to_string ( _("Applications"), QueryFlags.APPLICATIONS ),
         Category.name_query_to_string ( _("All"), QueryFlags.ALL ),
@@ -88,11 +88,37 @@ namespace Synapse.Gui
       }
     }
     
+    public Gee.Map<QueryFlags, string> labels {
+      get {
+        return _labels;
+      }
+    }
+    
+    public Gee.Map<QueryFlags, string> _labels;
     private Gee.List<Category> _categories;
     construct
     {
       _categories = new Gee.ArrayList<Category> ();
+      _labels = new Gee.HashMap<QueryFlags, string> ();
+      init_labels ();
       this.update_categories ();
+    }
+    
+    private void init_labels ()
+    {
+      _labels.set (QueryFlags.ALL, _("All")); // Do not remove!
+      
+      _labels.set (QueryFlags.INCLUDE_REMOTE, _("Include remote content"));
+      _labels.set (QueryFlags.ACTIONS, _("Actions"));
+      _labels.set (QueryFlags.FOLDERS, _("Folders"));
+      _labels.set (QueryFlags.AUDIO, _("Audio"));
+      _labels.set (QueryFlags.APPLICATIONS, _("Applications"));
+      _labels.set (QueryFlags.DOCUMENTS, _("Documents"));
+      _labels.set (QueryFlags.IMAGES, _("Images"));
+      _labels.set (QueryFlags.VIDEO, _("Video"));
+      _labels.set (QueryFlags.INTERNET, _("Internet"));
+      _labels.set (QueryFlags.FILES, _("Files"));
+      _labels.set (QueryFlags.UNCATEGORIZED, _("Uncategorized"));
     }
     
     public void update_categories ()

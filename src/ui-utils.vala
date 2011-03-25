@@ -789,4 +789,3 @@ namespace Synapse.Gui
 
   }
 }
-
