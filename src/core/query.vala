@@ -23,19 +23,46 @@ namespace Synapse
   [Flags]
   public enum QueryFlags
   {
+    /* HowTo create categories (32bit).
+     * Categories are "stored" in 3 Levels:
+     *  Super-Category
+     *  -> Category
+     *  ----> Sub-Category
+     * ------------------------------------
+     * if (Super-Category does NOT have childs):
+     *    SUPER = 1 << FreeBitPosition
+     * else:
+     *    if (Category does NOT have childs)
+     *      CATEGORY = 1 << FreeBitPosition
+     *    else
+     *      SUB = 1 << FreeBitPosition
+     *      CATEGORY = OR ([subcategories, ...]);
+     *
+     *    SUPER = OR ([categories, ...]);
+     *
+     *
+     * Remember: 
+     *   if you add or remove a category, 
+     *   change labels in UIInterface.CategoryConfig.init_labels
+     */
     INCLUDE_REMOTE  = 1 << 0,
+    UNCATEGORIZED   = 1 << 1,
 
-    APPLICATIONS    = 1 << 1,
-    ACTIONS         = 1 << 2,
-    AUDIO           = 1 << 3,
-    VIDEO           = 1 << 4,
-    DOCUMENTS       = 1 << 5,
-    IMAGES          = 1 << 6,
-    INTERNET        = 1 << 7,
+    APPLICATIONS    = 1 << 2,
+    
+    ACTIONS         = 1 << 3,
+    
+      AUDIO           = 1 << 4,
+      VIDEO           = 1 << 5,
+      DOCUMENTS       = 1 << 6,
+      IMAGES          = 1 << 7,
+    FILES           = AUDIO | VIDEO | DOCUMENTS | IMAGES,
+    
+    FOLDERS         = 1 << 8,
 
-    UNCATEGORIZED   = 1 << 15,
+    INTERNET        = 1 << 9,
 
-    ALL           = 0xFF | QueryFlags.UNCATEGORIZED,
+    ALL           = 0xFFFFFFFF,
     LOCAL_CONTENT = ALL ^ QueryFlags.INCLUDE_REMOTE
   }
   

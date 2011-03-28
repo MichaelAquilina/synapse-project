@@ -97,29 +97,7 @@ namespace Synapse.Gui
        - protected override void on_composited_changed (Widget w)   //w is window
        - protected virtual void set_input_mask () {}
     */
-    protected string[] categories =
-    {
-      _("Actions"),
-      _("Audio"),
-      _("Applications"),
-      _("All"),
-      _("Documents"),
-      _("Images"),
-      _("Video"),
-      _("Internet")
-    };
-    protected QueryFlags[] categories_query =
-    {
-      QueryFlags.ACTIONS,
-      QueryFlags.AUDIO,
-      QueryFlags.APPLICATIONS,
-      QueryFlags.ALL,
-      QueryFlags.DOCUMENTS,
-      QueryFlags.IMAGES,
-      QueryFlags.VIDEO,
-      QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE
-    };
-    
+
     protected const int SHADOW_SIZE = 12; // shadow preferred size
 
     protected Synapse.Window window = null;
@@ -152,11 +130,19 @@ namespace Synapse.Gui
       
       /* Query flag selector  */
       flag_selector = new HTextSelector();
-      foreach (string s in this.categories)
+      foreach (CategoryConfig.Category c in this.category_config.categories)
       {
-        flag_selector.add_text (s);
+        flag_selector.add_text (c.name);
       }
-      flag_selector.selected = 3;
+      flag_selector.selected = this.category_config.default_category_index;
+      flag_selector.selection_changed.connect (()=>{
+        if (!searching_for_matches)
+        {
+          searching_for_matches = true;
+          searching_for_changed ();
+        }
+        update_query_flags (this.category_config.categories.get (flag_selector.selected).flags);
+      });
 
       /* Build UI */
       build_ui ();
@@ -263,7 +249,7 @@ namespace Synapse.Gui
     {
       searching_for_matches = true;
       show_list (false);
-      flag_selector.selected = 3;
+      flag_selector.selected = this.category_config.default_category_index;
       reset_search ();
       searching_for_changed ();
       //Synapse.Utils.Logger.log (this, "hide and reset");
@@ -370,11 +356,8 @@ namespace Synapse.Gui
       }
     }
     
-    protected virtual bool key_press_event (Gdk.EventKey event)
+    protected virtual bool fetch_command (KeyComboConfig.Commands command)
     {
-      /* Check for commands */
-      KeyComboConfig.Commands command = 
-        this.key_combo_config.get_command_from_eventkey (event);
       if (command != command.INVALID_COMMAND)
       {
         switch (command)
@@ -395,21 +378,11 @@ namespace Synapse.Gui
             break;
           case KeyComboConfig.Commands.PREV_CATEGORY:
             flag_selector.select_prev ();
-            if (!searching_for_matches)
-            {
-              searching_for_matches = true;
-              searching_for_changed ();
-            }
-            update_query_flags (this.categories_query[flag_selector.selected]);
+            flag_selector.selection_changed ();
             break;
           case KeyComboConfig.Commands.NEXT_CATEGORY:
             flag_selector.select_next ();
-            if (!searching_for_matches)
-            {
-              searching_for_matches = true;
-              searching_for_changed ();
-            }
-            update_query_flags (this.categories_query[flag_selector.selected]);
+            flag_selector.selection_changed ();
             break;
           case KeyComboConfig.Commands.FIRST_RESULT:
             bool b = true;
@@ -501,6 +474,16 @@ namespace Synapse.Gui
         }
         return true;
       }
+      return false;
+    }
+    
+    protected virtual bool key_press_event (Gdk.EventKey event)
+    {
+      /* Check for commands */
+      KeyComboConfig.Commands command = 
+        this.key_combo_config.get_command_from_eventkey (event);
+      
+      if (this.fetch_command (command)) return true;
       /* Check for text input */
       im_context.filter_keypress (event);
       return true;
