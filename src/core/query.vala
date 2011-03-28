@@ -23,7 +23,7 @@ namespace Synapse
   [Flags]
   public enum QueryFlags
   {
-    /* HowTo create categories (64bit).
+    /* HowTo create categories (32bit).
      * Categories are "stored" in 3 Levels:
      *  Super-Category
      *  -> Category
@@ -62,7 +62,7 @@ namespace Synapse
 
     INTERNET        = 1 << 9,
 
-    ALL           = 0xFFFFFFFFFFFFFFFF,
+    ALL           = 0xFFFFFFFF,
     LOCAL_CONTENT = ALL ^ QueryFlags.INCLUDE_REMOTE
   }
   

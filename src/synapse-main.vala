@@ -63,7 +63,7 @@ namespace Synapse
       config = ConfigService.get_default ();
       data_sink = new DataSink ();
       key_combo_config = (Gui.KeyComboConfig) config.bind_config ("ui", "shortcuts", typeof (Gui.KeyComboConfig));
-      category_config = (Gui.CategoryConfig) config.bind_config ("ui", "categories", typeof (Gui.CategoryConfig));
+      category_config = (Gui.CategoryConfig) config.get_config ("ui", "categories", typeof (Gui.CategoryConfig));
       key_combo_config.update_bindings ();
       register_plugins ();
       settings = new SettingsWindow (data_sink, key_combo_config);

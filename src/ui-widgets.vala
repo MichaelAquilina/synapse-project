@@ -1027,9 +1027,8 @@ namespace Synapse.Gui
     }
   }
   
-  public class HTextSelector : Label
+  public class HTextSelector : EventBox
   {
-    private new Pango.Layout layout;
     private const int ARROW_SIZE = 7;
     public string selected_markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>";}
     public string unselected_markup {get; set; default = "<span size=\"small\">%s</span>";}
@@ -1071,17 +1070,24 @@ namespace Synapse.Gui
     private int hmax;
     private int current_offset;
     private Utils.ColorHelper ch;
+    private Label label;
     
     public HTextSelector ()
     {
-      ch = new Utils.ColorHelper (this);
+      this.above_child = false;
+      this.set_has_window (false);
+      this.visible_window = false;
+      this.label = new Label ("");
+      this.label.show ();
+      this.add (label);
+      this.set_events (Gdk.EventMask.BUTTON_PRESS_MASK |
+                       Gdk.EventMask.SCROLL_MASK);
+      ch = new Utils.ColorHelper (label);
       cached_surface = null;
       tid = 0;
       wmax = hmax = current_offset = 0;
       texts = new Gee.ArrayList<PangoReadyText> ();
-      layout = this.create_pango_layout (null);
-      this.style_set.connect (()=>{
-        layout.context_changed ();
+      this.label.style_set.connect (()=>{
         update_all_sizes ();
         update_cached_surface ();
         queue_resize ();
@@ -1101,6 +1107,35 @@ namespace Synapse.Gui
       var config = (UIWidgetsConfig) ConfigService.get_default ().get_config ("ui", "widgets", typeof (UIWidgetsConfig));
       animation_enabled = config.animation_enabled;
     }
+    public override bool button_press_event (Gdk.EventButton event)
+    {
+      int x = (int)event.x;
+      x -= current_offset;
+      if (x < 0)
+      {
+        this.selected = 0;
+        selection_changed ();
+        return false;
+      }
+      int i = 0;
+      while (i < texts.size && texts.get (i).offset < x) i++;
+      this.selected = i - 1;
+      selection_changed ();
+      return false;
+    }
+    
+    public override bool scroll_event (Gdk.EventScroll event)
+    {
+      if (event.direction == event.direction.UP)
+        select_prev ();
+      else
+        select_next ();
+      selection_changed ();
+      return true;
+    }
+    
+    public signal void selection_changed ();
+    
     public void add_text (string txt)
     {
       texts.add (new PangoReadyText(){
@@ -1110,6 +1145,17 @@ namespace Synapse.Gui
         height = 0
       });
       _global_update ();
+    }
+    
+    
+    
+    public void remove_text (int i)
+    {
+      return_if_fail (i > 0 && i < texts.size);
+      return_if_fail (texts.size == 1);
+      texts.remove_at (i);
+      _global_update ();
+      if (selected >= texts.size) selected = texts.size - 1;
     }
     private void _global_update ()
     {
@@ -1126,6 +1172,7 @@ namespace Synapse.Gui
       string s;
       PangoReadyText txt = null;
       int lastx = 0;
+      var layout = this.label.get_layout ();
       for (int i = 0; i < texts.size; i++)
       {
         txt = texts.get (i);
@@ -1166,6 +1213,7 @@ namespace Synapse.Gui
       this.cached_surface = new Surface.similar (window_context.get_target (), Cairo.Content.COLOR_ALPHA, w, h);
       var ctx = new Cairo.Context (this.cached_surface);
 
+      var layout = this.label.get_layout ();
       Pango.cairo_update_context (ctx, layout.get_context ());
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, this.get_state ());
       ctx.set_operator (Cairo.Operator.OVER);

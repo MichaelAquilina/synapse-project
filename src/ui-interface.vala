@@ -67,7 +67,6 @@ namespace Synapse.Gui
     public string[] list {
       get; set; default = {
         Category.name_query_to_string ( _("Actions"), QueryFlags.ACTIONS ),
-        Category.name_query_to_string ( _("Folders"), QueryFlags.FOLDERS ),
         Category.name_query_to_string ( _("Audio"), QueryFlags.AUDIO ),
         Category.name_query_to_string ( _("Applications"), QueryFlags.APPLICATIONS ),
         Category.name_query_to_string ( _("All"), QueryFlags.ALL ),
@@ -106,7 +105,7 @@ namespace Synapse.Gui
     
     private void init_labels ()
     {
-      _labels.set (QueryFlags.ALL, _("All")); // Do not remove!
+      //_labels.set (QueryFlags.ALL, _("All")); // Do not remove!
       
       _labels.set (QueryFlags.INCLUDE_REMOTE, _("Include remote content"));
       _labels.set (QueryFlags.ACTIONS, _("Actions"));
@@ -117,7 +116,7 @@ namespace Synapse.Gui
       _labels.set (QueryFlags.IMAGES, _("Images"));
       _labels.set (QueryFlags.VIDEO, _("Video"));
       _labels.set (QueryFlags.INTERNET, _("Internet"));
-      _labels.set (QueryFlags.FILES, _("Files"));
+      //_labels.set (QueryFlags.FILES, _("Files"));
       _labels.set (QueryFlags.UNCATEGORIZED, _("Uncategorized"));
     }
     

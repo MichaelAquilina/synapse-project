@@ -135,6 +135,14 @@ namespace Synapse.Gui
         flag_selector.add_text (c.name);
       }
       flag_selector.selected = this.category_config.default_category_index;
+      flag_selector.selection_changed.connect (()=>{
+        if (!searching_for_matches)
+        {
+          searching_for_matches = true;
+          searching_for_changed ();
+        }
+        update_query_flags (this.category_config.categories.get (flag_selector.selected).flags);
+      });
 
       /* Build UI */
       build_ui ();
@@ -348,11 +356,8 @@ namespace Synapse.Gui
       }
     }
     
-    protected virtual bool key_press_event (Gdk.EventKey event)
+    protected virtual bool fetch_command (KeyComboConfig.Commands command)
     {
-      /* Check for commands */
-      KeyComboConfig.Commands command = 
-        this.key_combo_config.get_command_from_eventkey (event);
       if (command != command.INVALID_COMMAND)
       {
         switch (command)
@@ -373,21 +378,11 @@ namespace Synapse.Gui
             break;
           case KeyComboConfig.Commands.PREV_CATEGORY:
             flag_selector.select_prev ();
-            if (!searching_for_matches)
-            {
-              searching_for_matches = true;
-              searching_for_changed ();
-            }
-            update_query_flags (this.category_config.categories.get (flag_selector.selected).flags);
+            flag_selector.selection_changed ();
             break;
           case KeyComboConfig.Commands.NEXT_CATEGORY:
             flag_selector.select_next ();
-            if (!searching_for_matches)
-            {
-              searching_for_matches = true;
-              searching_for_changed ();
-            }
-            update_query_flags (this.category_config.categories.get (flag_selector.selected).flags);
+            flag_selector.selection_changed ();
             break;
           case KeyComboConfig.Commands.FIRST_RESULT:
             bool b = true;
@@ -479,6 +474,16 @@ namespace Synapse.Gui
         }
         return true;
       }
+      return false;
+    }
+    
+    protected virtual bool key_press_event (Gdk.EventKey event)
+    {
+      /* Check for commands */
+      KeyComboConfig.Commands command = 
+        this.key_combo_config.get_command_from_eventkey (event);
+      
+      if (this.fetch_command (command)) return true;
       /* Check for text input */
       im_context.filter_keypress (event);
       return true;
