@@ -580,7 +580,7 @@ namespace Synapse.Gui
       results = {null, null};
       search = {"", ""};
       if (reset_flags)
-        qf = QueryFlags.ALL;
+        qf = this.category_config.categories.get (this.category_config.default_category_index).flags;
       if (notify)
       {
         set_throbber_visible (false);
