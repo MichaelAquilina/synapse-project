@@ -278,6 +278,11 @@ namespace Synapse
         Synapse.Utils.Logger.debug (this, "Searching for desktop files in: %s", path);
         bool exists = yield Utils.query_exists_async (directory);
         if (!exists) return;
+        /* Check if we already scanned this directory // lp:686624 */
+        foreach (var scanned_dir in monitored_dirs)
+        {
+          if (path == scanned_dir.get_path ()) return;
+        }
         monitored_dirs.add (directory);
         var enumerator = yield directory.enumerate_children_async (
           FILE_ATTRIBUTE_STANDARD_NAME + "," + FILE_ATTRIBUTE_STANDARD_TYPE,
