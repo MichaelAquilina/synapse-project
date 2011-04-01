@@ -214,19 +214,11 @@ namespace Synapse.Gui
       {
         Utils.cairo_rounded_rect (ctx, 0, 0,
                                        container_top.allocation.width + SHADOW_SIZE * 2, 
-                                       container_top.allocation.height + SHADOW_SIZE * 2,
+                                       list_visible ?
+                                       h : container_top.allocation.height + SHADOW_SIZE * 2,
                                        BORDER_RADIUS);
         ctx.fill ();
-        if (list_visible)
-        {
-          results_container.size_request (out req);
-              
-          ctx.rectangle (SHADOW_SIZE + BORDER_RADIUS,
-                         container_top.allocation.height,
-                         req.width,
-                         h - container_top.allocation.height);
-          ctx.fill ();
-        }
+        add_kde_compatibility (window, w, h);
       }
       else
       {

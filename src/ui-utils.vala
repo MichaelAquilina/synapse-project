@@ -741,17 +741,14 @@ namespace Synapse.Gui
     /* Code from Gnome-Do */
     public static void present_window (Gtk.Window window)
     {
-      if (Synapse.Utils.Logger.debug_enabled ())
-      {
-        // raise without grab
-        uint32 timestamp = Gtk.get_current_event_time();
-        window.present_with_time (timestamp);
-        window.get_window ().raise ();
-        window.get_window ().focus (timestamp);
-        return;
-      }
-      window.present ();
-      window.window.raise ();
+      // raise without grab
+      uint32 timestamp = Gtk.get_current_event_time();
+      window.present_with_time (timestamp);
+      window.get_window ().raise ();
+      window.get_window ().focus (timestamp);
+
+      if (Synapse.Utils.Logger.debug_enabled ()) return;
+      // grab
       int i = 0;
       Timeout.add (100, ()=>{
         if (i >= 100)

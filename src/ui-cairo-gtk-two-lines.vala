@@ -85,8 +85,8 @@ namespace Synapse.Gui
       results_container = new HSelectionContainer (null, 0);
       results_container.set_separator_visible (false);
       
-      results_match = new ResultBox (450);
-      results_action = new ResultBox (450);
+      results_match = new ResultBox (UI_WIDTH - PADDING * 2 - SHADOW_SIZE * 2);
+      results_action = new ResultBox (UI_WIDTH - PADDING * 2 - SHADOW_SIZE * 2);
       results_match.get_match_list_view ().selected_index_changed.connect (this.set_selection_match);
       results_action.get_match_list_view ().selected_index_changed.connect (this.set_selection_action);
       results_match.get_match_list_view ().fire_item.connect (this.command_execute);
@@ -241,20 +241,11 @@ namespace Synapse.Gui
                                        ICON_SIZE, BORDER_RADIUS);
         ctx.fill ();
         Utils.cairo_rounded_rect (ctx, 0, spacing,
-                                       container_top.allocation.width + SHADOW_SIZE * 2, 
-                                       container_top.allocation.height + SHADOW_SIZE * 2 - spacing,
+                                       UI_WIDTH + PADDING * 2, 
+                                       list_visible ? h : container_top.allocation.height + SHADOW_SIZE * 2 - spacing,
                                        BORDER_RADIUS);
         ctx.fill ();
-        if (list_visible)
-        {
-          results_container.size_request (out req);
-              
-          ctx.rectangle ((w - req.width) / 2,
-                         container_top.allocation.height,
-                         req.width,
-                         h - container_top.allocation.height);
-          ctx.fill ();
-        }
+        add_kde_compatibility (window, req.width, req.height);
       }
       else
       {

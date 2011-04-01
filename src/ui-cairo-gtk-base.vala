@@ -106,13 +106,23 @@ namespace Synapse.Gui
     protected HTextSelector flag_selector = null;
     protected bool searching_for_matches = true;
     protected ColorHelper ch;
+    protected bool is_kwin = false;
     
     protected virtual void set_input_mask () {}
     
     protected IMContext im_context;
     
+    private void update_wm ()
+    {
+      string wmname = Gdk.x11_screen_get_window_manager_name (Gdk.Screen.get_default ()).down ();
+      this.is_kwin = wmname == "kwin";
+    }
+    
     construct
     {
+      update_wm ();
+      if (is_kwin) Synapse.Utils.Logger.log (this, "Using KWin compatibiliy mode.");
+
       window = new Synapse.Window ();
       window.set_app_paintable (true);
       window.skip_taskbar_hint = true;
@@ -120,7 +130,11 @@ namespace Synapse.Gui
       window.set_position (WindowPosition.CENTER);
       window.set_decorated (false);
       window.set_resizable (false);
-      window.set_type_hint (Gdk.WindowTypeHint.SPLASHSCREEN);
+      /* SPLASHSCREEN is needed for Metacity/Compiz, but doesn't work with KWin */
+      if (is_kwin)
+        window.set_type_hint (Gdk.WindowTypeHint.NORMAL);
+      else
+        window.set_type_hint (Gdk.WindowTypeHint.SPLASHSCREEN);
       window.set_keep_above (true);
       window.window_state_event.connect (on_window_state_event);
 
@@ -225,6 +239,24 @@ namespace Synapse.Gui
       }
       Synapse.Utils.Logger.log (this, "Screen is%s composited.", comp ? "": " NOT");
       w.set_colormap (cm);
+
+      update_wm ();
+    }
+    
+    protected void add_kde_compatibility (Gtk.Window window, int w, int h)
+    {
+      if (this.is_kwin)
+      {
+        /* Fix to the horrible shadow glitches in KDE 4 */
+        /* If shape mask is set, KWin will not add that horrible shadow */
+        var bitmap = new Gdk.Pixmap (null, w, h, 1);
+        var ctx = Gdk.cairo_create (bitmap);
+        ctx.set_source_rgba (0, 0, 0, 1);
+        ctx.set_operator (Cairo.Operator.SOURCE);
+        ctx.paint ();
+        window.shape_combine_mask (null, 0, 0);
+        window.shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
+      }
     }
 
     protected virtual void search_add_char (string chr)

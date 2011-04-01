@@ -236,6 +236,32 @@ namespace Synapse.Gui
       search_label.set_markup (Markup.printf_escaped ("<span size=\"medium\"><b>%s </b></span>", s));
     }
     
+    protected override void set_input_mask ()
+    {
+      Requisition req = {0, 0};
+      window.size_request (out req);
+      bool composited = window.is_composited ();
+      var bitmap = new Gdk.Pixmap (null, req.width, req.height, 1);
+      var ctx = Gdk.cairo_create (bitmap);
+      ctx.set_operator (Cairo.Operator.CLEAR);
+      ctx.paint ();
+      ctx.set_source_rgba (0, 0, 0, 1);
+      ctx.set_operator (Cairo.Operator.SOURCE);
+      if (composited)
+      {
+        Utils.cairo_rounded_rect (ctx, 0, 0, req.width, req.height, BORDER_RADIUS);
+        ctx.fill ();
+        add_kde_compatibility (window, req.width, req.height);
+      }
+      else
+      {
+        ctx.set_operator (Cairo.Operator.SOURCE);
+        ctx.paint ();
+      }
+      window.input_shape_combine_mask (null, 0, 0);
+      window.input_shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
+    }
+    
     private void visual_update_search_for ()
     {
       if (searching_for_matches)
@@ -257,6 +283,7 @@ namespace Synapse.Gui
       }
       status_selector.select (searching_for_matches ? 0 : 1);
       update_search_label ();
+      set_input_mask ();
       window.queue_draw ();
     }
     
@@ -344,6 +371,8 @@ namespace Synapse.Gui
       update_match_result_list (null, 0, null);
       update_search_label ();
       window.summon ();
+      set_input_mask ();
+      window.queue_draw ();
     }
 
     protected override void focus_match ( int index, Match? match )
@@ -377,6 +406,7 @@ namespace Synapse.Gui
     }
     protected override void update_match_result_list (Gee.List<Match>? matches, int index, Match? match)
     {
+      bool update_mask = false;
       if (list_view_matches == null) return;
       if (matches != null && matches.size > 0)
       {
@@ -385,6 +415,7 @@ namespace Synapse.Gui
           m.description = Utils.replace_home_path_with (m.description, _("Home"), " > ");
         }
         list_view_matches.set_list (matches);
+        if (list_view_matches.min_visible_rows != 5) update_mask = true;
         list_view_matches.min_visible_rows = 5;
         list_view_matches.selection_enabled = true;
         matches_status_label.set_markup (Markup.printf_escaped (_("<b>1 of %d</b>"), matches.size));
@@ -395,12 +426,14 @@ namespace Synapse.Gui
         matches_status_label.set_markup ("");
         if (get_match_search () == "" && matches == null)
         {
+          if (list_view_matches.min_visible_rows != 1) update_mask = true;
           list_view_matches.min_visible_rows = 1;
           list_view_matches.set_list (tts_list);
           list_view_matches.selection_enabled = false;
         }
         else
         {
+          if (list_view_matches.min_visible_rows != 5) update_mask = true;
           list_view_matches.min_visible_rows = 5;
           list_view_matches.set_list (nores_list);
           list_view_matches.selection_enabled = false;
@@ -410,6 +443,7 @@ namespace Synapse.Gui
         list_view_matches.set_indexes (0, 0);
         focus_match ( 0, null );
       }
+      if (update_mask) set_input_mask ();
       window.queue_draw ();
     }
     protected override void update_action_result_list (Gee.List<Match>? actions, int index, Match? action)

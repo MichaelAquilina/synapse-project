@@ -224,6 +224,11 @@ namespace Synapse
       DesktopFileInfo.EnvironmentType.GNOME;
     private string session_type_str = "GNOME";
     
+    public DesktopFileInfo.EnvironmentType get_environment ()
+    {
+      return this.session_type;
+    }
+    
     private void get_environment_type ()
     {
       unowned string? session_var = Environment.get_variable ("DESKTOP_SESSION");

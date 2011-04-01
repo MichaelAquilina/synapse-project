@@ -322,6 +322,7 @@ namespace Synapse.Gui
                          req.height - (y + h));
           ctx.fill ();
         }
+        add_kde_compatibility (window, req.width, req.height);
       }
       else
       {
