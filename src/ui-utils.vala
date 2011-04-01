@@ -741,8 +741,16 @@ namespace Synapse.Gui
     /* Code from Gnome-Do */
     public static void present_window (Gtk.Window window)
     {
+      if (Synapse.Utils.Logger.debug_enabled ())
+      {
+        // raise without grab
+        uint32 timestamp = Gtk.get_current_event_time();
+        window.present_with_time (timestamp);
+        window.get_window ().raise ();
+        window.get_window ().focus (timestamp);
+        return;
+      }
       window.present ();
-      if (Synapse.UILauncher.is_debug) return;
       window.window.raise ();
       int i = 0;
       Timeout.add (100, ()=>{
@@ -755,9 +763,8 @@ namespace Synapse.Gui
     /* Code from Gnome-Do */
     public static void unpresent_window (Gtk.Window window)
     {
-      if (Synapse.UILauncher.is_debug) return;
-      uint time;
-      time = Gtk.get_current_event_time();
+      if (Synapse.Utils.Logger.debug_enabled ()) return;
+      uint32 time = Gtk.get_current_event_time();
 
       Gdk.pointer_ungrab (time);
       Gdk.keyboard_ungrab (time);

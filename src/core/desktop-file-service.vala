@@ -270,6 +270,7 @@ namespace Synapse
       {
         string path = directory.get_path ();
         if (path != null && path.has_suffix ("menu-xdg")) return; // lp:686624
+        Synapse.Utils.Logger.debug (this, "Searching for desktop files in: %s", path);
         bool exists = yield Utils.query_exists_async (directory);
         if (!exists) return;
         monitored_dirs.add (directory);

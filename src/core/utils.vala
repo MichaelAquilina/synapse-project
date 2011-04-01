@@ -110,20 +110,28 @@ namespace Synapse
 
       private static void log_internal (Object? obj, LogLevelFlags level, string format, va_list args)
       {
-        if (!initialized)
-        {
-          var levels = LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.LEVEL_INFO |
-            LogLevelFlags.LEVEL_WARNING | LogLevelFlags.LEVEL_CRITICAL |
-            LogLevelFlags.LEVEL_ERROR;
-          Log.set_handler ("Synapse", levels, handler);
-          
-          show_debug = Environment.get_variable ("SYNAPSE_DEBUG") != null;
-          initialized = true;
-        }
+        if (!initialized) initialize ();
         Type obj_type = obj != null ? obj.get_type () : typeof (Logger);
         string obj_class = extract_type_name (obj_type);
         string pretty_obj = "%s[%s]%s ".printf (MAGENTA, obj_class, RESET);
         logv ("Synapse", level, pretty_obj + format, args);
+      }
+      
+      private static void initialize ()
+      {
+        var levels = LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.LEVEL_INFO |
+            LogLevelFlags.LEVEL_WARNING | LogLevelFlags.LEVEL_CRITICAL |
+            LogLevelFlags.LEVEL_ERROR;
+        Log.set_handler ("Synapse", levels, handler);
+        
+        show_debug = Environment.get_variable ("SYNAPSE_DEBUG") != null;
+        initialized = true;
+      }
+      
+      public static bool debug_enabled ()
+      {
+        if (!initialized) initialize ();
+        return show_debug;
       }
       
       public static void log (Object? obj, string format, ...)

@@ -166,11 +166,29 @@ namespace Synapse.Gui
 
       focus_match (0, null);
       focus_action (0, null);
+      
+      if (Synapse.Utils.Logger.debug_enabled ())
+      {
+        Synapse.Utils.Logger.warning (this, "Debug enabled: Synapse's input grab disabled.");
+        // Grab Hack disabled => listen on focus change
+        window.notify["is-active"].connect (()=>{
+          Idle.add (check_focus);
+        });
+      }
     }
 
     ~GtkCairoBase ()
     {
       window.destroy ();
+    }
+    
+    private bool check_focus ()
+    {
+      if (!window.is_active && (menu == null || !menu.is_menu_visible ()))
+      {
+        hide ();
+      }
+      return false;
     }
     
     private bool on_window_state_event (Widget w, Gdk.EventWindowState event)
