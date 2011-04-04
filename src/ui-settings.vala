@@ -39,8 +39,8 @@ namespace Synapse.Gui
                      icon: info.icon_name,
                      pi: info,
                      show_action_button: info.runnable,
-                     add_button_stock: Gtk.STOCK_YES,
-                     remove_button_stock: Gtk.STOCK_NO);
+                     add_button_stock: Gtk.Stock.YES,
+                     remove_button_stock: Gtk.Stock.NO);
       }
 
       construct
@@ -52,7 +52,7 @@ namespace Synapse.Gui
 
         var help_button = new Gtk.Button ();
         help_button.set_image (
-          new Gtk.Image.from_stock (Gtk.STOCK_HELP,
+          new Gtk.Image.from_stock (Gtk.Stock.HELP,
                                     Gtk.IconSize.SMALL_TOOLBAR));
         help_button.set_tooltip_markup (_("About this plugin"));
         help_button.clicked.connect (() =>
@@ -67,7 +67,7 @@ namespace Synapse.Gui
         {
           var config_button = new Gtk.Button ();
           config_button.set_image (
-            new Gtk.Image.from_stock (Gtk.STOCK_PREFERENCES,
+            new Gtk.Image.from_stock (Gtk.Stock.PREFERENCES,
                                       Gtk.IconSize.SMALL_TOOLBAR));
           config_button.set_tooltip_markup (_("Configure plugin"));
           config_button.clicked.connect (() =>
@@ -211,7 +211,7 @@ namespace Synapse.Gui
           var dialog = new Gtk.Dialog.with_buttons (_("Configure plugin"),
                                                     this,
                                                     Gtk.DialogFlags.MODAL | Gtk.DialogFlags.NO_SEPARATOR,
-                                                    Gtk.STOCK_CLOSE, null);
+                                                    Gtk.Stock.CLOSE, null);
           dialog.set_default_size (300, 200);
           (dialog.get_content_area () as Gtk.Container).add (widget);
           dialog.run ();
@@ -415,7 +415,7 @@ namespace Synapse.Gui
       /* Add info */
       
       var info_box = new HBox (false, 6);
-      var info_image = new Image.from_stock (STOCK_INFO, IconSize.MENU);
+      var info_image = new Image.from_stock (Gtk.Stock.INFO, IconSize.MENU);
       info_box.pack_start (info_image, false);
       var info_label = new Label (Markup.printf_escaped ("<span size=\"small\">%s</span>",
             _("Click the shortcut you wish to change and press the new shortcut.")));
@@ -442,7 +442,7 @@ namespace Synapse.Gui
       /* Button */
       var bbox = new Gtk.HButtonBox ();
       bbox.set_layout (Gtk.ButtonBoxStyle.END);
-      var close_button = new Gtk.Button.from_stock (Gtk.STOCK_CLOSE);
+      var close_button = new Gtk.Button.from_stock (Gtk.Stock.CLOSE);
       close_button.clicked.connect (() => { this.hide (); });
       bbox.pack_start (close_button);
       

@@ -99,17 +99,17 @@ namespace Synapse
     {
       var indicator_menu = new Menu ();
       var activate_item = new ImageMenuItem.with_label (_ ("Activate"));
-      activate_item.set_image (new Gtk.Image.from_stock (Gtk.STOCK_EXECUTE, Gtk.IconSize.MENU));
+      activate_item.set_image (new Gtk.Image.from_stock (Gtk.Stock.EXECUTE, Gtk.IconSize.MENU));
       activate_item.activate.connect (() =>
       {
         show_ui (Gtk.get_current_event_time ());
       });
       indicator_menu.append (activate_item);
-      var settings_item = new ImageMenuItem.from_stock (Gtk.STOCK_PREFERENCES, null);
+      var settings_item = new ImageMenuItem.from_stock (Gtk.Stock.PREFERENCES, null);
       settings_item.activate.connect (() => { settings.show (); });
       indicator_menu.append (settings_item);
       indicator_menu.append (new SeparatorMenuItem ());
-      var quit_item = new ImageMenuItem.from_stock (Gtk.STOCK_QUIT, null);
+      var quit_item = new ImageMenuItem.from_stock (Gtk.Stock.QUIT, null);
       quit_item.activate.connect (Gtk.main_quit);
       indicator_menu.append (quit_item);
       indicator_menu.show_all ();

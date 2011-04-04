@@ -748,11 +748,11 @@ namespace Synapse.Gui
       menu = new Gtk.Menu ();
       Gtk.MenuItem item = null;
       
-      item = new Gtk.ImageMenuItem.from_stock (Gtk.STOCK_PREFERENCES, null);
+      item = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.PREFERENCES, null);
       item.activate.connect (()=> {settings_clicked ();});
       menu.append (item);
       
-      item = new ImageMenuItem.from_stock (Gtk.STOCK_ABOUT, null);
+      item = new ImageMenuItem.from_stock (Gtk.Stock.ABOUT, null);
       item.activate.connect (()=> 
       {
         var about = new SynapseAboutDialog ();
@@ -764,7 +764,7 @@ namespace Synapse.Gui
       item = new Gtk.SeparatorMenuItem ();
       menu.append (item);
       
-      item = new ImageMenuItem.from_stock (Gtk.STOCK_QUIT, null);
+      item = new ImageMenuItem.from_stock (Gtk.Stock.QUIT, null);
       item.activate.connect (Gtk.main_quit);
       menu.append (item);
       

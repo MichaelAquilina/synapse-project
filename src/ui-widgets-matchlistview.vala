@@ -680,7 +680,7 @@ namespace Synapse.Gui
       if (this.items == null || this.items.size <= this.dragdrop_target_item)
       {
         Gtk.drag_source_set_target_list (this, tl);
-        Gtk.drag_source_set_icon_stock (this, Gtk.STOCK_MISSING_IMAGE);
+        Gtk.drag_source_set_icon_stock (this, Gtk.Stock.MISSING_IMAGE);
         return true;
       }
       
@@ -713,7 +713,7 @@ namespace Synapse.Gui
       if (um == null)
       {
         Gtk.drag_source_set_target_list (this, tl);
-        Gtk.drag_source_set_icon_stock (this, Gtk.STOCK_MISSING_IMAGE);
+        Gtk.drag_source_set_icon_stock (this, Gtk.Stock.MISSING_IMAGE);
         return true;
       }
 

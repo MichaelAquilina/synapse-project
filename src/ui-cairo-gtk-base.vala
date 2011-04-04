@@ -358,7 +358,7 @@ namespace Synapse.Gui
       if (!has_match_results ())
       {
         Gtk.drag_source_set_target_list (w, tl);
-        Gtk.drag_source_set_icon_stock (w, Gtk.STOCK_MISSING_IMAGE);
+        Gtk.drag_source_set_icon_stock (w, Gtk.Stock.MISSING_IMAGE);
         return false;
       }
       Match m;
@@ -369,7 +369,7 @@ namespace Synapse.Gui
       if (um == null)
       {
         Gtk.drag_source_set_target_list (w, tl);
-        Gtk.drag_source_set_icon_stock (w, Gtk.STOCK_MISSING_IMAGE);
+        Gtk.drag_source_set_icon_stock (w, Gtk.Stock.MISSING_IMAGE);
         return false;
       }
 

@@ -136,8 +136,8 @@ namespace UI.Widgets
 
     public bool enabled { get; set; default = true; }
 
-    public string add_button_stock { get; protected set; default = Gtk.STOCK_ADD; }
-    public string remove_button_stock { get; protected set; default = Gtk.STOCK_DELETE; }
+    public string add_button_stock { get; protected set; default = Gtk.Stock.ADD; }
+    public string remove_button_stock { get; protected set; default = Gtk.Stock.DELETE; }
     public string add_button_tooltip { get; protected set; }
     public string remove_button_tooltip { get; protected set; }
 

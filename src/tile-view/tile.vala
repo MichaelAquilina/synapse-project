@@ -216,7 +216,7 @@ namespace UI.Widgets
           }
           catch (GLib.Error err)
           {
-            temp_pb = it.load_icon (Gtk.STOCK_FILE,
+            temp_pb = it.load_icon (Gtk.Stock.FILE,
                                     icon_size,
                                     IconLookupFlags.FORCE_SIZE);
           }
