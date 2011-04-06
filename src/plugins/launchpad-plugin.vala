@@ -246,7 +246,7 @@ namespace Synapse
       public LaunchpadObject (string title, string desc, string uri)
       {
         Object (title: title, description: desc,
-                icon_name: g_content_type_get_icon ("text/html").to_string (),
+                icon_name: ContentType.get_icon ("text/html").to_string (),
                 match_type: MatchType.GENERIC_URI,
                 uri: uri, mime_type: "text/html",
                 file_type: QueryFlags.INTERNET);

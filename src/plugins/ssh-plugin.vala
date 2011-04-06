@@ -81,7 +81,7 @@ namespace Synapse
             foreach (var host in line.split (" "))
             {
               string host_stripped = host.strip ();
-              if (host_stripped != "" && host_stripped.str ("*") == null)
+              if (host_stripped != "" && host_stripped.index_of ("*") == -1)
               {
                 // TODO: no dupes
                 // FIXME: handle wildcard hosts somehow

@@ -59,22 +59,14 @@ namespace Synapse.Gui
           StringBuilder res = new StringBuilder ();
           for (int i = 1; i < cnt; i++)
           {
-            // fetch_pos doesn't return utf8 offsets, so we can't use 
-            // string.substring ()
             mi.fetch_pos (i, out start_pos, out end_pos);
             warn_if_fail (start_pos >= 0 && end_pos >= 0);
-            char* str_ptr = text;
-            str_ptr += last_pos;
-            unowned string non_matched = (string) str_ptr;
-            res.append (Markup.escape_text (non_matched.ndup (start_pos - last_pos)));
+            res.append (Markup.escape_text (text.substring (last_pos, start_pos - last_pos)));
             last_pos = end_pos;
             res.append (Markup.printf_escaped ("<u><b>%s</b></u>", mi.fetch (i)));
             if (i == cnt - 1)
             {
-              str_ptr = text;
-              str_ptr += last_pos;
-              non_matched = (string) str_ptr;
-              res.append (Markup.escape_text (non_matched));
+              res.append (Markup.escape_text (text.substring (last_pos)));
             }
           }
           highlighted = res.str;

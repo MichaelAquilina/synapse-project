@@ -225,7 +225,7 @@ namespace Synapse
             // FIXME: maybe we shouldn't care about the real path?
             var f = File.new_for_uri (um.uri);
             if (f.get_path () == null) return false;
-            return g_content_type_is_a (um.mime_type, "image/*");
+            return ContentType.is_a (um.mime_type, "image/*");
           default:
             return false;
         }

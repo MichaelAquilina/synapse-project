@@ -51,24 +51,12 @@ namespace Synapse
       return result;
     }
     
-    public static string? remove_last_unichar (string input, long offset)
+    public static string? remove_last_unichar (string input)
     {
-#if VALA_0_12
-      long string_length = input.char_count ();
-      if (offset < 0) {
-        offset = string_length + offset;
-        GLib.return_val_if_fail (offset >= 0, null);
-      } else {
-        GLib.return_val_if_fail (offset <= string_length, null);
-      }
-      long len = string_length - offset - 1;
+      long char_count = input.char_count ();
 
-      GLib.return_val_if_fail (offset + len <= string_length, null);
-      unowned string start = input.utf8_offset (offset);
-      return start.ndup (((char*) start.utf8_offset (len)) - ((char*) start));
-#else
-      return input.substring (offset, input.length - 1);
-#endif
+      int len = input.index_of_nth_char (char_count - 1);
+      return input.substring (0, len);
     }
     
     public static async bool query_exists_async (GLib.File f)
@@ -255,28 +243,28 @@ namespace Synapse
             // let's determine the file type
             unowned string mime_type = 
               fi.get_attribute_string (FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
-            if (g_content_type_is_unknown (mime_type))
+            if (ContentType.is_unknown (mime_type))
             {
               file_type = QueryFlags.UNCATEGORIZED;
             }
-            else if (g_content_type_is_a (mime_type, "audio/*"))
+            else if (ContentType.is_a (mime_type, "audio/*"))
             {
               file_type = QueryFlags.AUDIO;
             }
-            else if (g_content_type_is_a (mime_type, "video/*"))
+            else if (ContentType.is_a (mime_type, "video/*"))
             {
               file_type = QueryFlags.VIDEO;
             }
-            else if (g_content_type_is_a (mime_type, "image/*"))
+            else if (ContentType.is_a (mime_type, "image/*"))
             {
               file_type = QueryFlags.IMAGES;
             }
-            else if (g_content_type_is_a (mime_type, "text/*"))
+            else if (ContentType.is_a (mime_type, "text/*"))
             {
               file_type = QueryFlags.DOCUMENTS;
             }
             // FIXME: this isn't right
-            else if (g_content_type_is_a (mime_type, "application/*"))
+            else if (ContentType.is_a (mime_type, "application/*"))
             {
               file_type = QueryFlags.DOCUMENTS;
             }

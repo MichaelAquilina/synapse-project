@@ -219,7 +219,7 @@ namespace Synapse
             var um = match as UriMatch;
             var f = File.new_for_uri (um.uri);
             if (f.get_path () == null) return false;
-            return g_content_type_is_a (um.mime_type, "text/*");
+            return ContentType.is_a (um.mime_type, "text/*");
           default:
             return false;
         }

@@ -138,7 +138,7 @@ namespace Synapse
               icon_name.has_suffix (".svg") ||
               icon_name.has_suffix (".xpm")))
           {
-            icon_name = icon_name.ndup (icon_name.size () - 4);
+            icon_name = icon_name.substring (0, icon_name.length - 4);
           }
         }
         if (keyfile.has_key (GROUP, "MimeType"))
@@ -427,7 +427,16 @@ namespace Synapse
 
       foreach (var dfi in all_desktop_files)
       {
-        var exec = exec_re.replace_literal (dfi.exec, -1, 0, "").strip ();
+        string exec = "";
+        try
+        {
+          exec = exec_re.replace_literal (dfi.exec, -1, 0, "");
+        }
+        catch (RegexError err)
+        {
+          Utils.Logger.error (this, "%s", err.message);
+        }
+        exec = exec.strip ();
         // update exec map
         Gee.List<DesktopFileInfo>? exec_list = exec_map[exec];
         if (exec_list == null)

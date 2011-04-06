@@ -297,7 +297,7 @@ namespace Synapse
             if (cancellable.is_cancelled ()) return;
             else if (!exists) continue;
             
-            icon = g_content_type_get_icon ("application/x-note").to_string ();
+            icon = ContentType.get_icon ("application/x-note").to_string ();
           }
           else if (local_only)
           {
@@ -309,7 +309,7 @@ namespace Synapse
             unowned string mimetype = subject.get_mimetype ();
             if (mimetype != null && mimetype != "")
             {
-              icon = g_content_type_get_icon (mimetype).to_string ();
+              icon = ContentType.get_icon (mimetype).to_string ();
             }
             // we want to increase relevancy of shorter URL, so we'll do this
             if (uri.has_prefix ("http"))
@@ -355,7 +355,7 @@ namespace Synapse
 #endif
           float mult = (len - minimum) / (float)(maximum - minimum);
           int adjusted_relevancy = entry.value - (int)(mult * Match.Score.INCREMENT_MINOR);
-          if (mo.uri.str ("?") != null) adjusted_relevancy -= Match.Score.INCREMENT_SMALL;
+          if (mo.uri.index_of ("?") != -1) adjusted_relevancy -= Match.Score.INCREMENT_SMALL;
           real_results.add (mo, adjusted_relevancy);
         }
         else
@@ -432,7 +432,7 @@ namespace Synapse
             unowned string mimetype = subject.get_mimetype ();
             if (mimetype != null && mimetype != "")
             {
-              icon = g_content_type_get_icon (mimetype).to_string ();
+              icon = ContentType.get_icon (mimetype).to_string ();
             }
           }
 
