@@ -208,11 +208,8 @@ namespace Synapse
     
     private static void update_min_max (string uri, ref long minimum, ref long maximum)
     {
-#if VALA_0_12
       long len = uri.length;
-#else
-      long len = (long) uri.size ();
-#endif
+
       if (len > maximum) maximum = len;
       if (len < minimum) minimum = len;
     }
@@ -348,11 +345,8 @@ namespace Synapse
         var mo = entry.key as MatchObject;
         if (mo.uri != null && mo.uri.has_prefix ("http") && minimum != maximum)
         {
-#if VALA_0_12
           long len = mo.uri.length;
-#else
-          long len = (long) mo.uri.size ();
-#endif
+
           float mult = (len - minimum) / (float)(maximum - minimum);
           int adjusted_relevancy = entry.value - (int)(mult * Match.Score.INCREMENT_MINOR);
           if (mo.uri.index_of ("?") != -1) adjusted_relevancy -= Match.Score.INCREMENT_SMALL;
