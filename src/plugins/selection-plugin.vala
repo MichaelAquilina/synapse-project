@@ -110,7 +110,7 @@ namespace Synapse
     
 #if VALA_0_12
     // strangely enough the 0.10 variant is correct here
-    // FIXME: remove once official 0.12 is out
+    // FIXME: remove once official 0.12 is out and 0.11.x aren't used anymore
     private delegate void ClipboardTextReceivedFunc (Gtk.Clipboard cb, string? text);
 #endif
 

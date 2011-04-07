@@ -109,13 +109,8 @@ namespace Synapse
           DataInputStream pastebinit_output = new DataInputStream (read_stream);
           UnixOutputStream write_stream = new UnixOutputStream (write_fd, true);
 
-#if VALA_0_12
           yield write_stream.write_async (content.data);
           yield write_stream.close_async ();
-#else
-          yield write_stream.write_async ((void*)content, content.size (), Priority.DEFAULT);
-          yield write_stream.close_async (Priority.DEFAULT);
-#endif
 
           string? line = null;
           string complete_output = "";

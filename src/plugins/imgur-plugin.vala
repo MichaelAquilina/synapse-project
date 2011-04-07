@@ -75,22 +75,14 @@ namespace Synapse
         int save = 0;
         var encoded = new StringBuilder ();
 
-#if VALA_0_12
         read_bytes = yield input.read_async (buffer);
-#else
-        read_bytes = yield input.read_async (buffer, buffer.length, Priority.DEFAULT);
-#endif
         while (read_bytes != 0)
         {
           buffer.length = (int) read_bytes;
           size_t enc_len = Base64.encode_step ((uchar[]) buffer, false, encode_buffer,
                                                ref state, ref save);
           encoded.append_len ((string) encode_buffer, (ssize_t) enc_len);
-#if VALA_0_12
           read_bytes = yield input.read_async (buffer);
-#else
-          read_bytes = yield input.read_async (buffer, buffer.length, Priority.DEFAULT);
-#endif
         }
         size_t enc_close = Base64.encode_close (false, encode_buffer, ref state, ref save);
         encoded.append_len ((string) encode_buffer, (ssize_t) enc_close);

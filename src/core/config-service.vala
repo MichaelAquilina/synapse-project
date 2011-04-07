@@ -146,10 +146,6 @@ namespace Synapse
       // why the hell is this necessary?
       if (group_obj.has_member (key)) group_obj.remove_member (key);
 
-#if VALA_0_12
-#else
-      unowned
-#endif
       Json.Node node = Json.gobject_serialize (cfg_obj);
       group_obj.set_object_member (key, node.get_object ());
       
