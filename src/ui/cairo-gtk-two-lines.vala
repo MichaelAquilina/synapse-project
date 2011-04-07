@@ -360,12 +360,7 @@ namespace Synapse.Gui
     
     private string get_description_markup (string s)
     {
-      // FIXME: i18n
-      if (s == "") return "<span size=\"medium\"> </span>";
-
-      return Utils.markup_string_with_search (Utils.replace_home_path_with (s, "Home", " > "),
-                                             get_match_search (),
-                                             "medium");
+      return "<span size=\"medium\">%s</span>".printf (s);
     }
 
     /* UI INTERFACE IMPLEMENTATION */
@@ -424,7 +419,10 @@ namespace Synapse.Gui
           match_icon_thumb.clear ();
 
         match_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), size, true));
-        match_label_description.set_markup (get_description_markup (match.description));
+        match_label_description.set_markup (
+              Utils.markup_string_with_search (Utils.get_printable_description (match),
+                                               get_match_search (),
+                                               "medium"));
       }
       results_match.move_selection_to_index (index);
     }

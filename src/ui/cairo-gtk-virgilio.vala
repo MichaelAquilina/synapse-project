@@ -410,10 +410,6 @@ namespace Synapse.Gui
       if (list_view_matches == null) return;
       if (matches != null && matches.size > 0)
       {
-        foreach (Match m in matches)
-        {
-          m.description = Utils.replace_home_path_with (m.description, _("Home"), " > ");
-        }
         list_view_matches.set_list (matches);
         if (list_view_matches.min_visible_rows != 5) update_mask = true;
         list_view_matches.min_visible_rows = 5;

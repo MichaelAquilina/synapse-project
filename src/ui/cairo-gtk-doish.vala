@@ -156,7 +156,7 @@ namespace Synapse.Gui
       spacer.set_size_request (1, 14);
       container_top.pack_start (spacer, false, false, 0);
       
-      description_label = new Label ("Find the difference!! - Is this really Gnome-Do?");
+      description_label = new Label ("");
       description_label.single_line_mode = true;
       description_label.ellipsize = Pango.EllipsizeMode.END;
       description_label.set_alignment (0.5f, 1.0f);
@@ -366,12 +366,7 @@ namespace Synapse.Gui
     
     private string get_description_markup (string s)
     {
-      // FIXME: i18n
-      if (s == "") return "<span size=\"small\"> </span>";
-
-      return Utils.markup_string_with_search (Utils.replace_home_path_with (s, "Home", " > "),
-                                             get_match_search (),
-                                             "small");
+      return "<span size=\"small\">%s</span>".printf (s);
     }
 
     /* UI INTERFACE IMPLEMENTATION */
@@ -435,7 +430,10 @@ namespace Synapse.Gui
           match_icon.set_icon_name (match.icon_name, IconSize.DIALOG);
 
         match_label.set_markup (Utils.markup_string_with_search (match.title, get_match_search (), size, true));
-        description_label.set_markup (get_description_markup (match.description));
+        description_label.set_markup (
+              Utils.markup_string_with_search (Utils.get_printable_description (match),
+                                               get_match_search (),
+                                               "small"));
       }
       results_match.move_selection_to_index (index);
     }

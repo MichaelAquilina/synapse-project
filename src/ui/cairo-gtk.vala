@@ -407,9 +407,9 @@ namespace Synapse.Gui
           if (match.description != "")
           {
             main_label_description.set_markup (
-              Utils.markup_string_with_search (Utils.replace_home_path_with (match.description, "Home", " > "),
-                                             get_match_search (),
-                                             DESCRIPTION_TEXT_SIZE));
+              Utils.markup_string_with_search (Utils.get_printable_description (match),
+                                               get_match_search (),
+                                               DESCRIPTION_TEXT_SIZE));
           }
           else
           {

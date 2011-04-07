@@ -35,7 +35,6 @@ namespace Synapse.Gui
     protected NamedIcon action_icon = null;
     protected ContainerOverlayed match_icon_container_overlayed = null;
     
-    protected Label match_label_description = null;
     protected ShrinkingLabel current_label = null;
 
     protected HBox container_top = null;

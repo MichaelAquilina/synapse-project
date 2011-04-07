@@ -86,22 +86,46 @@ namespace Synapse.Gui
       }
     }
     
-    public static string replace_home_path_with (string path, string replace,
-                                                 string delimiter)
+    public static string get_printable_description (Match match)
     {
-    	if (home_directory == null)
+      UriMatch? m = match as UriMatch;
+      
+      if (m == null) return match.description; // not an UriMatch
+      
+      if (!m.uri.has_prefix("file://")) return m.uri; //fix only local files
+      
+      unowned string? desc = m.get_data<string> ("printable-description");
+      if (desc != null) return desc; // already fixed
+
+      string desc_fixed = m.description;
+      
+      /* // remove filename from path if the title is equal
+      if (m.description.has_suffix(m.title))
+      {
+        desc_fixed = m.description.substring (0, m.description.length - m.title.length);
+      } */
+
+      if (home_directory == null)
     	{
     		home_directory = Environment.get_home_dir ();
     		home_directory_length = home_directory.length;
     	}
-      if (path.has_prefix (home_directory))
-      {
-        string rem = path.substring (home_directory_length);
-        string[] parts = Regex.split_simple ("/", rem);
-        return replace + string.joinv (delimiter, parts);
-      }
-      else
-      	return path;
+    	if (desc_fixed.has_prefix (home_directory)) //if is home dir
+    	{
+    	  desc_fixed = _("Home") + desc_fixed.substring (home_directory_length);
+    	}
+    	else // is root
+    	{
+    	  desc_fixed = _("Root") + desc_fixed;
+    	}
+    	
+    	// convert "/" to " > "
+    	string[] parts = Regex.split_simple ("/", desc_fixed);
+    	desc_fixed = string.joinv (" > ", parts);
+
+    	m.set_data<string> ("printable-description", desc_fixed);
+
+    	return desc_fixed;
     }
     
     public static void update_layout_rtl (Pango.Layout layout, Gtk.TextDirection rtl)

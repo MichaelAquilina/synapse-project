@@ -227,7 +227,7 @@ namespace Synapse.Gui
       }
       
       /* ------------------ draw description --------------------- */
-      s = Markup.printf_escaped (description_markup, m.description);
+      s = Markup.printf_escaped (description_markup, Utils.get_printable_description (m));
 
       layout.set_markup (s, -1);
       layout.set_width (Pango.SCALE * width_for_description);
@@ -835,13 +835,6 @@ namespace Synapse.Gui
 
     public void update_matches (Gee.List<Synapse.Match>? rs)
     {
-      if (rs != null)
-      {
-        foreach (Synapse.Match m in rs)
-        {
-          m.description = Utils.replace_home_path_with (m.description, _("Home"), " > ");
-        }
-      }
       view.set_list (rs);
       if (rs==null || rs.size == 0)
         status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
