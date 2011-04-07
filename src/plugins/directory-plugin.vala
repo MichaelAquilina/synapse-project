@@ -297,12 +297,21 @@ namespace Synapse
       var rs = new ResultSet ();
       foreach (var entry in directory_info_map.values)
       {
-        if (entry.name_folded.has_prefix (q.query_string_folded))
+        if (entry.name_folded == q.query_string_folded)
         {
-          int relevancy = entry.match_obj.uri.has_prefix (home_dir_uri) ?
+          // exact match
+          int relevancy1 = entry.match_obj.uri.has_prefix (home_dir_uri) ?
+            Match.Score.EXCELLENT - Match.Score.URI_PENALTY :
+            Match.Score.AVERAGE - Match.Score.URI_PENALTY;
+          rs.add (entry.match_obj, relevancy1);
+        }
+        else if (entry.name_folded.has_prefix (q.query_string_folded))
+        {
+          // prefix match
+          int relevancy2 = entry.match_obj.uri.has_prefix (home_dir_uri) ?
             Match.Score.VERY_GOOD - Match.Score.URI_PENALTY :
             Match.Score.ABOVE_AVERAGE - Match.Score.URI_PENALTY;
-          rs.add (entry.match_obj, relevancy);
+          rs.add (entry.match_obj, relevancy2);
         }
       }
       

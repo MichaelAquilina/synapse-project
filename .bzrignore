@@ -30,8 +30,8 @@ Makefile.in
 *.gmo
 .deps
 .libs
-src/*.c
-src/synapse
+src/ui/*.c
+src/ui/synapse
 src/core/*.c
 src/plugins/*.c
 src/tile-view/*.c
@@ -41,7 +41,6 @@ src/tile-view/*.h
 src/core/*.vapi
 src/plugins/*.vapi
 src/tile-view/*.vapi
-core
 data/synapse.desktop
 m4/intltool.m4
 m4/libtool.m4
