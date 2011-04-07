@@ -13,7 +13,7 @@ libplugins_la_VALAFLAGS = \
 	--pkg dbus-glib-1 \
 	--pkg gio-unix-2.0 \
 	--pkg libnotify \
-	--vapidir $(top_srcdir)/src/core \
+	--vapidir $(top_builddir)/src/core \
 	--pkg synapse-core \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
@@ -23,9 +23,12 @@ libplugins_la_VALAFLAGS = \
 libplugins_la_CFLAGS = \
 	$(SYNAPSE_MODULES_CFLAGS) \
 	-include config.h -w \
-	-I$(top_srcdir)/src/core \
+	-I$(top_builddir)/src/core \
 	$(NULL)
-libplugins_la_LIBADD = $(SYNAPSE_MODULES_LIBS) ../core/libsynapsecore.la
+libplugins_la_LIBADD = \
+	$(SYNAPSE_MODULES_LIBS) \
+	$(top_builddir)/src/core/libsynapsecore.la \
+	$(NULL)
 libplugins_la_VALASOURCES = \
 	banshee-plugin.vala \
 	calculator-plugin.vala \
@@ -63,6 +66,7 @@ libplugins_la_CFLAGS += $(REST_CFLAGS)
 libplugins_la_LIBADD += $(REST_LIBS)
 endif
 
+GENERATED_C_FILES = $(libplugins_la_VALASOURCES:.vala=.c)
 libplugins_la_SOURCES = \
 	$(libplugins_la_VALASOURCES:.vala=.c) \
 	$(NULL)
@@ -75,8 +79,7 @@ BUILT_SOURCES = plugins.vala.stamp
 
 EXTRA_DIST = \
 	$(libplugins_la_VALASOURCES) \
-	plugins.vapi \
-	plugins.h
+	$(NULL)
 
 DISTCLEANFILES = \
 	$(libplugins_la_VALASOURCES:.vala=.c) \
@@ -84,4 +87,8 @@ DISTCLEANFILES = \
 	plugins.vapi \
 	plugins.h \
 	$(NULL)
+
+# need to make sure the vala sources are rebuilt
+dist-hook:
+	rm -f $(addprefix $(distdir)/,$(GENERATED_C_FILES))
 

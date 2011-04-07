@@ -39,6 +39,7 @@ libsynapsecore_la_CFLAGS += $(ZEITGEIST_CFLAGS)
 libsynapsecore_la_LIBADD += $(ZEITGEIST_LIBS)
 endif
 
+GENERATED_C_FILES = $(libsynapsecore_la_VALASOURCES:.vala=.c)
 libsynapsecore_la_SOURCES = \
 	$(libsynapsecore_la_VALASOURCES:.vala=.c) \
 	$(NULL)
@@ -51,8 +52,7 @@ BUILT_SOURCES = synapse-core.vala.stamp
 
 EXTRA_DIST = \
 	$(libsynapsecore_la_VALASOURCES) \
-	synapse-core.vapi \
-	synapse-core.h
+	$(NULL)
 
 DISTCLEANFILES = \
 	$(libsynapsecore_la_VALASOURCES:.vala=.c) \
@@ -61,4 +61,7 @@ DISTCLEANFILES = \
 	synapse-core.h \
 	SynapseCore-1.0.gir \
 	$(NULL)
+
+dist-hook:
+	rm -f $(addprefix $(distdir)/,$(GENERATED_C_FILES))
 
