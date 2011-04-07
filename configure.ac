@@ -1,4 +1,4 @@
-AC_INIT([synapse], [0.2.6])
+AC_INIT([synapse], [0.2.7])
 AC_DEFINE(RELEASE_NAME, "Aspartate", "Codename of this release")
 
 AC_CONFIG_MACRO_DIR([m4])
