@@ -23,6 +23,7 @@ namespace Synapse
   private class ZeitgeistRelevancyBackend: Object, RelevancyBackend
   {
     private Zeitgeist.Log zg_log;
+    private Zeitgeist.DataSourceRegistry zg_dsr;
     private Gee.Map<string, int> application_popularity;
     private Gee.Map<string, int> uri_popularity;
     private bool has_datahub_gio_module = false;
@@ -43,9 +44,9 @@ namespace Synapse
 
     private async void check_data_sources ()
     {
-      var dsr = new Zeitgeist.DataSourceRegistry ();
-      var ptr_arr = yield dsr.get_data_sources (null);
-      
+      zg_dsr = new Zeitgeist.DataSourceRegistry ();
+      var ptr_arr = yield zg_dsr.get_data_sources (null);
+
       for (uint i=0; i < ptr_arr.len; i++)
       {
         unowned Zeitgeist.DataSource ds;
