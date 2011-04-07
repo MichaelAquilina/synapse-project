@@ -73,7 +73,9 @@ namespace Synapse
         _ ("Control Banshee and add items to playlists."),
         "banshee",
         register_plugin,
-        DBusService.get_default ().name_is_activatable (BansheePlaybackController.UNIQUE_NAME),
+        Environment.find_program_in_path ("banshee") != null ||
+        Environment.find_program_in_path ("banshee-1") != null,
+        //DBusService.get_default ().name_is_activatable (BansheePlaybackController.UNIQUE_NAME), // doesn't work for banshee
         _ ("Banshee is not installed")
       );
     }
