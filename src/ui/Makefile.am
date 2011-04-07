@@ -1,8 +1,6 @@
 # vim: set ft=automake ts=8 sts=8 sw=8 :
 include $(top_srcdir)/Makefile.common
 
-SUBDIRS = core plugins tile-view
-
 bin_PROGRAMS = synapse
 
 VAPIDIR = $(top_srcdir)/vapi
@@ -17,11 +15,11 @@ synapse_VALAFLAGS = \
 	--pkg gee-1.0 \
 	--pkg json-glib-1.0 \
 	--pkg unique-1.0 \
-	--vapidir $(top_srcdir)/src/core \
+	--vapidir $(top_builddir)/src/core \
 	--pkg synapse-core \
-	--vapidir $(top_srcdir)/src/plugins \
+	--vapidir $(top_builddir)/src/plugins \
 	--pkg plugins \
-	--vapidir $(top_srcdir)/src/tile-view \
+	--vapidir $(top_builddir)/src/tile-view \
 	--pkg tile-view \
 	--vapidir $(VAPIDIR) \
 	--pkg gtkhotkey-1.0 \
@@ -33,16 +31,16 @@ synapse_VALAFLAGS = \
 synapse_CFLAGS = \
 	$(SYNAPSE_MODULES_CFLAGS) \
 	-include config.h -w \
-	-I$(top_srcdir)/src/core \
-	-I$(top_srcdir)/src/plugins \
-	-I$(top_srcdir)/src/tile-view \
+	-I$(top_builddir)/src/core \
+	-I$(top_builddir)/src/plugins \
+	-I$(top_builddir)/src/tile-view \
 	$(NULL)
 
 synapse_LDADD = \
 	$(SYNAPSE_MODULES_LIBS) \
-	core/libsynapsecore.la \
-	plugins/libplugins.la \
-	tile-view/libtileview.la \
+	$(top_builddir)/src/core/libsynapsecore.la \
+	$(top_builddir)/src/plugins/libplugins.la \
+	$(top_builddir)/src/tile-view/libtileview.la \
 	$(NULL)
 
 if HAVE_INDICATOR
@@ -65,19 +63,19 @@ endif
 
 synapse_VALASOURCES = \
 	synapse-main.vala \
-	ui-cairo-gtk-base.vala \
-	ui-cairo-gtk.vala \
-	ui-cairo-gtk-doish.vala \
-	ui-cairo-gtk-mini.vala \
-	ui-cairo-gtk-two-lines.vala \
-	ui-cairo-gtk-virgilio.vala \
+	cairo-gtk-base.vala \
+	cairo-gtk.vala \
+	cairo-gtk-doish.vala \
+	cairo-gtk-mini.vala \
+	cairo-gtk-two-lines.vala \
+	cairo-gtk-virgilio.vala \
 	ui-interface.vala \
-	ui-widgets.vala \
-	ui-widgets-matchlistview.vala \
-	ui-icon-cache-service.vala \
-	ui-utils.vala \
-	ui-settings.vala \
-	ui-inspector.vala \
+	widgets.vala \
+	widgets-matchlistview.vala \
+	icon-cache-service.vala \
+	utils.vala \
+	settings.vala \
+	inspector.vala \
 	$(NULL)
 
 GENERATED_C_FILES = $(synapse_VALASOURCES:.vala=.c)
@@ -86,15 +84,16 @@ synapse_SOURCES = $(synapse_VALASOURCES:.vala=.c)
 # we can't let make handle this, otherwise tarballs won't support configure
 # flags (ie --disable-indicator won't rebuild the Vala sources)
 
-$(GENERATED_C_FILES): synapse_vala.stamp
-
-synapse_vala.stamp: $(addprefix $(srcdir)/,$(synapse_VALASOURCES)) Makefile
+#synapse_vala.stamp: $(addprefix $(srcdir)/,$(synapse_VALASOURCES)) Makefile
+synapse_vala.stamp: $(synapse_VALASOURCES) Makefile
 	$(AM_V_VALA)$(VALAC) $(synapse_VALAFLAGS) $(VALAFLAGS) -C $(filter %.vala %.c,$^)
 	$(AM_V_at)touch $@
+
+BUILT_SOURCES = synapse_vala.stamp
 
 DISTCLEANFILES = $(GENERATED_C_FILES) synapse_vala.stamp
 EXTRA_DIST = $(synapse_VALASOURCES)
 
 # need to make sure the vala sources are rebuilt
 dist-hook:
-	rm -rf $(addprefix $(distdir)/,$(GENERATED_C_FILES))
+	rm -f $(addprefix $(distdir)/,$(GENERATED_C_FILES))

@@ -20,8 +20,8 @@ libtileview_la_VALASOURCES = \
 	tile-view.vala \
 	wrap-label.vala \
 	$(NULL)
+GENERATED_C_FILES = $(libtileview_la_VALASOURCES:.vala=.c)
 libtileview_la_SOURCES = \
-	tile-view.vala.stamp \
 	$(libtileview_la_VALASOURCES:.vala=.c) \
 	$(NULL)
 
@@ -33,7 +33,16 @@ BUILT_SOURCES = tile-view.vala.stamp
 
 EXTRA_DIST = \
 	$(libtileview_la_VALASOURCES) \
-	tile-view.vapi \
-	tile-view.vala.stamp \
-	tile-view.h
+	$(NULL)
+
+DISTCLEANFILES = \
+        $(libtileview_la_VALASOURCES:.vala=.c) \
+        tile-view.vala.stamp \
+        tile-view.vapi \
+        tile-view.h \
+        $(NULL)
+
+# need to make sure the vala sources are rebuilt
+dist-hook:
+	rm -f $(addprefix $(distdir)/,$(GENERATED_C_FILES))
 
