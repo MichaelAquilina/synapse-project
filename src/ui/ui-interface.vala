@@ -44,7 +44,7 @@ namespace Synapse.Gui
         if (nameflags.length == 2)
         {
           this.name = nameflags[0];
-          this.flags = (QueryFlags) nameflags[1].to_uint64 ();
+          this.flags = (QueryFlags) uint64.parse (nameflags[1]);
         }
         else if (nameflags.length == 1)
         {

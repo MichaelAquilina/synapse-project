@@ -30,8 +30,10 @@ namespace Synapse
       
       [DBus (name = "addToQueue")]
       public abstract void add_to_queue (string uri) throws DBus.Error;
+      /*
       [DBus (name = "clearQueue")]
       public abstract void clear_queue () throws DBus.Error;
+      */
       [DBus (name = "loadURI")]
       public abstract void load_uri (string uri, bool b) throws DBus.Error;
       

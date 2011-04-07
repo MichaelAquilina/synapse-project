@@ -373,7 +373,7 @@ namespace Synapse.Gui
       {
         string? keyname = KeyComboConfig.get_name_from_key (accel_key, accel_mods);
 
-        int index = path.to_int ();
+        int index = int.parse (path);
         if (index == 0) // Activate
         {
           if (check_keybinding_in_use (index, keyname) >= 0) return;
@@ -396,7 +396,7 @@ namespace Synapse.Gui
       (ren as CellRendererAccel).accel_cleared.connect (
         (a, path) =>
       {
-        int index = path.to_int ();
+        int index = int.parse (path);
         if (index == 0) this.set_keybinding ("");
       });
       col = new TreeViewColumn.with_attributes (_("Shortcut"), ren, "text",1);

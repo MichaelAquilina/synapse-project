@@ -120,8 +120,8 @@ namespace Synapse
         {
           if (limit_remaining != null && reset_time != null)
           {
-            int remaining = limit_remaining.to_int ();
-            long reset = reset_time.to_long ();
+            int remaining = int.parse (limit_remaining);
+            long reset = long.parse (reset_time);
             if (remaining < 10 && reset > 0)
             {
               var cur_time = TimeVal ();

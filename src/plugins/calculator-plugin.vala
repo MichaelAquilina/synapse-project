@@ -83,9 +83,13 @@ namespace Synapse
          will match. Basically it matches strings of the form: 
          "paratheses_open* number (operator paratheses_open* number paratheses_close*)+"
       */
-
-      regex = new Regex ("^\\(*(-?\\d+(\\.\\d+)?)([*/+-^]\\(*(-?\\d+(\\.\\d+)?)\\)*)+$",
+      try
+      {
+        regex = new Regex ("^\\(*(-?\\d+(\\.\\d+)?)([*/+-^]\\(*(-?\\d+(\\.\\d+)?)\\)*)+$",
                          RegexCompileFlags.OPTIMIZE);
+      }catch (Error e) {
+        Utils.Logger.error (this, "Error creating regexp.");
+      }
     }
     
     public bool handles_query (Query query)
@@ -126,7 +130,7 @@ namespace Synapse
 
           if (solution != null)
           {
-            double d = solution.to_double ();
+            double d = double.parse (solution);
             Result result = new Result (d, query.query_string);
             ResultSet results = new ResultSet ();
             results.add (result, Match.Score.AVERAGE);

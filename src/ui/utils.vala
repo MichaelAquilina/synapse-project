@@ -445,14 +445,23 @@ namespace Synapse.Gui
         {
           gdk_color_to_rgb (col, out this.r, out this.g, out this.b);
         }
-
+        
+        /*
+        public void clone (Color col)
+        {
+          this.r = col.r;
+          this.g = col.g;
+          this.b = col.b;
+        }
+        
         public void init_from_rgb (double r, double g, double b)
         {
           this.r = r;
           this.g = g;
           this.b = b;
         }
-        
+        */
+
         public void mix (Color target, double mix_pct, out double r, out double g, out double b)
         {
           r = target.r - this.r;
@@ -463,13 +472,6 @@ namespace Synapse.Gui
           b = this.b + b * mix_pct;
         }
 
-        public void clone (Color col)
-        {
-          this.r = col.r;
-          this.g = col.g;
-          this.b = col.b;
-        }
-        
         public void apply_mod (Mod k)
         {
           switch (k)
