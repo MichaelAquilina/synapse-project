@@ -210,7 +210,7 @@ namespace Synapse
             try
             {
               re = new Regex (any_order, flags);
-              results[re] = Match.Score.ABOVE_AVERAGE + Match.Score.INCREMENT_MINOR;
+              results[re] = Match.Score.AVERAGE + Match.Score.INCREMENT_MINOR;
             }
             catch (RegexError err)
             {
@@ -224,7 +224,7 @@ namespace Synapse
         try
         {
           re = new Regex ("(%s)".printf (Regex.escape_string (query)), flags);
-          results[re] = Match.Score.AVERAGE;
+          results[re] = Match.Score.BELOW_AVERAGE;
         }
         catch (RegexError err)
         {
