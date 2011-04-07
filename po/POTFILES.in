@@ -7,6 +7,7 @@ src/ui/settings.vala
 src/ui/widgets.vala
 src/ui/widgets-matchlistview.vala
 src/ui/icon-cache-service.vala
+src/ui/utils.vala
 src/core/common-actions.vala
 src/plugins/banshee-plugin.vala
 src/plugins/calculator-plugin.vala

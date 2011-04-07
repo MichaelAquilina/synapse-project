@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-24 01:57+0100\n"
+"POT-Creation-Date: 2011-04-07 15:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,235 +26,245 @@ msgid "Synapse"
 msgstr ""
 
 #. activate has to stay in first position!
-#: ../src/synapse-main.vala:97 ../src/ui-settings.vala:244
+#: ../src/ui/synapse-main.vala:101 ../src/ui/settings.vala:244
 msgid "Activate"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-base.vala:102
-msgid "Actions"
-msgstr ""
-
-#: ../src/ui-cairo-gtk-base.vala:103
-msgid "Audio"
-msgstr ""
-
-#: ../src/ui-cairo-gtk-base.vala:104
-msgid "Applications"
-msgstr ""
-
-#: ../src/ui-cairo-gtk-base.vala:105
-msgid "All"
-msgstr ""
-
-#: ../src/ui-cairo-gtk-base.vala:106
-msgid "Documents"
-msgstr ""
-
-#: ../src/ui-cairo-gtk-base.vala:107
-msgid "Images"
-msgstr ""
-
-#: ../src/ui-cairo-gtk-base.vala:108
-msgid "Video"
-msgstr ""
-
-#: ../src/ui-cairo-gtk-base.vala:109
-msgid "Internet"
-msgstr ""
-
-#: ../src/ui-cairo-gtk-virgilio.vala:356 ../src/ui-cairo-gtk-virgilio.vala:375
-#: ../src/ui-widgets-matchlistview.vala:855
+#: ../src/ui/cairo-gtk-virgilio.vala:385 ../src/ui/cairo-gtk-virgilio.vala:404
+#: ../src/ui/widgets-matchlistview.vala:848
 #, c-format
 msgid "<b>%d of %d</b>"
 msgstr ""
 
-#: ../src/ui-cairo-gtk-virgilio.vala:385
-#: ../src/ui-widgets-matchlistview.vala:842
-msgid "Home"
-msgstr ""
-
-#: ../src/ui-cairo-gtk-virgilio.vala:390 ../src/ui-cairo-gtk-virgilio.vala:421
-#: ../src/ui-widgets-matchlistview.vala:849
+#: ../src/ui/cairo-gtk-virgilio.vala:417 ../src/ui/cairo-gtk-virgilio.vala:451
+#: ../src/ui/widgets-matchlistview.vala:842
 #, c-format
 msgid "<b>1 of %d</b>"
 msgstr ""
 
-#: ../src/ui-interface.vala:552
+#: ../src/ui/ui-interface.vala:31 ../src/ui/ui-interface.vala:72
+#: ../src/ui/ui-interface.vala:134
+msgid "All"
+msgstr ""
+
+#: ../src/ui/ui-interface.vala:69 ../src/ui/ui-interface.vala:111
+msgid "Actions"
+msgstr ""
+
+#: ../src/ui/ui-interface.vala:70 ../src/ui/ui-interface.vala:113
+msgid "Audio"
+msgstr ""
+
+#: ../src/ui/ui-interface.vala:71 ../src/ui/ui-interface.vala:114
+msgid "Applications"
+msgstr ""
+
+#: ../src/ui/ui-interface.vala:73 ../src/ui/ui-interface.vala:115
+msgid "Documents"
+msgstr ""
+
+#: ../src/ui/ui-interface.vala:74 ../src/ui/ui-interface.vala:116
+msgid "Images"
+msgstr ""
+
+#: ../src/ui/ui-interface.vala:75 ../src/ui/ui-interface.vala:117
+msgid "Video"
+msgstr ""
+
+#: ../src/ui/ui-interface.vala:76 ../src/ui/ui-interface.vala:118
+msgid "Internet"
+msgstr ""
+
+#. _labels.set (QueryFlags.ALL, _("All")); // Do not remove!
+#: ../src/ui/ui-interface.vala:110
+msgid "Include remote content"
+msgstr ""
+
+#: ../src/ui/ui-interface.vala:112
+msgid "Folders"
+msgstr ""
+
+#. _labels.set (QueryFlags.FILES, _("Files"));
+#: ../src/ui/ui-interface.vala:120
+msgid "Uncategorized"
+msgstr ""
+
+#: ../src/ui/ui-interface.vala:674
 msgid "Searching..."
 msgstr ""
 
-#: ../src/ui-interface.vala:553
+#: ../src/ui/ui-interface.vala:675
 msgid "No results found."
 msgstr ""
 
-#: ../src/ui-interface.vala:554
+#: ../src/ui/ui-interface.vala:676
 msgid "No recent activities found."
 msgstr ""
 
-#: ../src/ui-interface.vala:555
+#: ../src/ui/ui-interface.vala:677
 msgid "Type to search..."
 msgstr ""
 
-#: ../src/ui-interface.vala:653
+#: ../src/ui/ui-interface.vala:775
 msgid "...or press down key to browse recent activities"
 msgstr ""
 
-#: ../src/ui-settings.vala:48
+#: ../src/ui/settings.vala:48
 msgid "Status"
 msgstr ""
 
-#: ../src/ui-settings.vala:50
+#: ../src/ui/settings.vala:50
 msgid "Enable this plugin"
 msgstr ""
 
-#: ../src/ui-settings.vala:51
+#: ../src/ui/settings.vala:51
 msgid "Disable this plugin"
 msgstr ""
 
-#: ../src/ui-settings.vala:57
+#: ../src/ui/settings.vala:57
 msgid "About this plugin"
 msgstr ""
 
-#: ../src/ui-settings.vala:72 ../src/ui-settings.vala:211
+#: ../src/ui/settings.vala:72 ../src/ui/settings.vala:211
 msgid "Configure plugin"
 msgstr ""
 
-#: ../src/ui-settings.vala:88 ../src/ui-settings.vala:463
+#: ../src/ui/settings.vala:88 ../src/ui/settings.vala:463
 msgid "Disabled"
 msgstr ""
 
-#: ../src/ui-settings.vala:92
+#: ../src/ui/settings.vala:92
 msgid "Enabled"
 msgstr ""
 
-#: ../src/ui-settings.vala:146
+#: ../src/ui/settings.vala:146
 msgid "Synapse - Settings"
 msgstr ""
 
-#: ../src/ui-settings.vala:168
+#: ../src/ui/settings.vala:168
 msgid "Default"
 msgstr ""
 
-#: ../src/ui-settings.vala:169
+#: ../src/ui/settings.vala:169
 msgid "Mini"
 msgstr ""
 
-#: ../src/ui-settings.vala:170
+#: ../src/ui/settings.vala:170
 msgid "Dual"
 msgstr ""
 
-#: ../src/ui-settings.vala:171
+#: ../src/ui/settings.vala:171
 msgid "Virgilio"
 msgstr ""
 
-#: ../src/ui-settings.vala:172
+#: ../src/ui/settings.vala:172
 msgid "Do-ish"
 msgstr ""
 
-#: ../src/ui-settings.vala:245
+#: ../src/ui/settings.vala:245
 msgid "Execute"
 msgstr ""
 
-#: ../src/ui-settings.vala:246
+#: ../src/ui/settings.vala:246
 msgid "Execute without hiding"
 msgstr ""
 
-#: ../src/ui-settings.vala:247
+#: ../src/ui/settings.vala:247
 msgid "Alternative Delete"
 msgstr ""
 
-#: ../src/ui-settings.vala:248
+#: ../src/ui/settings.vala:248
 msgid "Next Result"
 msgstr ""
 
-#: ../src/ui-settings.vala:249
+#: ../src/ui/settings.vala:249
 msgid "Previous Result"
 msgstr ""
 
-#: ../src/ui-settings.vala:250
+#: ../src/ui/settings.vala:250
 msgid "First Result"
 msgstr ""
 
-#: ../src/ui-settings.vala:251
+#: ../src/ui/settings.vala:251
 msgid "Last Result"
 msgstr ""
 
-#: ../src/ui-settings.vala:252
+#: ../src/ui/settings.vala:252
 msgid "Next 5 Results"
 msgstr ""
 
-#: ../src/ui-settings.vala:253
+#: ../src/ui/settings.vala:253
 msgid "Previous 5 Results"
 msgstr ""
 
-#: ../src/ui-settings.vala:254
+#: ../src/ui/settings.vala:254
 msgid "Next Category"
 msgstr ""
 
-#: ../src/ui-settings.vala:255
+#: ../src/ui/settings.vala:255
 msgid "Previous Category"
 msgstr ""
 
-#: ../src/ui-settings.vala:256
+#: ../src/ui/settings.vala:256
 msgid "Next Pane"
 msgstr ""
 
-#: ../src/ui-settings.vala:257
+#: ../src/ui/settings.vala:257
 msgid "Previous Pane"
 msgstr ""
 
-#: ../src/ui-settings.vala:258
+#: ../src/ui/settings.vala:258
 msgid "Paste"
 msgstr ""
 
-#: ../src/ui-settings.vala:272
+#: ../src/ui/settings.vala:272
 msgid "Shortcut already in use"
 msgstr ""
 
-#: ../src/ui-settings.vala:298
+#: ../src/ui/settings.vala:298
 msgid "General"
 msgstr ""
 
-#: ../src/ui-settings.vala:299
+#: ../src/ui/settings.vala:299
 msgid "Plugins"
 msgstr ""
 
-#: ../src/ui-settings.vala:305
+#: ../src/ui/settings.vala:305
 msgid "Behavior & Look"
 msgstr ""
 
-#: ../src/ui-settings.vala:317
+#: ../src/ui/settings.vala:317
 msgid "Theme:"
 msgstr ""
 
 #. Autostart checkbox
-#: ../src/ui-settings.vala:322
+#: ../src/ui/settings.vala:322
 msgid "Startup on login"
 msgstr ""
 
 #. Notification icon
-#: ../src/ui-settings.vala:328
+#: ../src/ui/settings.vala:328
 msgid "Show notification icon"
 msgstr ""
 
-#: ../src/ui-settings.vala:343
+#: ../src/ui/settings.vala:343
 msgid "Shortcuts"
 msgstr ""
 
-#: ../src/ui-settings.vala:365
+#: ../src/ui/settings.vala:365
 msgid "Action"
 msgstr ""
 
-#: ../src/ui-settings.vala:402
+#: ../src/ui/settings.vala:402
 msgid "Shortcut"
 msgstr ""
 
-#: ../src/ui-settings.vala:421
+#: ../src/ui/settings.vala:421
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr ""
 
-#: ../src/ui-widgets-matchlistview.vala:827
-#: ../src/ui-widgets-matchlistview.vala:847
+#: ../src/ui/widgets-matchlistview.vala:827
+#: ../src/ui/widgets-matchlistview.vala:840
 msgid "No results."
 msgstr ""
 
@@ -302,60 +312,61 @@ msgstr ""
 msgid "Control Banshee and add items to playlists."
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:77
+#. DBusService.get_default ().name_is_activatable (BansheePlaybackController.UNIQUE_NAME), // doesn't work for banshee
+#: ../src/plugins/banshee-plugin.vala:79
 msgid "Banshee is not installed"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:142
-#: ../src/plugins/rhythmbox-plugin.vala:153
+#: ../src/plugins/banshee-plugin.vala:144
+#: ../src/plugins/rhythmbox-plugin.vala:155
 msgid "Play"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:143
+#: ../src/plugins/banshee-plugin.vala:145
 msgid "Start playback in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:170
-#: ../src/plugins/rhythmbox-plugin.vala:204
+#: ../src/plugins/banshee-plugin.vala:172
+#: ../src/plugins/rhythmbox-plugin.vala:206
 msgid "Pause"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:171
+#: ../src/plugins/banshee-plugin.vala:173
 msgid "Pause playback in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:192
-#: ../src/plugins/rhythmbox-plugin.vala:220
+#: ../src/plugins/banshee-plugin.vala:194
+#: ../src/plugins/rhythmbox-plugin.vala:222
 msgid "Next"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:193
+#: ../src/plugins/banshee-plugin.vala:195
 msgid "Plays the next song in Banshee's playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:215
-#: ../src/plugins/rhythmbox-plugin.vala:243
+#: ../src/plugins/banshee-plugin.vala:217
+#: ../src/plugins/rhythmbox-plugin.vala:245
 msgid "Previous"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:216
+#: ../src/plugins/banshee-plugin.vala:218
 msgid "Plays the previous song in Banshee's playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:239
+#: ../src/plugins/banshee-plugin.vala:241
 msgid "Enqueue in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:240
+#: ../src/plugins/banshee-plugin.vala:242
 msgid "Add the song to Banshee playlist"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:282
+#: ../src/plugins/banshee-plugin.vala:284
 msgid "Play in Banshee"
 msgstr ""
 
-#: ../src/plugins/banshee-plugin.vala:283
-#: ../src/plugins/rhythmbox-plugin.vala:316
+#: ../src/plugins/banshee-plugin.vala:285
+#: ../src/plugins/rhythmbox-plugin.vala:318
 msgid "Clears the current playlist and plays the song"
 msgstr ""
 
@@ -457,27 +468,27 @@ msgstr ""
 msgid "Upload selection to imgur image sharer"
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:171
-#: ../src/plugins/pastebin-plugin.vala:157
+#: ../src/plugins/imgur-plugin.vala:163
+#: ../src/plugins/pastebin-plugin.vala:152
 msgid ""
 "The selection was successfully uploaded and its URL was copied to clipboard."
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:175
-#: ../src/plugins/pastebin-plugin.vala:161
+#: ../src/plugins/imgur-plugin.vala:167
+#: ../src/plugins/pastebin-plugin.vala:156
 msgid ""
 "An error occurred during upload, please check the log for more information."
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:183
+#: ../src/plugins/imgur-plugin.vala:175
 msgid "Synapse - Imgur"
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:239
+#: ../src/plugins/imgur-plugin.vala:231
 msgid "Imgur"
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:240
+#: ../src/plugins/imgur-plugin.vala:232
 msgid "Share images using imgur."
 msgstr ""
 
@@ -556,7 +567,7 @@ msgid "Search using Google Maps"
 msgstr ""
 
 #: ../src/plugins/pastebin-plugin.vala:42
-#: ../src/plugins/pastebin-plugin.vala:233
+#: ../src/plugins/pastebin-plugin.vala:228
 msgid "Pastebin"
 msgstr ""
 
@@ -564,51 +575,51 @@ msgstr ""
 msgid "Pastebin selection"
 msgstr ""
 
-#: ../src/plugins/pastebin-plugin.vala:169
+#: ../src/plugins/pastebin-plugin.vala:164
 msgid "Synapse - Pastebin"
 msgstr ""
 
-#: ../src/plugins/pastebin-plugin.vala:234
+#: ../src/plugins/pastebin-plugin.vala:229
 msgid "Upload files to pastebin."
 msgstr ""
 
-#: ../src/plugins/pastebin-plugin.vala:238
+#: ../src/plugins/pastebin-plugin.vala:233
 msgid "Unable to find \"pastebinit\" program"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:84
+#: ../src/plugins/rhythmbox-plugin.vala:86
 msgid "Control Rhythmbox and add items to playlists."
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:88
+#: ../src/plugins/rhythmbox-plugin.vala:90
 msgid "Rhythmbox is not installed"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:154
+#: ../src/plugins/rhythmbox-plugin.vala:156
 msgid "Start playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:205
+#: ../src/plugins/rhythmbox-plugin.vala:207
 msgid "Pause playback in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:221
+#: ../src/plugins/rhythmbox-plugin.vala:223
 msgid "Plays the next song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:244
+#: ../src/plugins/rhythmbox-plugin.vala:246
 msgid "Plays the previous song in Rhythmbox's playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:268
+#: ../src/plugins/rhythmbox-plugin.vala:270
 msgid "Enqueue in Rhythmbox"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:269
+#: ../src/plugins/rhythmbox-plugin.vala:271
 msgid "Add the song to Rhythmbox playlist"
 msgstr ""
 
-#: ../src/plugins/rhythmbox-plugin.vala:315
+#: ../src/plugins/rhythmbox-plugin.vala:317
 msgid "Play in Rhythmbox"
 msgstr ""
 
