@@ -63,5 +63,36 @@ namespace Synapse.Gui
       _focus[searching_for].key = i;
       _focus[searching_for].value = _results[searching_for].get (i);
     }
+    
+    public void clear (int default_category = 0)
+    {
+      searching_for = SearchingFor.SOURCES;
+      for (int i = 0; i < SearchingFor.COUNT; i++)
+      {
+        _focus[i].key = 0;
+        _focus[i].value = null;
+        _results[i] = null;
+        _query[i] = "";
+      }
+      selected_category = default_category;
+    }
+    
+    public void clear_searching_for (SearchingFor i)
+    {
+      Synapse.Utils.Logger.log (this, "CLEAR: %u", i);
+      _focus[i].key = 0;
+      _focus[i].value = null;
+      _results[i] = null;
+      _query[i] = "";
+    }
+    
+    construct
+    {
+      for (int i = 0; i < SearchingFor.COUNT; i++)
+      {
+        _focus[i] = new Entry<int, Match> ();
+      }
+      clear ();
+    }
   }
 }

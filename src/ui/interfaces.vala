@@ -62,6 +62,9 @@ namespace Synapse.Gui
     public abstract Entry<int, Match> get_actual_focus ();
     
     public abstract void set_actual_focus (int i);
+    
+    public abstract void clear (int default_category = 0);
+    public abstract void clear_searching_for (SearchingFor what);
   }
   
   public interface IController : Object
@@ -72,6 +75,7 @@ namespace Synapse.Gui
     public abstract CategoryConfig category_config { get; construct set; }
     
     public static const int RESULTS_PER_PAGE = 5;
+    public static const int PARTIAL_RESULT_TIMEOUT = 110;
     
     /* Events called by View */
     

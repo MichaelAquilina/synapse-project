@@ -31,18 +31,17 @@ namespace Synapse.Gui
     public CategoryConfig category_config { get; construct set; }
     
     protected IModel model;
-    private QueryFlags qf;
-    
     protected IView view = null;
+
     public void set_view (Type view_type)
     {
       if (!view_type.is_a (typeof (IView))) return;
       if (this.view != null) this.view.vanish ();
       this.view = GLib.Object.new (view_type, "model", this.model,
                                               "controller", this) as IView;
-      //reset_search (true, true); //TODO!!
+      reset_search (true, true);
       this.view.vanished.connect (()=>{
-        //reset_search (true, true);
+        reset_search (true, true);
       });
     }
     
@@ -72,11 +71,11 @@ namespace Synapse.Gui
       if (category_index == model.selected_category) return;
 
       model.selected_category = category_index;
-      model.query [SearchingFor.ACTIONS] = "";
-      model.query [SearchingFor.TARGETS] = "";
+      view.update_selected_category ();
+      
       qf = this.category_config.categories.get (category_index).flags;
       
-      // TODO: start the new search!
+      search_for_matches (SearchingFor.SOURCES); //TODO: recent activities
     }
 
     
@@ -94,9 +93,17 @@ namespace Synapse.Gui
       {
         case SearchingFor.SOURCES:
           view.update_focused_source ();
+          model.clear_searching_for (SearchingFor.ACTIONS);
+          search_for_actions ();
           break;
         case SearchingFor.ACTIONS:
           view.update_focused_action ();
+
+          model.clear_searching_for (SearchingFor.TARGETS);
+          view.update_targets ();
+          view.update_focused_target ();
+          if (model.focus[SearchingFor.ACTIONS].value.needs_target())
+            search_for_matches (SearchingFor.TARGETS, true);
           break;
         default: //case SearchingFor.TARGETS:
           view.update_focused_target ();
@@ -120,7 +127,7 @@ namespace Synapse.Gui
     {
       /* Initialize model */
       this.model = new Model ();
-      //this.init_search ();
+      this.init_search ();
      
       /* Typing handle */
       im_context = new Gtk.IMMulticontext ();
@@ -167,13 +174,13 @@ namespace Synapse.Gui
       switch (model.searching_for)
       {
         case SearchingFor.SOURCES:
-          //TODO: start search
+          search_for_matches (SearchingFor.SOURCES); //TODO: recent activities
           break;
         case SearchingFor.ACTIONS:
-          //TODO: start search
+          search_for_actions ();
           break;
         default: //case SearchingFor.TARGETS:
-          //TODO : start new search for targets
+          search_for_matches (SearchingFor.TARGETS, true);
           break;
       }
     }
@@ -202,15 +209,24 @@ namespace Synapse.Gui
             clear_search_or_hide_pressed ();
             break;
           case KeyComboConfig.Commands.PREV_CATEGORY:
-            
+            //TODO update qf
             break;
           case KeyComboConfig.Commands.NEXT_CATEGORY:
-            
+            //TODO update qf
             break;
           case KeyComboConfig.Commands.FIRST_RESULT:
+            if (view.is_list_visible () && this.model.focus[this.model.searching_for].key == 0)
+            {
+              view.set_list_visible (false);
+              break;
+            }
             selected_index_changed_event (0);
             break;
           case KeyComboConfig.Commands.LAST_RESULT:
+            if (!view.is_list_visible ())
+            {
+              view.set_list_visible (true);
+            }
             if (model.has_results ())
               selected_index_changed_event (this.model.results[this.model.searching_for].size - 1);
             break;
@@ -295,7 +311,278 @@ namespace Synapse.Gui
     }
     
     /* ------------ Search Engine here ---------------- */
+    private QueryFlags qf;
+    /* Stupid Vala: I can't use array[SearchingFor.COUNT] for declaration */
+    private Cancellable current_cancellable[3];
+    private uint tid[3];
+    private bool partial_result_sent[3];
     
+    private ResultSet last_result_set; //FIXME: is this really needed here?!
     
+    private void init_search ()
+    {
+      for (int i = 0; i < SearchingFor.COUNT; i++)
+      {
+        current_cancellable[i] = new Cancellable ();
+        tid[i] = 0;
+        partial_result_sent[i] = false;
+      }
+      model.clear (category_config.default_category_index);
+      qf = category_config.categories.get (category_config.default_category_index).flags;
+      last_result_set = null;
+    }
+    
+    /**
+     * This method can be called to reset the search.
+     * @param notify if true, visual update matches and actions in the UI
+     * @param reset_flags, if true, resets query flags to default (All)
+     */
+    protected void reset_search (bool notify = true, bool reset_flags = true)
+    {
+      Synapse.Utils.Logger.log (this, "RESET");
+      for (int i = 0; i < SearchingFor.COUNT; i++)
+      {
+        current_cancellable[i].cancel ();
+        current_cancellable[i] = new Cancellable ();
+        if (tid[i] != 0)
+        {
+          Source.remove (tid[i]);
+          tid[i] = 0;
+        }
+        partial_result_sent[i] = false;
+      }
+//      search_with_empty = false;
+      model.clear ();
+      if (reset_flags)
+      {
+        model.selected_category = this.category_config.default_category_index;
+        qf = this.category_config.categories.get (model.selected_category).flags;
+        if (view == null) return;
+        view.update_selected_category ();
+      }
+      if (notify && view != null)
+      {
+        //set_throbber_visible (false);
+        view.update_sources ();
+        view.update_actions ();
+        view.update_targets ();
+        view.update_focused_source ();
+        view.update_focused_action ();
+        view.update_focused_target ();
+        view.update_searching_for ();
+      }
+    }
+    
+    private void search_for_matches (SearchingFor what, bool search_with_empty = false, SearchProvider? search_provider = null)
+    {
+      Synapse.Utils.Logger.log (this, "search_for_matches: %u", what);
+    
+      current_cancellable[what].cancel ();
+      current_cancellable[what] = new Cancellable ();
+      
+      if (search_provider == null) search_provider = data_sink;
+      
+      if (what == SearchingFor.SOURCES)
+      {
+        /* Stop search on targets, just in case */
+        current_cancellable[SearchingFor.TARGETS].cancel ();
+        current_cancellable[SearchingFor.TARGETS] = new Cancellable ();
+        partial_result_sent[SearchingFor.TARGETS] = false;
+        if (tid[SearchingFor.TARGETS] != 0)
+        {
+          Source.remove (tid[SearchingFor.TARGETS]);
+          tid[SearchingFor.TARGETS] = 0;
+        }
+      }
+      else
+      {
+        /* You cannot search for targets if you don't have an action */
+        return_if_fail (model.focus[SearchingFor.ACTIONS].value != null);
+      }
+      
+      /* if string is empty, and not want to search recent activities, reset */
+      if (!search_with_empty && model.query[what]=="")
+      {
+        reset_search (true);
+        return;
+      }
+      
+      partial_result_sent[what] = false;
+
+      last_result_set = new ResultSet ();
+      if (tid[what] == 0)
+      {
+        tid[what] = Timeout.add (PARTIAL_RESULT_TIMEOUT, () => {
+            tid[what] = 0;
+            send_partial_results (what, this.last_result_set);
+            return false;
+        });
+      }
+      
+      search_provider.search (model.query[what],
+                              what == what.SOURCES ? qf : model.focus[SearchingFor.ACTIONS].value.target_flags (),
+                              last_result_set,
+                              current_cancellable[what],
+                              (obj, res)=>{
+        try 
+        {
+          var rs = (obj as SearchProvider).search.end (res);
+          search_ready (what, rs);
+        }
+        catch (Error e) {
+          //cancelled
+        }
+      });
+    }
+    
+    private void send_partial_results (SearchingFor what, ResultSet rs)
+    {
+      Synapse.Utils.Logger.log (this, "partial_matches: %u", what);
+      /* Search not ready */
+      //TODO: set_throbber_visible (true);
+      partial_result_sent[what] = true;
+      /* If partial result set is empty
+       * Try to match the new string on current focus
+       */
+      if (model.focus[what].value != null && rs.size == 0)
+      {
+        var matchers = Query.get_matchers_for_query (model.query[what], 0,
+            RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
+        foreach (var matcher in matchers)
+        {
+          if (matcher.key.match (model.focus[what].value.title))
+          {
+            if (what == what.SOURCES)
+              view.update_focused_source ();
+            else
+              view.update_focused_target ();
+            return;
+          }
+        }
+      }
+      /* String didn't match, get partial results */
+      model.focus[what].key = 0;
+      model.results[what] = rs.get_sorted_list ();
+      if (model.results[what].size > 0)
+      {
+        model.focus[what].value = model.results[what].first();
+      }
+      else
+      {
+        model.focus[what].value = null;
+      }
+      
+      if (what == what.SOURCES)
+      {
+        view.update_sources ();
+        view.update_focused_source ();
+
+        model.clear_searching_for (SearchingFor.ACTIONS);
+        search_for_actions ();
+      }
+      else
+      {
+        view.update_targets ();
+        view.update_focused_target ();
+      }
+    }
+    
+    private void search_ready (SearchingFor what, Gee.List<Match> res)
+    {
+      Synapse.Utils.Logger.log (this, "ready_for_matches: %u", what);
+      if (!partial_result_sent[what])
+      {
+        /* reset current focus */
+        model.focus[what].value = null;
+        model.focus[what].key = 0;
+      }
+      model.results[what] = res;
+
+      /* Search not cancelled and ready */
+      //set_throbber_visible (false);
+      if (tid[what] != 0)
+      {
+        Source.remove (tid[what]);
+        tid[what] = 0;
+      }
+      if (model.results[what].size > 0)
+      {
+        if (model.focus[what].value != null)
+        {
+          /* The magic is here, remove che current focus from the new list */
+          /* and then reinsert it in the current focus position */
+          int i = model.results[what].index_of (model.focus[what].value);
+          if (i >= 0)
+          {
+            model.focus[what].key = i;
+          }
+          else
+          {
+            // cannot find the item! That's impossible! Btw, select the first item
+            model.focus[what].key = 0;
+            model.focus[what].value = model.results[what].first();
+          }
+        }
+        else
+        {
+          model.focus[what].value = model.results[what].get (model.focus[what].key);
+        }
+      }
+      else
+      {
+        model.clear_searching_for (what);
+      }
+
+      if (what == what.SOURCES)
+      {
+        view.update_sources ();
+        view.update_focused_source ();
+        
+        model.clear_searching_for (SearchingFor.ACTIONS);
+        search_for_actions ();
+      }
+      else
+      {
+        view.update_targets ();
+        view.update_focused_target ();
+      }
+    }
+
+    private void search_for_actions ()
+    {
+      Synapse.Utils.Logger.log (this, "search_for_actions");
+      /* We are searching for actions => reset target & notify */
+      model.clear_searching_for (SearchingFor.TARGETS);
+      view.update_targets ();
+      view.update_focused_target ();
+      
+      /* No sources => no actions */
+      if (model.focus[SearchingFor.SOURCES].value == null)
+      {
+        model.clear_searching_for (SearchingFor.ACTIONS);
+        view.update_actions ();
+        view.update_focused_action ();
+        return;
+      }
+      
+      model.results[SearchingFor.ACTIONS] = 
+        data_sink.find_actions_for_match (model.focus[SearchingFor.SOURCES].value, model.query[SearchingFor.ACTIONS], qf);
+      if (model.results[SearchingFor.ACTIONS].size > 0)
+      {
+        model.focus[SearchingFor.ACTIONS].value = model.results[SearchingFor.ACTIONS].first();
+        if (model.focus[SearchingFor.ACTIONS].value.needs_target ())
+        {
+          search_for_matches (SearchingFor.TARGETS, true);
+        }
+      }
+      else
+      {
+        model.focus[SearchingFor.ACTIONS].value = null;
+      }
+      model.focus[SearchingFor.ACTIONS].key = 0;
+
+      view.update_actions ();
+      view.update_focused_action ();
+    }
   }
 }
