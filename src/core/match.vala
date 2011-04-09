@@ -64,6 +64,21 @@ namespace Synapse
       Utils.Logger.error (this, "execute () is not implemented");
     }
     
+    public virtual void execute_with_target (Match? source, Match? target = null)
+    {
+      if (target == null) execute (source);
+      else Utils.Logger.error (this, "execute () is not implemented");
+    }
+    
+    public virtual bool needs_target () {
+      return false;
+    }
+    
+    public virtual QueryFlags target_flags ()
+    {
+      return QueryFlags.ALL;
+    }
+    
     public signal void executed ();
   }
   

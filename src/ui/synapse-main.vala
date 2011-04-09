@@ -51,6 +51,7 @@ namespace Synapse
 #else
     private StatusIcon status_icon;
 #endif
+    private Gui.IController controller;
     
     public UILauncher ()
     {
@@ -66,8 +67,14 @@ namespace Synapse
       
       bind_keyboard_shortcut ();
       
-      init_ui (settings.get_current_theme ());
-      if (!is_startup) this.show_ui (Gtk.get_current_event_time ());
+      //init_ui (settings.get_current_theme ());
+      //if (!is_startup) this.show_ui (Gtk.get_current_event_time ());
+      controller = GLib.Object.new (typeof (Gui.Controller), 
+                                    "data-sink", data_sink,
+                                    "key-combo-config", key_combo_config,
+                                    "category-config", category_config) as Gui.IController;
+      controller.set_view (typeof (TestView));
+      controller.summon_or_vanish ();
       
       settings.theme_selected.connect (init_ui);
       init_indicator ();
@@ -192,8 +199,10 @@ namespace Synapse
     
     protected void show_ui (uint32 event_time)
     {
-      if (this.ui == null) return;
-      this.ui.show_hide_with_time (event_time);
+      //if (this.ui == null) return;
+      //this.ui.show_hide_with_time (event_time);
+      if (this.controller == null) return;
+      this.controller.summon_or_vanish ();
     }
     
     private void bind_keyboard_shortcut ()

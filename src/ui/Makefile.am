@@ -63,6 +63,10 @@ endif
 
 synapse_VALASOURCES = \
 	synapse-main.vala \
+	interfaces.vala \
+	controller.vala \
+	model.vala \
+	view-test.vala \
 	cairo-gtk-base.vala \
 	cairo-gtk.vala \
 	cairo-gtk-doish.vala \
