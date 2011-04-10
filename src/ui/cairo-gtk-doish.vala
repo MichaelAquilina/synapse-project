@@ -457,7 +457,7 @@ namespace Synapse.Gui
         else
         {
           action_label.set_markup (Utils.markup_string_with_search ("", get_action_search(), size));
-          description_label.set_text (get_description_markup (NO_RESULTS));
+          description_label.set_markup (get_description_markup (NO_RESULTS));
         }
       }
       else
