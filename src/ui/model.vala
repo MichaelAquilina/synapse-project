@@ -79,7 +79,7 @@ namespace Synapse.Gui
     
     public void clear_searching_for (SearchingFor i)
     {
-      Synapse.Utils.Logger.log (this, "CLEAR: %u", i);
+      // Synapse.Utils.Logger.log (this, "CLEAR: %u", i);
       _focus[i].key = 0;
       _focus[i].value = null;
       _results[i] = null;

@@ -88,6 +88,8 @@ namespace Synapse.Gui
       if (focus_index >= model.results[model.searching_for].size)
         focus_index = model.results[model.searching_for].size - 1;
 
+      if (focus_index == model.focus[model.searching_for].key) return;
+
       model.set_actual_focus (focus_index);
       switch (model.searching_for)
       {
@@ -339,7 +341,7 @@ namespace Synapse.Gui
      */
     protected void reset_search (bool notify = true, bool reset_flags = true)
     {
-      Synapse.Utils.Logger.log (this, "RESET");
+      // Synapse.Utils.Logger.log (this, "RESET");
       for (int i = 0; i < SearchingFor.COUNT; i++)
       {
         current_cancellable[i].cancel ();
@@ -375,7 +377,7 @@ namespace Synapse.Gui
     
     private void search_for_matches (SearchingFor what, bool search_with_empty = false, SearchProvider? search_provider = null)
     {
-      Synapse.Utils.Logger.log (this, "search_for_matches: %u", what);
+      // Synapse.Utils.Logger.log (this, "search_for_matches: %u", what);
     
       current_cancellable[what].cancel ();
       current_cancellable[what] = new Cancellable ();
@@ -437,7 +439,7 @@ namespace Synapse.Gui
     
     private void send_partial_results (SearchingFor what, ResultSet rs)
     {
-      Synapse.Utils.Logger.log (this, "partial_matches: %u", what);
+      // Synapse.Utils.Logger.log (this, "partial_matches: %u", what);
       /* Search not ready */
       //TODO: set_throbber_visible (true);
       partial_result_sent[what] = true;
@@ -489,7 +491,7 @@ namespace Synapse.Gui
     
     private void search_ready (SearchingFor what, Gee.List<Match> res)
     {
-      Synapse.Utils.Logger.log (this, "ready_for_matches: %u", what);
+      // Synapse.Utils.Logger.log (this, "ready_for_matches: %u", what);
       if (!partial_result_sent[what])
       {
         /* reset current focus */
@@ -550,11 +552,14 @@ namespace Synapse.Gui
 
     private void search_for_actions ()
     {
-      Synapse.Utils.Logger.log (this, "search_for_actions");
+      // Synapse.Utils.Logger.log (this, "search_for_actions");
       /* We are searching for actions => reset target & notify */
-      model.clear_searching_for (SearchingFor.TARGETS);
-      view.update_targets ();
-      view.update_focused_target ();
+      if (model.results[SearchingFor.TARGETS] != null)
+      {
+        model.clear_searching_for (SearchingFor.TARGETS);
+        view.update_targets ();
+        view.update_focused_target ();
+      }
       
       /* No sources => no actions */
       if (model.focus[SearchingFor.SOURCES].value == null)

@@ -30,19 +30,57 @@ namespace Synapse.Gui
       build_ui ();
     }
     
-    private NamedIcon match_icon;
-    private Label match_label;
+    private NamedIcon source_icon;
+    private Label source_label;
+    private NamedIcon action_icon;
+    private Label action_label;
+    private NamedIcon target_icon;
+    private Label target_label;
     
     private void build_ui ()
     {
       HBox hb = new HBox (false, 5);
-      match_icon = new NamedIcon ();
-      match_icon.set_icon_name ("synapse", IconSize.DND);
-      match_icon.set_size_request (128, 128);
-      match_icon.set_pixel_size (128);
-      hb.pack_start (match_icon, false);
-      match_label = new Label ("");
-      hb.pack_start (match_label, true);
+      
+      VBox vb = null;
+      
+      {
+        vb = new VBox (false, 5);
+        source_icon = new NamedIcon ();
+        source_icon.set_icon_name ("synapse", IconSize.DND);
+        source_icon.set_size_request (128, 128);
+        source_icon.set_pixel_size (128);
+        vb.pack_start (source_icon, false);
+        source_label = new Label ("");
+        source_label.set_ellipsize (Pango.EllipsizeMode.END);
+        vb.pack_start (source_label, true);
+        hb.pack_start (vb);
+      }
+      
+      {
+        vb = new VBox (false, 5);
+        action_icon = new NamedIcon ();
+        action_icon.set_icon_name ("synapse", IconSize.DND);
+        action_icon.set_size_request (128, 128);
+        action_icon.set_pixel_size (128);
+        vb.pack_start (action_icon, false);
+        action_label = new Label ("");
+        action_label.set_ellipsize (Pango.EllipsizeMode.END);
+        vb.pack_start (action_label, true);
+        hb.pack_start (vb);
+      }
+      
+      {
+        vb = new VBox (false, 5);
+        target_icon = new NamedIcon ();
+        target_icon.set_icon_name ("synapse", IconSize.DND);
+        target_icon.set_size_request (128, 128);
+        target_icon.set_pixel_size (128);
+        vb.pack_start (target_icon, false);
+        target_label = new Label ("");
+        target_label.set_ellipsize (Pango.EllipsizeMode.END);
+        vb.pack_start (target_label, true);
+        hb.pack_start (vb);
+      }
       
       hb.show_all ();
       
@@ -53,23 +91,43 @@ namespace Synapse.Gui
     {
       if (this.model.focus[SearchingFor.SOURCES].value != null)
       {
-        match_icon.set_icon_name (this.model.focus[SearchingFor.SOURCES].value.icon_name, IconSize.DND);
-        match_label.set_markup (Gui.Utils.markup_string_with_search (this.model.focus[SearchingFor.SOURCES].value.title, 
+        source_icon.set_icon_name (this.model.focus[SearchingFor.SOURCES].value.icon_name, IconSize.DND);
+        source_label.set_markup (Gui.Utils.markup_string_with_search (this.model.focus[SearchingFor.SOURCES].value.title, 
                                                                      this.model.query[SearchingFor.SOURCES]));
       }
       else
       {
-        match_icon.set_icon_name ("synapse", IconSize.DND);
-        match_label.set_text ("search");
+        source_icon.set_icon_name ("synapse", IconSize.DND);
+        source_label.set_text ("search");
       }
     }
     public override void update_focused_action ()
     {
-    
+      if (this.model.focus[SearchingFor.ACTIONS].value != null)
+      {
+        action_icon.set_icon_name (this.model.focus[SearchingFor.ACTIONS].value.icon_name, IconSize.DND);
+        action_label.set_markup (Gui.Utils.markup_string_with_search (this.model.focus[SearchingFor.ACTIONS].value.title, 
+                                                                     this.model.query[SearchingFor.ACTIONS]));
+      }
+      else
+      {
+        action_icon.set_icon_name ("synapse", IconSize.DND);
+        action_label.set_text ("search");
+      }
     }
     public override void update_focused_target ()
     {
-    
+      if (this.model.focus[SearchingFor.TARGETS].value != null)
+      {
+        target_icon.set_icon_name (this.model.focus[SearchingFor.TARGETS].value.icon_name, IconSize.DND);
+        target_label.set_markup (Gui.Utils.markup_string_with_search (this.model.focus[SearchingFor.TARGETS].value.title, 
+                                                                     this.model.query[SearchingFor.TARGETS]));
+      }
+      else
+      {
+        target_icon.set_icon_name ("synapse", IconSize.DND);
+        target_label.set_text ("search");
+      }
     }
     public override void update_sources ()
     {
