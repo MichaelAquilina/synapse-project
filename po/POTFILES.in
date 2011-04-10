@@ -3,6 +3,7 @@ src/ui/synapse-main.vala
 src/ui/interfaces.vala
 src/ui/model.vala
 src/ui/controller.vala
+src/ui/view-base.vala
 src/ui/view-test.vala
 src/ui/cairo-gtk-base.vala
 src/ui/cairo-gtk-virgilio.vala

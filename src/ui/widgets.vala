@@ -37,6 +37,277 @@ namespace Synapse.Gui
     public bool extended_info_enabled { get; set; default = true; }
   }
 
+  public class SmartLabel : Gtk.Misc
+  {
+    protected static string[] size_to_string = {
+      "xx-small",
+      "x-small",
+      "small",
+      "medium",
+      "large",
+      "x-large",
+      "xx-large"
+    };
+    
+    protected static double[] size_to_scale = {
+      Pango.Scale.XX_SMALL,
+      Pango.Scale.X_SMALL,
+      Pango.Scale.SMALL,
+      Pango.Scale.MEDIUM,
+      Pango.Scale.LARGE,
+      Pango.Scale.X_LARGE,
+      Pango.Scale.XX_LARGE
+    };
+
+    public enum Size
+    {
+      XX_SMALL,
+      X_SMALL,
+      SMALL,
+      MEDIUM,
+      LARGE,
+      X_LARGE,
+      XX_LARGE
+    }
+    
+    public Size size {
+      get; set; default = Size.MEDIUM;
+    }
+
+    public Size min_size {
+      get; set; default = Size.MEDIUM;
+    }
+    
+    private string text = "";
+    
+    private Size real_size = Size.MEDIUM;
+    private Requisition last_req;
+    private Pango.Layout layout;
+    private Utils.ColorHelper ch;
+    private Pango.EllipsizeMode ellipsize = Pango.EllipsizeMode.NONE;
+    
+    private uint tid = 0;
+    private static const int INITIAL_TIMEOUT = 1750;
+    private static const int SPACING = 50;
+    private int offset = 0;
+    private bool animate = false;
+
+    construct
+    {
+      layout = this.create_pango_layout ("");
+      ch = new Utils.ColorHelper (this);
+      last_req = {0, 0};
+      this.set_has_window (false);
+      this.notify["size"].connect (sizes_changed);
+      this.notify["min-size"].connect (sizes_changed);
+      this.xalign = 0.0f;
+      this.yalign = 1.0f;
+
+      //do not remove this, it's important to create the first scale attr
+      this.set_text ("");
+    }
+    
+    private void sizes_changed ()
+    {
+      if (min_size > size) this._min_size = this._size;
+      this.real_size = size;
+      queue_resize ();
+    }
+    
+    public void set_animation_enabled (bool b)
+    {
+      this.animate = b;
+
+      if (b)
+      {
+        this.ellipsize = Pango.EllipsizeMode.NONE;
+        sizes_changed ();
+      }
+      else
+      {
+        if (tid != 0) stop_animation ();
+        sizes_changed ();
+      }
+    }
+    
+    public void set_text (string s)
+    {
+      string m = Markup.escape_text (s);
+      if (m == text) return;
+      text = m;
+      text_updated ();
+    }
+    
+    public void set_markup (string m)
+    {
+      if (m == text) return;
+      text = m;
+      text_updated ();
+    }
+    
+    private void stop_animation ()
+    {
+      Source.remove (tid);
+      tid = 0;
+      offset = 0;
+    }
+    
+    private void start_animation ()
+    {
+      if (tid != 0) return;
+
+      int width, height;
+      layout.get_pixel_size (out width, out height);
+      width += SPACING;
+      tid = Timeout.add (40, ()=>{
+        offset = (offset - 1) % width;
+        queue_draw ();
+        return true;
+      });
+    }
+    
+    public void set_ellipsize (Pango.EllipsizeMode mode)
+    {
+      if (animate) this.ellipsize = Pango.EllipsizeMode.NONE;
+      else this.ellipsize = mode;
+    }
+    
+    private void text_updated ()
+    {
+      real_size = _size;
+      queue_resize ();
+      if (tid != 0) stop_animation ();
+    }
+    
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      base.size_allocate (allocation);
+
+      /* size_allocate is called after size_request */
+      /* so last_req is filled with the standard requisition */
+
+      if (allocation.width >= last_req.width || ((!animate) && real_size == _min_size))
+      {
+        /* That's good, we have enough space for default size */
+        if (tid != 0) stop_animation ();
+        return;
+      }
+      /* Mh, bad, let's start shrinking */
+      Requisition req;
+
+      var attrs = layout.get_attributes ();
+      var iter = attrs.get_iterator (); //the first iterator is a scale
+      unowned Pango.Attribute? attr = iter.get (Pango.AttrType.SCALE);
+      unowned Pango.AttrFloat a = (Pango.AttrFloat) attr;
+
+      bool needs_animation = true;
+      while (real_size >= _min_size)
+      {
+        real_size = real_size - 1;
+        a.value = this.size_to_scale[real_size];
+        layout.context_changed ();
+        requistion_for_size (out req, null, real_size, true);
+
+        if (allocation.width >= req.width)
+        {
+          needs_animation = false;
+          break;
+        }
+      }
+
+      if (animate && needs_animation)
+      {
+        if (tid == 0)
+        {
+          tid = Timeout.add (INITIAL_TIMEOUT, ()=>{
+            tid = 0;
+            start_animation ();
+            return false;
+          });
+        }
+      }
+      else
+      {
+        if (tid != 0) stop_animation ();
+      }
+    }
+    
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      int h = this.allocation.height - this.ypad * 2;
+      int w = this.allocation.width - this.xpad * 2;
+      Cairo.Context ctx = Gdk.cairo_create (this.window);
+      ctx.translate (this.allocation.x + this.xpad, this.allocation.y + this.ypad);
+      ctx.rectangle (0, 0, w, h);
+      ctx.clip ();
+
+      int width, height;
+      layout.get_pixel_size (out width, out height);
+
+      ctx.translate (xalign * (w - width), yalign * (h - height));
+      
+      if (animate && tid != 0)
+      {
+        ctx.translate (offset, 0);
+      }
+      else
+      {
+        if (ellipsize != Pango.EllipsizeMode.NONE)
+        {
+          layout.set_width (w * Pango.SCALE);
+          layout.set_ellipsize (ellipsize);
+        }
+      }
+      ctx.set_operator (Cairo.Operator.OVER);
+      ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, this.get_state ());
+      
+      Pango.cairo_show_layout (ctx, layout);
+      
+      width += SPACING;
+      if (animate && tid != 0 && (offset + width) < w)
+      {
+        ctx.translate (width, 0);
+        Pango.cairo_show_layout (ctx, layout);
+      }
+
+      return true;
+    }
+
+    protected void requistion_for_size (out Requisition req, out int char_width, Size s, bool return_only_width = false)
+    {
+      req.width = this.xpad * 2;
+      req.height = this.ypad * 2;
+
+      Pango.Rectangle logical_rect;
+      layout.set_width (-1);
+      layout.set_ellipsize (Pango.EllipsizeMode.NONE);
+      layout.get_extents (null, out logical_rect);
+      
+      req.width += logical_rect.width / Pango.SCALE;
+      if (return_only_width) return;
+      
+      Pango.Context ctx = layout.get_context ();
+      Pango.FontDescription fdesc = new Pango.FontDescription ();
+      fdesc.merge_static (this.style.font_desc, true);
+
+      fdesc.set_size ((int)(this.size_to_scale[s] * (double)fdesc.get_size()));
+      var metrics = ctx.get_metrics (fdesc, ctx.get_language ());
+
+      req.height += (metrics.get_ascent () + metrics.get_descent ()) / Pango.SCALE;
+      char_width = int.max (metrics.get_approximate_char_width (), metrics.get_approximate_digit_width ()) / Pango.SCALE;
+    }
+    
+    public override void size_request (out Requisition req)
+    {
+      layout.set_markup ("<span size=\"%s\">%s</span>".printf (size_to_string[_size], this.text), -1);
+      int char_width;
+      this.requistion_for_size (out req, out char_width, this._size);
+      last_req.width = req.width;
+      last_req.height = req.height;
+      if (this.ellipsize != Pango.EllipsizeMode.NONE || animate)
+        req.width = char_width * 3;
+    }
+  }
 
   public class ContainerOverlayed: Gtk.Container
   {

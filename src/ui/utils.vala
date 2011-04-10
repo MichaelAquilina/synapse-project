@@ -30,17 +30,19 @@ namespace Synapse.Gui
     
     public static string markup_string_with_search (string text, string pattern, string size = "xx-large", bool show_not_found = false)
     {
-    	string _size = size;
+    	string markup = "%s";
     	if (size != "")
-    		_size = " size=\"%s\"".printf (size);
+    	{
+    	  markup = "<span size=\"%s\">%s</span>".printf (size, "%s");
+      }
       if (pattern == "")
       {
-        return "<span%s>%s</span>".printf (_size, Markup.escape_text(text));
+        return markup.printf (Markup.escape_text(text));
       }
       // if no text found, use pattern
       if (text == "")
       {
-        return "<span%s>%s</span>".printf (_size, Markup.escape_text(pattern));
+        return markup.printf (Markup.escape_text(pattern));
       }
 
       var matchers = Query.get_matchers_for_query (
@@ -75,14 +77,14 @@ namespace Synapse.Gui
       }
       if (highlighted != null)
       {
-        return "<span%s>%s</span>".printf (_size, highlighted);
+        return markup.printf (highlighted);
       }
       else
       {
       	if (show_not_found)
-      		return "<span%s>%s <small><small>(%s)</small></small></span>".printf (_size, Markup.escape_text(text), Markup.escape_text(pattern));
+      	  return markup.printf ("%s <small><small>(%s)</small></small>").printf (Markup.escape_text(text), Markup.escape_text(pattern));
        	else
-       		return "<span%s>%s</span>".printf (_size, Markup.escape_text(text));
+       		return markup.printf (Markup.escape_text(text));
       }
     }
     

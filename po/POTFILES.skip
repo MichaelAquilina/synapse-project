@@ -2,6 +2,7 @@ src/ui/synapse-main.c
 src/ui/interfaces.c
 src/ui/model.c
 src/ui/controller.c
+src/ui/view-base.c
 src/ui/view-test.c
 src/ui/cairo-gtk-base.c
 src/ui/cairo-gtk-virgilio.c
