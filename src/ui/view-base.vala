@@ -117,7 +117,7 @@ namespace Synapse
       if (menu != null)
       {
         menu.get_menu ().show.connect (this.force_grab);
-        menu.settings_clicked.connect (()=>{ /* TODO: settings menu */ });
+        menu.settings_clicked.connect (()=>{ controller.show_settings_requested (); });
       }
     }
     

@@ -110,6 +110,9 @@ namespace Synapse.Gui
     
     /* Tells if the controller is searching for recent activities in current searching for */
     public abstract bool is_searching_for_recent ();
+    
+    /* Tells at synapse main, that the user wants to configure synapse */
+    public signal void show_settings_requested ();
   }
   
   public interface IView : Object

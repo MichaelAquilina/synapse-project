@@ -67,30 +67,12 @@ namespace Synapse
       
       bind_keyboard_shortcut ();
       
-      //init_ui (settings.get_current_theme ());
-      //if (!is_startup) this.show_ui (Gtk.get_current_event_time ());
       controller = GLib.Object.new (typeof (Gui.Controller), 
                                     "data-sink", data_sink,
                                     "key-combo-config", key_combo_config,
                                     "category-config", category_config) as Gui.IController;
-      controller.set_view (typeof (Gui.ViewEssential));
-      controller.summon_or_vanish ();
-      
-      settings.theme_selected.connect (init_ui);
-      init_indicator ();
-    }
-    
-    ~UILauncher ()
-    {
-      config.save ();
-    }
-    
-    private void init_ui (Type t)
-    {
-      ui = GLib.Object.new (t, "data-sink", data_sink,
-                               "key-combo-config", key_combo_config,
-                               "category-config", category_config) as UIInterface;
-      ui.show_settings_clicked.connect (()=>{
+
+      controller.show_settings_requested.connect (()=>{
         settings.show ();
         uint32 timestamp = Gtk.get_current_event_time ();
         /* Make sure that the settings window is showed */
@@ -98,8 +80,20 @@ namespace Synapse
         settings.present_with_time (timestamp);
         settings.get_window ().raise ();
         settings.get_window ().focus (timestamp);
-        ui.hide ();
+        controller.summon_or_vanish ();
       });
+
+      controller.set_view (typeof (Gui.ViewEssential));
+
+      if (!is_startup) controller.summon_or_vanish ();
+      
+      // settings.theme_selected.connect (init_ui); //TODO: change view
+      init_indicator ();
+    }
+    
+    ~UILauncher ()
+    {
+      config.save ();
     }
     
     private void init_indicator ()
