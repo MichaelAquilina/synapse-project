@@ -471,18 +471,20 @@ namespace Synapse.Gui
 
     private bool _select (int i)
     {
-      if (this.items == null) return false;
-      if (i < -1 || i >= this.items.size) return false;
-      if (i == this.select_index) return false;
+      if (i == this.select_index ||
+          this.items == null ||
+          i < -1 ||
+          i >= this.items.size) return false;
       this.select_index = i;
       return true;
     }
     
     private bool _goto (int i)
     {
-      if (this.items == null) return false;
-      if (i < 0 || i >= this.items.size) return false;
-      if (i == this.goto_index) return false;
+      if (i == this.goto_index ||
+          this.items == null ||
+          i < 0 ||
+          i >= this.items.size) return false;
       this.goto_index = i;
       return true;
     }
