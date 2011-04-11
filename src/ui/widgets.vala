@@ -459,14 +459,28 @@ namespace Synapse.Gui
       if (i < 0) return;
       if (i >= children.size) return;
       active_child = i;
+      i = 0;
+      foreach (var child in children)
+      {
+        if (i == active_child)
+        {
+          if (!child.visible) child.show ();
+        }
+        else
+        {
+          if (child.visible) child.hide ();
+        }
+        
+        i++;
+      }
       if (!this.is_realized ()) return;
       queue_resize ();
     }
     
     public override void forall_internal (bool b, Gtk.Callback callback)
     {
-      if (active_child >= children.size) return;
-      callback (children.get(active_child));
+      foreach (var child in children)
+        callback (child);
     }
     
     public override void add (Widget widget)
@@ -484,14 +498,14 @@ namespace Synapse.Gui
     {
       base.size_allocate (allocation);
       if (active_child >= children.size) return;
-      children.get(active_child).size_allocate (allocation);
+      children.get (active_child).size_allocate (allocation);
     }
     
     public override void size_request (out Requisition req)
     {
       req = {0, 0};
       if (active_child >= children.size) return;
-      children.get(active_child).size_request (out req);
+      children.get (active_child).size_request (out req);
     }
   }
 

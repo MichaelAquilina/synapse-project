@@ -84,7 +84,7 @@ namespace Synapse.Gui
       
       qf = this.category_config.categories.get (category_index).flags;
       
-      search_for_matches (SearchingFor.SOURCES); //TODO: recent activities
+      search_for_matches (SearchingFor.SOURCES, this.search_recent_activities);
     }
 
     
@@ -185,7 +185,8 @@ namespace Synapse.Gui
       switch (model.searching_for)
       {
         case SearchingFor.SOURCES:
-          search_for_matches (SearchingFor.SOURCES); //TODO: recent activities
+          search_for_matches (SearchingFor.SOURCES);
+          this.search_recent_activities = false;
           break;
         case SearchingFor.ACTIONS:
           search_for_actions ();
@@ -260,6 +261,7 @@ namespace Synapse.Gui
           case KeyComboConfig.Commands.NEXT_RESULT:
             if (this.is_in_initial_state ())
             {
+              this.search_recent_activities = true;
               this.search_for_matches (SearchingFor.SOURCES, true);
               view.set_list_visible (true);
               break;

@@ -44,6 +44,7 @@ namespace Synapse
     private Requisition req_current;
     
     protected Gui.Utils.ColorHelper ch;
+    protected HTextSelector flag_selector;
 
     protected int BORDER_RADIUS;
     protected int SHADOW_SIZE;
@@ -97,6 +98,16 @@ namespace Synapse
       composited_changed ();
       
       ch = new Gui.Utils.ColorHelper (this);
+      
+      flag_selector = new HTextSelector ();
+      foreach (CategoryConfig.Category c in controller.category_config.categories)
+      {
+        flag_selector.add_text (c.name);
+      }
+      flag_selector.selected = controller.category_config.default_category_index;
+      flag_selector.selection_changed.connect (()=>{
+        controller.category_changed_event (flag_selector.selected);
+      });
     }
     
     public override void composited_changed ()

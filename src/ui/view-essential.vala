@@ -71,7 +71,7 @@ namespace Synapse.Gui
     private ResultBox results_sources;
     private ResultBox results_actions;
     private ResultBox results_targets;
-
+    
     private void build_ui ()
     {
       container = new VBox (false, 0);
@@ -107,6 +107,11 @@ namespace Synapse.Gui
       var vb = new VBox (false, 0);
       vb.pack_end (description_label, false);
       vb.pack_end (focus_label, false);
+      vb.pack_end (new Gtk.HSeparator (), false, true, 3);
+      vb.pack_end (flag_selector, false);
+      
+      flag_selector.selected_markup = "<span size=\"small\"><b>%s</b></span>";
+      flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
       
       /* Top Container */
       var hb = new HBox (false, 5);
@@ -167,7 +172,8 @@ namespace Synapse.Gui
     
     protected override void paint_background (Cairo.Context ctx)
     {
-      if (is_list_visible ())
+      bool comp = this.is_composited ();
+      if (is_list_visible () || (!comp))
       {
         ctx.set_operator (Operator.SOURCE);
         ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
@@ -176,11 +182,10 @@ namespace Synapse.Gui
       }
 
       double r = 0, b = 0, g = 0;
-      bool comp = this.is_composited ();
       int width = this.allocation.width;
       int height = spacer.allocation.y + BORDER_RADIUS + SHADOW_SIZE;
 
-      int delta = focus_label.allocation.y - BORDER_RADIUS;
+      int delta = flag_selector.allocation.y - BORDER_RADIUS;
       if (!comp) delta = 0;
       
       ctx.save ();
