@@ -45,6 +45,7 @@ namespace Synapse
     
     protected Gui.Utils.ColorHelper ch;
     protected HTextSelector flag_selector;
+    protected MenuButton menu;
 
     protected int BORDER_RADIUS;
     protected int SHADOW_SIZE;
@@ -108,6 +109,21 @@ namespace Synapse
       flag_selector.selection_changed.connect (()=>{
         controller.category_changed_event (flag_selector.selected);
       });
+      
+      menu = null;
+      
+      build_ui ();
+      
+      if (menu != null)
+      {
+        menu.get_menu ().show.connect (this.force_grab);
+        menu.settings_clicked.connect (()=>{ /* TODO: settings menu */ });
+      }
+    }
+    
+    protected virtual void build_ui ()
+    {
+      
     }
     
     public override void composited_changed ()

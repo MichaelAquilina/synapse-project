@@ -28,7 +28,7 @@ namespace Synapse.Gui
   public class ViewEssential : Synapse.Gui.View
   {
     construct {
-      build_ui ();
+      
     }
     
     static construct
@@ -72,7 +72,7 @@ namespace Synapse.Gui
     private ResultBox results_actions;
     private ResultBox results_targets;
     
-    private void build_ui ()
+    protected override void build_ui ()
     {
       container = new VBox (false, 0);
       /* Icons */
@@ -104,12 +104,26 @@ namespace Synapse.Gui
       description_label.size = SmartLabel.Size.SMALL;
       description_label.set_animation_enabled (true);
       
+      /* Categories - Throbber and menu */ //#0C71D6
+      var categories_hbox = new HBox (false, 0);
+
+      var menuthrobber = new MenuThrobber ();
+      menu = (MenuButton) menuthrobber;
+      menuthrobber.set_size_request (14, 14);
+      menuthrobber.button_scale = 0.75;
+
+      spacer = new Label ("");
+      spacer.set_size_request (14, 1);
+      categories_hbox.pack_start (spacer, false);
+      categories_hbox.pack_start (flag_selector);
+      categories_hbox.pack_start (menuthrobber, false);
+
       var vb = new VBox (false, 0);
       vb.pack_end (description_label, false);
       vb.pack_end (focus_label, false);
       vb.pack_end (new Gtk.HSeparator (), false, true, 3);
-      vb.pack_end (flag_selector, false);
-      
+      vb.pack_end (categories_hbox, false);
+
       flag_selector.selected_markup = "<span size=\"small\"><b>%s</b></span>";
       flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
       

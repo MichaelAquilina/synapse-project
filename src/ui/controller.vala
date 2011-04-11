@@ -164,6 +164,12 @@ namespace Synapse.Gui
       var action = this.model.focus[SearchingFor.ACTIONS].value;
       var target = this.model.focus[SearchingFor.TARGETS].value;
       
+      if (action is SearchProvider)
+      {
+        search_for_matches (SearchingFor.SOURCES, false, action as SearchProvider);
+        return;
+      }
+      
       Timeout.add (20, ()=>{
         action.execute_with_target (source, target);
         return false;
