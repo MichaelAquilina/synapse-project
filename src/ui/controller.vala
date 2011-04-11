@@ -77,14 +77,22 @@ namespace Synapse.Gui
         view.update_selected_category ();
         return;
       }
+
       if (category_index == model.selected_category) return;
 
       model.selected_category = category_index;
+
       view.update_selected_category ();
       
       qf = this.category_config.categories.get (category_index).flags;
       
-      search_for_matches (SearchingFor.SOURCES, this.search_recent_activities);
+      if (model.query[SearchingFor.SOURCES] != "" || this.search_recent_activities)
+        search_for_matches (SearchingFor.SOURCES, this.search_recent_activities);
+    }
+    
+    public void fire_focus ()
+    {
+      this.execute (true);
     }
 
     
@@ -159,7 +167,7 @@ namespace Synapse.Gui
       if (hide)
       {
         this.view.vanish ();
-        // TODO: reset!
+        this.reset_search (true, true);
       }
       else
       {
@@ -199,7 +207,23 @@ namespace Synapse.Gui
     
     protected virtual void clear_search_or_hide_pressed ()
     {
-      view.vanish (); //TODO
+      if (model.searching_for != SearchingFor.SOURCES)
+      {
+        model.query[SearchingFor.ACTIONS] = "";
+        model.searching_for = SearchingFor.SOURCES;
+        view.update_searching_for ();
+        search_for_actions ();
+      }
+      else if (model.query[SearchingFor.SOURCES] != "" ||
+               this.search_recent_activities)
+      {
+        reset_search (true, false);
+      }
+      else
+      {
+        view.vanish ();
+        view.set_list_visible (false);
+      }
     }
     
     protected virtual bool fetch_command (KeyComboConfig.Commands command)
@@ -221,10 +245,10 @@ namespace Synapse.Gui
             clear_search_or_hide_pressed ();
             break;
           case KeyComboConfig.Commands.PREV_CATEGORY:
-            //TODO update qf
+            category_changed_event (model.selected_category - 1);
             break;
           case KeyComboConfig.Commands.NEXT_CATEGORY:
-            //TODO update qf
+            category_changed_event (model.selected_category + 1);
             break;
           case KeyComboConfig.Commands.FIRST_RESULT:
             if (view.is_list_visible () && this.model.focus[this.model.searching_for].key == 0)
@@ -367,6 +391,7 @@ namespace Synapse.Gui
         partial_result_sent[i] = false;
       }
       model.clear (category_config.default_category_index);
+
       qf = category_config.categories.get (category_config.default_category_index).flags;
       last_result_set = null;
     }
@@ -390,7 +415,7 @@ namespace Synapse.Gui
         }
         partial_result_sent[i] = false;
       }
-//      search_with_empty = false;
+      search_recent_activities = false;
       model.clear ();
       if (reset_flags)
       {

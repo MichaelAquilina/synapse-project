@@ -63,7 +63,7 @@ namespace Synapse.Gui
     
     public abstract void set_actual_focus (int i);
     
-    public abstract void clear (int default_category = 0);
+    public abstract void clear (int default_category = -1);
     public abstract void clear_searching_for (SearchingFor what);
   }
   
@@ -91,6 +91,9 @@ namespace Synapse.Gui
     
     /* category_changed_event should be fired ie when user clicks on a category */
     public abstract void category_changed_event (int category_index);
+    
+    /* fire_focus should be fired ie when user dblclicks on a item in the list */
+    public abstract void fire_focus ();
     
     /* selected_index_changed should be fired when users clicks on an item in the list */
     /* Model.focus[Model.searching_for] will be changed */

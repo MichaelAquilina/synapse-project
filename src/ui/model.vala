@@ -64,7 +64,7 @@ namespace Synapse.Gui
       _focus[searching_for].value = _results[searching_for].get (i);
     }
     
-    public void clear (int default_category = 0)
+    public void clear (int default_category = -1)
     {
       searching_for = SearchingFor.SOURCES;
       for (int i = 0; i < SearchingFor.COUNT; i++)
@@ -74,7 +74,8 @@ namespace Synapse.Gui
         _results[i] = null;
         _query[i] = "";
       }
-      selected_category = default_category;
+      if (default_category >= 0)
+        selected_category = default_category;
     }
     
     public void clear_searching_for (SearchingFor i)

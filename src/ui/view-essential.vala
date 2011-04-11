@@ -129,10 +129,10 @@ namespace Synapse.Gui
 
       results_sources = new ResultBox (100);
       results_actions = new ResultBox (100);
-      //results_match.get_match_list_view ().selected_index_changed.connect (this.set_selection_match);
-      //results_action.get_match_list_view ().selected_index_changed.connect (this.set_selection_action);
-      //results_match.get_match_list_view ().fire_item.connect (command_execute);
-      //results_action.get_match_list_view ().fire_item.connect (command_execute);
+      results_sources.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
+      results_actions.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
+      results_sources.get_match_list_view ().fire_item.connect (controller.fire_focus);
+      results_actions.get_match_list_view ().fire_item.connect (controller.fire_focus);
       results_container.add (results_sources);
       results_container.add (results_actions);
       
@@ -168,6 +168,11 @@ namespace Synapse.Gui
       }
       update_labels ();
       results_container.select_child (model.searching_for);
+    }
+    
+    public override void update_selected_category ()
+    {
+      flag_selector.selected = model.selected_category;
     }
     
     protected override void paint_background (Cairo.Context ctx)
