@@ -69,6 +69,13 @@ namespace Synapse.Gui
   
   public interface IController : Object
   {
+    /* Helpful strings */
+    public static string SEARCHING; /* Searching... */
+    public static string NO_RESULTS; /* No results found. */
+    public static string NO_RECENT_ACTIVITIES; /* No recent activities found. */
+    public static string TYPE_TO_SEARCH; /* Type to search */
+    public static string DOWN_TO_SEE_RECENT; /* Press down to see recent */
+    
     /* Construct properties */
     public abstract DataSink data_sink { get; construct set; }
     public abstract KeyComboConfig key_combo_config { get; construct set; }
@@ -94,6 +101,12 @@ namespace Synapse.Gui
 
     /* Shows or hide the View */
     public abstract void summon_or_vanish ();
+    
+    /* Tells if the controller is in initial state (no search active) */
+    public abstract bool is_in_initial_state ();
+    
+    /* Tells if the controller is searching for recent activities in current searching for */
+    public abstract bool is_searching_for_recent ();
   }
   
   public interface IView : Object
@@ -107,13 +120,13 @@ namespace Synapse.Gui
     public abstract Synapse.Gui.IModel model {get; construct set;}
     public abstract Synapse.Gui.IController controller {get; construct set;}
     
-    public abstract void update_focused_source ();
-    public abstract void update_focused_action ();
-    public abstract void update_focused_target ();
+    public abstract void update_focused_source (Entry<int, Match> m);
+    public abstract void update_focused_action (Entry<int, Match> m);
+    public abstract void update_focused_target (Entry<int, Match> m);
     
-    public abstract void update_sources ();
-    public abstract void update_actions ();
-    public abstract void update_targets ();
+    public abstract void update_sources (Gee.List<Match>? list = null);
+    public abstract void update_actions (Gee.List<Match>? list = null);
+    public abstract void update_targets (Gee.List<Match>? list = null);
     
     public abstract void update_selected_category ();
     

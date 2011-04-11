@@ -308,6 +308,139 @@ namespace Synapse.Gui
         req.width = char_width * 3;
     }
   }
+  
+  public class SchemaContainer: Gtk.Container
+  {
+    public class Schema : GLib.Object
+    {
+      private Allocation[] _positions = {};
+      public Allocation[] positions { get {return _positions;} }
+      public Schema ()
+      {
+
+      }
+      public void add_allocation (Allocation alloc)
+      {
+        alloc.x = int.max (0, int.min (100, alloc.x));
+        alloc.y = int.max (0, int.min (100, alloc.y));
+        alloc.width = int.max (0, int.min (100, alloc.width));
+        alloc.height = int.max (0, int.min (100, alloc.height));
+        if ((alloc.x + alloc.width) > 100) alloc.width = 100 - alloc.x;
+        if ((alloc.y + alloc.height) > 100) alloc.height = 100 - alloc.y;
+        this._positions += alloc;
+      }
+    }
+    
+    protected Gee.List<Schema> schemas;
+    protected Gee.List<Widget> children;
+    private int active_schema = 0;
+    private int[] render_order = null;
+    
+    public SchemaContainer (int width, int height)
+    {
+      schemas = new Gee.ArrayList<Schema> ();
+      children = new Gee.ArrayList<Widget> ();
+      set_has_window (false);
+      set_redraw_on_allocate (false);
+      this.set_size_request (width, height);
+    }
+    
+    public void set_render_order (int[]? order)
+    {
+      this.render_order = order;
+      this.queue_draw ();
+    }
+
+    public new void set_size_request (int width, int height)
+    {
+      if (width <= 0) width = 1;
+      if (height <= 0) height = 1;
+      
+      base.set_size_request (width, height);
+    }
+    
+    public void add_schema (Schema s)
+    {
+      schemas.add (s);
+      if (schemas.size == 1) select_schema (0);
+    }
+    
+    public void select_schema (int i)
+    {
+      if (i < 0) return;
+      if (i >= schemas.size) return;
+      active_schema = i;
+      if (!this.is_realized ()) return;
+      size_allocate ({
+        this.allocation.x, this.allocation.y,
+        this.allocation.width, this.allocation.height
+      });
+      queue_resize ();
+    }
+    
+    
+    
+    public override void forall_internal (bool b, Gtk.Callback callback)
+    {
+      if (render_order == null)
+      {
+        foreach (var child in children)
+        {
+          callback (child);
+        }
+      }
+      else
+      {
+        for (int i = 0; i < render_order.length; i++)
+          callback (children.get (render_order[i]));
+      }
+    }
+    
+    public override void add (Widget widget)
+    {
+      this.children.add (widget);
+      widget.set_parent (this);
+    }
+    
+    public override void remove (Widget widget)
+    {
+      // cannot remove for now :P TODO
+    }
+    
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      base.size_allocate (allocation);
+      
+      if (schemas.size <= 0)
+      {
+        foreach (Widget child in children)
+          child.hide ();
+        return;
+      }
+      Allocation[] alloc = schemas.get (active_schema).positions;
+      
+      int i = 0;
+      foreach (Widget child in children)
+      {
+        if (alloc.length <= i)
+        {
+          child.hide ();
+        }
+        else
+        {
+          Gdk.Rectangle a = {
+            allocation.x + alloc[i].x * allocation.width / 100,
+            allocation.y + alloc[i].y * allocation.height / 100,
+            alloc[i].width * allocation.width / 100,
+            alloc[i].height * allocation.height / 100
+          };
+          child.size_allocate (a);
+          child.show ();
+        }
+        i++;
+      }
+    }
+  }
 
   public class ContainerOverlayed: Gtk.Container
   {
@@ -782,7 +915,9 @@ namespace Synapse.Gui
       ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
       ctx.clip ();
 
-      Gdk.Pixbuf icon_pixbuf = IconCacheService.get_default ().get_icon (current, pixel_size);
+      Gdk.Pixbuf icon_pixbuf = IconCacheService.get_default ().get_icon (
+            current, pixel_size <= 0 ? int.min (this.allocation.width, this.allocation.height) : pixel_size);
+
       if (icon_pixbuf == null) return true;
 
       Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 
@@ -797,7 +932,7 @@ namespace Synapse.Gui
       current = "";
       this.queue_draw ();
     }
-    public void set_icon_name (string? name, IconSize size)
+    public void set_icon_name (string? name, IconSize size = IconSize.DND)
     {
       if (name == null)
         name = "";

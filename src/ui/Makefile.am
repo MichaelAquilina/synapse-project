@@ -67,7 +67,7 @@ synapse_VALASOURCES = \
 	controller.vala \
 	model.vala \
 	view-base.vala \
-	view-test.vala \
+	view-essential.vala \
 	cairo-gtk-base.vala \
 	cairo-gtk.vala \
 	cairo-gtk-doish.vala \

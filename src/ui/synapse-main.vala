@@ -73,7 +73,7 @@ namespace Synapse
                                     "data-sink", data_sink,
                                     "key-combo-config", key_combo_config,
                                     "category-config", category_config) as Gui.IController;
-      controller.set_view (typeof (Gui.ViewTest));
+      controller.set_view (typeof (Gui.ViewEssential));
       controller.summon_or_vanish ();
       
       settings.theme_selected.connect (init_ui);

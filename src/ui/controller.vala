@@ -25,6 +25,15 @@ namespace Synapse.Gui
 {
   public class Controller : IController, Object
   {
+    static construct
+    {
+      SEARCHING = _("Searching...");
+      NO_RESULTS = _("No results found.");
+      NO_RECENT_ACTIVITIES = _("No recent activities found.");
+      TYPE_TO_SEARCH = _("Type to search...");
+      DOWN_TO_SEE_RECENT = "";
+    }
+
     /* Construct properties */
     public DataSink data_sink { get; construct set; }
     public KeyComboConfig key_combo_config { get; construct set; }
@@ -94,21 +103,21 @@ namespace Synapse.Gui
       switch (model.searching_for)
       {
         case SearchingFor.SOURCES:
-          view.update_focused_source ();
+          view.update_focused_source (model.focus[model.searching_for]);
           model.clear_searching_for (SearchingFor.ACTIONS);
           search_for_actions ();
           break;
         case SearchingFor.ACTIONS:
-          view.update_focused_action ();
+          view.update_focused_action (model.focus[model.searching_for]);
 
           model.clear_searching_for (SearchingFor.TARGETS);
-          view.update_targets ();
-          view.update_focused_target ();
+          view.update_targets (null);
+          view.update_focused_target (model.focus[SearchingFor.TARGETS]);
           if (model.focus[SearchingFor.ACTIONS].value.needs_target())
             search_for_matches (SearchingFor.TARGETS, true);
           break;
         default: //case SearchingFor.TARGETS:
-          view.update_focused_target ();
+          view.update_focused_target (model.focus[model.searching_for]);
           break;
       }
     }
@@ -312,7 +321,25 @@ namespace Synapse.Gui
       return false;
     }
     
+    /* Tells if the controller is in initial state (no search active) */
+    public bool is_in_initial_state ()
+    {
+      return model.query[SearchingFor.SOURCES] == "" && (!search_recent_activities);
+    }
+    
+    /* Tells if the controller is searching for recent activities in current searching for */
+    public bool is_searching_for_recent ()
+    {
+      switch (model.searching_for)
+      {
+        case SearchingFor.SOURCES: return search_recent_activities; break;
+        case SearchingFor.ACTIONS: return false; break;
+        default: return model.query[SearchingFor.TARGETS] == ""; break;
+      }
+    }
+    
     /* ------------ Search Engine here ---------------- */
+    private bool search_recent_activities = false;
     private QueryFlags qf;
     /* Stupid Vala: I can't use array[SearchingFor.COUNT] for declaration */
     private Cancellable current_cancellable[3];
@@ -368,9 +395,9 @@ namespace Synapse.Gui
         view.update_sources ();
         view.update_actions ();
         view.update_targets ();
-        view.update_focused_source ();
-        view.update_focused_action ();
-        view.update_focused_target ();
+        view.update_focused_source (model.focus[SearchingFor.SOURCES]);
+        view.update_focused_action (model.focus[SearchingFor.ACTIONS]);
+        view.update_focused_target (model.focus[SearchingFor.TARGETS]);
         view.update_searching_for ();
       }
     }
@@ -455,9 +482,9 @@ namespace Synapse.Gui
           if (matcher.key.match (model.focus[what].value.title))
           {
             if (what == what.SOURCES)
-              view.update_focused_source ();
+              view.update_focused_source (model.focus[what]);
             else
-              view.update_focused_target ();
+              view.update_focused_target (model.focus[what]);
             return;
           }
         }
@@ -476,16 +503,16 @@ namespace Synapse.Gui
       
       if (what == what.SOURCES)
       {
-        view.update_sources ();
-        view.update_focused_source ();
+        view.update_sources (model.results[what]);
+        view.update_focused_source (model.focus[what]);
 
         model.clear_searching_for (SearchingFor.ACTIONS);
         search_for_actions ();
       }
       else
       {
-        view.update_targets ();
-        view.update_focused_target ();
+        view.update_targets (model.results[what]);
+        view.update_focused_target (model.focus[what]);
       }
     }
     
@@ -537,16 +564,16 @@ namespace Synapse.Gui
 
       if (what == what.SOURCES)
       {
-        view.update_sources ();
-        view.update_focused_source ();
+        view.update_sources (model.results[what]);
+        view.update_focused_source (model.focus[what]);
         
         model.clear_searching_for (SearchingFor.ACTIONS);
         search_for_actions ();
       }
       else
       {
-        view.update_targets ();
-        view.update_focused_target ();
+        view.update_targets (model.results[what]);
+        view.update_focused_target (model.focus[what]);
       }
     }
 
@@ -557,16 +584,16 @@ namespace Synapse.Gui
       if (model.results[SearchingFor.TARGETS] != null)
       {
         model.clear_searching_for (SearchingFor.TARGETS);
-        view.update_targets ();
-        view.update_focused_target ();
+        view.update_targets (model.results[SearchingFor.TARGETS]);
+        view.update_focused_target (model.focus[SearchingFor.TARGETS]);
       }
       
       /* No sources => no actions */
       if (model.focus[SearchingFor.SOURCES].value == null)
       {
         model.clear_searching_for (SearchingFor.ACTIONS);
-        view.update_actions ();
-        view.update_focused_action ();
+        view.update_actions (model.results[SearchingFor.ACTIONS]);
+        view.update_focused_action (model.focus[SearchingFor.ACTIONS]);
         return;
       }
       
@@ -586,8 +613,8 @@ namespace Synapse.Gui
       }
       model.focus[SearchingFor.ACTIONS].key = 0;
 
-      view.update_actions ();
-      view.update_focused_action ();
+      view.update_actions (model.results[SearchingFor.ACTIONS]);
+      view.update_focused_action (model.focus[SearchingFor.ACTIONS]);
     }
   }
 }
