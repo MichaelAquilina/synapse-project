@@ -39,14 +39,14 @@ namespace Synapse.Gui
     public KeyComboConfig key_combo_config { get; construct set; }
     public CategoryConfig category_config { get; construct set; }
     
-    protected IModel model;
+    protected Model model;
     protected IView view = null;
 
     public void set_view (Type view_type)
     {
       if (!view_type.is_a (typeof (IView))) return;
       if (this.view != null) this.view.vanish ();
-      this.view = GLib.Object.new (view_type, "model", this.model,
+      this.view = GLib.Object.new (view_type, "controller-model", this.model,
                                               "controller", this) as IView;
       reset_search (true, true);
       this.view.vanished.connect (()=>{

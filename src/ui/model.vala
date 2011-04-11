@@ -23,45 +23,42 @@ using Gee;
 
 namespace Synapse.Gui
 {
-  public class Model : IModel, Object
+  public class Model : Object
   {
     /* Search strings */
-    protected string[] _query = new string[SearchingFor.COUNT];
-    public string[] query { get {return _query;} }
+    public string[] query = new string[SearchingFor.COUNT];
     
     /* Result Sets */
-    protected Gee.List<Match>[] _results = new Gee.List<Match>[SearchingFor.COUNT];
-    public Gee.List<Match>[] results { get {return _results;} }
+    public Gee.List<Match>[] results = new Gee.List<Match>[SearchingFor.COUNT];
 
     /* Focus */
-    protected Entry<int, Match>[] _focus = new Entry<int, Match>[SearchingFor.COUNT];
-    public Entry<int, Match>[] focus { get {return _focus;} }
+    public Entry<int, Match>[] focus = new Entry<int, Match>[SearchingFor.COUNT];
       
     /* Multiple Selection :: maybe in the future */
     //public Gee.Map<int, Match> selected_sources {get; set;}
     //public Gee.Map<int, Match> selected_targets {get; set;}
     
     /* Category */
-    public int selected_category {get; set;}
+    public int selected_category = 0;
     
     /* SearchingFor */
-    public SearchingFor searching_for {get; set; default = SearchingFor.SOURCES;}
+    public SearchingFor searching_for = SearchingFor.SOURCES;
     
     /* returns results[searching_for] != null && .size > 0 */
     public bool has_results ()
     {
-      return _results[searching_for] != null && _results[searching_for].size > 0;
+      return results[searching_for] != null && results[searching_for].size > 0;
     }
-    
+        
     public Entry<int, Match> get_actual_focus ()
     {
-      return _focus[searching_for];
+      return focus[searching_for];
     }
     
     public void set_actual_focus (int i)
     {
-      _focus[searching_for].key = i;
-      _focus[searching_for].value = _results[searching_for].get (i);
+      focus[searching_for].key = i;
+      focus[searching_for].value = results[searching_for].get (i);
     }
     
     public void clear (int default_category = -1)
@@ -69,10 +66,10 @@ namespace Synapse.Gui
       searching_for = SearchingFor.SOURCES;
       for (int i = 0; i < SearchingFor.COUNT; i++)
       {
-        _focus[i].key = 0;
-        _focus[i].value = null;
-        _results[i] = null;
-        _query[i] = "";
+        focus[i].key = 0;
+        focus[i].value = null;
+        results[i] = null;
+        query[i] = "";
       }
       if (default_category >= 0)
         selected_category = default_category;
@@ -81,17 +78,17 @@ namespace Synapse.Gui
     public void clear_searching_for (SearchingFor i)
     {
       // Synapse.Utils.Logger.log (this, "CLEAR: %u", i);
-      _focus[i].key = 0;
-      _focus[i].value = null;
-      _results[i] = null;
-      _query[i] = "";
+      focus[i].key = 0;
+      focus[i].value = null;
+      results[i] = null;
+      query[i] = "";
     }
     
     construct
     {
       for (int i = 0; i < SearchingFor.COUNT; i++)
       {
-        _focus[i] = new Entry<int, Match> ();
+        focus[i] = new Entry<int, Match> ();
       }
       clear ();
     }

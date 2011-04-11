@@ -31,42 +31,7 @@ namespace Synapse.Gui
     
     COUNT
   }
-  
-  public interface IModel : Object
-  {
-    /* Search strings */
-    public abstract string[] query
-      { get; } //cardinality : SearchingFor.COUNT
-    
-    /* Result Sets */
-    public abstract Gee.List<Match>[] results
-      { get; } //cardinality : SearchingFor.COUNT
 
-    /* Focus */
-    public abstract Entry<int, Match>[] focus
-      { get; } //cardinality : SearchingFor.COUNT
-      
-    /* Multiple Selection :: maybe in the future */
-    //public abstract Gee.Map<int, Match> selected_sources {get; set;}
-    //public abstract Gee.Map<int, Match> selected_targets {get; set;}
-    
-    /* Category */
-    public abstract int selected_category {get; set;}
-    
-    /* SearchingFor */
-    public abstract SearchingFor searching_for {get; set;}
-    
-    /* returns results[searching_for] != null && .size > 0 */
-    public abstract bool has_results ();
-    
-    public abstract Entry<int, Match> get_actual_focus ();
-    
-    public abstract void set_actual_focus (int i);
-    
-    public abstract void clear (int default_category = -1);
-    public abstract void clear_searching_for (SearchingFor what);
-  }
-  
   public interface IController : Object
   {
     /* Helpful strings */
@@ -123,7 +88,7 @@ namespace Synapse.Gui
     public abstract void vanish ();
     public abstract void summon_or_vanish ();
     
-    public abstract Synapse.Gui.IModel model {get; construct set;}
+    public abstract Synapse.Gui.Model controller_model {get; construct set;}
     public abstract Synapse.Gui.IController controller {get; construct set;}
     
     public abstract void update_focused_source (Entry<int, Match> m);

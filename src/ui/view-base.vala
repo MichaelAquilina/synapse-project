@@ -119,6 +119,8 @@ namespace Synapse
         menu.get_menu ().show.connect (this.force_grab);
         menu.settings_clicked.connect (()=>{ controller.show_settings_requested (); });
       }
+      
+      model = controller_model;
     }
     
     protected virtual void build_ui ()
@@ -258,7 +260,9 @@ namespace Synapse
         summon ();
     }
     
-    public Synapse.Gui.IModel model {get; construct set;}
+    protected Synapse.Gui.Model model = null;
+    
+    public Synapse.Gui.Model controller_model {get; construct set;}
     public Synapse.Gui.IController controller {get; construct set;}
     
     public virtual void update_focused_source (Entry<int, Match> m){}
