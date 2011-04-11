@@ -160,13 +160,19 @@ namespace Synapse.Gui
       if (this.model.focus[SearchingFor.SOURCES].value == null) return;
       if (this.model.focus[SearchingFor.ACTIONS].value == null) return;
 
-      this.model.focus[SearchingFor.ACTIONS].value.execute_with_target (
-                              this.model.focus[SearchingFor.SOURCES].value,
-                              this.model.focus[SearchingFor.TARGETS].value);
+      var source = this.model.focus[SearchingFor.SOURCES].value;
+      var action = this.model.focus[SearchingFor.ACTIONS].value;
+      var target = this.model.focus[SearchingFor.TARGETS].value;
+      
+      Timeout.add (20, ()=>{
+        action.execute_with_target (source, target);
+        return false;
+      });
 
       if (hide)
       {
         this.view.vanish ();
+        this.view.set_list_visible (false);
         this.reset_search (true, true);
       }
       else
@@ -222,6 +228,7 @@ namespace Synapse.Gui
       else
       {
         view.vanish ();
+        reset_search (true, true);
         view.set_list_visible (false);
       }
     }
@@ -334,8 +341,9 @@ namespace Synapse.Gui
             }
             break;
           case KeyComboConfig.Commands.ACTIVATE:
-            //TODO: reset
-            this.view.vanish ();
+            view.vanish ();
+            reset_search (true, true);
+            view.set_list_visible (false);
             break;
           case KeyComboConfig.Commands.PASTE:
             var display = Gdk.Screen.get_default ().get_display ();

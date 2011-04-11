@@ -218,6 +218,9 @@ namespace Synapse
     
     public virtual void summon ()
     {
+      this.set_list_visible (true);
+      Gui.Utils.move_window_to_center (this);
+      this.set_list_visible (false);
       this.show ();
       Gui.Utils.present_window (this);
       this.queue_draw ();
