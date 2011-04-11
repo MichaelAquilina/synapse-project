@@ -83,7 +83,7 @@ namespace Synapse.Gui
       target_icon = new NamedIcon ();
       source_icon.set_icon_name ("search", IconSize.DND);
       
-      icon_container = new SchemaContainer (80, 80);
+      icon_container = new SchemaContainer (96, 96);
       icon_container.add (source_icon);
       icon_container.add (action_icon);
       icon_container.add (target_icon);
@@ -102,14 +102,17 @@ namespace Synapse.Gui
       focus_label.set_ellipsize (Pango.EllipsizeMode.END);
       focus_label.size = SmartLabel.Size.LARGE;
       focus_label.min_size = SmartLabel.Size.MEDIUM;
+      focus_label.set_state (StateType.SELECTED);
       description_label = new SmartLabel ();
       description_label.size = SmartLabel.Size.SMALL;
       description_label.set_animation_enabled (true);
+      description_label.set_state (StateType.SELECTED);
       
       /* Categories - Throbber and menu */ //#0C71D6
       var categories_hbox = new HBox (false, 0);
 
       menuthrobber = new MenuThrobber ();
+      menuthrobber.set_state (StateType.SELECTED);
       menu = (MenuButton) menuthrobber;
       menuthrobber.set_size_request (14, 14);
       menuthrobber.button_scale = 0.75;
@@ -128,6 +131,7 @@ namespace Synapse.Gui
 
       flag_selector.selected_markup = "<span size=\"small\"><b>%s</b></span>";
       flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
+      flag_selector.set_state (StateType.SELECTED);
       
       /* Top Container */
       var hb = new HBox (false, 5);
