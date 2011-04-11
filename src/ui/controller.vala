@@ -258,6 +258,12 @@ namespace Synapse.Gui
             selected_index_changed_event (this.model.focus[this.model.searching_for].key - this.RESULTS_PER_PAGE);
             break;
           case KeyComboConfig.Commands.NEXT_RESULT:
+            if (this.is_in_initial_state ())
+            {
+              this.search_for_matches (SearchingFor.SOURCES, true);
+              view.set_list_visible (true);
+              break;
+            }
             if (!view.is_list_visible ())
             {
               view.set_list_visible (true);
@@ -324,7 +330,9 @@ namespace Synapse.Gui
     /* Tells if the controller is in initial state (no search active) */
     public bool is_in_initial_state ()
     {
-      return model.query[SearchingFor.SOURCES] == "" && (!search_recent_activities);
+      return model.query[SearchingFor.SOURCES] == "" &&
+             model.focus[SearchingFor.SOURCES].value == null &&
+             (!search_recent_activities);
     }
     
     /* Tells if the controller is searching for recent activities in current searching for */
@@ -332,9 +340,9 @@ namespace Synapse.Gui
     {
       switch (model.searching_for)
       {
-        case SearchingFor.SOURCES: return search_recent_activities; break;
-        case SearchingFor.ACTIONS: return false; break;
-        default: return model.query[SearchingFor.TARGETS] == ""; break;
+        case SearchingFor.SOURCES: return search_recent_activities;
+        case SearchingFor.ACTIONS: return false;
+        default: return model.query[SearchingFor.TARGETS] == "";
       }
     }
     

@@ -441,6 +441,59 @@ namespace Synapse.Gui
       }
     }
   }
+  
+  public class SelectionContainer: Gtk.Container
+  {
+    protected Gee.List<Widget> children;
+    private int active_child = 0;
+    
+    public SelectionContainer ()
+    {
+      children = new Gee.ArrayList<Widget> ();
+      set_has_window (false);
+      set_redraw_on_allocate (false);
+    }
+    
+    public void select_child (int i)
+    {
+      if (i < 0) return;
+      if (i >= children.size) return;
+      active_child = i;
+      if (!this.is_realized ()) return;
+      queue_resize ();
+    }
+    
+    public override void forall_internal (bool b, Gtk.Callback callback)
+    {
+      if (active_child >= children.size) return;
+      callback (children.get(active_child));
+    }
+    
+    public override void add (Widget widget)
+    {
+      this.children.add (widget);
+      widget.set_parent (this);
+    }
+    
+    public override void remove (Widget widget)
+    {
+      //TODO
+    }
+    
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      base.size_allocate (allocation);
+      if (active_child >= children.size) return;
+      children.get(active_child).size_allocate (allocation);
+    }
+    
+    public override void size_request (out Requisition req)
+    {
+      req = {0, 0};
+      if (active_child >= children.size) return;
+      children.get(active_child).size_request (out req);
+    }
+  }
 
   public class ContainerOverlayed: Gtk.Container
   {

@@ -50,6 +50,7 @@ namespace Synapse.Gui
       this.style.get (typeof(Synapse.Gui.ViewEssential), "ui-width", out width);
       
       container.set_size_request (width, -1);
+      spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
     }
     
     private NamedIcon source_icon;
@@ -61,8 +62,16 @@ namespace Synapse.Gui
     
     private SchemaContainer icon_container;
     
+    private Label spacer;
+    
     private VBox container;
     
+    private SelectionContainer results_container;
+    
+    private ResultBox results_sources;
+    private ResultBox results_actions;
+    private ResultBox results_targets;
+
     private void build_ui ()
     {
       container = new VBox (false, 0);
@@ -105,11 +114,38 @@ namespace Synapse.Gui
       hb.pack_start (vb, true);
       
       container.pack_start (hb, false);
+      spacer = new Label (null);
+      spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
+      container.pack_start (spacer, false);
+      
+      /* list */
+      results_container = new SelectionContainer ();
+      container.pack_start (results_container, false);
 
+      results_sources = new ResultBox (100);
+      results_actions = new ResultBox (100);
+      //results_match.get_match_list_view ().selected_index_changed.connect (this.set_selection_match);
+      //results_action.get_match_list_view ().selected_index_changed.connect (this.set_selection_action);
+      //results_match.get_match_list_view ().fire_item.connect (command_execute);
+      //results_action.get_match_list_view ().fire_item.connect (command_execute);
+      results_container.add (results_sources);
+      results_container.add (results_actions);
       
       container.show_all ();
+      results_container.hide ();
+
       container.set_size_request (500, -1);
       this.add (container);
+    }
+    
+    public override bool is_list_visible ()
+    {
+      return results_container.visible;
+    }
+    
+    public override void set_list_visible (bool visible)
+    {
+      results_container.visible = visible;
     }
     
     public override void update_searching_for ()
@@ -126,12 +162,24 @@ namespace Synapse.Gui
           break;
       }
       update_labels ();
+      results_container.select_child (model.searching_for);
     }
     
-    protected override void paint_background (Cairo.Context ctx, int width, int height)
+    protected override void paint_background (Cairo.Context ctx)
     {
+      if (is_list_visible ())
+      {
+        ctx.set_operator (Operator.SOURCE);
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
+        ctx.rectangle (spacer.allocation.x, spacer.allocation.y + BORDER_RADIUS, spacer.allocation.width, SHADOW_SIZE);
+        ctx.fill ();
+      }
+
       double r = 0, b = 0, g = 0;
       bool comp = this.is_composited ();
+      int width = this.allocation.width;
+      int height = spacer.allocation.y + BORDER_RADIUS + SHADOW_SIZE;
+
       int delta = focus_label.allocation.y - BORDER_RADIUS;
       if (!comp) delta = 0;
       
@@ -140,18 +188,18 @@ namespace Synapse.Gui
       width -= SHADOW_SIZE * 2;
       height -= SHADOW_SIZE + delta;
       // shadow
-      ctx.set_operator (Operator.SOURCE);
       ctx.translate (0.5, 0.5);
+      ctx.set_operator (Operator.OVER);
       Utils.cairo_make_shadow_for_rect (ctx, 0, 0, width - 1, height - 1, BORDER_RADIUS, r, g, b, SHADOW_SIZE);
       ctx.translate (-0.5, -0.5);
       
       ctx.save ();
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
-      r = g = b = 0.15;
+      r = g = b = 0.5;
       ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
       pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
-      r = g = b = 0.5;
+      r = g = b = 0.15;
       ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
       pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
@@ -194,22 +242,44 @@ namespace Synapse.Gui
     
     public override void update_focused_source (Entry<int, Match> m)
     {
-      source_icon.set_icon_name (m.value == null ? 
-                                 "search" :
-                                 m.value.icon_name);
+      if (controller.is_in_initial_state ()) source_icon.set_icon_name ("search");
+      else if (m.value == null) source_icon.set_icon_name ("");
+      else
+      {
+        source_icon.set_icon_name (m.value.icon_name);
+        results_sources.move_selection_to_index (m.key);
+      }
       if (model.searching_for == SearchingFor.SOURCES) update_labels ();
     }
     
     public override void update_focused_action (Entry<int, Match> m)
     {
-      if (m.value == null) action_icon.clear ();
-      else action_icon.set_icon_name (m.value.icon_name);
+      if (controller.is_in_initial_state ()) action_icon.clear ();
+      else if (m.value == null) action_icon.set_icon_name ("");
+      else
+      {
+        action_icon.set_icon_name (m.value.icon_name);
+        results_actions.move_selection_to_index (m.key);
+      }
       if (model.searching_for == SearchingFor.ACTIONS) update_labels ();
     }
     
     public override void update_focused_target (Entry<int, Match> m)
     {
       // TODO: not implemented
+    }
+    
+    public override void update_sources (Gee.List<Match>? list = null)
+    {
+      results_sources.update_matches (list);
+    }
+    public override void update_actions (Gee.List<Match>? list = null)
+    {
+      results_actions.update_matches (list);
+    }
+    public override void update_targets (Gee.List<Match>? list = null)
+    {
+    
     }
   }
 }

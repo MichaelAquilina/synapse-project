@@ -42,7 +42,6 @@ namespace Synapse
     
     private Requisition req_target;
     private Requisition req_current;
-    private uint tid = 0;
     
     protected Gui.Utils.ColorHelper ch;
 
@@ -174,8 +173,6 @@ namespace Synapse
     
     public override bool expose_event (Gdk.EventExpose event)
     {
-      bool comp = this.is_composited ();
-
       Cairo.Context ctx = Gdk.cairo_create (this.window);
       ctx.set_operator (Cairo.Operator.CLEAR);
       ctx.paint ();
@@ -187,7 +184,7 @@ namespace Synapse
       ctx.save ();
       ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
       ctx.clip ();
-      paint_background (ctx, this.allocation.width, this.allocation.height);
+      paint_background (ctx);
       ctx.restore ();
       ctx.pop_group_to_source ();
       ctx.set_operator (Cairo.Operator.DEST_OVER);
@@ -196,7 +193,7 @@ namespace Synapse
       return true;
     }
     
-    protected virtual void paint_background (Cairo.Context ctx, int width, int height)
+    protected virtual void paint_background (Cairo.Context ctx)
     {
       ch.set_source_rgba (ctx, 0.9, ch.StyleType.BG, StateType.NORMAL);
       ctx.set_operator (Cairo.Operator.SOURCE);
