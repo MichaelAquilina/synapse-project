@@ -1,0 +1,252 @@
+/*
+ * Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>
+ * Copyright (C) 2010 Alberto Aldegheri <albyrock87+dev@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Authored by Alberto Aldegheri <albyrock87+dev@gmail.com>
+ *
+ */
+
+using Gtk;
+
+namespace Synapse
+{
+  /* Gtk+-2.0 base class */
+  public class Gui.View : Gtk.Window, Synapse.Gui.IView
+  {
+    /* --- base class for gtk+-2.0 --- */
+    /* In ~/.config/synapse/gtkrc  use:
+       widget_class "*SynapseGui*" style : highest "synapse" 
+       and set your custom colors
+    */
+    
+    protected bool is_kwin = false;
+    
+    private void update_wm ()
+    {
+      string wmname = Gdk.x11_screen_get_window_manager_name (Gdk.Screen.get_default ()).down ();
+      this.is_kwin = wmname == "kwin";
+    }
+    
+    private Requisition req_target;
+    private Requisition req_current;
+    private uint tid = 0;
+    
+    protected Gui.Utils.ColorHelper ch;
+
+    protected int BORDER_RADIUS;
+    protected int SHADOW_SIZE;
+    
+    static construct
+    {
+      var border_radius = new GLib.ParamSpecInt ("border-radius",
+                                                 "Border Radius",
+                                                 "Border Radius of Synapse window",
+                                                 0, 50, 10,
+                                                 GLib.ParamFlags.READABLE);
+      var shadow_size = new GLib.ParamSpecInt ("shadow-size",
+                                               "Shadow Size",
+                                               "Shadow size of Synapse window",
+                                               0, 50, 10,
+                                               GLib.ParamFlags.READABLE);
+      
+      install_style_property (border_radius);
+      install_style_property (shadow_size);
+    }
+
+    construct
+    {
+      update_wm ();
+      if (is_kwin) Synapse.Utils.Logger.log (this, "Using KWin compatibiliy mode.");
+      
+      req_target = {0, 0};
+      req_current = {0, 0};
+      
+      this.style.get (typeof(Synapse.Gui.View), "border-radius", out BORDER_RADIUS);
+      this.style.get (typeof(Synapse.Gui.View), "shadow-size", out SHADOW_SIZE);
+      
+      this.set_app_paintable (true);
+      this.skip_taskbar_hint = true;
+      this.skip_pager_hint = true;
+      this.set_position (Gtk.WindowPosition.CENTER);
+      this.set_decorated (false);
+      this.set_resizable (false);
+      /* SPLASHSCREEN is needed for Metacity/Compiz, but doesn't work with KWin */
+      if (is_kwin)
+        this.set_type_hint (Gdk.WindowTypeHint.NORMAL);
+      else
+        this.set_type_hint (Gdk.WindowTypeHint.SPLASHSCREEN);
+      this.set_keep_above (true);
+
+      /* Listen on click events */
+      this.set_events (this.get_events () | Gdk.EventMask.BUTTON_PRESS_MASK
+                                          | Gdk.EventMask.KEY_PRESS_MASK);
+
+      Gui.Utils.ensure_transparent_bg (this);
+      composited_changed ();
+      
+      ch = new Gui.Utils.ColorHelper (this);
+    }
+    
+    public override void composited_changed ()
+    {
+      Gdk.Screen screen = this.get_screen ();
+      bool comp = screen.is_composited ();
+      Gdk.Colormap? cm = screen.get_rgba_colormap();
+      if (cm == null)
+      {
+        comp = false;
+        cm = screen.get_rgb_colormap();
+      }
+      Synapse.Utils.Logger.log (this, "Screen is%s composited.", comp ? "": " NOT");
+      this.set_colormap (cm);
+
+      update_wm ();
+      update_border_and_shadow ();
+    }
+    
+    public override void style_set (Gtk.Style? old)
+    {
+      base.style_set (old);
+    }
+    
+    protected void update_border_and_shadow ()
+    {
+      if (this.is_composited ())
+      {
+        this.style.get (typeof(Synapse.Gui.View), "border-radius", out BORDER_RADIUS);
+        this.style.get (typeof(Synapse.Gui.View), "shadow-size", out SHADOW_SIZE);
+      }
+      else
+      {
+        BORDER_RADIUS = 0;
+        SHADOW_SIZE = 1;
+      }
+
+      this.border_width = BORDER_RADIUS + SHADOW_SIZE;
+
+      this.queue_resize ();
+      this.queue_draw ();
+    }
+    
+    public override bool button_press_event (Gdk.EventButton event)
+    {
+      int x = (int)event.x_root;
+      int y = (int)event.y_root;
+      int rx, ry;
+      this.get_window ().get_root_origin (out rx, out ry);
+
+      if (!Gui.Utils.is_point_in_mask (this, x - rx, y - ry)) this.vanish ();
+
+      return false;
+    }
+    
+    public override bool key_press_event (Gdk.EventKey event)
+    {
+      this.controller.key_press_event (event);
+      return false;
+    }
+    
+    public override void size_request (out Requisition requisition)
+    {
+      base.size_request (out requisition);
+      /* if the size requested is different => redraw () */
+      if (this.is_realized () && (
+            this.allocation.height != requisition.height ||
+            this.allocation.width != requisition.width
+          ))
+      {
+        this.queue_draw ();
+      }
+    }
+    
+    public override bool expose_event (Gdk.EventExpose event)
+    {
+      bool comp = this.is_composited ();
+
+      Cairo.Context ctx = Gdk.cairo_create (this.window);
+      ctx.set_operator (Cairo.Operator.CLEAR);
+      ctx.paint ();
+
+      /* Propagate Expose */
+      this.propagate_expose (this.get_child(), event);
+      
+      ctx.push_group ();
+      ctx.save ();
+      ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
+      ctx.clip ();
+      paint_background (ctx, this.allocation.width, this.allocation.height);
+      ctx.restore ();
+      ctx.pop_group_to_source ();
+      ctx.set_operator (Cairo.Operator.DEST_OVER);
+      ctx.paint ();
+
+      return true;
+    }
+    
+    protected virtual void paint_background (Cairo.Context ctx, int width, int height)
+    {
+      ch.set_source_rgba (ctx, 0.9, ch.StyleType.BG, StateType.NORMAL);
+      ctx.set_operator (Cairo.Operator.SOURCE);
+      ctx.paint ();
+    }
+
+    public void force_grab ()
+    {
+      Gui.Utils.present_window (this);
+    }
+    
+    public virtual void summon ()
+    {
+      this.show ();
+      Gui.Utils.present_window (this);
+      this.queue_draw ();
+      this.summoned ();
+    }
+
+    public virtual void vanish ()
+    {
+      Gui.Utils.unpresent_window (this);
+      this.hide ();
+      this.vanished ();
+    }
+
+    public virtual void summon_or_vanish ()
+    {
+      if (this.visible)
+        vanish ();
+      else
+        summon ();
+    }
+    
+    public Synapse.Gui.IModel model {get; construct set;}
+    public Synapse.Gui.IController controller {get; construct set;}
+    
+    public virtual void update_focused_source (Entry<int, Match> m){}
+    public virtual void update_focused_action (Entry<int, Match> m){}
+    public virtual void update_focused_target (Entry<int, Match> m){}
+
+    public virtual void update_sources (Gee.List<Match>? list = null){}
+    public virtual void update_actions (Gee.List<Match>? list = null){}
+    public virtual void update_targets (Gee.List<Match>? list = null){}
+    
+    public virtual void update_selected_category (){}
+    
+    public virtual void update_searching_for (){}
+    
+    public virtual bool is_list_visible (){ return true; }
+    public virtual void set_list_visible (bool visible){}
+  }
+}

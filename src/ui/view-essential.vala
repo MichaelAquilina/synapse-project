@@ -90,7 +90,7 @@ namespace Synapse.Gui
       focus_label = new SmartLabel ();
       focus_label.set_ellipsize (Pango.EllipsizeMode.END);
       focus_label.size = SmartLabel.Size.LARGE;
-      focus_label.min_size = SmartLabel.Size.SMALL;
+      focus_label.min_size = SmartLabel.Size.MEDIUM;
       description_label = new SmartLabel ();
       description_label.size = SmartLabel.Size.SMALL;
       description_label.set_animation_enabled (true);
@@ -131,9 +131,14 @@ namespace Synapse.Gui
     protected override void paint_background (Cairo.Context ctx, int width, int height)
     {
       double r = 0, b = 0, g = 0;
-      ctx.translate (SHADOW_SIZE, SHADOW_SIZE);
+      bool comp = this.is_composited ();
+      int delta = focus_label.allocation.y - BORDER_RADIUS;
+      if (!comp) delta = 0;
+      
+      ctx.save ();
+      ctx.translate (SHADOW_SIZE, delta);
       width -= SHADOW_SIZE * 2;
-      height -= SHADOW_SIZE * 2;
+      height -= SHADOW_SIZE + delta;
       // shadow
       ctx.set_operator (Operator.SOURCE);
       ctx.translate (0.5, 0.5);
@@ -154,6 +159,8 @@ namespace Synapse.Gui
       ctx.set_operator (Operator.SOURCE);
       ctx.clip ();
       ctx.paint ();
+      ctx.restore ();
+
       ctx.restore ();
     }
     
