@@ -200,7 +200,7 @@ namespace Synapse.Gui
       {
         // add
         model.query[model.searching_for] = 
-          model.query[model.searching_for] + newchar;
+        model.query[model.searching_for] + newchar;
       }
       switch (model.searching_for)
       {
@@ -440,7 +440,7 @@ namespace Synapse.Gui
       }
       if (notify && view != null)
       {
-        //set_throbber_visible (false);
+        view.set_throbber_visible (false);
         view.update_sources ();
         view.update_actions ();
         view.update_targets ();
@@ -479,9 +479,9 @@ namespace Synapse.Gui
       }
       
       /* if string is empty, and not want to search recent activities, reset */
-      if (!search_with_empty && model.query[what]=="")
+      if (what == SearchingFor.SOURCES && !search_with_empty && model.query[what]=="")
       {
-        reset_search (true);
+        reset_search (true, false);
         return;
       }
       
@@ -517,7 +517,7 @@ namespace Synapse.Gui
     {
       // Synapse.Utils.Logger.log (this, "partial_matches: %u", what);
       /* Search not ready */
-      //TODO: set_throbber_visible (true);
+      view.set_throbber_visible (true);
       partial_result_sent[what] = true;
       /* If partial result set is empty
        * Try to match the new string on current focus
@@ -577,11 +577,14 @@ namespace Synapse.Gui
       model.results[what] = res;
 
       /* Search not cancelled and ready */
-      //set_throbber_visible (false);
       if (tid[what] != 0)
       {
         Source.remove (tid[what]);
         tid[what] = 0;
+      }
+      if (tid[SearchingFor.SOURCES] == 0 && tid[SearchingFor.TARGETS] == 0)
+      {
+        view.set_throbber_visible (false);
       }
       if (model.results[what].size > 0)
       {

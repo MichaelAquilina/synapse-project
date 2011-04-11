@@ -137,6 +137,7 @@ namespace Synapse.Gui
     
     public abstract bool is_list_visible ();
     public abstract void set_list_visible (bool visible);
+    public abstract void set_throbber_visible (bool visible);
   }
   
   public class Entry<K, V>

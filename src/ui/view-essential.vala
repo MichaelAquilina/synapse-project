@@ -72,6 +72,8 @@ namespace Synapse.Gui
     private ResultBox results_actions;
     private ResultBox results_targets;
     
+    private MenuThrobber menuthrobber;
+    
     protected override void build_ui ()
     {
       container = new VBox (false, 0);
@@ -107,7 +109,7 @@ namespace Synapse.Gui
       /* Categories - Throbber and menu */ //#0C71D6
       var categories_hbox = new HBox (false, 0);
 
-      var menuthrobber = new MenuThrobber ();
+      menuthrobber = new MenuThrobber ();
       menu = (MenuButton) menuthrobber;
       menuthrobber.set_size_request (14, 14);
       menuthrobber.button_scale = 0.75;
@@ -165,6 +167,11 @@ namespace Synapse.Gui
     public override void set_list_visible (bool visible)
     {
       results_container.visible = visible;
+    }
+    
+    public override void set_throbber_visible (bool visible)
+    {
+      menuthrobber.active = visible;
     }
     
     public override void update_searching_for ()

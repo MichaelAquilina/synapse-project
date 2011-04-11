@@ -275,5 +275,6 @@ namespace Synapse
     
     public virtual bool is_list_visible (){ return true; }
     public virtual void set_list_visible (bool visible){}
+    public virtual void set_throbber_visible (bool visible){}
   }
 }
