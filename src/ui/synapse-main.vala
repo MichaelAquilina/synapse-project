@@ -39,7 +39,6 @@ namespace Synapse
       }
     };
     
-    private UIInterface? ui;
     private SettingsWindow settings;
     private DataSink data_sink;
     private Gui.KeyComboConfig key_combo_config;
@@ -55,7 +54,6 @@ namespace Synapse
     
     public UILauncher ()
     {
-      ui = null;
       config = ConfigService.get_default ();
       data_sink = new DataSink ();
       key_combo_config = (Gui.KeyComboConfig) config.bind_config ("ui", "shortcuts", typeof (Gui.KeyComboConfig));

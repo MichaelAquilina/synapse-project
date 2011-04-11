@@ -63,18 +63,13 @@ endif
 
 synapse_VALASOURCES = \
 	synapse-main.vala \
+	keybindings.vala \
+	category.vala \
 	interfaces.vala \
 	controller.vala \
 	model.vala \
 	view-base.vala \
 	view-essential.vala \
-	cairo-gtk-base.vala \
-	cairo-gtk.vala \
-	cairo-gtk-doish.vala \
-	cairo-gtk-mini.vala \
-	cairo-gtk-two-lines.vala \
-	cairo-gtk-virgilio.vala \
-	ui-interface.vala \
 	widgets.vala \
 	widgets-matchlistview.vala \
 	icon-cache-service.vala \

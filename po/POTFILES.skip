@@ -1,12 +1,11 @@
 src/ui/synapse-main.c
 src/ui/interfaces.c
+src/ui/keybindings.c
+src/ui/category.c
 src/ui/model.c
 src/ui/controller.c
 src/ui/view-base.c
 src/ui/view-essential.c
-src/ui/cairo-gtk-base.c
-src/ui/cairo-gtk-virgilio.c
-src/ui/ui-interface.c
 src/ui/settings.c
 src/ui/widgets.c
 src/ui/widgets-matchlistview.c
