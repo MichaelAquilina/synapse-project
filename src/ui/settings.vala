@@ -165,11 +165,7 @@ namespace Synapse.Gui
     {
       themes = new Gee.HashMap<string, Theme?>();
 
-      themes["default"] = Theme (_("Default"), "", typeof (SynapseWindow));
-      themes["mini"] = Theme (_("Mini"), "", typeof (SynapseWindowMini));
-      themes["dual"] = Theme (_("Dual"), "", typeof (SynapseWindowTwoLines));
-      themes["virgilio"] = Theme (_("Virgilio"), "", typeof (SynapseWindowVirgilio));
-      themes["doish"] = Theme (_("Do-ish"), "", typeof (SynapseWindowDoish));
+      themes["default"] = Theme (_("Default"), "", typeof (Synapse.Gui.ViewEssential));
 
       selected_theme = config.ui_type;
     }
@@ -478,6 +474,7 @@ namespace Synapse.Gui
       cb_themes.pack_start (ctxt, true);
       cb_themes.set_attributes (ctxt, "text", 1);
       /* Pack data into the model and select current theme */
+      if (!themes.has_key (selected_theme)) selected_theme = "default";
       TreeIter iter;
       foreach (Gee.Map.Entry<string,Theme?> e in themes.entries)
       {

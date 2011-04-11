@@ -83,12 +83,17 @@ namespace Synapse
         controller.summon_or_vanish ();
       });
 
-      controller.set_view (typeof (Gui.ViewEssential));
+      init_ui (settings.get_current_theme ());
 
       if (!is_startup) controller.summon_or_vanish ();
       
-      // settings.theme_selected.connect (init_ui); //TODO: change view
+      settings.theme_selected.connect (init_ui);
       init_indicator ();
+    }
+    
+    private void init_ui (Type t)
+    {
+      controller.set_view (t);
     }
     
     ~UILauncher ()
