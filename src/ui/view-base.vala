@@ -260,6 +260,82 @@ namespace Synapse
         summon ();
     }
     
+    private string dragdrop_name = "";
+    private string dragdrop_uri = "";
+
+    protected void make_draggable (EventBox obj)
+    {
+      obj.set_events (obj.get_events () | Gdk.EventMask.BUTTON_PRESS_MASK);
+      // D&D
+      Gtk.drag_source_set (obj, Gdk.ModifierType.BUTTON1_MASK, {}, 
+                               Gdk.DragAction.ASK | 
+                               Gdk.DragAction.COPY | 
+                               Gdk.DragAction.MOVE | 
+                               Gdk.DragAction.LINK);
+      obj.button_press_event.connect (this.draggable_clicked);
+      obj.drag_data_get.connect (this.draggable_get);
+      obj.drag_end.connect (drag_end_handler);
+      //TODO: drag data recieved => vanish
+    }
+    
+    protected void drag_end_handler (Widget w, Gdk.DragContext context)
+    {
+      this.force_grab ();
+    }
+    
+    private void draggable_get (Widget w, Gdk.DragContext context, SelectionData selection_data, uint info, uint time_)
+    {
+      /* Called at drop time */
+      selection_data.set_text (dragdrop_name, -1);
+      selection_data.set_uris ({dragdrop_uri});
+    }
+    
+    private bool draggable_clicked (Gtk.Widget w, Gdk.EventButton event)
+    {
+      var tl = new TargetList ({});
+      var sf = model.searching_for;
+      if (sf == SearchingFor.ACTIONS) sf = SearchingFor.SOURCES;
+      if (model.focus[sf].value == null)
+      {
+        dragdrop_name = "";
+        dragdrop_uri = "";
+        Gtk.drag_source_set_target_list (w, tl);
+        Gtk.drag_source_set_icon_stock (w, Gtk.Stock.MISSING_IMAGE);
+        return false;
+      }
+
+      UriMatch? um = model.focus[sf].value as UriMatch;
+      if (um == null)
+      {
+        dragdrop_name = "";
+        dragdrop_uri = "";
+        Gtk.drag_source_set_target_list (w, tl);
+        Gtk.drag_source_set_icon_stock (w, Gtk.Stock.MISSING_IMAGE);
+        return false;
+      }
+      
+      dragdrop_name = um.title;
+      dragdrop_uri = um.uri;
+      tl.add_text_targets (0);
+      tl.add_uri_targets (1);
+      Gtk.drag_source_set_target_list (w, tl);
+      
+      try {
+        var icon = GLib.Icon.new_for_string (um.icon_name);
+        if (icon == null) return false;
+
+        Gtk.IconInfo iconinfo = Gtk.IconTheme.get_default ().lookup_by_gicon (icon, 48, Gtk.IconLookupFlags.FORCE_SIZE);
+        if (iconinfo == null) return false;
+
+        Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
+        if (icon_pixbuf == null) return false;
+        
+        Gtk.drag_source_set_icon_pixbuf (w, icon_pixbuf);
+      }
+      catch (GLib.Error err) {}
+      return false;
+    }
+    
     protected Synapse.Gui.Model model = null;
     
     public Synapse.Gui.Model controller_model {get; construct set;}

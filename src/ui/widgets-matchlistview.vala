@@ -673,6 +673,8 @@ namespace Synapse.Gui
     public signal void fire_item ();
     
     private int dragdrop_target_item = 0;
+    private string dragdrop_name = "";
+    private string dragdrop_uri = "";
     public override bool button_press_event (Gdk.EventButton event)
     {
       if (this.tid != 0) return true;
@@ -681,6 +683,8 @@ namespace Synapse.Gui
       
       if (this.items == null || this.items.size <= this.dragdrop_target_item)
       {
+        dragdrop_name = "";
+        dragdrop_uri = "";
         Gtk.drag_source_set_target_list (this, tl);
         Gtk.drag_source_set_icon_stock (this, Gtk.Stock.MISSING_IMAGE);
         return true;
@@ -716,11 +720,15 @@ namespace Synapse.Gui
       {
         Gtk.drag_source_set_target_list (this, tl);
         Gtk.drag_source_set_icon_stock (this, Gtk.Stock.MISSING_IMAGE);
+        dragdrop_name = "";
+        dragdrop_uri = "";
         return true;
       }
 
       tl.add_text_targets (0);
       tl.add_uri_targets (1);
+      dragdrop_name = um.title;
+      dragdrop_uri = um.uri;
       Gtk.drag_source_set_target_list (this, tl);
       
       try {
@@ -741,11 +749,9 @@ namespace Synapse.Gui
     
     public override void drag_data_get (Gdk.DragContext context, SelectionData selection_data, uint info, uint time_)
     {
-      /* Chiamato al momento del drop, imposto i vari dati di rilascio */
-      UriMatch? um = items.get (this.dragdrop_target_item) as UriMatch;
-      return_if_fail (um != null);
-      selection_data.set_text (um.title, -1);
-      selection_data.set_uris ({um.uri});
+      /* Called at drop time */
+      selection_data.set_text (dragdrop_name, -1);
+      selection_data.set_uris ({dragdrop_uri});
     }
   }
   

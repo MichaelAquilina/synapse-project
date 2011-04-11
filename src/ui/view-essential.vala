@@ -135,7 +135,9 @@ namespace Synapse.Gui
       
       /* Top Container */
       var hb = new HBox (false, 5);
-      hb.pack_start (icon_container, false);
+      var sensitive = new SensitiveWidget (icon_container);
+      this.make_draggable (sensitive);
+      hb.pack_start (sensitive, false);
       hb.pack_start (vb, true);
       
       container.pack_start (hb, false);
@@ -149,10 +151,15 @@ namespace Synapse.Gui
 
       results_sources = new ResultBox (100);
       results_actions = new ResultBox (100);
+      /* regrab mouse after drag */
+      results_sources.get_match_list_view ().drag_end.connect (drag_end_handler);
+      results_actions.get_match_list_view ().drag_end.connect (drag_end_handler);
+      /* listen on scroll / click / dblclick */
       results_sources.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
       results_actions.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
       results_sources.get_match_list_view ().fire_item.connect (controller.fire_focus);
       results_actions.get_match_list_view ().fire_item.connect (controller.fire_focus);
+
       results_container.add (results_sources);
       results_container.add (results_actions);
       
