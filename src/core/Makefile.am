@@ -16,7 +16,7 @@ libsynapsecore_la_VALAFLAGS = \
 	$(VAPIDIR)/cancellable-fix.vapi \
 	$(NULL)
 
-libsynapsecore_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h -w
+libsynapsecore_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS)$(GLOBAL_CFLAGS) -include config.h -w
 libsynapsecore_la_LIBADD = $(SYNAPSE_MODULES_LIBS)
 libsynapsecore_la_VALASOURCES = \
 	common-actions.vala \
