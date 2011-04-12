@@ -20,6 +20,7 @@ src/plugins/desktop-file-plugin.vala
 src/plugins/devhelp-search.vala
 src/plugins/dictionary.vala
 src/plugins/directory-plugin.vala
+src/plugins/file-op-plugin.vala
 src/plugins/gnome-screensaver-plugin.vala
 src/plugins/hybrid-search-plugin.vala
 src/plugins/imgur-plugin.vala

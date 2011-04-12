@@ -33,6 +33,7 @@ libplugins_la_VALASOURCES = \
 	banshee-plugin.vala \
 	calculator-plugin.vala \
 	command-plugin.vala \
+	file-op-plugin.vala \
 	desktop-file-plugin.vala \
 	devhelp-search.vala \
 	ssh-plugin.vala \

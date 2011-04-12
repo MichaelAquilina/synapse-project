@@ -175,6 +175,7 @@ namespace Synapse
         typeof (CalculatorPlugin),
         typeof (SelectionPlugin),
         typeof (SshPlugin),
+        typeof (FileOpPlugin),
 #if HAVE_ZEITGEIST
         typeof (ZeitgeistPlugin),
 #endif

@@ -19,6 +19,7 @@ src/plugins/desktop-file-plugin.c
 src/plugins/devhelp-search.c
 src/plugins/dictionary.c
 src/plugins/directory-plugin.c
+src/plugins/file-op-plugin.c
 src/plugins/gnome-screensaver-plugin.c
 src/plugins/gnome-session-plugin.c
 src/plugins/hello-world-plugin.c
