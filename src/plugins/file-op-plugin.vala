@@ -76,7 +76,7 @@ namespace Synapse
       {
         Object (title: _ ("Move to"),
                 description: _ ("Move file to folder"),
-                icon_name: "system-run", has_thumbnail: false,
+                icon_name: "document-import", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: Match.Score.GOOD);
       }
@@ -93,7 +93,7 @@ namespace Synapse
       
       public override QueryFlags target_flags ()
       {
-        return QueryFlags.FILES;
+        return QueryFlags.FILES; //TODO: change to FOLDERS when Places fixed
       }
       
       public override bool valid_for_match (Match match)
@@ -101,8 +101,8 @@ namespace Synapse
         switch (match.match_type)
         {
           case MatchType.GENERIC_URI:
-            //TODO: check if is a local file
-            return true;
+            UriMatch um = match as UriMatch;
+            return (um.file_type & QueryFlags.FILES) != 0;
           default:
             return false;
         }

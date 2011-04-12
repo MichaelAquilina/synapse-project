@@ -106,8 +106,10 @@ namespace Synapse.Gui
       if (category_index == model.selected_category) return;
 
       model.selected_category = category_index;
+      model.searching_for = SearchingFor.SOURCES;
 
       view.update_selected_category ();
+      view.update_searching_for ();
       
       qf = this.category_config.categories.get (category_index).flags;
       
