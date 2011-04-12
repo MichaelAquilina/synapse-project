@@ -219,15 +219,27 @@ namespace Synapse.Gui
     protected override void paint_background (Cairo.Context ctx)
     {
       bool comp = this.is_composited ();
+      double r = 0, b = 0, g = 0;
+
       if (is_list_visible () || (!comp))
       {
+        if (comp && is_list_visible ())
+        {
+          ctx.translate (0.5, 0.5);
+          ctx.set_operator (Operator.OVER);
+          Utils.cairo_make_shadow_for_rect (ctx, results_container.allocation.x,
+                                                 results_container.allocation.y,
+                                                 results_container.allocation.width - 1,
+                                                 results_container.allocation.height - 1,
+                                                 0, r, g, b, SHADOW_SIZE);
+          ctx.translate (-0.5, -0.5);
+        }
         ctx.set_operator (Operator.SOURCE);
         ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
         ctx.rectangle (spacer.allocation.x, spacer.allocation.y + BORDER_RADIUS, spacer.allocation.width, SHADOW_SIZE);
         ctx.fill ();
       }
 
-      double r = 0, b = 0, g = 0;
       int width = this.allocation.width;
       int height = spacer.allocation.y + BORDER_RADIUS + SHADOW_SIZE;
 
