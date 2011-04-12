@@ -83,27 +83,32 @@ namespace Synapse.Gui
       target_icon = new NamedIcon ();
       source_icon.set_icon_name ("search", IconSize.DND);
       
-      icon_container = new SchemaContainer (96, 96);
+      icon_container = new SchemaContainer (160, 160);
       icon_container.add (source_icon);
       icon_container.add (action_icon);
       icon_container.add (target_icon);
       var schema = new SchemaContainer.Schema (); // searcing for sources
-      schema.add_allocation ({ 0, 0, 100, 100 });
-      schema.add_allocation ({ 60, 60, 40, 40 });
+      schema.add_allocation ({ 0, 40, 60, 60 });
+      schema.add_allocation ({ 50, 70, 30, 30 });
+      icon_container.add_schema (schema);
+      schema = new SchemaContainer.Schema (); // searcing for sources with target
+      schema.add_allocation ({ 0, 40, 60, 60 });
+      schema.add_allocation ({ 50, 70, 30, 30 });
+      schema.add_allocation ({ 70, 70, 30, 30 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // searching for actions, but no target
-      schema.add_allocation ({ 0, 0, 40, 40 });
-      schema.add_allocation ({ 20, 20, 80, 80 });
+      schema.add_allocation ({ 0, 70, 30, 30 });
+      schema.add_allocation ({ 20, 40, 60, 60 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // searching for actions, with target
-      schema.add_allocation ({ 0, 0, 40, 40 });
-      schema.add_allocation ({ 20, 20, 80, 80 });
-      schema.add_allocation ({ 60, 60, 40, 40 });
+      schema.add_allocation ({ 0, 70, 30, 30 });
+      schema.add_allocation ({ 20, 40, 60, 60 });
+      schema.add_allocation ({ 70, 70, 30, 30 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // searching for target
-      schema.add_allocation ({ 0, 0, 40, 40 });
-      schema.add_allocation ({ 10, 10, 40, 40 });
-      schema.add_allocation ({ 25, 25, 75, 75 });
+      schema.add_allocation ({ 0, 70, 30, 30 });
+      schema.add_allocation ({ 20, 70, 30, 30 });
+      schema.add_allocation ({ 40, 40, 60, 60 });
       icon_container.add_schema (schema);
       
       icon_container.show ();
@@ -202,33 +207,6 @@ namespace Synapse.Gui
     
     public override void update_searching_for ()
     {
-      switch (model.searching_for)
-      {
-        case SearchingFor.SOURCES:
-          icon_container.select_schema (0);
-          icon_container.set_render_order ({0, 1});
-          flag_selector.sensitive = true;
-          break;
-        case SearchingFor.ACTIONS:
-          if (model.focus[SearchingFor.ACTIONS].value != null && 
-              model.focus[SearchingFor.ACTIONS].value.needs_target ())
-          {
-            icon_container.select_schema (2);
-            icon_container.set_render_order ({1, 2, 0});
-          }
-          else
-          {
-            icon_container.select_schema (1);
-            icon_container.set_render_order ({1, 0});
-          }
-          flag_selector.sensitive = true;
-          break;
-        default: //case SearchingFor.TARGETS:
-          icon_container.select_schema (3);
-          icon_container.set_render_order ({0, 1, 2});
-          flag_selector.sensitive = false;
-          break;
-      }
       update_labels ();
       results_container.select_child (model.searching_for);
     }
@@ -311,6 +289,40 @@ namespace Synapse.Gui
         description_label.set_text (Utils.get_printable_description (focus.value));
         focus_label.set_markup (Utils.markup_string_with_search (focus.value.title, this.model.query[model.searching_for], ""));
       }
+      switch (model.searching_for)
+      {
+        case SearchingFor.SOURCES:
+          flag_selector.sensitive = true;
+          if (model.focus[SearchingFor.ACTIONS].value != null && 
+              model.focus[SearchingFor.ACTIONS].value.needs_target ())
+          {
+            icon_container.select_schema (1);
+          }
+          else
+          {
+            icon_container.select_schema (0);
+          }
+          icon_container.set_render_order ({0, 1, 2});
+          break;
+        case SearchingFor.ACTIONS:
+          if (model.focus[SearchingFor.ACTIONS].value != null && 
+              model.focus[SearchingFor.ACTIONS].value.needs_target ())
+          {
+            icon_container.select_schema (3);
+          }
+          else
+          {
+            icon_container.select_schema (2);
+          }
+          icon_container.set_render_order ({1, 2, 0});
+          flag_selector.sensitive = true;
+          break;
+        default: //case SearchingFor.TARGETS:
+          icon_container.select_schema (4);
+          icon_container.set_render_order ({0, 1, 2});
+          flag_selector.sensitive = false;
+          break;
+      }
     }
     
     public override void update_focused_source (Entry<int, Match> m)
@@ -339,7 +351,10 @@ namespace Synapse.Gui
     
     public override void update_focused_target (Entry<int, Match> m)
     {
-      if (controller.is_in_initial_state ()) target_icon.clear ();
+      if (controller.is_in_initial_state () ||
+          model.focus[SearchingFor.ACTIONS].value == null ||
+         (!model.focus[SearchingFor.ACTIONS].value.needs_target ())
+         ) target_icon.clear ();
       else if (m.value == null) target_icon.set_icon_name ("");
       else
       {

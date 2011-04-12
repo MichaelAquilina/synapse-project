@@ -260,6 +260,7 @@ namespace Synapse.Gui
                this.search_recent_activities)
       {
         reset_search (true, false);
+        view.set_list_visible (false);
       }
       else
       {
@@ -288,9 +289,11 @@ namespace Synapse.Gui
             clear_search_or_hide_pressed ();
             break;
           case KeyComboConfig.Commands.PREV_CATEGORY:
+            if (model.searching_for == SearchingFor.TARGETS) break;
             category_changed_event (model.selected_category - 1);
             break;
           case KeyComboConfig.Commands.NEXT_CATEGORY:
+            if (model.searching_for == SearchingFor.TARGETS) break;
             category_changed_event (model.selected_category + 1);
             break;
           case KeyComboConfig.Commands.FIRST_RESULT:
