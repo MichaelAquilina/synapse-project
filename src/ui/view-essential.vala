@@ -87,13 +87,23 @@ namespace Synapse.Gui
       icon_container.add (source_icon);
       icon_container.add (action_icon);
       icon_container.add (target_icon);
-      var schema = new SchemaContainer.Schema ();
+      var schema = new SchemaContainer.Schema (); // searcing for sources
       schema.add_allocation ({ 0, 0, 100, 100 });
       schema.add_allocation ({ 60, 60, 40, 40 });
       icon_container.add_schema (schema);
-      schema = new SchemaContainer.Schema ();
+      schema = new SchemaContainer.Schema (); // searching for actions, but no target
       schema.add_allocation ({ 0, 0, 40, 40 });
       schema.add_allocation ({ 20, 20, 80, 80 });
+      icon_container.add_schema (schema);
+      schema = new SchemaContainer.Schema (); // searching for actions, with target
+      schema.add_allocation ({ 0, 0, 40, 40 });
+      schema.add_allocation ({ 20, 20, 80, 80 });
+      schema.add_allocation ({ 60, 60, 40, 40 });
+      icon_container.add_schema (schema);
+      schema = new SchemaContainer.Schema (); // searching for target
+      schema.add_allocation ({ 0, 0, 40, 40 });
+      schema.add_allocation ({ 10, 10, 40, 40 });
+      schema.add_allocation ({ 25, 25, 75, 75 });
       icon_container.add_schema (schema);
       
       icon_container.show ();
@@ -151,17 +161,22 @@ namespace Synapse.Gui
 
       results_sources = new ResultBox (100);
       results_actions = new ResultBox (100);
+      results_targets = new ResultBox (100);
       /* regrab mouse after drag */
       results_sources.get_match_list_view ().drag_end.connect (drag_end_handler);
       results_actions.get_match_list_view ().drag_end.connect (drag_end_handler);
+      results_targets.get_match_list_view ().drag_end.connect (drag_end_handler);
       /* listen on scroll / click / dblclick */
       results_sources.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
       results_actions.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
+      results_targets.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
       results_sources.get_match_list_view ().fire_item.connect (controller.fire_focus);
       results_actions.get_match_list_view ().fire_item.connect (controller.fire_focus);
+      results_targets.get_match_list_view ().fire_item.connect (controller.fire_focus);
 
       results_container.add (results_sources);
       results_container.add (results_actions);
+      results_container.add (results_targets);
       
       container.show_all ();
       results_container.hide ();
@@ -194,8 +209,21 @@ namespace Synapse.Gui
           icon_container.set_render_order ({0, 1});
           break;
         case SearchingFor.ACTIONS:
-          icon_container.select_schema (1);
-          icon_container.set_render_order ({1, 0});
+          if (model.focus[SearchingFor.ACTIONS].value != null && 
+              model.focus[SearchingFor.ACTIONS].value.needs_target ())
+          {
+            icon_container.select_schema (2);
+            icon_container.set_render_order ({1, 2, 0});
+          }
+          else
+          {
+            icon_container.select_schema (1);
+            icon_container.set_render_order ({1, 0});
+          }
+          break;
+        default: //case SearchingFor.TARGETS:
+          icon_container.select_schema (3);
+          icon_container.set_render_order ({0, 1, 2});
           break;
       }
       update_labels ();
@@ -308,7 +336,14 @@ namespace Synapse.Gui
     
     public override void update_focused_target (Entry<int, Match> m)
     {
-      // TODO: not implemented
+      if (controller.is_in_initial_state ()) target_icon.clear ();
+      else if (m.value == null) target_icon.set_icon_name ("");
+      else
+      {
+        target_icon.set_icon_name (m.value.icon_name);
+        results_targets.move_selection_to_index (m.key);
+      }
+      if (model.searching_for == SearchingFor.TARGETS) update_labels ();
     }
     
     public override void update_sources (Gee.List<Match>? list = null)
@@ -321,7 +356,7 @@ namespace Synapse.Gui
     }
     public override void update_targets (Gee.List<Match>? list = null)
     {
-    
+      results_targets.update_matches (list);
     }
   }
 }

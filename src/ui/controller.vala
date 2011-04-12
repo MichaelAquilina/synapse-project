@@ -50,23 +50,22 @@ namespace Synapse.Gui
                                               "controller", this) as IView;
       reset_search (true, true);
 
-      // IBus fix
-      if (this.view is Gtk.Window)
+      // Input Method Fix
+      if (this.view is Gtk.Window) //this has to be true, otherwise im_context will not work well
       {
         Gtk.Window v = this.view as Gtk.Window;
-        Gdk.Window win = v.get_window ();
-        // im_context.set_client_window (win); //if you enable this, IBUS will cover Synapse window
+
         Synapse.Utils.Logger.log (view, "Using %s input method.", im_context.get_context_id ());
 
         v.focus_in_event.connect ( ()=> {
           im_context.reset ();
           im_context.focus_in ();
-          return true;
+          return false;
         });
 
         v.focus_out_event.connect ( ()=>{
           im_context.focus_out ();
-          return true;
+          return false;
         });
       }
       this.view.vanished.connect (()=>{
