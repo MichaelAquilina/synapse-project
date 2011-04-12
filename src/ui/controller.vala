@@ -196,7 +196,9 @@ namespace Synapse.Gui
         return;
       }
       
-      if (action.needs_target () && target == null) return;
+      if ( (action.needs_target () && target == null) ||
+           (!action.needs_target () && target != null)
+         ) return; // can't do that
       
       Timeout.add (20, ()=>{
         action.execute_with_target (source, target);
