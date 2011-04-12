@@ -29,7 +29,7 @@ synapse_VALAFLAGS = \
 	$(NULL)
 
 synapse_CFLAGS = \
-	$(SYNAPSE_MODULES_CFLAGS)$(GLOBAL_CFLAGS) \
+	$(SYNAPSE_MODULES_CFLAGS) \
 	-include config.h -w \
 	-I$(top_builddir)/src/core \
 	-I$(top_builddir)/src/plugins \

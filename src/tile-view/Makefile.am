@@ -12,7 +12,7 @@ libtileview_la_VALAFLAGS = \
 	$(VAPIDIR)/config.vapi \
 	$(NULL)
 
-libtileview_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS)$(GLOBAL_CFLAGS) -include config.h
+libtileview_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h
 libtileview_la_LIBADD = $(SYNAPSE_MODULES_LIBS)
 libtileview_la_VALASOURCES = \
 	abstract-tile-object.vala \

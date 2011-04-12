@@ -21,7 +21,7 @@ libplugins_la_VALAFLAGS = \
 	$(NULL)
 
 libplugins_la_CFLAGS = \
-	$(SYNAPSE_MODULES_CFLAGS)$(GLOBAL_CFLAGS) \
+	$(SYNAPSE_MODULES_CFLAGS) \
 	-include config.h -w \
 	-I$(top_builddir)/src/core \
 	$(NULL)
