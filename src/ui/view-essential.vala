@@ -207,6 +207,7 @@ namespace Synapse.Gui
         case SearchingFor.SOURCES:
           icon_container.select_schema (0);
           icon_container.set_render_order ({0, 1});
+          flag_selector.sensitive = true;
           break;
         case SearchingFor.ACTIONS:
           if (model.focus[SearchingFor.ACTIONS].value != null && 
@@ -220,10 +221,12 @@ namespace Synapse.Gui
             icon_container.select_schema (1);
             icon_container.set_render_order ({1, 0});
           }
+          flag_selector.sensitive = true;
           break;
         default: //case SearchingFor.TARGETS:
           icon_container.select_schema (3);
           icon_container.set_render_order ({0, 1, 2});
+          flag_selector.sensitive = false;
           break;
       }
       update_labels ();

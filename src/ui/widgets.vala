@@ -1019,6 +1019,10 @@ namespace Synapse.Gui
             return update_current_offset ();
           });
       });
+      this.notify["sensitive"].connect (()=>{
+        update_cached_surface ();
+        queue_draw ();
+      });
       this.realize.connect (this._global_update);
       this.notify["selected-markup"].connect (_global_update);
       this.notify["unselected-markup"].connect (_global_update);
@@ -1153,7 +1157,10 @@ namespace Synapse.Gui
       /* Arrows */
       if (!this.show_arrows)
         return;
-      ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.SELECTED);
+      if (this.get_state () == StateType.SELECTED)
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.NORMAL);
+      else
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.SELECTED);
       txt = texts.get (_selected);
       double asize = double.min (ARROW_SIZE, h);
       double px, py = h / 2;
