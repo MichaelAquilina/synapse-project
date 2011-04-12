@@ -191,7 +191,7 @@ namespace Synapse.Gui
     
     
     /* Clear all non relevant masks like the ones used in IBUS */
-    private static uint mod_normalize_mask = Gtk.accelerator_get_default_mod_mask ();
+    public static uint mod_normalize_mask = Gtk.accelerator_get_default_mod_mask ();
 
     public Commands get_command_from_eventkey (Gdk.EventKey event)
     {

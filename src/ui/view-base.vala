@@ -84,6 +84,7 @@ namespace Synapse
       this.set_position (Gtk.WindowPosition.CENTER);
       this.set_decorated (false);
       this.set_resizable (false);
+
       /* SPLASHSCREEN is needed for Metacity/Compiz, but doesn't work with KWin */
       if (is_kwin)
         this.set_type_hint (Gdk.WindowTypeHint.NORMAL);

@@ -49,6 +49,26 @@ namespace Synapse.Gui
       this.view = GLib.Object.new (view_type, "controller-model", this.model,
                                               "controller", this) as IView;
       reset_search (true, true);
+
+      // IBus fix
+      if (this.view is Gtk.Window)
+      {
+        Gtk.Window v = this.view as Gtk.Window;
+        Gdk.Window win = v.get_window ();
+        // im_context.set_client_window (win); //if you enable this, IBUS will cover Synapse window
+        Synapse.Utils.Logger.log (view, "Using %s input method.", im_context.get_context_id ());
+
+        v.focus_in_event.connect ( ()=> {
+          im_context.reset ();
+          im_context.focus_in ();
+          return true;
+        });
+
+        v.focus_out_event.connect ( ()=>{
+          im_context.focus_out ();
+          return true;
+        });
+      }
       this.view.vanished.connect (()=>{
         reset_search (true, true);
       });
@@ -59,13 +79,19 @@ namespace Synapse.Gui
     /* key_press_event should be fired on key press */
     public void key_press_event (Gdk.EventKey event)
     {
+      bool filtered = false;
+      /* Check for text input */
+      filtered = im_context.filter_keypress (event);
+
+      if (filtered && (event.state & KeyComboConfig.mod_normalize_mask) == 0) return;
+
       /* Check for commands */
       KeyComboConfig.Commands command = 
         this.key_combo_config.get_command_from_eventkey (event);
       
+      if (command != command.INVALID_COMMAND) im_context.reset ();
+      
       if (this.fetch_command (command)) return;
-      /* Check for text input */
-      im_context.filter_keypress (event);
     }
     
     /* category_changed_event should be fired ie when user clicks on a category */
@@ -152,7 +178,6 @@ namespace Synapse.Gui
       im_context = new Gtk.IMMulticontext ();
       im_context.set_use_preedit (false);
       im_context.commit.connect (search_add_delete_char);
-      im_context.focus_in ();
     }
     
     protected void execute (bool hide = true)
