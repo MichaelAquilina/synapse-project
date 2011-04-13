@@ -588,11 +588,12 @@ namespace Synapse.Gui
       
       if (what == what.SOURCES)
       {
-        view.update_sources (model.results[what]);
-        view.update_focused_source (model.focus[what]);
-
+        /* It's important to search for actions before show the match */
         model.clear_searching_for (SearchingFor.ACTIONS);
         search_for_actions ();
+        
+        view.update_sources (model.results[what]);
+        view.update_focused_source (model.focus[what]);
       }
       else
       {
@@ -654,11 +655,12 @@ namespace Synapse.Gui
 
       if (what == what.SOURCES)
       {
-        view.update_sources (model.results[what]);
-        view.update_focused_source (model.focus[what]);
-        
+        /* It's important to search for actions before show the match */
         model.clear_searching_for (SearchingFor.ACTIONS);
         search_for_actions ();
+        
+        view.update_sources (model.results[what]);
+        view.update_focused_source (model.focus[what]);
       }
       else
       {

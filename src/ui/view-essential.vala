@@ -82,6 +82,8 @@ namespace Synapse.Gui
       action_icon = new NamedIcon ();
       target_icon = new NamedIcon ();
       source_icon.set_icon_name ("search", IconSize.DND);
+      action_icon.clear ();
+      target_icon.set_icon_name ("");
       
       icon_container = new SchemaContainer (96);
       icon_container.fixed_height = true;
@@ -362,11 +364,7 @@ namespace Synapse.Gui
     
     public override void update_focused_target (Entry<int, Match> m)
     {
-      if (controller.is_in_initial_state () ||
-          model.focus[SearchingFor.ACTIONS].value == null ||
-         (!model.focus[SearchingFor.ACTIONS].value.needs_target ())
-         ) target_icon.clear ();
-      else if (m.value == null) target_icon.set_icon_name ("");
+      if (m.value == null) target_icon.set_icon_name ("");
       else
       {
         target_icon.set_icon_name (m.value.icon_name);

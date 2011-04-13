@@ -78,7 +78,7 @@ namespace Synapse
                 description: _ ("Move file to folder"),
                 icon_name: "document-import", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.GOOD);
+                default_relevancy: Match.Score.AVERAGE);
       }
       
       public override void execute_with_target (Match? source, Match? target = null)
