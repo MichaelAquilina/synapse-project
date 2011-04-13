@@ -356,7 +356,7 @@ namespace Synapse.Gui
           {
             icon_container.select_schema (0);
           }
-          icon_container.set_render_order ({0, 1, 2});
+          icon_container.set_render_order ({2, 0, 1});
           break;
         case SearchingFor.ACTIONS:
           if (model.needs_target ())
@@ -367,12 +367,12 @@ namespace Synapse.Gui
           {
             icon_container.select_schema (2);
           }
-          icon_container.set_render_order ({1, 2, 0});
+          icon_container.set_render_order ({0, 2, 1});
           flag_selector.sensitive = true;
           break;
         default: //case SearchingFor.TARGETS:
           icon_container.select_schema (4);
-          icon_container.set_render_order ({0, 1, 2});
+          icon_container.set_render_order ({2, 0, 1});
           flag_selector.sensitive = false;
           break;
       }
