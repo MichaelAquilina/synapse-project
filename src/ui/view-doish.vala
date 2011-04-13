@@ -25,7 +25,7 @@ using Cairo;
 
 namespace Synapse.Gui
 {
-  public class ViewEssential : Synapse.Gui.View
+  public class ViewDoish : Synapse.Gui.View
   {
     construct {
       
@@ -34,10 +34,10 @@ namespace Synapse.Gui
     static construct
     {
       var width = new GLib.ParamSpecInt ("ui-width",
-                                         "Width",
-                                         "The width of the content in Essential theme",
-                                         0, 1024, 500,
-                                         GLib.ParamFlags.READABLE);
+                                             "Width",
+                                             "The width of Doish theme",
+                                             300, 1024, 500,
+                                             GLib.ParamFlags.READABLE);
       var icon_size = new GLib.ParamSpecInt ("icon-size",
                                              "Icon Size",
                                              "The size of focused icon in Essential theme",
@@ -46,12 +46,12 @@ namespace Synapse.Gui
       var title_max = new GLib.ParamSpecString ("title-size",
                                                 "Title Font Size",
                                                 "The standard size the match title in Pango absolute sizes (string)",
-                                                "large",
+                                                "medium",
                                                 GLib.ParamFlags.READABLE);
       var title_min = new GLib.ParamSpecString ("title-min-size",
                                                 "Title minimum Font Size",
                                                 "The minimum size the match title in Pango absolute sizes (string)",
-                                                "medium",
+                                                "small",
                                                 GLib.ParamFlags.READABLE);
       var descr_max = new GLib.ParamSpecString ("description-size",
                                                 "Title Font Size",
@@ -61,7 +61,7 @@ namespace Synapse.Gui
       var descr_min = new GLib.ParamSpecString ("description-min-size",
                                                 "Title minimum Font Size",
                                                 "The minimum size the match title in Pango absolute sizes (string)",
-                                                "small",
+                                                "x-small",
                                                 GLib.ParamFlags.READABLE);
       
       install_style_property (width);
@@ -78,12 +78,12 @@ namespace Synapse.Gui
 
       int width, icon_size;
       string tmax, tmin, dmax, dmin;
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "ui-width", out width);
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "icon-size", out icon_size);
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "title-size", out tmax);
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "title-min-size", out tmin);
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "description-size", out dmax);
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "description-min-size", out dmin);
+      this.style.get (typeof(Synapse.Gui.ViewDoish), "ui-width", out width);
+      this.style.get (typeof(Synapse.Gui.ViewDoish), "icon-size", out icon_size);
+      this.style.get (typeof(Synapse.Gui.ViewDoish), "title-size", out tmax);
+      this.style.get (typeof(Synapse.Gui.ViewDoish), "title-min-size", out tmin);
+      this.style.get (typeof(Synapse.Gui.ViewDoish), "description-size", out dmax);
+      this.style.get (typeof(Synapse.Gui.ViewDoish), "description-min-size", out dmin);
       
       icon_container.scale_size = icon_size;
       container.set_size_request (width, -1);
@@ -128,31 +128,18 @@ namespace Synapse.Gui
       
       icon_container = new SchemaContainer (96);
       icon_container.fixed_height = true;
-      icon_container.add (source_icon);
       icon_container.add (action_icon);
       icon_container.add (target_icon);
-      var schema = new SchemaContainer.Schema (); // searcing for sources
+      var schema = new SchemaContainer.Schema (); // action without target
       schema.add_allocation ({ 0, 0, 100, 100 });
-      schema.add_allocation ({ 80, 50, 50, 50 });
       icon_container.add_schema (schema);
-      schema = new SchemaContainer.Schema (); // searcing for sources with target
+      schema = new SchemaContainer.Schema (); // action with target
       schema.add_allocation ({ 0, 0, 100, 100 });
-      schema.add_allocation ({ 80, 50, 50, 50 });
-      schema.add_allocation ({ 110, 50, 50, 50 });
+      schema.add_allocation ({ 60, 60, 40, 40 });
       icon_container.add_schema (schema);
-      schema = new SchemaContainer.Schema (); // searching for actions, but no target
-      schema.add_allocation ({ 0, 50, 50, 50 });
-      schema.add_allocation ({ 30, 0, 100, 100 });
-      icon_container.add_schema (schema);
-      schema = new SchemaContainer.Schema (); // searching for actions, with target
-      schema.add_allocation ({ 0, 50, 50, 50 });
-      schema.add_allocation ({ 30, 0, 100, 100 });
-      schema.add_allocation ({ 110, 50, 50, 50 });
-      icon_container.add_schema (schema);
-      schema = new SchemaContainer.Schema (); // searching for target
-      schema.add_allocation ({ 0, 50, 50, 50 });
-      schema.add_allocation ({ 30, 50, 50, 50 });
-      schema.add_allocation ({ 60, 0, 100, 100 });
+      schema = new SchemaContainer.Schema (); // target
+      schema.add_allocation ({ 60, 60, 40, 40 });
+      schema.add_allocation ({ 0, 0, 100, 100 });
       icon_container.add_schema (schema);
       
       icon_container.show ();

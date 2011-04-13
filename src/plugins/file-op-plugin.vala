@@ -76,7 +76,7 @@ namespace Synapse
       {
         Object (title: _ ("Move to"),
                 description: _ ("Move file to folder"),
-                icon_name: "document-import", has_thumbnail: false,
+                icon_name: "forward", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: Match.Score.AVERAGE);
       }

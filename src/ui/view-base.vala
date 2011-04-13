@@ -149,6 +149,7 @@ namespace Synapse
     public override void style_set (Gtk.Style? old)
     {
       base.style_set (old);
+      update_border_and_shadow ();
     }
     
     protected void update_border_and_shadow ()

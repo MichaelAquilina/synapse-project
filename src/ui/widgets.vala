@@ -49,6 +49,16 @@ namespace Synapse.Gui
       "xx-large"
     };
     
+    public static Size string_to_size (string sizename)
+    {
+      Size s = Size.MEDIUM;
+      for (uint i = 0; i < size_to_string.length; i++)
+      {
+        if (size_to_string[i] == sizename) return (Size)i;
+      }
+      return s;
+    }
+    
     protected static double[] size_to_scale = {
       Pango.Scale.XX_SMALL,
       Pango.Scale.X_SMALL,
@@ -354,6 +364,9 @@ namespace Synapse.Gui
       children = new Gee.ArrayList<Widget> ();
       set_has_window (false);
       set_redraw_on_allocate (false);
+      this.notify["scale-size"].connect (this.queue_resize);
+      this.notify["fixed-width"].connect (this.queue_resize);
+      this.notify["fixed-height"].connect (this.queue_resize);
     }
     
     public void set_render_order (int[]? order)

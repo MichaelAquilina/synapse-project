@@ -588,7 +588,6 @@ namespace Synapse.Gui
     
     public override bool expose_event (Gdk.EventExpose event)
     {
-      if (this.items == null || this.items.size == 0) return true;
       /* Clip */
       Cairo.Context ctx = Gdk.cairo_create (this.window);
       ctx.translate (this.allocation.x, this.allocation.y);
@@ -601,6 +600,8 @@ namespace Synapse.Gui
         ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
         ctx.paint ();
       }
+      
+      if (this.items == null || this.items.size == 0) return true;
 
       ctx.set_font_options (this.get_screen().get_font_options());
 

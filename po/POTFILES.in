@@ -7,6 +7,7 @@ src/ui/model.vala
 src/ui/controller.vala
 src/ui/view-base.vala
 src/ui/view-essential.vala
+src/ui/view-doish.vala
 src/ui/settings.vala
 src/ui/widgets.vala
 src/ui/widgets-matchlistview.vala

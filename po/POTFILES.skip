@@ -6,6 +6,7 @@ src/ui/model.c
 src/ui/controller.c
 src/ui/view-base.c
 src/ui/view-essential.c
+src/ui/view-doish.c
 src/ui/settings.c
 src/ui/widgets.c
 src/ui/widgets-matchlistview.c
