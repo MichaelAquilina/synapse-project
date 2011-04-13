@@ -321,12 +321,11 @@ namespace Synapse.Gui
       }
       public void add_allocation (Allocation alloc)
       {
-        alloc.x = int.max (0, int.min (100, alloc.x));
-        alloc.y = int.max (0, int.min (100, alloc.y));
-        alloc.width = int.max (0, int.min (100, alloc.width));
-        alloc.height = int.max (0, int.min (100, alloc.height));
-        if ((alloc.x + alloc.width) > 100) alloc.width = 100 - alloc.x;
-        if ((alloc.y + alloc.height) > 100) alloc.height = 100 - alloc.y;
+        alloc.x = int.max (0, alloc.x);
+        alloc.y = int.max (0, alloc.y);
+        alloc.width = int.max (0, alloc.width);
+        alloc.height = int.max (0, alloc.height);
+
         this._positions += alloc;
       }
     }
@@ -336,13 +335,25 @@ namespace Synapse.Gui
     private int active_schema = 0;
     private int[] render_order = null;
     
-    public SchemaContainer (int width, int height)
+    public int scale_size {
+      get; set; default = 128;
+    }
+    
+    public bool fixed_height {
+      get; set; default = false;
+    }
+    
+    public bool fixed_width {
+      get; set; default = false;
+    }
+    
+    public SchemaContainer (int scale_size)
     {
+      this.scale_size = scale_size;
       schemas = new Gee.ArrayList<Schema> ();
       children = new Gee.ArrayList<Widget> ();
       set_has_window (false);
       set_redraw_on_allocate (false);
-      this.set_size_request (width, height);
     }
     
     public void set_render_order (int[]? order)
@@ -407,6 +418,30 @@ namespace Synapse.Gui
       // cannot remove for now :P TODO
     }
     
+    public override void size_request (out Gtk.Requisition req)
+    {
+      req = {0, 0};
+      int i = 0;
+      Allocation[] alloc = schemas.get (active_schema).positions;
+
+      foreach (Widget child in children)
+      {
+        if (alloc.length > i)
+        {
+          req.width = int.max ((alloc[i].x+alloc[i].width)*_scale_size/100, req.width);
+          req.height = int.max ((alloc[i].y+alloc[i].height)*_scale_size/100, req.height);
+          child.visible = true;
+        }
+        else
+        {
+          child.visible = false;
+        }
+        i++;
+      }
+      if (this._fixed_height) req.height = this._scale_size;
+      if (this._fixed_width) req.width = this._scale_size;
+    }
+    
     public override void size_allocate (Gdk.Rectangle allocation)
     {
       base.size_allocate (allocation);
@@ -422,21 +457,23 @@ namespace Synapse.Gui
       int i = 0;
       foreach (Widget child in children)
       {
+        Gdk.Rectangle a;
         if (alloc.length <= i)
         {
-          child.hide ();
+          a = {
+            0, 0, 0, 0
+          };
         }
         else
         {
-          Gdk.Rectangle a = {
-            allocation.x + alloc[i].x * allocation.width / 100,
-            allocation.y + alloc[i].y * allocation.height / 100,
-            alloc[i].width * allocation.width / 100,
-            alloc[i].height * allocation.height / 100
+          a = {
+            allocation.x + alloc[i].x * this._scale_size / 100,
+            allocation.y + alloc[i].y * this._scale_size / 100,
+            alloc[i].width * this._scale_size / 100,
+            alloc[i].height * this._scale_size / 100
           };
-          child.size_allocate (a);
-          child.show ();
         }
+        child.size_allocate (a);
         i++;
       }
     }

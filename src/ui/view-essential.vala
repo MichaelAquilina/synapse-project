@@ -83,32 +83,33 @@ namespace Synapse.Gui
       target_icon = new NamedIcon ();
       source_icon.set_icon_name ("search", IconSize.DND);
       
-      icon_container = new SchemaContainer (160, 160);
+      icon_container = new SchemaContainer (96);
+      icon_container.fixed_height = true;
       icon_container.add (source_icon);
       icon_container.add (action_icon);
       icon_container.add (target_icon);
       var schema = new SchemaContainer.Schema (); // searcing for sources
-      schema.add_allocation ({ 0, 40, 60, 60 });
-      schema.add_allocation ({ 50, 70, 30, 30 });
+      schema.add_allocation ({ 0, 0, 100, 100 });
+      schema.add_allocation ({ 80, 50, 50, 50 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // searcing for sources with target
-      schema.add_allocation ({ 0, 40, 60, 60 });
-      schema.add_allocation ({ 50, 70, 30, 30 });
-      schema.add_allocation ({ 70, 70, 30, 30 });
+      schema.add_allocation ({ 0, 0, 100, 100 });
+      schema.add_allocation ({ 80, 50, 50, 50 });
+      schema.add_allocation ({ 110, 50, 50, 50 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // searching for actions, but no target
-      schema.add_allocation ({ 0, 70, 30, 30 });
-      schema.add_allocation ({ 20, 40, 60, 60 });
+      schema.add_allocation ({ 0, 50, 50, 50 });
+      schema.add_allocation ({ 30, 0, 100, 100 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // searching for actions, with target
-      schema.add_allocation ({ 0, 70, 30, 30 });
-      schema.add_allocation ({ 20, 40, 60, 60 });
-      schema.add_allocation ({ 70, 70, 30, 30 });
+      schema.add_allocation ({ 0, 50, 50, 50 });
+      schema.add_allocation ({ 30, 0, 100, 100 });
+      schema.add_allocation ({ 110, 50, 50, 50 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // searching for target
-      schema.add_allocation ({ 0, 70, 30, 30 });
-      schema.add_allocation ({ 20, 70, 30, 30 });
-      schema.add_allocation ({ 40, 40, 60, 60 });
+      schema.add_allocation ({ 0, 50, 50, 50 });
+      schema.add_allocation ({ 30, 50, 50, 50 });
+      schema.add_allocation ({ 60, 0, 100, 100 });
       icon_container.add_schema (schema);
       
       icon_container.show ();
@@ -305,8 +306,7 @@ namespace Synapse.Gui
       {
         case SearchingFor.SOURCES:
           flag_selector.sensitive = true;
-          if (model.focus[SearchingFor.ACTIONS].value != null && 
-              model.focus[SearchingFor.ACTIONS].value.needs_target ())
+          if (model.needs_target ())
           {
             icon_container.select_schema (1);
           }
@@ -317,8 +317,7 @@ namespace Synapse.Gui
           icon_container.set_render_order ({0, 1, 2});
           break;
         case SearchingFor.ACTIONS:
-          if (model.focus[SearchingFor.ACTIONS].value != null && 
-              model.focus[SearchingFor.ACTIONS].value.needs_target ())
+          if (model.needs_target ())
           {
             icon_container.select_schema (3);
           }

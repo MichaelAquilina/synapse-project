@@ -93,7 +93,7 @@ namespace Synapse
       
       public override QueryFlags target_flags ()
       {
-        return QueryFlags.FILES; //TODO: change to FOLDERS when Places fixed
+        return QueryFlags.FOLDERS; //TODO: change to FOLDERS when Places fixed
       }
       
       public override bool valid_for_match (Match match)

@@ -88,9 +88,11 @@ namespace Synapse.Gui
       KeyComboConfig.Commands command = 
         this.key_combo_config.get_command_from_eventkey (event);
       
-      if (command != command.INVALID_COMMAND) im_context.reset ();
-      
-      if (this.fetch_command (command)) return;
+      if (command != command.INVALID_COMMAND)
+      {
+        im_context.reset ();
+        this.fetch_command (command);
+      }
     }
     
     /* category_changed_event should be fired ie when user clicks on a category */
@@ -138,18 +140,19 @@ namespace Synapse.Gui
       switch (model.searching_for)
       {
         case SearchingFor.SOURCES:
-          view.update_focused_source (model.focus[model.searching_for]);
           model.clear_searching_for (SearchingFor.ACTIONS);
           search_for_actions ();
+          
+          view.update_focused_source (model.focus[model.searching_for]);
           break;
         case SearchingFor.ACTIONS:
-          view.update_focused_action (model.focus[model.searching_for]);
-
           model.clear_searching_for (SearchingFor.TARGETS);
           view.update_targets (null);
           view.update_focused_target (model.focus[SearchingFor.TARGETS]);
           if (model.focus[SearchingFor.ACTIONS].value.needs_target())
             search_for_matches (SearchingFor.TARGETS, true);
+
+          view.update_focused_action (model.focus[model.searching_for]);
           break;
         default: //case SearchingFor.TARGETS:
           view.update_focused_target (model.focus[model.searching_for]);
@@ -230,7 +233,7 @@ namespace Synapse.Gui
       {
         // add
         model.query[model.searching_for] = 
-        model.query[model.searching_for] + newchar;
+              model.query[model.searching_for] + newchar;
       }
       switch (model.searching_for)
       {
@@ -253,8 +256,8 @@ namespace Synapse.Gui
       {
         model.query[SearchingFor.ACTIONS] = "";
         model.searching_for = SearchingFor.SOURCES;
-        view.update_searching_for ();
         search_for_actions ();
+        view.update_searching_for ();
       }
       else if (model.query[SearchingFor.SOURCES] != "" ||
                this.search_recent_activities)
@@ -644,7 +647,9 @@ namespace Synapse.Gui
       }
       else
       {
-        model.clear_searching_for (what);
+        model.focus[what].value = null;
+        model.focus[what].key = 0;
+        model.results[what] = null;
       }
 
       if (what == what.SOURCES)
@@ -687,10 +692,7 @@ namespace Synapse.Gui
       if (model.results[SearchingFor.ACTIONS].size > 0)
       {
         model.focus[SearchingFor.ACTIONS].value = model.results[SearchingFor.ACTIONS].first();
-        if (model.focus[SearchingFor.ACTIONS].value.needs_target ())
-        {
-          search_for_matches (SearchingFor.TARGETS, true);
-        }
+        // we'll search for targets only when users jumps to searching for actions
       }
       else
       {

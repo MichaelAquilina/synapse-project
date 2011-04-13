@@ -61,6 +61,12 @@ namespace Synapse.Gui
       focus[searching_for].value = results[searching_for].get (i);
     }
     
+    public bool needs_target ()
+    {
+      return focus[SearchingFor.ACTIONS].value != null && 
+             focus[SearchingFor.ACTIONS].value.needs_target ();
+    }
+    
     public void clear (int default_category = -1)
     {
       searching_for = SearchingFor.SOURCES;
