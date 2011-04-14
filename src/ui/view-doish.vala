@@ -33,15 +33,15 @@ namespace Synapse.Gui
     
     static construct
     {
-      var width = new GLib.ParamSpecInt ("ui-width",
-                                             "Width",
-                                             "The width of Doish theme",
-                                             300, 1024, 500,
+      var spacing = new GLib.ParamSpecInt ("pane-spacing",
+                                             "Pane Spacing",
+                                             "The space between two panes in Doish theme",
+                                             5, 100, 20,
                                              GLib.ParamFlags.READABLE);
       var icon_size = new GLib.ParamSpecInt ("icon-size",
                                              "Icon Size",
-                                             "The size of focused icon in Essential theme",
-                                             32, 160, 96,
+                                             "The size of icons in Doish theme",
+                                             32, 192, 128,
                                              GLib.ParamFlags.READABLE);
       var title_max = new GLib.ParamSpecString ("title-size",
                                                 "Title Font Size",
@@ -64,7 +64,7 @@ namespace Synapse.Gui
                                                 "x-small",
                                                 GLib.ParamFlags.READABLE);
       
-      install_style_property (width);
+      install_style_property (spacing);
       install_style_property (icon_size);
       install_style_property (title_max);
       install_style_property (title_min);
@@ -76,20 +76,25 @@ namespace Synapse.Gui
     {
       base.style_set (old);
 
-      int width, icon_size;
+      int spacing, icon_size;
       string tmax, tmin, dmax, dmin;
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "ui-width", out width);
+      this.style.get (typeof(Synapse.Gui.ViewDoish), "pane-spacing", out spacing);
       this.style.get (typeof(Synapse.Gui.ViewDoish), "icon-size", out icon_size);
       this.style.get (typeof(Synapse.Gui.ViewDoish), "title-size", out tmax);
       this.style.get (typeof(Synapse.Gui.ViewDoish), "title-min-size", out tmin);
       this.style.get (typeof(Synapse.Gui.ViewDoish), "description-size", out dmax);
       this.style.get (typeof(Synapse.Gui.ViewDoish), "description-min-size", out dmin);
       
+      sp1.set_size_request (spacing, -1);
+      sp2.set_size_request (spacing, -1);
+      sp3.set_size_request (spacing, -1);
       icon_container.scale_size = icon_size;
-      container.set_size_request (width, -1);
+      source_icon.set_pixel_size (icon_size);
       spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
-      focus_label.size = SmartLabel.string_to_size (tmax);
-      focus_label.min_size = SmartLabel.string_to_size (tmin);
+      source_label.size = SmartLabel.string_to_size (tmax);
+      source_label.min_size = SmartLabel.string_to_size (tmin);
+      action_label.size = SmartLabel.string_to_size (tmax);
+      action_label.min_size = SmartLabel.string_to_size (tmin);
       description_label.size = SmartLabel.string_to_size (dmax);
       description_label.min_size = SmartLabel.string_to_size (dmin);
     }
@@ -98,7 +103,8 @@ namespace Synapse.Gui
     private NamedIcon action_icon;
     private NamedIcon target_icon;
     
-    private SmartLabel focus_label;
+    private SmartLabel source_label;
+    private SmartLabel action_label;
     private SmartLabel description_label;
     
     private SchemaContainer icon_container;
@@ -115,6 +121,13 @@ namespace Synapse.Gui
     
     private MenuThrobber menuthrobber;
     
+    private VBox spane; //source and action panes
+    private VBox apane;
+    
+    private Label sp1;
+    private Label sp2;
+    private Label sp3;
+    
     protected override void build_ui ()
     {
       container = new VBox (false, 0);
@@ -126,7 +139,10 @@ namespace Synapse.Gui
       action_icon.clear ();
       target_icon.set_icon_name ("");
       
-      icon_container = new SchemaContainer (96);
+      source_icon.set_pixel_size (128);
+      source_icon.xpad = 15;
+      icon_container = new SchemaContainer (128);
+      icon_container.xpad = 15;
       icon_container.fixed_height = true;
       icon_container.add (action_icon);
       icon_container.add (target_icon);
@@ -143,16 +159,25 @@ namespace Synapse.Gui
       icon_container.add_schema (schema);
       
       icon_container.show ();
+      
       /* Labels */
-      focus_label = new SmartLabel ();
-      focus_label.set_ellipsize (Pango.EllipsizeMode.END);
-      focus_label.size = SmartLabel.Size.LARGE;
-      focus_label.min_size = SmartLabel.Size.MEDIUM;
-      focus_label.set_state (StateType.SELECTED);
+      source_label = new SmartLabel ();
+      source_label.set_ellipsize (Pango.EllipsizeMode.END);
+      source_label.size = SmartLabel.Size.MEDIUM;
+      source_label.min_size = SmartLabel.Size.SMALL;
+      source_label.set_state (StateType.SELECTED);
+      source_label.xalign = 0.5f;
+      action_label = new SmartLabel ();
+      action_label.set_ellipsize (Pango.EllipsizeMode.END);
+      action_label.size = SmartLabel.Size.MEDIUM;
+      action_label.min_size = SmartLabel.Size.SMALL;
+      action_label.set_state (StateType.SELECTED);
+      action_label.xalign = 0.5f;
       description_label = new SmartLabel ();
       description_label.size = SmartLabel.Size.SMALL;
       description_label.set_animation_enabled (true);
       description_label.set_state (StateType.SELECTED);
+      description_label.xalign = 0.5f;
       
       /* Categories - Throbber and menu */ //#0C71D6
       var categories_hbox = new HBox (false, 0);
@@ -166,57 +191,48 @@ namespace Synapse.Gui
       categories_hbox.pack_start (flag_selector);
       categories_hbox.pack_start (menuthrobber, false);
 
-      var vb = new VBox (false, 0);
-      vb.pack_end (description_label, false);
-      vb.pack_end (focus_label, false);
-      var hsep = new Gtk.HSeparator ();
-      hsep.set_size_request (-1, 2);
-      vb.pack_end (hsep, false, true, 3);
-      vb.pack_end (categories_hbox, false);
-
       flag_selector.selected_markup = "<span size=\"small\"><b>%s</b></span>";
       flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
       flag_selector.set_state (StateType.SELECTED);
+
+      container.pack_start (categories_hbox, false);
       
-      /* Top Container */
-      var hb = new HBox (false, 5);
-      var sensitive = new SensitiveWidget (icon_container);
-      this.make_draggable (sensitive);
-      hb.pack_start (sensitive, false);
-      hb.pack_start (vb, true);
+      var hbox_panes = new HBox (false, 0);
+      container.pack_start (hbox_panes, false, true, 10);
+      /* PANES */
+      sp1 = new Label (null);
+      sp2 = new Label (null);
+      sp3 = new Label (null);
+      hbox_panes.pack_start (sp1);
+      spane = new VBox (false, 0);
+      hbox_panes.pack_start (spane, false);
+      hbox_panes.pack_start (sp2);
+      apane = new VBox (false, 0);
+      hbox_panes.pack_start (apane, false);
+      hbox_panes.pack_start (sp3);
       
-      container.pack_start (hb, false);
+      /* Source Pane */
+      spane.pack_start (source_icon, false);
+      spane.pack_start (source_label, false);
+      
+      /* Action Pane */
+      apane.pack_start (icon_container, false);
+      apane.pack_start (action_label, false);
+      
+      container.pack_start (description_label, false);
+      
       spacer = new Label (null);
       spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
       container.pack_start (spacer, false);
       
       /* list */
-      results_container = new SelectionContainer ();
+      this.prepare_results_container (out results_container, out results_sources,
+                                      out results_actions, out results_targets);
       container.pack_start (results_container, false);
-
-      results_sources = new ResultBox (100);
-      results_actions = new ResultBox (100);
-      results_targets = new ResultBox (100);
-      /* regrab mouse after drag */
-      results_sources.get_match_list_view ().drag_end.connect (drag_end_handler);
-      results_actions.get_match_list_view ().drag_end.connect (drag_end_handler);
-      results_targets.get_match_list_view ().drag_end.connect (drag_end_handler);
-      /* listen on scroll / click / dblclick */
-      results_sources.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
-      results_actions.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
-      results_targets.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
-      results_sources.get_match_list_view ().fire_item.connect (controller.fire_focus);
-      results_actions.get_match_list_view ().fire_item.connect (controller.fire_focus);
-      results_targets.get_match_list_view ().fire_item.connect (controller.fire_focus);
-
-      results_container.add (results_sources);
-      results_container.add (results_actions);
-      results_container.add (results_targets);
       
       container.show_all ();
       results_container.hide ();
 
-      container.set_size_request (500, -1);
       this.add (container);
     }
     
@@ -239,6 +255,7 @@ namespace Synapse.Gui
     {
       update_labels ();
       results_container.select_child (model.searching_for);
+      queue_draw ();
     }
     
     public override void update_selected_category ()
@@ -286,13 +303,12 @@ namespace Synapse.Gui
       Utils.cairo_make_shadow_for_rect (ctx, 0, 0, width - 1, height - 1, BORDER_RADIUS, r, g, b, SHADOW_SIZE);
       ctx.translate (-0.5, -0.5);
       
-      ctx.save ();
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
-      r = g = b = 0.5;
+      r = g = b = 0.15;
       ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
       pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
-      r = g = b = 0.15;
+      r = g = b = 0.40;
       ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
       pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
@@ -300,9 +316,55 @@ namespace Synapse.Gui
       ctx.set_operator (Operator.SOURCE);
       ctx.clip ();
       ctx.paint ();
-      ctx.restore ();
+      
+      // reflection
+      ctx.set_operator (Operator.OVER);
+      ctx.new_path ();
+      ctx.move_to (0, 0);
+      ctx.rel_line_to (0.0, height / 3.0);
+      ctx.rel_curve_to (width / 4.0, -height / 10.0, width / 4.0 * 3.0, -height / 10.0, width, 0.0);
+      ctx.rel_line_to (0.0, -height / 3.0);
+      ctx.close_path ();
+      pat = new Pattern.linear (0, height / 10.0, 0, height / 3.0);
+      ch.add_color_stop_rgba (pat, 0.0, 0.0, ch.StyleType.FG, StateType.SELECTED);
+      ch.add_color_stop_rgba (pat, 1.0, 0.4, ch.StyleType.FG, StateType.SELECTED);
+      ctx.set_source (pat);
+      ctx.clip ();
+      ctx.paint ();
 
       ctx.restore ();
+      
+      // icon bgs
+      ctx.set_operator (Operator.OVER);
+      ctx.save ();
+      Utils.cairo_rounded_rect (ctx, spane.allocation.x,
+                                     spane.allocation.y,
+                                     spane.allocation.width,
+                                     spane.allocation.height,
+                                     15);
+      ch.set_source_rgba (ctx, model.searching_for == SearchingFor.SOURCES ? 0.3 : 0.08,
+                          ch.StyleType.FG, StateType.SELECTED);
+      ctx.clip ();
+      ctx.paint ();
+      ctx.restore ();
+      
+      ctx.save ();
+      Utils.cairo_rounded_rect (ctx, apane.allocation.x,
+                                     apane.allocation.y,
+                                     apane.allocation.width,
+                                     apane.allocation.height,
+                                     15);
+      ch.set_source_rgba (ctx, model.searching_for != SearchingFor.SOURCES ? 0.3 : 0.08,
+                          ch.StyleType.FG, StateType.SELECTED);
+      ctx.clip ();
+      ctx.paint ();
+      ctx.restore ();
+    }
+    
+    private string get_down_to_see_recent ()
+    {
+      if (controller.DOWN_TO_SEE_RECENT == "") return controller.TYPE_TO_SEARCH;
+      return "%s (%s)".printf (controller.TYPE_TO_SEARCH, controller.DOWN_TO_SEE_RECENT);
     }
     
     private void update_labels ()
@@ -312,56 +374,36 @@ namespace Synapse.Gui
       {
         if (controller.is_in_initial_state ())
         {
-          focus_label.set_text (controller.TYPE_TO_SEARCH);
-          description_label.set_text (controller.DOWN_TO_SEE_RECENT);
+          description_label.set_text (get_down_to_see_recent ());
         }
         else if (controller.is_searching_for_recent ())
         {
-          focus_label.set_text ("");
           description_label.set_text (controller.NO_RECENT_ACTIVITIES);
         }
         else
         {
-          focus_label.set_text (this.model.query[model.searching_for]);
           description_label.set_text (controller.NO_RESULTS);
         }
       }
       else
       {
         description_label.set_text (Utils.get_printable_description (focus.value));
-        focus_label.set_markup (Utils.markup_string_with_search (focus.value.title, this.model.query[model.searching_for], ""));
       }
-      switch (model.searching_for)
+      if (model.searching_for == SearchingFor.TARGETS)
       {
-        case SearchingFor.SOURCES:
-          flag_selector.sensitive = true;
-          if (model.needs_target ())
-          {
-            icon_container.select_schema (1);
-          }
-          else
-          {
-            icon_container.select_schema (0);
-          }
-          icon_container.set_render_order ({0, 1, 2});
-          break;
-        case SearchingFor.ACTIONS:
-          if (model.needs_target ())
-          {
-            icon_container.select_schema (3);
-          }
-          else
-          {
-            icon_container.select_schema (2);
-          }
-          icon_container.set_render_order ({1, 2, 0});
-          flag_selector.sensitive = true;
-          break;
-        default: //case SearchingFor.TARGETS:
-          icon_container.select_schema (4);
-          icon_container.set_render_order ({0, 1, 2});
-          flag_selector.sensitive = false;
-          break;
+        icon_container.select_schema (2);
+        icon_container.set_render_order ({1, 0});
+        action_label.set_markup (Utils.markup_string_with_search (focus.value == null ? "" : focus.value.title, this.model.query[model.searching_for], ""));
+      }
+      else
+      {
+        if (model.needs_target ())
+          icon_container.select_schema (1);
+        else
+          icon_container.select_schema (0);
+        icon_container.set_render_order ({0, 1});
+        focus = model.focus[SearchingFor.ACTIONS];
+        action_label.set_markup (Utils.markup_string_with_search (focus.value == null ? "" : focus.value.title, this.model.query[SearchingFor.ACTIONS], ""));
       }
     }
     
@@ -374,6 +416,7 @@ namespace Synapse.Gui
         source_icon.set_icon_name (m.value.icon_name);
         results_sources.move_selection_to_index (m.key);
       }
+      source_label.set_markup (Utils.markup_string_with_search (m.value == null ? "" : m.value.title, this.model.query[SearchingFor.SOURCES], ""));
       if (model.searching_for == SearchingFor.SOURCES) update_labels ();
     }
     

@@ -224,6 +224,32 @@ namespace Synapse
       return true;
     }
     
+    protected virtual void prepare_results_container (out SelectionContainer results_container,
+                                                      out ResultBox results_sources,
+                                                      out ResultBox results_actions,
+                                                      out ResultBox results_targets)
+    {
+      results_container = new SelectionContainer ();
+      results_sources = new ResultBox (100);
+      results_actions = new ResultBox (100);
+      results_targets = new ResultBox (100);
+      /* regrab mouse after drag */
+      results_sources.get_match_list_view ().drag_end.connect (drag_end_handler);
+      results_actions.get_match_list_view ().drag_end.connect (drag_end_handler);
+      results_targets.get_match_list_view ().drag_end.connect (drag_end_handler);
+      /* listen on scroll / click / dblclick */
+      results_sources.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
+      results_actions.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
+      results_targets.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
+      results_sources.get_match_list_view ().fire_item.connect (controller.fire_focus);
+      results_actions.get_match_list_view ().fire_item.connect (controller.fire_focus);
+      results_targets.get_match_list_view ().fire_item.connect (controller.fire_focus);
+
+      results_container.add (results_sources);
+      results_container.add (results_actions);
+      results_container.add (results_targets);
+    }
+    
     protected virtual void paint_background (Cairo.Context ctx)
     {
       ch.set_source_rgba (ctx, 0.9, ch.StyleType.BG, StateType.NORMAL);

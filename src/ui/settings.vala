@@ -166,7 +166,7 @@ namespace Synapse.Gui
       themes = new Gee.HashMap<string, Theme?>();
 
       themes["default"] = Theme (_("Essential"), "", typeof (Synapse.Gui.ViewEssential));
-      //themes["doish"] = Theme (_("Doish"), "", typeof (Synapse.Gui.ViewDoish));
+      themes["doish"] = Theme (_("Doish"), "", typeof (Synapse.Gui.ViewDoish));
 
       selected_theme = config.ui_type;
     }

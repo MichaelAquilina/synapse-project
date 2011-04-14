@@ -345,6 +345,9 @@ namespace Synapse.Gui
     private int active_schema = 0;
     private int[] render_order = null;
     
+    public int xpad { get; set; default = 0; }
+    public int ypad { get; set; default = 0; }
+    
     public int scale_size {
       get; set; default = 128;
     }
@@ -367,6 +370,8 @@ namespace Synapse.Gui
       this.notify["scale-size"].connect (this.queue_resize);
       this.notify["fixed-width"].connect (this.queue_resize);
       this.notify["fixed-height"].connect (this.queue_resize);
+      this.notify["xpad"].connect (this.queue_resize);
+      this.notify["ypad"].connect (this.queue_resize);
     }
     
     public void set_render_order (int[]? order)
@@ -453,6 +458,8 @@ namespace Synapse.Gui
       }
       if (this._fixed_height) req.height = this._scale_size;
       if (this._fixed_width) req.width = this._scale_size;
+      req.width += _xpad * 2;
+      req.height += _ypad * 2;
     }
     
     public override void size_allocate (Gdk.Rectangle allocation)
@@ -468,6 +475,8 @@ namespace Synapse.Gui
       Allocation[] alloc = schemas.get (active_schema).positions;
       
       int i = 0;
+      int x = allocation.x + _xpad;
+      int y = allocation.y + _ypad;
       foreach (Widget child in children)
       {
         Gdk.Rectangle a;
@@ -480,8 +489,8 @@ namespace Synapse.Gui
         else
         {
           a = {
-            allocation.x + alloc[i].x * this._scale_size / 100,
-            allocation.y + alloc[i].y * this._scale_size / 100,
+            x + alloc[i].x * this._scale_size / 100,
+            y + alloc[i].y * this._scale_size / 100,
             alloc[i].width * this._scale_size / 100,
             alloc[i].height * this._scale_size / 100
           };
@@ -603,11 +612,29 @@ namespace Synapse.Gui
     public string not_found_name {get; set; default = "unknown";}
     private string current;
     private IconSize current_size;
-
+    
     construct
     {
       current = "";
       current_size = IconSize.DIALOG;
+    }
+    
+    public override void size_request (out Requisition req)
+    {
+      req = {
+        this.width_request,
+        this.height_request
+      };
+      if (req.width <= 0 && req.height <= 0)
+      {
+        req.width = xpad * 2;
+        req.height = ypad * 2;
+        if (pixel_size >= 0)
+        {
+          req.width += pixel_size;
+          req.height += pixel_size;
+        }
+      }
     }
 
     public override bool expose_event (Gdk.EventExpose event)
@@ -616,8 +643,10 @@ namespace Synapse.Gui
       var ctx = Gdk.cairo_create (this.window);
       ctx.set_operator (Cairo.Operator.OVER);
 
-      ctx.translate (this.allocation.x, this.allocation.y);
-      ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
+      int w = this.allocation.width - this.xpad * 2;
+      int h = this.allocation.height - this.ypad * 2;
+      ctx.translate (this.allocation.x + this.xpad, this.allocation.y + this.ypad);
+      ctx.rectangle (0, 0, w, h);
       ctx.clip ();
 
       Gdk.Pixbuf icon_pixbuf = IconCacheService.get_default ().get_icon (
@@ -626,8 +655,8 @@ namespace Synapse.Gui
       if (icon_pixbuf == null) return true;
 
       Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 
-          (this.allocation.width - icon_pixbuf.get_width ()) / 2, 
-          (this.allocation.height - icon_pixbuf.get_height ()) / 2);
+          (w - icon_pixbuf.get_width ()) / 2, 
+          (h - icon_pixbuf.get_height ()) / 2);
       ctx.paint ();
 
       return true;

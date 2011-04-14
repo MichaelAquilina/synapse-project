@@ -204,27 +204,9 @@ namespace Synapse.Gui
       container.pack_start (spacer, false);
       
       /* list */
-      results_container = new SelectionContainer ();
+      this.prepare_results_container (out results_container, out results_sources,
+                                      out results_actions, out results_targets);
       container.pack_start (results_container, false);
-
-      results_sources = new ResultBox (100);
-      results_actions = new ResultBox (100);
-      results_targets = new ResultBox (100);
-      /* regrab mouse after drag */
-      results_sources.get_match_list_view ().drag_end.connect (drag_end_handler);
-      results_actions.get_match_list_view ().drag_end.connect (drag_end_handler);
-      results_targets.get_match_list_view ().drag_end.connect (drag_end_handler);
-      /* listen on scroll / click / dblclick */
-      results_sources.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
-      results_actions.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
-      results_targets.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
-      results_sources.get_match_list_view ().fire_item.connect (controller.fire_focus);
-      results_actions.get_match_list_view ().fire_item.connect (controller.fire_focus);
-      results_targets.get_match_list_view ().fire_item.connect (controller.fire_focus);
-
-      results_container.add (results_sources);
-      results_container.add (results_actions);
-      results_container.add (results_targets);
       
       container.show_all ();
       results_container.hide ();
