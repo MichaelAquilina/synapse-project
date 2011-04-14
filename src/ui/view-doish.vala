@@ -36,7 +36,7 @@ namespace Synapse.Gui
       var spacing = new GLib.ParamSpecInt ("pane-spacing",
                                              "Pane Spacing",
                                              "The space between two panes in Doish theme",
-                                             5, 100, 20,
+                                             5, 100, 30,
                                              GLib.ParamFlags.READABLE);
       var icon_size = new GLib.ParamSpecInt ("icon-size",
                                              "Icon Size",
@@ -85,9 +85,9 @@ namespace Synapse.Gui
       this.style.get (typeof(Synapse.Gui.ViewDoish), "description-size", out dmax);
       this.style.get (typeof(Synapse.Gui.ViewDoish), "description-min-size", out dmin);
       
-      sp1.set_size_request (spacing, -1);
+      sp1.set_size_request (spacing / 4, -1);
       sp2.set_size_request (spacing, -1);
-      sp3.set_size_request (spacing, -1);
+      sp3.set_size_request (spacing / 4, -1);
       icon_container.scale_size = icon_size;
       source_icon.set_pixel_size (icon_size);
       spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
@@ -154,7 +154,7 @@ namespace Synapse.Gui
       schema.add_allocation ({ 60, 60, 40, 40 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // target
-      schema.add_allocation ({ 60, 60, 40, 40 });
+      schema.add_allocation ({ 0, 60, 40, 40 });
       schema.add_allocation ({ 0, 0, 100, 100 });
       icon_container.add_schema (schema);
       
@@ -205,9 +205,11 @@ namespace Synapse.Gui
       sp3 = new Label (null);
       hbox_panes.pack_start (sp1);
       spane = new VBox (false, 0);
+      spane.border_width = 5;
       hbox_panes.pack_start (spane, false);
       hbox_panes.pack_start (sp2);
       apane = new VBox (false, 0);
+      apane.border_width = 5;
       hbox_panes.pack_start (apane, false);
       hbox_panes.pack_start (sp3);
       
