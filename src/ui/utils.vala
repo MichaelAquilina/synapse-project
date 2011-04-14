@@ -96,18 +96,11 @@ namespace Synapse.Gui
       
       if (!m.uri.has_prefix("file://")) return m.uri; //fix only local files
       
-      /* FIXME: MEMORY LEAK HERE!!! GObject set_data is not safe! */
       //unowned string? desc = m.get_data<string> ("printable-description");
       //if (desc != null) return desc; // already fixed
 
       string desc_fixed = m.description;
       
-      /* // remove filename from path if the title is equal
-      if (m.description.has_suffix(m.title))
-      {
-        desc_fixed = m.description.substring (0, m.description.length - m.title.length);
-      } */
-
       if (home_directory == null)
     	{
     		home_directory = Environment.get_home_dir ();

@@ -393,12 +393,14 @@ namespace Synapse.Gui
       }
       if (model.searching_for == SearchingFor.TARGETS)
       {
+        flag_selector.sensitive = false;
         icon_container.select_schema (2);
         icon_container.set_render_order ({1, 0});
         action_label.set_markup (Utils.markup_string_with_search (focus.value == null ? "" : focus.value.title, this.model.query[model.searching_for], ""));
       }
       else
       {
+        flag_selector.sensitive = true;
         if (model.needs_target ())
           icon_container.select_schema (1);
         else

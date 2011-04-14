@@ -35,7 +35,8 @@ namespace Synapse.Gui
       PREV_RESULT,
       NEXT_CATEGORY,
       PREV_CATEGORY,
-      SWITCH_SEARCH_TYPE,
+      NEXT_PANE,
+      PREV_PANE,
       EXECUTE,
       EXECUTE_WITHOUT_HIDE,
       NEXT_PAGE,
@@ -180,9 +181,9 @@ namespace Synapse.Gui
       name_to_key_mod (prev_category, out keyval, out mods);
       kcs.set_keycombo_command (keyval, mods, Commands.PREV_CATEGORY);
       name_to_key_mod (next_search_type, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.SWITCH_SEARCH_TYPE);
+      kcs.set_keycombo_command (keyval, mods, Commands.NEXT_PANE);
       name_to_key_mod (prev_search_type, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.SWITCH_SEARCH_TYPE);
+      kcs.set_keycombo_command (keyval, mods, Commands.PREV_PANE);
       name_to_key_mod (cancel, out keyval, out mods);
       kcs.set_keycombo_command (keyval, mods, Commands.CLEAR_SEARCH_OR_HIDE);
       name_to_key_mod (paste, out keyval, out mods);

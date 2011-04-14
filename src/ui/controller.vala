@@ -360,7 +360,7 @@ namespace Synapse.Gui
             }
             selected_index_changed_event (this.model.focus[this.model.searching_for].key + this.RESULTS_PER_PAGE);
             break;
-          case KeyComboConfig.Commands.SWITCH_SEARCH_TYPE:
+          case KeyComboConfig.Commands.NEXT_PANE:
             switch (this.model.searching_for)
             {
               case SearchingFor.SOURCES:
@@ -383,8 +383,24 @@ namespace Synapse.Gui
                 view.update_searching_for ();
                 break;
               default: //TARGETS
-                this.model.searching_for = SearchingFor.SOURCES;
+                this.model.searching_for = SearchingFor.ACTIONS; //go back to actions
                 view.update_searching_for ();
+                break;
+            }
+            break;
+          case KeyComboConfig.Commands.PREV_PANE:
+            switch (this.model.searching_for)
+            {
+              case SearchingFor.ACTIONS:
+                this.model.searching_for = SearchingFor.SOURCES; //go back to sources
+                view.update_searching_for ();
+                break;
+              case SearchingFor.TARGETS:
+                this.model.searching_for = SearchingFor.ACTIONS; //go back to actions
+                view.update_searching_for ();
+                break;
+              default: //SOURCES
+                //cannot go back from sources
                 break;
             }
             break;
