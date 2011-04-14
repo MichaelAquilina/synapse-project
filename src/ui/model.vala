@@ -33,10 +33,6 @@ namespace Synapse.Gui
 
     /* Focus */
     public Entry<int, Match>[] focus = new Entry<int, Match>[SearchingFor.COUNT];
-      
-    /* Multiple Selection :: maybe in the future */
-    //public Gee.Map<int, Match> selected_sources {get; set;}
-    //public Gee.Map<int, Match> selected_targets {get; set;}
     
     /* Category */
     public int selected_category = 0;

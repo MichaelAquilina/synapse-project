@@ -46,6 +46,7 @@ namespace Synapse.Gui
     {
       if (!view_type.is_a (typeof (IView))) return;
       if (this.view != null) this.view.vanish ();
+      IconCacheService.get_default ().clear_cache ();
       this.view = GLib.Object.new (view_type, "controller-model", this.model,
                                               "controller", this) as IView;
       reset_search (true, true);
@@ -198,6 +199,8 @@ namespace Synapse.Gui
       
       if (action is SearchProvider)
       {
+        model.searching_for = SearchingFor.SOURCES;
+        view.update_searching_for ();
         search_for_matches (SearchingFor.SOURCES, false, action as SearchProvider);
         return;
       }

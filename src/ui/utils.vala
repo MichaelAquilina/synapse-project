@@ -96,8 +96,9 @@ namespace Synapse.Gui
       
       if (!m.uri.has_prefix("file://")) return m.uri; //fix only local files
       
-      unowned string? desc = m.get_data<string> ("printable-description");
-      if (desc != null) return desc; // already fixed
+      /* FIXME: MEMORY LEAK HERE!!! GObject set_data is not safe! */
+      //unowned string? desc = m.get_data<string> ("printable-description");
+      //if (desc != null) return desc; // already fixed
 
       string desc_fixed = m.description;
       
@@ -125,7 +126,7 @@ namespace Synapse.Gui
     	string[] parts = Regex.split_simple ("/", desc_fixed);
     	desc_fixed = string.joinv (" > ", parts);
 
-    	m.set_data<string> ("printable-description", desc_fixed);
+    	//m.set_data<string> ("printable-description", desc_fixed);
 
     	return desc_fixed;
     }

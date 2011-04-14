@@ -65,7 +65,7 @@ namespace Synapse.Gui
       map = new Gee.HashMap<string, PixbufInfo> ();
     }
     
-    private void clear_cache ()
+    public void clear_cache ()
     {
       map.clear ();
     }
@@ -82,6 +82,7 @@ namespace Synapse.Gui
         if (pixbuf == null) return null;
         info = new PixbufInfo (pixbuf);
         map.set (key, info);
+        //debug ("ms: %d", map.size);
       }
       return info.pixbuf;
     }
