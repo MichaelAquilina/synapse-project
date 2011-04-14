@@ -146,9 +146,12 @@ namespace Synapse.Gui
           view.update_focused_source (model.focus[model.searching_for]);
           break;
         case SearchingFor.ACTIONS:
-          model.clear_searching_for (SearchingFor.TARGETS);
-          view.update_targets (null);
-          view.update_focused_target (model.focus[SearchingFor.TARGETS]);
+          if (model.results[SearchingFor.TARGETS] != null)
+          {
+            model.clear_searching_for (SearchingFor.TARGETS);
+            view.update_targets (null);
+            view.update_focused_target (model.focus[SearchingFor.TARGETS]);
+          }
           if (model.focus[SearchingFor.ACTIONS].value.needs_target())
             search_for_matches (SearchingFor.TARGETS, true);
 
