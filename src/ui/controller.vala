@@ -180,7 +180,7 @@ namespace Synapse.Gui
       /* Initialize model */
       this.model = new Model ();
       this.init_search ();
-     
+
       /* Typing handle */
       im_context = new Gtk.IMMulticontext ();
       im_context.set_use_preedit (false);
@@ -335,7 +335,7 @@ namespace Synapse.Gui
             selected_index_changed_event (this.model.focus[this.model.searching_for].key - this.RESULTS_PER_PAGE);
             break;
           case KeyComboConfig.Commands.NEXT_RESULT:
-            if (this.is_in_initial_state ())
+            if (this.is_in_initial_state () && handle_empty)
             {
               this.search_recent_activities = true;
               this.search_for_matches (SearchingFor.SOURCES, true);
@@ -427,6 +427,7 @@ namespace Synapse.Gui
     
     /* ------------ Search Engine here ---------------- */
     private bool search_recent_activities = false;
+    private bool handle_empty = false;
     private QueryFlags qf;
     /* Stupid Vala: I can't use array[SearchingFor.COUNT] for declaration */
     private Cancellable current_cancellable[3];
@@ -447,6 +448,32 @@ namespace Synapse.Gui
 
       qf = category_config.categories.get (category_config.default_category_index).flags;
       last_result_set = null;
+      
+      var plugin = data_sink.get_plugin("SynapseZeitgeistPlugin");
+      if (plugin != null)
+      {
+        plugin_registered_handler (plugin);
+      }
+      data_sink.plugin_registered.connect (plugin_registered_handler);
+      update_handle_empty ();
+    }
+    
+    private void plugin_registered_handler (Object plugin)
+    {
+      // FIXME: expose this as prop of data-sink
+      if (plugin.get_type ().name () == "SynapseZeitgeistPlugin")
+      {
+        plugin.notify["enabled"].connect (update_handle_empty);
+        update_handle_empty ();
+      }
+    }
+    
+    private void update_handle_empty ()
+    {
+      var plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin");
+      handle_empty = plugin != null && (plugin as ItemProvider).enabled;
+      DOWN_TO_SEE_RECENT = handle_empty ? _("...or press down key to browse recent activities") : "";
+      if (view != null) view.update_focused_source (model.focus[SearchingFor.SOURCES]);
     }
     
     /**
@@ -516,7 +543,7 @@ namespace Synapse.Gui
         /* You cannot search for targets if you don't have an action */
         return_if_fail (model.focus[SearchingFor.ACTIONS].value != null);
       }
-      
+
       /* if string is empty, and not want to search recent activities, reset */
       if (what == SearchingFor.SOURCES && !search_with_empty && model.query[what]=="")
       {
