@@ -141,6 +141,29 @@ namespace Synapse.Gui
       layout.context_changed ();
     }
     
+    public static void get_draw_position (out int x, out int y,
+                                          out int width, out int height,
+                                          Pango.Layout layout, bool rtl,
+                                          int area_width, int area_height,
+                                          float xalign, float yalign)
+    {
+      if (rtl) xalign = 1.0f - xalign;
+
+      Pango.Rectangle logical_rect;
+      layout.get_pixel_extents (null, out logical_rect);
+      
+      layout.get_pixel_size (out width, out height);
+      
+      y = (int) (yalign * (area_height - height));
+      x = (int) (xalign * (area_width - width));
+      
+      if (rtl)
+        x = int.min (x, area_width);
+      else
+        x = int.max (x, 0);
+      x -= logical_rect.x;
+    }
+    
     public static void make_transparent_bg (Gtk.Widget widget)
     {
       unowned Gdk.Window window = widget.get_window ();

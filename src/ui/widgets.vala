@@ -116,7 +116,7 @@ namespace Synapse.Gui
       //do not remove this, it's important to create the first scale attr
       this.set_text ("");
     }
-    
+
     private void sizes_changed ()
     {
       if (min_size > size) this._min_size = this._size;
@@ -250,11 +250,10 @@ namespace Synapse.Gui
       ctx.translate (this.allocation.x + this.xpad, this.allocation.y + this.ypad);
       ctx.rectangle (0, 0, w, h);
       ctx.clip ();
+      
+      bool rtl = this.get_direction () == Gtk.TextDirection.RTL;
 
-      int width, height;
-      layout.get_pixel_size (out width, out height);
-
-      ctx.translate (xalign * (w - width), yalign * (h - height));
+      int x, y, width, height;
       
       if (animate && tid != 0)
       {
@@ -268,6 +267,11 @@ namespace Synapse.Gui
           layout.set_ellipsize (ellipsize);
         }
       }
+      
+      Gui.Utils.get_draw_position (out x, out y, out width, out height, layout, rtl,
+                                   w, h, this.xalign, this.yalign);
+      ctx.translate (x, y);
+      
       ctx.set_operator (Cairo.Operator.OVER);
       ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, this.get_state ());
       

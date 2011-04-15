@@ -215,11 +215,12 @@ namespace Synapse.Gui
         layout.set_width (Pango.SCALE * width_for_description);
         int w = 0, h = 0;
         layout.get_pixel_size (out w, out h);
+        w += _cell_hpadding * 2;
         
         width_for_description -= w;
         
         if (rtl == Gtk.TextDirection.RTL) 
-          ctx.translate (0, text_height - h);
+          ctx.translate (- width + w, text_height - h);
         else
           ctx.translate (width - w, text_height - h);
         Pango.cairo_show_layout (ctx, layout);
