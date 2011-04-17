@@ -390,7 +390,10 @@ namespace Synapse.Gui
       if (m.value == null) target_icon.set_icon_name ("");
       else
       {
-        target_icon.set_icon_name (m.value.icon_name);
+        if (m.value is DefaultMatch)
+          target_icon.set_icon_name ("text-plain");
+        else
+          target_icon.set_icon_name (m.value.icon_name);
         results_targets.move_selection_to_index (m.key);
       }
       if (model.searching_for == SearchingFor.TARGETS) update_labels ();

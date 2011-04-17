@@ -495,7 +495,10 @@ namespace Synapse.Gui
       if (m.value == null) target_icon.set_icon_name ("");
       else
       {
-        target_icon.set_icon_name (m.value.icon_name);
+        if (m.value is DefaultMatch)
+          target_icon.set_icon_name ("text-plain");
+        else
+          target_icon.set_icon_name (m.value.icon_name);
         results_targets.move_selection_to_index (m.key);
       }
       target_label.set_markup (Utils.markup_string_with_search (m.value == null ? "" : m.value.title, this.model.query[SearchingFor.TARGETS], ""));

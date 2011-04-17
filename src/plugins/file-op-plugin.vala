@@ -70,13 +70,13 @@ namespace Synapse
       }
     }
     
-    private class MoveTo: FileAction
+    private class RenameTo: FileAction
     {
-      public MoveTo ()
+      public RenameTo ()
       {
-        Object (title: _ ("Move to"),
-                description: _ ("Move file to folder"),
-                icon_name: "forward", has_thumbnail: false,
+        Object (title: _ ("Rename to"),
+                description: _ ("Rename the file to..."),
+                icon_name: "stock_save-as", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: Match.Score.AVERAGE);
       }
@@ -84,7 +84,24 @@ namespace Synapse
       public override void execute_with_target (Match? source, Match? target = null)
       {
         if (target == null) return; // not possible
-        Synapse.Utils.Logger.warning (this, "Not yet implemented.");
+        
+        UriMatch uri_match = source as UriMatch;
+        if (uri_match == null) return; // not possible
+        
+        File f;
+        f = File.new_for_uri (uri_match.uri);
+        if (!f.query_exists ())
+        {
+          Utils.Logger.error (this, _("File \"%s\"does not exist."), uri_match.uri);
+          return;
+        }
+        string newpath = Path.build_filename (Path.get_dirname (f.get_path ()), target.title);
+        var f2 = File.new_for_path (newpath);
+        Utils.Logger.debug (this, "Moving \"%s\" to \"%s\"", f.get_path (), newpath);
+        if (!f.move (f2, GLib.FileCopyFlags.OVERWRITE))
+        {
+          Utils.Logger.error (this, _("Cannot move \"%s\" to \"%s\""), f.get_path (), newpath);
+        }
       }
       
       public override bool needs_target () {
@@ -93,7 +110,7 @@ namespace Synapse
       
       public override QueryFlags target_flags ()
       {
-        return QueryFlags.FOLDERS; //TODO: change to FOLDERS when Places fixed
+        return QueryFlags.TEXT;
       }
       
       public override bool valid_for_match (Match match)
@@ -131,7 +148,7 @@ namespace Synapse
     {
       actions = new Gee.ArrayList<FileAction> ();
 
-      actions.add (new MoveTo ());
+      actions.add (new RenameTo ());
     }
 
     public ResultSet? find_for_match (Query query, Match match)

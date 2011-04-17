@@ -61,6 +61,8 @@ namespace Synapse
     FOLDERS         = 1 << 8,
 
     INTERNET        = 1 << 9,
+    
+    TEXT            = 1 << 10,
 
     ALL           = 0xFFFFFFFF,
     LOCAL_CONTENT = ALL ^ QueryFlags.INCLUDE_REMOTE
