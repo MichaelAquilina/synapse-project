@@ -783,21 +783,28 @@ namespace Synapse.Gui
 		private MatchListView view;
 		private MatchViewRenderer rend;
 		private Label status;
+		private Label logo;
+		
+		public new void set_state (Gtk.StateType state)
+		{
+		  base.set_state (state);
+		  status.set_state (state);
+		  logo.set_state (state);
+		}
 		
 		public override bool expose_event (Gdk.EventExpose event)
 		{
         var ctx = Gdk.cairo_create (this.get_window ());
         ctx.set_operator (Cairo.Operator.OVER);
-        ctx.translate (this.allocation.x, this.allocation.y);
-        ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
+        ctx.translate (this.allocation.x, status.allocation.y);
+        ctx.rectangle (0, 0, this.allocation.width, status.allocation.height);
         ctx.clip ();
         /* Prepare bg's colors using GtkStyle */
-        Pattern pat = new Pattern.linear(0, 0, 0, this.allocation.height);
-
-        double status_bar_pct = 15.0 / this.allocation.height;
-        ch.add_color_stop_rgba (pat, 1.0 - status_bar_pct, 0.95, ch.StyleType.BASE, StateType.NORMAL);
-        ch.add_color_stop_rgba (pat, 1.0 - 0.85 * status_bar_pct, 0.95, ch.StyleType.BG, StateType.NORMAL);
-        ch.add_color_stop_rgba (pat, 1.0, 0.95, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
+        Pattern pat = new Pattern.linear(0, 0, 0, status.allocation.height);
+        
+        StateType t = this.get_state ();
+        ch.add_color_stop_rgba (pat, 0.0, 0.95, ch.StyleType.BG, t);
+        ch.add_color_stop_rgba (pat, 1.0, 0.95, ch.StyleType.BG, t, ch.Mod.DARKER);
         /* Prepare and draw top bg's rect */
         ctx.set_source (pat);
         ctx.paint ();
@@ -835,7 +842,7 @@ namespace Synapse.Gui
       status = new Label (null);
       status.set_alignment (0, 0);
       status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
-      var logo = new Label (null);
+      logo = new Label (null);
       logo.set_alignment (1, 0);
       logo.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
       status_box.pack_start (status, false, false, 10);
