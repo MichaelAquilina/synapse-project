@@ -219,11 +219,9 @@ namespace Synapse.Gui
       
       target_container = new VBox (false, 0);
       var hb = new HBox (false, 0);
-      //hb.pack_start (sp2, false);
+      hb.pack_start (sp2, false);
       hb.pack_start (tpane, false, false);
-      var category_spacer = new SmartLabel ();
-      category_spacer.size = SmartLabel.Size.SMALL;
-      target_container.pack_start (category_spacer, false);
+      target_container.pack_start (new CloneWidget (categories_hbox), false);
       target_container.pack_start (hb, false, true, 5);
       target_container.pack_start (new Label (null), true);
 
@@ -325,14 +323,14 @@ namespace Synapse.Gui
         ctx.save ();
         ctx.translate (0.5, 0.5);
         ctx.set_operator (Operator.OVER);
-        Utils.cairo_make_shadow_for_rect (ctx, tpane.allocation.x - BORDER_RADIUS, 
+        Utils.cairo_make_shadow_for_rect (ctx, target_container.allocation.x - BORDER_RADIUS, 
                                                tpane.allocation.y,
-                                               tpane.allocation.width - 1 + BORDER_RADIUS,
+                                               target_container.allocation.width - 1 + BORDER_RADIUS,
                                                tpane.allocation.height - 1, 15, r, g, b, SHADOW_SIZE);
         ctx.translate (-0.5, -0.5);
-        Utils.cairo_rounded_rect (ctx, tpane.allocation.x - BORDER_RADIUS, 
+        Utils.cairo_rounded_rect (ctx, target_container.allocation.x - BORDER_RADIUS, 
                                        tpane.allocation.y,
-                                       tpane.allocation.width + BORDER_RADIUS,
+                                       target_container.allocation.width + BORDER_RADIUS,
                                        tpane.allocation.height, 15);
         ctx.set_operator (Operator.SOURCE);
         ctx.set_source (pat);

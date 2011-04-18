@@ -27,7 +27,8 @@ namespace Synapse
     APPLICATION,
     GENERIC_URI,
     ACTION,
-    SEARCH
+    SEARCH,
+    CONTACT
   }
 
   public interface Match: Object
@@ -94,6 +95,12 @@ namespace Synapse
     public abstract string uri { get; set; }
     public abstract QueryFlags file_type { get; set; }
     public abstract string mime_type { get; set; }
+  }
+  
+  public interface ContactMatch: Match
+  {
+    public abstract void send_message (string message);
+    public abstract void open_chat ();
   }
 
   public interface ExtendedInfo: Match

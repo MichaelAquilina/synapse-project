@@ -36,6 +36,20 @@ namespace Synapse.Gui
     public bool animation_enabled { get; set; default = true; }
     public bool extended_info_enabled { get; set; default = true; }
   }
+  
+  public class CloneWidget : Gtk.Widget
+  {
+    private Widget clone;
+    public CloneWidget (Widget to_clone)
+    {
+      this.clone = to_clone;
+      this.set_has_window (false);
+    }
+    public override void size_request (out Gtk.Requisition req)
+    {
+      req = clone.requisition;
+    }
+  }
 
   public class SmartLabel : Gtk.Misc
   {
