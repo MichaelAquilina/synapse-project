@@ -15,6 +15,7 @@ src/ui/utils.c
 src/core/common-actions.c
 src/plugins/banshee-plugin.c
 src/plugins/calculator-plugin.c
+src/plugins/chat-actions-plugin.c
 src/plugins/command-plugin.c
 src/plugins/desktop-file-plugin.c
 src/plugins/devhelp-search.c
@@ -30,6 +31,7 @@ src/plugins/launchpad-plugin.c
 src/plugins/locate-plugin.c
 src/plugins/opensearch.c
 src/plugins/pastebin-plugin.c
+src/plugins/pidgin-plugin.c
 src/plugins/rhythmbox-plugin.c
 src/plugins/selection-plugin.c
 src/plugins/ssh-plugin.c

@@ -1,0 +1,238 @@
+/*
+ * Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>
+ * Copyright (C) 2010 Alberto Aldegheri <albyrock87+dev@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
+ *
+ * Authored by Alberto Aldegheri <albyrock87+dev@gmail.com>
+ *
+ */
+
+namespace Synapse
+{
+  [DBus (name = "im.pidgin.purple.PurpleInterface")]
+  interface PurpleInterface : Object {
+      public const string UNIQUE_NAME = "im.pidgin.purple.PurpleService";
+      public const string OBJECT_PATH = "/im/pidgin/purple/PurpleObject";
+      public const string INTERFACE_NAME = "im.pidgin.purple.PurpleInterface";
+      
+      public abstract string purple_account_get_protocol_name (int account) throws DBus.Error;
+      public abstract int purple_buddy_get_account (int buddy) throws DBus.Error;
+      public abstract string purple_buddy_get_name (int buddy) throws DBus.Error;
+      public abstract string purple_buddy_get_alias (int buddy) throws DBus.Error;
+      public abstract string purple_buddy_icon_get_full_path (int icon) throws DBus.Error;
+      public abstract int purple_buddy_get_icon (int buddy) throws DBus.Error;
+      public abstract int purple_buddy_is_online (int buddy) throws DBus.Error;
+      
+      public abstract int[] purple_accounts_get_all_active () throws DBus.Error;
+      public abstract int[] purple_find_buddies (int account, string pattern = "") throws DBus.Error;
+      
+      public abstract int purple_conversation_new (int type, int account, string name) throws DBus.Error;
+      public abstract void purple_conversation_present (int conv) throws DBus.Error;
+      public abstract int purple_conv_im (int conv) throws DBus.Error;
+      public abstract void purple_conv_im_send (int im, string mess) throws DBus.Error;
+  }
+
+  public class PidginPlugin: Object, Activatable, ItemProvider
+  {
+    public bool enabled { get; set; default = true; }
+
+    public void activate ()
+    {
+      
+    }
+
+    public void deactivate ()
+    {
+      
+    }
+
+    static void register_plugin ()
+    {
+      DataSink.PluginRegistry.get_default ().register_plugin (
+        typeof (PidginPlugin),
+        "Pidgin",
+        _ ("Get access to your Pidgin contacts"),
+        "pidgin",
+        register_plugin,
+        Environment.find_program_in_path ("pidgin") != null,
+        _ ("Pidgin is not installed.")
+      );
+    }
+    
+    static construct
+    {
+      register_plugin ();
+    }
+
+    
+    
+    private class Contact: Object, Match, ContactMatch
+    {
+      // from Match interface
+      public string title { get; construct set; }
+      public string description { get; set; }
+      public string icon_name { get; construct set; }
+      public bool has_thumbnail { get; construct set; }
+      public string thumbnail_path { get; construct set; }
+      public MatchType match_type { get; construct set; }
+      public PidginPlugin plugin { get; construct set; }
+      
+      public int account_id { get; construct set; }
+      public int contact_id { get; construct set; }
+      public string real_alias { get; construct set; }
+      public string name { get; construct set; }
+      
+      public Contact (PidginPlugin plugin, int account_id, int contact_id, string name,
+                           string title, string alias, string? icon_path, string description)
+      {
+        Object (title: title,
+                description: description,
+                real_alias: alias,
+                name: name,
+                icon_name: icon_path ?? "stock_person",
+                has_thumbnail: false,
+                match_type: MatchType.CONTACT,
+                plugin: plugin,
+                account_id: account_id,
+                contact_id: contact_id);
+      }
+
+      public virtual void send_message (string message, bool present)
+      {
+        plugin.send_message (this, message, present);
+      }
+      
+      public virtual void open_chat ()
+      {
+        plugin.open_chat (this);
+      }
+    }
+    
+    private void send_message (Contact contact, string? message, bool present)
+    {
+      try {
+        var conv = p.purple_conversation_new (1, contact.account_id, contact.name);
+        if (message != null)
+        {
+          var im = p.purple_conv_im (conv);
+          p.purple_conv_im_send (im, message);
+        }
+        if (present) p.purple_conversation_present (conv);
+      } catch (DBus.Error err)
+      {
+        Utils.Logger.warning (this, "Cannot open chat for %s", contact.title);
+      }
+    }
+    
+    private void open_chat (Contact contact)
+    {
+      send_message (contact, null, true);
+    }
+
+    private Gee.Map<int, Contact> contacts;
+    private PurpleInterface p;
+
+    construct
+    {
+      contacts = new Gee.HashMap<int, Contact> ();
+      p = null;
+      try {
+        var conn = DBusService.get_session_bus ();
+        p = (PurpleInterface) conn.get_object (PurpleInterface.UNIQUE_NAME,
+                                               PurpleInterface.OBJECT_PATH,
+                                               PurpleInterface.INTERFACE_NAME);
+      
+      } catch (DBus.Error err) {
+        Utils.Logger.warning (this, "Cannot load Pidgin contacts");
+      }
+      
+      if (p != null) init_contacts.begin ();
+    }
+    
+    private async Contact get_contact (int buddy, int account = -1, string? protocol = null) throws DBus.Error
+    {
+      string prot = protocol;
+      if (account < 0)
+        account = p.purple_buddy_get_account (buddy);
+      if (protocol == null)
+        prot = p.purple_account_get_protocol_name (account);
+      
+      string alias = p.purple_buddy_get_alias (buddy);
+      string name = p.purple_buddy_get_name (buddy);
+      
+      if (alias == null || alias == "") alias = name;
+      
+      int iconid = p.purple_buddy_get_icon (buddy);
+      string icon = null;
+      if (iconid > 0)
+        icon = p.purple_buddy_icon_get_full_path (iconid);
+      
+      return new Contact (this, account, buddy, name, "%s (%s)".printf (alias, prot), alias, icon, "");
+    }
+    
+    private async void init_contacts ()
+    {
+      try {
+        var accounts = p.purple_accounts_get_all_active ();
+        foreach (var account in accounts)
+        {
+          var protocol = p.purple_account_get_protocol_name (account);
+          var buddies = p.purple_find_buddies (account);
+          
+          foreach (var buddy in buddies)
+          {
+            if (p.purple_buddy_is_online (buddy) > 0)
+              contacts[buddy] = yield get_contact (buddy, account, protocol);
+          }
+        }
+      
+      } catch (DBus.Error err) {
+        Utils.Logger.warning (this, "Cannot load Pidgin contacts");
+      }
+    }
+    
+    public async ResultSet? search (Query q) throws SearchError
+    {
+      // we only search for actions
+      if (!(QueryFlags.CONTACTS in q.query_type)) return null;
+
+      var result = new ResultSet ();
+      
+      var matchers = Query.get_matchers_for_query (q.query_string, 0,
+        RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
+      
+      var matches = contacts.entries;
+
+      foreach (var contact in matches)
+      {
+        foreach (var matcher in matchers)
+        {
+          if (matcher.key.match (contact.value.real_alias))
+          {
+            result.add (contact.value, matcher.value - Match.Score.INCREMENT_SMALL);
+            break;
+          }
+        }
+      }
+
+      q.check_cancellable ();
+
+      return result;
+    }
+
+    
+  }
+}

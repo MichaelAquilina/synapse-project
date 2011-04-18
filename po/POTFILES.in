@@ -16,6 +16,7 @@ src/ui/utils.vala
 src/core/common-actions.vala
 src/plugins/banshee-plugin.vala
 src/plugins/calculator-plugin.vala
+src/plugins/chat-actions-plugin.vala
 src/plugins/command-plugin.vala
 src/plugins/desktop-file-plugin.vala
 src/plugins/devhelp-search.vala
@@ -29,6 +30,7 @@ src/plugins/launchpad-plugin.vala
 src/plugins/locate-plugin.vala
 src/plugins/opensearch.vala
 src/plugins/pastebin-plugin.vala
+src/plugins/pidgin-plugin.vala
 src/plugins/rhythmbox-plugin.vala
 src/plugins/selection-plugin.vala
 src/plugins/ssh-plugin.vala
