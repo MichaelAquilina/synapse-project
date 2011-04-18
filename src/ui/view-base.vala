@@ -50,6 +50,9 @@ namespace Synapse
     protected int BORDER_RADIUS;
     protected int SHADOW_SIZE;
     
+    protected bool cache_enabled;
+    protected Gee.Map<string, Cairo.Surface> bg_cache;
+    
     static construct
     {
       var border_radius = new GLib.ParamSpecInt ("border-radius",
@@ -71,6 +74,9 @@ namespace Synapse
     {
       update_wm ();
       if (is_kwin) Synapse.Utils.Logger.log (this, "Using KWin compatibiliy mode.");
+      
+      cache_enabled = true;
+      bg_cache = new Gee.HashMap<string, Cairo.Surface> ();
       
       req_target = {0, 0};
       req_current = {0, 0};
@@ -149,6 +155,7 @@ namespace Synapse
     public override void style_set (Gtk.Style? old)
     {
       base.style_set (old);
+      this.bg_cache.clear ();
       update_border_and_shadow ();
     }
     
@@ -211,13 +218,36 @@ namespace Synapse
       /* Propagate Expose */
       this.propagate_expose (this.get_child(), event);
       
-      ctx.push_group ();
-      ctx.save ();
       ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
       ctx.clip ();
-      paint_background (ctx);
-      ctx.restore ();
-      ctx.pop_group_to_source ();
+      
+      string key = "%dx%dx%d".printf (this.allocation.width, this.allocation.height, model.searching_for);
+      
+      if (cache_enabled)
+      {
+        if (this.bg_cache.has_key (key))
+        {
+          ctx.set_source_surface (this.bg_cache[key], 0, 0);
+        }
+        else
+        {
+          Cairo.Surface surf = new Cairo.Surface.similar (ctx.get_target (),
+                                                          Cairo.Content.COLOR_ALPHA,
+                                                          this.allocation.width,
+                                                          this.allocation.height);
+          Cairo.Context cr = new Cairo.Context (surf);
+          paint_background (cr);
+          bg_cache[key] = surf;
+          ctx.set_source_surface (surf, 0, 0);
+        }
+      }
+      else
+      {
+        ctx.push_group ();
+        paint_background (ctx);
+        ctx.pop_group_to_source ();
+      }
+
       ctx.set_operator (Cairo.Operator.DEST_OVER);
       ctx.paint ();
 
