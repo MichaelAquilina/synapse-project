@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by Michal Hruby <michal.mhr@gmail.com>
- *
+ *             Alberto Aldegheri <albyrock87+dev@gmail.com>
  */
 
 namespace Synapse

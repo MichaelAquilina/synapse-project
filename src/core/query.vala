@@ -24,6 +24,7 @@ namespace Synapse
   public enum QueryFlags
   {
     /* HowTo create categories (32bit).
+     * Authored by Alberto Aldegheri <albyrock87+dev@gmail.com>
      * Categories are "stored" in 3 Levels:
      *  Super-Category
      *  -> Category
@@ -44,6 +45,7 @@ namespace Synapse
      * Remember: 
      *   if you add or remove a category, 
      *   change labels in UIInterface.CategoryConfig.init_labels
+     *
      */
     INCLUDE_REMOTE  = 1 << 0,
     UNCATEGORIZED   = 1 << 1,
