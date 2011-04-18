@@ -43,6 +43,14 @@ namespace Synapse
       public abstract void purple_conversation_present (int conv) throws DBus.Error;
       public abstract int purple_conv_im (int conv) throws DBus.Error;
       public abstract void purple_conv_im_send (int im, string mess) throws DBus.Error;
+      
+      public abstract signal void account_added (int acc);
+      public abstract signal void account_removed (int acc);
+      public abstract signal void buddy_added (int buddy);
+      public abstract signal void buddy_removed (int buddy);
+      public abstract signal void buddy_signed_on (int buddy);
+      public abstract signal void buddy_signed_off (int buddy);
+      public abstract signal void buddy_icon_changed (int buddy);
   }
 
   public class PidginPlugin: Object, Activatable, ItemProvider
@@ -92,15 +100,15 @@ namespace Synapse
       
       public int account_id { get; construct set; }
       public int contact_id { get; construct set; }
-      public string real_alias { get; construct set; }
       public string name { get; construct set; }
+      public bool online { get; set; }
       
-      public Contact (PidginPlugin plugin, int account_id, int contact_id, string name,
-                           string title, string alias, string? icon_path, string description)
+      public Contact (PidginPlugin plugin, int account_id, int contact_id, string name, bool online,
+                           string alias, string? icon_path, string description)
       {
-        Object (title: title,
+        Object (title: alias,
                 description: description,
-                real_alias: alias,
+                online: online,
                 name: name,
                 icon_name: icon_path ?? "stock_person",
                 has_thumbnail: false,
@@ -145,24 +153,95 @@ namespace Synapse
     private Gee.Map<int, Contact> contacts;
     private PurpleInterface p;
 
+    private void connect_to_bus ()
+    {
+      p = null;
+
+      var conn = DBusService.get_session_bus ();
+      p = (PurpleInterface) conn.get_object (PurpleInterface.UNIQUE_NAME,
+                                             PurpleInterface.OBJECT_PATH,
+                                             PurpleInterface.INTERFACE_NAME);
+      
+      
+      if (p != null)
+      {
+        init_contacts.begin (
+        (obj, res) => {
+          connect_to_signals ();
+        });
+      }
+    }
+    
+    private void connect_to_signals ()
+    {
+      p.account_added.connect ((acc)=>{
+        init_contacts.begin ();
+      });
+      
+      p.account_removed.connect ((acc)=>{
+        init_contacts.begin ();
+      });
+      
+      p.buddy_added.connect ((buddy)=>{
+        contact_changed (buddy, -1, 1);
+      });
+      p.buddy_removed.connect ((buddy)=>{
+        contact_changed (buddy, -1, 0);
+      });
+      p.buddy_signed_on.connect ((buddy)=>{
+        contact_changed (buddy, 1);
+      });
+      p.buddy_signed_off.connect ((buddy)=>{
+        contact_changed (buddy, 0);
+      });
+      p.buddy_icon_changed.connect ((buddy)=>{
+        contact_changed (buddy, -1, 0);
+        contact_changed (buddy, -1, 1);
+      });
+    }
+    
+    private void contact_changed (int buddy, int online = -1, int addremove = -1)
+    {
+      if (online >= 0)
+      {
+        var contact = contacts[buddy];
+        if (contact == null) return;
+        contact.online = online > 0;
+      }
+      else if (addremove >= 0)
+      {
+        if (addremove == 1)
+          get_contact (buddy);
+        else
+          contacts.unset (buddy);
+      }
+    }
+    
     construct
     {
       contacts = new Gee.HashMap<int, Contact> ();
-      p = null;
-      try {
-        var conn = DBusService.get_session_bus ();
-        p = (PurpleInterface) conn.get_object (PurpleInterface.UNIQUE_NAME,
-                                               PurpleInterface.OBJECT_PATH,
-                                               PurpleInterface.INTERFACE_NAME);
+      var service = DBusService.get_default ();
       
-      } catch (DBus.Error err) {
-        Utils.Logger.warning (this, "Cannot load Pidgin contacts");
+      if (service.name_has_owner (PurpleInterface.UNIQUE_NAME))
+      {
+        connect_to_bus ();
       }
       
-      if (p != null) init_contacts.begin ();
+      service.owner_changed.connect ((name, is_owned)=>{
+        if (name == PurpleInterface.UNIQUE_NAME)
+        {
+          if (is_owned)
+            connect_to_bus ();
+          else
+          {
+            p = null;
+            contacts.clear ();
+          }
+        }
+      });
     }
     
-    private async Contact get_contact (int buddy, int account = -1, string? protocol = null) throws DBus.Error
+    private async void get_contact (int buddy, int account = -1, string? protocol = null) throws DBus.Error
     {
       string prot = protocol;
       if (account < 0)
@@ -173,6 +252,8 @@ namespace Synapse
       string alias = p.purple_buddy_get_alias (buddy);
       string name = p.purple_buddy_get_name (buddy);
       
+      bool online = p.purple_buddy_is_online (buddy) > 0;
+      
       if (alias == null || alias == "") alias = name;
       
       int iconid = p.purple_buddy_get_icon (buddy);
@@ -180,11 +261,12 @@ namespace Synapse
       if (iconid > 0)
         icon = p.purple_buddy_icon_get_full_path (iconid);
       
-      return new Contact (this, account, buddy, name, "%s (%s)".printf (alias, prot), alias, icon, "");
+      contacts[buddy] = new Contact (this, account, buddy, name, online, alias, icon, "%s (%s)".printf (name, prot));
     }
     
     private async void init_contacts ()
     {
+      contacts.clear ();
       try {
         var accounts = p.purple_accounts_get_all_active ();
         foreach (var account in accounts)
@@ -194,8 +276,7 @@ namespace Synapse
           
           foreach (var buddy in buddies)
           {
-            if (p.purple_buddy_is_online (buddy) > 0)
-              contacts[buddy] = yield get_contact (buddy, account, protocol);
+            yield get_contact (buddy, account, protocol);
           }
         }
       
@@ -218,9 +299,10 @@ namespace Synapse
 
       foreach (var contact in matches)
       {
+        if (!contact.value.online) continue;
         foreach (var matcher in matchers)
         {
-          if (matcher.key.match (contact.value.real_alias))
+          if (matcher.key.match (contact.value.title))
           {
             result.add (contact.value, matcher.value - Match.Score.INCREMENT_SMALL);
             break;

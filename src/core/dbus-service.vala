@@ -85,12 +85,16 @@ namespace Synapse
       if (old_owner == "")
       {
         owned_names.add (name);
+        owner_changed (name, true);
       }
       else if (new_owner == "")
       {
         owned_names.remove (name);
+        owner_changed (name, false);
       }
     }
+    
+    public signal void owner_changed (string name, bool is_owned);
     
     public bool name_has_owner (string name)
     {
