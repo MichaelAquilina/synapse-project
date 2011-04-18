@@ -99,7 +99,7 @@ namespace Synapse
   
   public interface ContactMatch: Match
   {
-    public abstract void send_message (string message);
+    public abstract void send_message (string message, bool present);
     public abstract void open_chat ();
   }
 

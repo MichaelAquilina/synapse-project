@@ -176,6 +176,8 @@ namespace Synapse
         typeof (SelectionPlugin),
         typeof (SshPlugin),
         typeof (FileOpPlugin),
+        typeof (PidginPlugin),
+        typeof (ChatActions),
 #if HAVE_ZEITGEIST
         typeof (ZeitgeistPlugin),
 #endif

@@ -92,15 +92,19 @@ namespace Synapse
         f = File.new_for_uri (uri_match.uri);
         if (!f.query_exists ())
         {
-          Utils.Logger.error (this, _("File \"%s\"does not exist."), uri_match.uri);
+          Utils.Logger.warning (this, _("File \"%s\"does not exist."), uri_match.uri);
           return;
         }
         string newpath = Path.build_filename (Path.get_dirname (f.get_path ()), target.title);
         var f2 = File.new_for_path (newpath);
         Utils.Logger.debug (this, "Moving \"%s\" to \"%s\"", f.get_path (), newpath);
-        if (!f.move (f2, GLib.FileCopyFlags.OVERWRITE))
+        bool done = false;
+        try {
+          done = f.move (f2, GLib.FileCopyFlags.OVERWRITE);
+        }catch (GLib.Error err) {}
+        if (!done)
         {
-          Utils.Logger.error (this, _("Cannot move \"%s\" to \"%s\""), f.get_path (), newpath);
+          Utils.Logger.warning (this, _("Cannot move \"%s\" to \"%s\""), f.get_path (), newpath);
         }
       }
       
@@ -132,7 +136,7 @@ namespace Synapse
         typeof (FileOpPlugin),
         _ ("File Operations"),
         _ ("Copy, Cut, Paste and Delete files"),
-        "copy",
+        "stock_copy",
         register_plugin
       );
     }
