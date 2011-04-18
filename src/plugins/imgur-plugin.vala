@@ -185,7 +185,7 @@ namespace Synapse
         }
       }
 
-      public override void do_execute (Match? match)
+      public override void do_execute (Match? match, Match? target = null)
       {
         if (match.match_type == MatchType.GENERIC_URI && match is UriMatch)
         {

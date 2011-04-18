@@ -46,7 +46,7 @@ namespace Synapse
                 default_relevancy: Match.Score.AVERAGE);
       }
       
-      private async string? pastebin_file (string path)
+      protected async string? pastebin_file (string path)
       {
         string[] argv = {"pastebinit", "-i", path};
 
@@ -91,7 +91,7 @@ namespace Synapse
         return null;
       }
 
-      private async string? pastebin_text (string content)
+      protected async string? pastebin_text (string content)
       {
         string[] argv = {"pastebinit"};
         
@@ -141,7 +141,7 @@ namespace Synapse
         return null;
       }
       
-      private void process_pastebin_result (string? url)
+      protected virtual void process_pastebin_result (string? url, Match? target = null)
       {
         string msg;
         if (url != null)
@@ -174,7 +174,7 @@ namespace Synapse
         }
       }
       
-      public override void do_execute (Match? match)
+      public override void do_execute (Match? match, Match? target = null)
       {
         if (match.match_type == MatchType.GENERIC_URI && match is UriMatch)
         {
@@ -189,7 +189,7 @@ namespace Synapse
           pastebin_file.begin (path, (obj, res) =>
           {
             string? url = pastebin_file.end (res);
-            process_pastebin_result (url);
+            process_pastebin_result (url, target);
           });
         }
         else if (match.match_type == MatchType.TEXT)
@@ -199,7 +199,7 @@ namespace Synapse
           pastebin_text.begin (content, (obj, res) =>
           {
             string? url = pastebin_text.end (res);
-            process_pastebin_result (url);
+            process_pastebin_result (url, target);
           });
         }
       }
@@ -218,6 +218,40 @@ namespace Synapse
           default:
             return false;
         }
+      }
+    }
+    
+    private class PastebinToContactAction : PastebinAction
+    {
+      public PastebinToContactAction ()
+      {
+        Object (title: _ ("Pastebin to contact"),
+                description: _ ("Pastebin selection"),
+                match_type: MatchType.ACTION,
+                icon_name: "document-send", has_thumbnail: false,
+                default_relevancy: Match.Score.AVERAGE);
+      }
+      
+      protected override void process_pastebin_result (string? url, Match? target = null)
+      {
+        ContactMatch? contact = target as ContactMatch;
+        if (contact == null || url == null)
+        {
+          base.process_pastebin_result (url, null);
+        }
+        else
+        {
+          contact.send_message (url, true);
+        }
+      }
+      
+      public override bool needs_target () {
+        return true;
+      }
+      
+      public override QueryFlags target_flags ()
+      {
+        return QueryFlags.CONTACTS;
       }
     }
 
@@ -239,16 +273,18 @@ namespace Synapse
       register_plugin ();
     }
 
-    PastebinAction action;
+    private Gee.List<PastebinAction> actions;
 
     construct
     {
-      action = new PastebinAction ();
+      actions = new Gee.ArrayList<PastebinAction> ();
+      actions.add (new PastebinAction ());
+      actions.add (new PastebinToContactAction ());
     }
 
     public ResultSet? find_for_match (Query q, Match match)
     {
-      if (!action.valid_for_match (match)) return null;
+      if (!actions[0].valid_for_match (match)) return null;
 
       // strip query
       q.query_string = q.query_string.strip ();
@@ -258,18 +294,23 @@ namespace Synapse
 
       if (query_empty)
       {
-        results.add (action, action.default_relevancy);
+        int rel = actions[1].default_relevancy;
+        results.add (actions[0], rel);
+        results.add (actions[1], rel);
       }
       else
       {
         var matchers = Query.get_matchers_for_query (q.query_string, 0,
           RegexCompileFlags.CASELESS);
-        foreach (var matcher in matchers)
+        foreach (var action in actions)
         {
-          if (matcher.key.match (action.title))
+          foreach (var matcher in matchers)
           {
-            results.add (action, matcher.value);
-            break;
+            if (matcher.key.match (action.title))
+            {
+              results.add (action, matcher.value);
+              break;
+            }
           }
         }
       }
