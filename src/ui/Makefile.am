@@ -69,6 +69,7 @@ synapse_VALASOURCES = \
 	controller.vala \
 	model.vala \
 	view-base.vala \
+	view-bar.vala \
 	view-essential.vala \
 	view-doish.vala \
 	widgets.vala \

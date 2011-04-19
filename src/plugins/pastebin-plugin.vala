@@ -225,7 +225,7 @@ namespace Synapse
     {
       public PastebinToContactAction ()
       {
-        Object (title: _ ("Pastebin to contact"),
+        Object (title: _ ("Pastebin to contact.."),
                 description: _ ("Pastebin selection"),
                 match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,

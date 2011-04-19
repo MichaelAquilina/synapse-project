@@ -31,16 +31,17 @@ namespace Synapse
   {
     public bool enabled { get; set; default = true; }
 
-    ImgUrAction? action;
+    private Gee.List<ImgUrAction> actions;
 
     public void activate ()
     {
-      action = new ImgUrAction ();
+      actions.add (new ImgUrAction ());
+      actions.add (new ImgUrToContactAction ());
     }
 
     public void deactivate ()
     {
-      action = null;
+      actions.clear ();
     }
 
     private class ImgUrAction: BaseAction
@@ -151,8 +152,8 @@ namespace Synapse
         
         throw new UploadError.UNKNOWN_ERROR ("Unable to parse result");
       }
-
-      private void process_result (string? url)
+      
+      protected virtual void process_result (string? url, Match? target = null)
       {
         string msg;
         if (url != null)
@@ -203,7 +204,7 @@ namespace Synapse
               Utils.Logger.warning (this, "%s", err.message);
             }
             
-            process_result (url);
+            process_result (url, target);
           });
         }
       }
@@ -221,6 +222,40 @@ namespace Synapse
           default:
             return false;
         }
+      }
+    }
+    
+    private class ImgUrToContactAction : ImgUrAction
+    {
+      public ImgUrToContactAction ()
+      {
+        Object (title: _ ("Upload to imgur to contact.."),
+                description: _ ("Upload selection to imgur image sharer, and send the link to contact"),
+                match_type: MatchType.ACTION,
+                icon_name: "document-send", has_thumbnail: false,
+                default_relevancy: Match.Score.AVERAGE - Match.Score.INCREMENT_MINOR);
+      }
+      
+      protected override void process_result (string? url, Match? target = null)
+      {
+        ContactMatch? contact = target as ContactMatch;
+        if (contact == null || url == null)
+        {
+          base.process_result (url, null);
+        }
+        else
+        {
+          contact.send_message (url, true);
+        }
+      }
+      
+      public override bool needs_target () {
+        return true;
+      }
+      
+      public override QueryFlags target_flags ()
+      {
+        return QueryFlags.CONTACTS;
       }
     }
 
@@ -242,11 +277,12 @@ namespace Synapse
 
     construct
     {
+      actions = new Gee.ArrayList<ImgUrAction> ();
     }
 
     public ResultSet? find_for_match (Query q, Match match)
     {
-      if (!action.valid_for_match (match)) return null;
+      if (!actions[0].valid_for_match (match)) return null;
 
       // strip query
       q.query_string = q.query_string.strip ();
@@ -256,22 +292,27 @@ namespace Synapse
 
       if (query_empty)
       {
-        results.add (action, action.default_relevancy);
+        int rel = actions[1].default_relevancy;
+        results.add (actions[0], rel);
+        results.add (actions[1], rel);
       }
       else
       {
         var matchers = Query.get_matchers_for_query (q.query_string, 0,
           RegexCompileFlags.CASELESS);
-        foreach (var matcher in matchers)
+        foreach (var action in actions)
         {
-          if (matcher.key.match (action.title))
+          foreach (var matcher in matchers)
           {
-            results.add (action, matcher.value);
-            break;
+            if (matcher.key.match (action.title))
+            {
+              results.add (action, matcher.value);
+              break;
+            }
           }
         }
       }
-
+      
       return results;
     }
   }

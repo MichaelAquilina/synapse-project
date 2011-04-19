@@ -318,7 +318,10 @@ namespace Synapse.Gui
         else
         {
           focus_label.set_text (this.model.query[model.searching_for]);
-          description_label.set_text (controller.NO_RESULTS);
+          if (this.menuthrobber.active)
+            description_label.set_text (controller.SEARCHING);
+          else
+            description_label.set_text (controller.NO_RESULTS);
         }
       }
       else

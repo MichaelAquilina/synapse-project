@@ -396,6 +396,12 @@ namespace Synapse
       }
     }
     
+    public bool handles_query (Query query)
+    {
+      // we will only search in the "Actions" category (that includes "All" as well)
+      return (QueryFlags.CONTACTS in query.query_type);
+    }
+    
     public async ResultSet? search (Query q) throws SearchError
     {
       // we only search for actions
