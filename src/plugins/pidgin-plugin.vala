@@ -52,10 +52,8 @@ namespace Synapse
       public abstract signal void buddy_signed_off (int buddy);
       public abstract signal void buddy_icon_changed (int buddy);
       
-      /* TODO: not working here, needs more documentation from Pidgin
-      public abstract int purple_xfer_new (int type, int account, string name) throws DBus.Error;
-      public abstract void purple_xfer_set_filename (int xfer, string file) throws DBus.Error;
-      public abstract void purple_xfer_add (int xfer) throws DBus.Error; */
+      public abstract void serv_send_file (int conn, string who, string file) throws DBus.Error;
+      public abstract int purple_account_get_connection (int account) throws DBus.Error;
   }
 
   public class PidginPlugin: Object, Activatable, ItemProvider, ActionProvider
@@ -181,9 +179,6 @@ namespace Synapse
     
     private void send_file (Contact contact, string uri)
     {
-      /*
-      TODO: not working here, needs more documentation from Pidgin
-       
       File f;
       f = File.new_for_uri (uri);
       if (!f.query_exists ())
@@ -193,15 +188,17 @@ namespace Synapse
       }
       string path = f.get_path ();
       try {
-        var xfer = p.purple_xfer_new (contact.account_id, 1, contact.name); // 1 = 
-        p.purple_xfer_set_filename (xfer, path);
-        p.purple_xfer_add (xfer);
+        int conn = p.purple_account_get_connection (contact.account_id);
+        if (conn <= 0)
+        {
+          Utils.Logger.warning (this, "Cannot send file to %s", contact.title);
+          return;
+        }
+        p.serv_send_file (conn, contact.name, path);
       } catch (DBus.Error err)
       {
         Utils.Logger.warning (this, "Cannot send file to %s", contact.title);
       }
-      
-      */
     }
     
     private void send_message (Contact contact, string? message, bool present)
@@ -297,7 +294,7 @@ namespace Synapse
     construct
     {
       actions = new Gee.ArrayList<BaseAction> ();
-      // actions.add (new SendToContact ());
+      actions.add (new SendToContact ());
       
       contacts = new Gee.HashMap<int, Contact> ();
       var service = DBusService.get_default ();
