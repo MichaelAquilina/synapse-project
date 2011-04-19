@@ -35,28 +35,7 @@ namespace Synapse
       
     }
     
-    private abstract class ContactAction: Object, Match
-    {
-      // from Match interface
-      public string title { get; construct set; }
-      public string description { get; set; }
-      public string icon_name { get; construct set; }
-      public bool has_thumbnail { get; construct set; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-      public int default_relevancy { get; set; }
-      
-      public virtual int get_relevancy ()
-      {
-        return default_relevancy;
-      }
-      
-      public virtual void execute (Match? match) {
-        
-      }
-    }
-    
-    private class OpenChat: ContactAction
+    private class OpenChat: BaseAction
     {
       public OpenChat ()
       {
@@ -67,11 +46,50 @@ namespace Synapse
                 default_relevancy: Match.Score.EXCELLENT);
       }
       
-      public override void execute (Match? match)
+      public override void do_execute (Match? match, Match? target = null)
       {
         ContactMatch? cm = match as ContactMatch;
         if ( match == null ) return;
         cm.open_chat ();
+      }
+      
+      public override bool valid_for_match (Match match)
+      {
+        return match.match_type == MatchType.CONTACT;
+      }
+    }
+    
+    private class SendMessage: BaseAction
+    {
+      public SendMessage ()
+      {
+        Object (title: _ ("Send a message"),
+                description: _ ("Send a message to the contact"),
+                icon_name: "message", has_thumbnail: false,
+                match_type: MatchType.ACTION,
+                default_relevancy: Match.Score.VERY_GOOD);
+      }
+      
+      public override void do_execute (Match? match, Match? target = null)
+      {
+        ContactMatch? cm = match as ContactMatch;
+        if ( match == null || target == null ) return;
+        cm.send_message (target.title, false);
+      }
+      
+      public override bool valid_for_match (Match match)
+      {
+        return match.match_type == MatchType.CONTACT;
+      }
+      
+            
+      public override bool needs_target () {
+        return true;
+      }
+      
+      public override QueryFlags target_flags ()
+      {
+        return QueryFlags.TEXT;
       }
     }
     
@@ -91,13 +109,14 @@ namespace Synapse
       register_plugin ();
     }
 
-    private Gee.List<ContactAction> actions;
+    private Gee.List<BaseAction> actions;
 
     construct
     {
-      actions = new Gee.ArrayList<ContactAction> ();
+      actions = new Gee.ArrayList<BaseAction> ();
 
       actions.add (new OpenChat ());
+      actions.add (new SendMessage ());
     }
 
     public ResultSet? find_for_match (Query query, Match match)
@@ -109,10 +128,8 @@ namespace Synapse
       {
         foreach (var action in actions)
         {
-          if (match is ContactMatch)
-          {
-            results.add (action, action.get_relevancy ());
-          }
+          if (!action.valid_for_match (match)) continue;
+          results.add (action, action.default_relevancy);
         }
       }
       else
@@ -121,7 +138,7 @@ namespace Synapse
           RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
         foreach (var action in actions)
         {
-          if (!(match is ContactMatch)) continue;
+          if (!action.valid_for_match (match)) continue;
           foreach (var matcher in matchers)
           {
             if (matcher.key.match (action.title))
