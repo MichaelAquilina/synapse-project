@@ -51,9 +51,14 @@ namespace Synapse
       public abstract signal void buddy_signed_on (int buddy);
       public abstract signal void buddy_signed_off (int buddy);
       public abstract signal void buddy_icon_changed (int buddy);
+      
+      /* TODO: not working here, needs more documentation from Pidgin
+      public abstract int purple_xfer_new (int type, int account, string name) throws DBus.Error;
+      public abstract void purple_xfer_set_filename (int xfer, string file) throws DBus.Error;
+      public abstract void purple_xfer_add (int xfer) throws DBus.Error; */
   }
 
-  public class PidginPlugin: Object, Activatable, ItemProvider
+  public class PidginPlugin: Object, Activatable, ItemProvider, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -85,7 +90,47 @@ namespace Synapse
       register_plugin ();
     }
 
-    
+    private class SendToContact: BaseAction
+    {
+      public SendToContact ()
+      {
+        Object (title: _ ("Send in chat to.."),
+                  description: _ ("Send selected file within Pidgin"),
+                  match_type: MatchType.ACTION,
+                  icon_name: "document-send", has_thumbnail: false,
+                  default_relevancy: Match.Score.AVERAGE);
+      }
+      
+      public override void do_execute (Match? match, Match? target = null)
+      {
+        Contact? c = target as Contact;
+        UriMatch? u = match as UriMatch;
+        if (c == null) return;
+        
+        c.send_file (u.uri);
+      }
+      
+      public override bool valid_for_match (Match match)
+      {
+        switch (match.match_type)
+        {
+          case MatchType.GENERIC_URI:
+            UriMatch um = match as UriMatch;
+            return (um.file_type & QueryFlags.FILES) != 0;
+          default:
+            return false;
+        }
+      }
+      
+      public override bool needs_target () {
+        return true;
+      }
+      
+      public override QueryFlags target_flags ()
+      {
+        return QueryFlags.CONTACTS;
+      }
+    }
     
     private class Contact: Object, Match, ContactMatch
     {
@@ -127,6 +172,36 @@ namespace Synapse
       {
         plugin.open_chat (this);
       }
+      
+      public void send_file (string path)
+      {
+        plugin.send_file (this, path);
+      }
+    }
+    
+    private void send_file (Contact contact, string uri)
+    {
+      /*
+      TODO: not working here, needs more documentation from Pidgin
+       
+      File f;
+      f = File.new_for_uri (uri);
+      if (!f.query_exists ())
+      {
+        Utils.Logger.warning (this, _("File \"%s\"does not exist."), uri);
+        return;
+      }
+      string path = f.get_path ();
+      try {
+        var xfer = p.purple_xfer_new (contact.account_id, 1, contact.name); // 1 = 
+        p.purple_xfer_set_filename (xfer, path);
+        p.purple_xfer_add (xfer);
+      } catch (DBus.Error err)
+      {
+        Utils.Logger.warning (this, "Cannot send file to %s", contact.title);
+      }
+      
+      */
     }
     
     private void send_message (Contact contact, string? message, bool present)
@@ -217,8 +292,13 @@ namespace Synapse
       }
     }
     
+    private Gee.List<BaseAction> actions;
+    
     construct
     {
+      actions = new Gee.ArrayList<BaseAction> ();
+      // actions.add (new SendToContact ());
+      
       contacts = new Gee.HashMap<int, Contact> ();
       var service = DBusService.get_default ();
       
@@ -239,6 +319,40 @@ namespace Synapse
           }
         }
       });
+    }
+    
+    public ResultSet? find_for_match (Query query, Match match)
+    {
+      bool query_empty = query.query_string == "";
+      var results = new ResultSet ();
+      
+      if (query_empty)
+      {
+        foreach (var action in actions)
+        {
+          if (!action.valid_for_match (match)) continue;
+          results.add (action, action.get_relevancy_for_match (match));
+        }
+      }
+      else
+      {
+        var matchers = Query.get_matchers_for_query (query.query_string, 0,
+          RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
+        foreach (var action in actions)
+        {
+          if (!action.valid_for_match (match)) continue;
+          foreach (var matcher in matchers)
+          {
+            if (matcher.key.match (action.title))
+            {
+              results.add (action, matcher.value);
+              break;
+            }
+          }
+        }
+      }
+
+      return results;
     }
     
     private async void get_contact (int buddy, int account = -1, string? protocol = null) throws DBus.Error

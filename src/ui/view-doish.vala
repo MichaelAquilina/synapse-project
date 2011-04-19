@@ -229,10 +229,7 @@ namespace Synapse.Gui
       spacer = new Label (null);
       spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
       this.prepare_results_container (out results_container, out results_sources,
-                                      out results_actions, out results_targets);
-      results_sources.set_state (StateType.SELECTED);
-      results_actions.set_state (StateType.SELECTED);
-      results_targets.set_state (StateType.SELECTED);
+                                      out results_actions, out results_targets, StateType.SELECTED);
 
       container = new VBox (false, 0);
       container.pack_start (categories_hbox, false);

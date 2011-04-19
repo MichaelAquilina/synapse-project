@@ -257,7 +257,8 @@ namespace Synapse
     protected virtual void prepare_results_container (out SelectionContainer results_container,
                                                       out ResultBox results_sources,
                                                       out ResultBox results_actions,
-                                                      out ResultBox results_targets)
+                                                      out ResultBox results_targets,
+                                                      Gtk.StateType state_type = Gtk.StateType.NORMAL)
     {
       results_container = new SelectionContainer ();
       results_sources = new ResultBox (100);
@@ -278,6 +279,10 @@ namespace Synapse
       results_container.add (results_sources);
       results_container.add (results_actions);
       results_container.add (results_targets);
+      
+      results_sources.set_state (state_type);
+      results_actions.set_state (state_type);
+      results_targets.set_state (state_type);
     }
     
     protected virtual void paint_background (Cairo.Context ctx)

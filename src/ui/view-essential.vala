@@ -205,7 +205,7 @@ namespace Synapse.Gui
       
       /* list */
       this.prepare_results_container (out results_container, out results_sources,
-                                      out results_actions, out results_targets);
+                                      out results_actions, out results_targets, StateType.SELECTED);
       container.pack_start (results_container, false);
       
       container.show_all ();
