@@ -47,7 +47,7 @@ namespace Synapse.Gui
     }
     public override void size_request (out Gtk.Requisition req)
     {
-      req = clone.requisition;
+      clone.size_request (out req);
     }
   }
 
@@ -92,6 +92,10 @@ namespace Synapse.Gui
       LARGE,
       X_LARGE,
       XX_LARGE
+    }
+    
+    public bool natural_requisition {
+      get; set; default = false;
     }
     
     public Size size {
@@ -225,7 +229,7 @@ namespace Synapse.Gui
       unowned Pango.AttrFloat a = (Pango.AttrFloat) attr;
 
       bool needs_animation = true;
-      while (real_size >= _min_size)
+      while (real_size > _min_size)
       {
         real_size = real_size - 1;
         a.value = this.size_to_scale[real_size];
@@ -332,7 +336,7 @@ namespace Synapse.Gui
       this.requistion_for_size (out req, out char_width, this._size);
       last_req.width = req.width;
       last_req.height = req.height;
-      if (this.ellipsize != Pango.EllipsizeMode.NONE || animate)
+      if (!this.natural_requisition && (this.ellipsize != Pango.EllipsizeMode.NONE || animate))
         req.width = char_width * 3;
     }
   }
@@ -495,6 +499,7 @@ namespace Synapse.Gui
       int i = 0;
       int x = allocation.x + _xpad;
       int y = allocation.y + _ypad;
+      bool rtl = this.get_direction () == Gtk.TextDirection.RTL;
       foreach (Widget child in children)
       {
         Gdk.Rectangle a;
@@ -513,6 +518,7 @@ namespace Synapse.Gui
             alloc[i].height * this._scale_size / 100
           };
         }
+        if (rtl) a.x = 2 * allocation.x + allocation.width - a.x - a.width;
         child.size_allocate (a);
         i++;
       }

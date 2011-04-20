@@ -247,7 +247,27 @@ namespace Synapse.Gui
       if (b >= 0.5) b /= 4; else b = 1 - b / 4;
     }
     
-    private void cairo_rounded_rect (Cairo.Context ctx, double x, double y, double w, double h, double r)
+    public static void cairo_arrow (Cairo.Context ctx, bool rtl, double x, double y, double w, double h)
+    {
+      double xh = x + w / 2;
+      double yh = y + h / 2;
+      ctx.new_path ();
+      if (rtl)
+      {
+        ctx.move_to (x + w, y);
+        ctx.curve_to (xh, yh, xh, yh, x + w, y + h);
+        ctx.line_to (x, yh);
+      }
+      else
+      {
+        ctx.move_to (x, y);
+        ctx.curve_to (xh, yh, xh, yh, x, y + h);
+        ctx.line_to (x + w, yh);
+      }
+      ctx.close_path ();
+    }
+    
+    public static void cairo_rounded_rect (Cairo.Context ctx, double x, double y, double w, double h, double r)
     {
       double y2 = y+h, x2 = x+w;
       ctx.move_to (x, y2 - r);
@@ -257,7 +277,7 @@ namespace Synapse.Gui
       ctx.arc (x+r, y2-r, r, Math.PI * 0.5, Math.PI);
     }
     
-    private void add_shadow_stops (Cairo.Pattern pat, double r, double g, double b, double size, double alpha)
+    private static void add_shadow_stops (Cairo.Pattern pat, double r, double g, double b, double size, double alpha)
     {
       /* Let's make a nice shadow */
       pat.add_color_stop_rgba (1.0, r, g, b, 0);
@@ -268,7 +288,7 @@ namespace Synapse.Gui
       pat.add_color_stop_rgba (0.0, r, g, b, alpha);
     }
 
-    private void cairo_make_shadow_for_rect (Cairo.Context ctx, double x1, double y1, double w, double h, double rad,
+    public static void cairo_make_shadow_for_rect (Cairo.Context ctx, double x1, double y1, double w, double h, double rad,
                                              double r, double g, double b, double size)
     {
       if (size < 1) return;

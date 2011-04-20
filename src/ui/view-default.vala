@@ -25,7 +25,7 @@ using Cairo;
 
 namespace Synapse.Gui
 {
-  public class ViewEssential : Synapse.Gui.View
+  public class ViewDefault : Synapse.Gui.View
   {
     construct {
       

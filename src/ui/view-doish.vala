@@ -31,47 +31,6 @@ namespace Synapse.Gui
       
     }
     
-    static construct
-    {
-      var spacing = new GLib.ParamSpecInt ("pane-spacing",
-                                             "Pane Spacing",
-                                             "The space between two panes in Doish theme",
-                                             5, 100, 30,
-                                             GLib.ParamFlags.READABLE);
-      var icon_size = new GLib.ParamSpecInt ("icon-size",
-                                             "Icon Size",
-                                             "The size of icons in Doish theme",
-                                             32, 192, 128,
-                                             GLib.ParamFlags.READABLE);
-      var title_max = new GLib.ParamSpecString ("title-size",
-                                                "Title Font Size",
-                                                "The standard size the match title in Pango absolute sizes (string)",
-                                                "medium",
-                                                GLib.ParamFlags.READABLE);
-      var title_min = new GLib.ParamSpecString ("title-min-size",
-                                                "Title minimum Font Size",
-                                                "The minimum size the match title in Pango absolute sizes (string)",
-                                                "small",
-                                                GLib.ParamFlags.READABLE);
-      var descr_max = new GLib.ParamSpecString ("description-size",
-                                                "Title Font Size",
-                                                "The standard size the match title in Pango absolute sizes (string)",
-                                                "small",
-                                                GLib.ParamFlags.READABLE);
-      var descr_min = new GLib.ParamSpecString ("description-min-size",
-                                                "Title minimum Font Size",
-                                                "The minimum size the match title in Pango absolute sizes (string)",
-                                                "x-small",
-                                                GLib.ParamFlags.READABLE);
-      
-      install_style_property (spacing);
-      install_style_property (icon_size);
-      install_style_property (title_max);
-      install_style_property (title_min);
-      install_style_property (descr_max);
-      install_style_property (descr_min);
-    }
-    
     public override void style_set (Gtk.Style? old)
     {
       base.style_set (old);

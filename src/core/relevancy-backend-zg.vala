@@ -37,7 +37,7 @@ namespace Synapse
       uri_popularity = new Gee.HashMap<string, int> ();
 
       refresh_popularity ();
-      check_data_sources ();
+      check_data_sources.begin ();
 
       Timeout.add_seconds (60*30, refresh_popularity);
     }

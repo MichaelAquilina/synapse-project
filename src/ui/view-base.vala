@@ -65,7 +65,50 @@ namespace Synapse
                                                "Shadow size of Synapse window",
                                                0, 50, 10,
                                                GLib.ParamFlags.READABLE);
+
+      var width = new GLib.ParamSpecInt ("ui-width",
+                                         "Width",
+                                         "The width of the content in supported themes",
+                                         0, 1024, 560,
+                                         GLib.ParamFlags.READABLE);
+      var spacing = new GLib.ParamSpecInt ("pane-spacing",
+                                             "Pane Spacing",
+                                             "The space between panes in supported themes",
+                                             5, 100, 30,
+                                             GLib.ParamFlags.READABLE);
+
+      var icon_size = new GLib.ParamSpecInt ("icon-size",
+                                             "Icon Size",
+                                             "The size of focused icon in supported themes",
+                                             32, 256, 96,
+                                             GLib.ParamFlags.READABLE);
+      var title_max = new GLib.ParamSpecString ("title-size",
+                                                "Title Font Size",
+                                                "The standard size the match title in Pango absolute sizes (string)",
+                                                "large",
+                                                GLib.ParamFlags.READABLE);
+      var title_min = new GLib.ParamSpecString ("title-min-size",
+                                                "Title minimum Font Size",
+                                                "The minimum size the match title in Pango absolute sizes (string)",
+                                                "medium",
+                                                GLib.ParamFlags.READABLE);
+      var descr_max = new GLib.ParamSpecString ("description-size",
+                                                "Title Font Size",
+                                                "The standard size the match title in Pango absolute sizes (string)",
+                                                "small",
+                                                GLib.ParamFlags.READABLE);
+      var descr_min = new GLib.ParamSpecString ("description-min-size",
+                                                "Title minimum Font Size",
+                                                "The minimum size the match title in Pango absolute sizes (string)",
+                                                "small",
+                                                GLib.ParamFlags.READABLE);
       
+      install_style_property (width);
+      install_style_property (icon_size);
+      install_style_property (title_max);
+      install_style_property (title_min);
+      install_style_property (descr_max);
+      install_style_property (descr_min);
       install_style_property (border_radius);
       install_style_property (shadow_size);
     }
