@@ -320,6 +320,7 @@ namespace Synapse
     
     public ResultSet? find_for_match (Query query, Match match)
     {
+      if (p == null) return null;
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
       
@@ -354,6 +355,7 @@ namespace Synapse
     
     private async void get_contact (int buddy, int account = -1, string? protocol = null) throws DBus.Error
     {
+      if (p == null) return;
       string prot = protocol;
       if (account < 0)
         account = p.purple_buddy_get_account (buddy);
@@ -378,15 +380,18 @@ namespace Synapse
     private async void init_contacts ()
     {
       contacts.clear ();
+      if (p == null) return;
       try {
         var accounts = p.purple_accounts_get_all_active ();
         foreach (var account in accounts)
         {
+          if (p == null) return;
           var protocol = p.purple_account_get_protocol_name (account);
           var buddies = p.purple_find_buddies (account);
           
           foreach (var buddy in buddies)
           {
+            if (p == null) return;
             yield get_contact (buddy, account, protocol);
           }
         }
@@ -398,7 +403,6 @@ namespace Synapse
     
     public bool handles_query (Query query)
     {
-      // we will only search in the "Actions" category (that includes "All" as well)
       return (QueryFlags.CONTACTS in query.query_type);
     }
     

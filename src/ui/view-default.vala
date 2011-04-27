@@ -161,7 +161,7 @@ namespace Synapse.Gui
       fi.border_radius = 5;
       fi.border_width = 5;
       fi.add (focus_label);
-      vb.pack_end (fi, false, false, 5);
+      vb.pack_end (fi, false, false, 2);
       vb.pack_end (categories_hbox, false);
       
       var sensitive = new SensitiveWidget (icon_container);
