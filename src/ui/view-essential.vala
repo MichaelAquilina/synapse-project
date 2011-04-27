@@ -41,16 +41,12 @@ namespace Synapse.Gui
       this.style.get (typeof(Synapse.Gui.ViewEssential), "icon-size", out icon_size);
       this.style.get (typeof(Synapse.Gui.ViewEssential), "title-size", out tmax);
       this.style.get (typeof(Synapse.Gui.ViewEssential), "title-min-size", out tmin);
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "description-size", out dmax);
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "description-min-size", out dmin);
       
       icon_container.scale_size = icon_size;
       container.set_size_request (width, -1);
       spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
       focus_label.size = SmartLabel.string_to_size (tmax);
       focus_label.min_size = SmartLabel.string_to_size (tmin);
-      description_label.size = SmartLabel.string_to_size (dmax);
-      description_label.min_size = SmartLabel.string_to_size (dmin);
     }
     
     private NamedIcon source_icon;
@@ -120,11 +116,7 @@ namespace Synapse.Gui
       focus_label.set_ellipsize (Pango.EllipsizeMode.END);
       focus_label.size = SmartLabel.Size.LARGE;
       focus_label.min_size = SmartLabel.Size.MEDIUM;
-      focus_label.set_state (StateType.SELECTED);
-      description_label = new SmartLabel ();
-      description_label.size = SmartLabel.Size.SMALL;
-      description_label.set_animation_enabled (true);
-      description_label.set_state (StateType.SELECTED);
+      focus_label.xpad = 3;
       
       /* Categories - Throbber and menu */ //#0C71D6
       var categories_hbox = new HBox (false, 0);
@@ -139,11 +131,12 @@ namespace Synapse.Gui
       categories_hbox.pack_start (menuthrobber, false);
 
       var vb = new VBox (false, 0);
-      vb.pack_end (description_label, false);
-      vb.pack_end (focus_label, false);
-      var hsep = new Gtk.HSeparator ();
-      hsep.set_size_request (-1, 2);
-      vb.pack_end (hsep, false, true, 3);
+      // vb.pack_end (description_label, false);
+      var fi = new FakeInput ();
+      fi.border_radius = 5;
+      fi.border_width = 5;
+      fi.add (focus_label);
+      vb.pack_end (fi, false, false, 2);
       vb.pack_end (categories_hbox, false);
 
       flag_selector.selected_markup = "<span size=\"small\"><b>%s</b></span>";
@@ -267,25 +260,18 @@ namespace Synapse.Gui
         if (controller.is_in_initial_state ())
         {
           focus_label.set_text (controller.TYPE_TO_SEARCH);
-          description_label.set_text (controller.DOWN_TO_SEE_RECENT);
         }
         else if (controller.is_searching_for_recent ())
         {
           focus_label.set_text ("");
-          description_label.set_text (controller.NO_RECENT_ACTIVITIES);
         }
         else
         {
           focus_label.set_text (this.model.query[model.searching_for]);
-          if (this.menuthrobber.active)
-            description_label.set_text (controller.SEARCHING);
-          else
-            description_label.set_text (controller.NO_RESULTS);
         }
       }
       else
       {
-        description_label.set_text (Utils.get_printable_description (focus.value));
         focus_label.set_markup (Utils.markup_string_with_search (focus.value.title, this.model.query[model.searching_for], ""));
       }
       switch (model.searching_for)
