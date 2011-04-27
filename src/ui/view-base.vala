@@ -198,6 +198,13 @@ namespace Synapse
     public override void style_set (Gtk.Style? old)
     {
       base.style_set (old);
+      string dmax, dmin;
+      this.style.get (typeof(Synapse.Gui.ViewEssential), "description-size", out dmax);
+      this.style.get (typeof(Synapse.Gui.ViewEssential), "description-min-size", out dmin);
+      flag_selector.selected_markup = "<span size=\"%s\"><b>%s</b></span>".printf (
+                                                      SmartLabel.size_to_string[SmartLabel.string_to_size (dmax)], "%s");
+      flag_selector.unselected_markup = "<span size=\"%s\">%s</span>".printf (
+                                                      SmartLabel.size_to_string[SmartLabel.string_to_size (dmin)], "%s");
       this.bg_cache.clear ();
       update_border_and_shadow ();
     }

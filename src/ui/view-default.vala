@@ -51,6 +51,10 @@ namespace Synapse.Gui
       focus_label.min_size = SmartLabel.string_to_size (tmin);
       description_label.size = SmartLabel.string_to_size (dmax);
       description_label.min_size = SmartLabel.string_to_size (dmin);
+      ldescription_label.size = SmartLabel.string_to_size (dmax);
+      ldescription_label.min_size = SmartLabel.string_to_size (dmin);
+      adescription_label.size = SmartLabel.string_to_size (dmax);
+      adescription_label.min_size = SmartLabel.string_to_size (dmin);
     }
     
     private NamedIcon source_icon;
@@ -59,6 +63,8 @@ namespace Synapse.Gui
     
     private SmartLabel focus_label;
     private SmartLabel description_label;
+    private SmartLabel ldescription_label;
+    private SmartLabel adescription_label;
     
     private SchemaContainer icon_container;
     
@@ -91,27 +97,27 @@ namespace Synapse.Gui
       icon_container.add (action_icon);
       icon_container.add (target_icon);
       var schema = new SchemaContainer.Schema (); // searcing for sources
-      schema.add_allocation ({ 30, 0, 100, 100 });
-      schema.add_allocation ({ 0, 50, 50, 50 });
+      schema.add_allocation ({ 0, 0, 100, 100 });
+      schema.add_allocation ({ 80, 50, 50, 50 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // searcing for sources with target
-      schema.add_allocation ({ 30, 0, 100, 100 });
-      schema.add_allocation ({ 0, 50, 50, 50 });
-      schema.add_allocation ({ 0, 0, 50, 50 });
+      schema.add_allocation ({ 0, 0, 100, 100 });
+      schema.add_allocation ({ 80, 50, 50, 50 });
+      schema.add_allocation ({ 80, 0, 50, 50 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // searching for actions, but no target
-      schema.add_allocation ({ 0, 50, 50, 50 });
-      schema.add_allocation ({ 30, 0, 100, 100 });
+      schema.add_allocation ({ 80, 50, 50, 50 });
+      schema.add_allocation ({ 0, 0, 100, 100 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // searching for actions, with target
-      schema.add_allocation ({ 0, 50, 50, 50 });
-      schema.add_allocation ({ 30, 0, 100, 100 });
-      schema.add_allocation ({ 0, 0, 50, 50 });
+      schema.add_allocation ({ 80, 50, 50, 50 });
+      schema.add_allocation ({ 0, 0, 100, 100 });
+      schema.add_allocation ({ 80, 0, 50, 50 });
       icon_container.add_schema (schema);
       schema = new SchemaContainer.Schema (); // searching for target
-      schema.add_allocation ({ 0, 50, 50, 50 });
-      schema.add_allocation ({ 0, 0, 50, 50 });
-      schema.add_allocation ({ 30, 0, 100, 100 });
+      schema.add_allocation ({ 80, 50, 50, 50 });
+      schema.add_allocation ({ 80, 0, 50, 50 });
+      schema.add_allocation ({ 0, 0, 100, 100 });
       icon_container.add_schema (schema);
       
       icon_container.show ();
@@ -125,6 +131,16 @@ namespace Synapse.Gui
       description_label.size = SmartLabel.Size.SMALL;
       description_label.set_animation_enabled (true);
       description_label.set_state (StateType.SELECTED);
+      ldescription_label = new SmartLabel ();
+      ldescription_label.xalign = 1.0f;
+      ldescription_label.size = SmartLabel.Size.SMALL;
+      ldescription_label.set_animation_enabled (true);
+      ldescription_label.set_state (StateType.SELECTED);
+      ldescription_label.set_ellipsize (Pango.EllipsizeMode.START);
+      adescription_label = new SmartLabel ();
+      adescription_label.xalign = 1.0f;
+      adescription_label.size = SmartLabel.Size.SMALL;
+      adescription_label.set_state (StateType.SELECTED);
       
       /* Categories - Throbber and menu */ //#0C71D6
       var categories_hbox = new HBox (false, 0);
@@ -145,6 +161,15 @@ namespace Synapse.Gui
       hsep.set_size_request (-1, 2);
       vb.pack_end (hsep, false, true, 3);
       vb.pack_end (categories_hbox, false);
+      
+      var sensitive = new SensitiveWidget (icon_container);
+      this.make_draggable (sensitive);
+      var lvb = new VBox (false, 0);
+      lvb.pack_start (sensitive, false);
+      var lhb = new HBox (false, 10);
+      lhb.pack_end (adescription_label, false);
+      lhb.pack_end (ldescription_label);
+      lvb.pack_start (lhb, false);
 
       flag_selector.selected_markup = "<span size=\"small\"><b>%s</b></span>";
       flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
@@ -152,9 +177,8 @@ namespace Synapse.Gui
       
       /* Top Container */
       var hb = new HBox (false, 5);
-      var sensitive = new SensitiveWidget (icon_container);
-      this.make_draggable (sensitive);
-      hb.pack_start (sensitive, false);
+      
+      hb.pack_start (lvb, false);
       hb.pack_start (vb, true);
       
       container.pack_start (hb, false);
@@ -288,6 +312,7 @@ namespace Synapse.Gui
         description_label.set_text (Utils.get_printable_description (focus.value));
         focus_label.set_markup (Utils.markup_string_with_search (focus.value.title, this.model.query[model.searching_for], ""));
       }
+
       switch (model.searching_for)
       {
         case SearchingFor.SOURCES:
@@ -301,6 +326,11 @@ namespace Synapse.Gui
             icon_container.select_schema (0);
           }
           icon_container.set_render_order ({2, 0, 1});
+          if (model.focus[SearchingFor.ACTIONS].value != null)
+            ldescription_label.set_text (model.focus[SearchingFor.ACTIONS].value.title);
+          else
+            ldescription_label.set_text ("");
+          adescription_label.visible = false;
           break;
         case SearchingFor.ACTIONS:
           if (model.needs_target ())
@@ -313,11 +343,16 @@ namespace Synapse.Gui
           }
           icon_container.set_render_order ({0, 2, 1});
           flag_selector.sensitive = true;
+          ldescription_label.set_text (model.focus[SearchingFor.SOURCES].value.title);
+          adescription_label.visible = false;
           break;
         default: //case SearchingFor.TARGETS:
           icon_container.select_schema (4);
           icon_container.set_render_order ({2, 0, 1});
           flag_selector.sensitive = false;
+          ldescription_label.set_text (model.focus[SearchingFor.SOURCES].value.title);
+          //adescription_label.visible = true;
+          adescription_label.set_text (model.focus[SearchingFor.ACTIONS].value.title);
           break;
       }
     }

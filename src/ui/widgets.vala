@@ -53,7 +53,7 @@ namespace Synapse.Gui
 
   public class SmartLabel : Gtk.Misc
   {
-    protected static string[] size_to_string = {
+    public static string[] size_to_string = {
       "xx-small",
       "x-small",
       "small",
@@ -180,15 +180,13 @@ namespace Synapse.Gui
       offset = 0;
     }
     
+    int _anim_width = 0;
     private void start_animation ()
     {
       if (tid != 0) return;
 
-      int width, height;
-      layout.get_pixel_size (out width, out height);
-      width += SPACING;
       tid = Timeout.add (40, ()=>{
-        offset = (offset - 1) % width;
+        offset = (offset - 1) % (_anim_width);
         queue_draw ();
         return true;
       });
@@ -296,7 +294,10 @@ namespace Synapse.Gui
       Pango.cairo_show_layout (ctx, layout);
       
       width += SPACING;
-      if (animate && tid != 0 && (offset + width) < w)
+      _anim_width = width;
+      int rotate = (offset + width);
+      if (rtl) rotate = offset;
+      if (animate && tid != 0 && rotate < w)
       {
         ctx.translate (width, 0);
         Pango.cairo_show_layout (ctx, layout);
