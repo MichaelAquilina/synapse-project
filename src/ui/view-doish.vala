@@ -31,18 +31,29 @@ namespace Synapse.Gui
       
     }
     
+    static construct
+    {
+      /* Override here style properties */
+      var icon_size = new GLib.ParamSpecInt ("icon-size",
+                                             "Icon Size",
+                                             "The size of focused icon in supported themes",
+                                             32, 256, 128,
+                                             GLib.ParamFlags.READWRITE);
+      install_style_property (icon_size);
+    }
+    
     public override void style_set (Gtk.Style? old)
     {
       base.style_set (old);
 
       int spacing, icon_size;
       string tmax, tmin, dmax, dmin;
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "pane-spacing", out spacing);
+      this.style.get (typeof(Synapse.Gui.View), "pane-spacing", out spacing);
       this.style.get (typeof(Synapse.Gui.ViewDoish), "icon-size", out icon_size);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "title-size", out tmax);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "title-min-size", out tmin);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "description-size", out dmax);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "description-min-size", out dmin);
+      this.style.get (typeof(Synapse.Gui.View), "title-size", out tmax);
+      this.style.get (typeof(Synapse.Gui.View), "title-min-size", out tmin);
+      this.style.get (typeof(Synapse.Gui.View), "description-size", out dmax);
+      this.style.get (typeof(Synapse.Gui.View), "description-min-size", out dmin);
       
       sp1.set_size_request (spacing, -1);
       sp2.set_size_request (spacing, -1);

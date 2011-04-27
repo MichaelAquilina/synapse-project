@@ -59,61 +59,64 @@ namespace Synapse
                                                  "Border Radius",
                                                  "Border Radius of Synapse window",
                                                  0, 50, 10,
-                                                 GLib.ParamFlags.READABLE);
+                                                 GLib.ParamFlags.READWRITE);
       var shadow_size = new GLib.ParamSpecInt ("shadow-size",
                                                "Shadow Size",
                                                "Shadow size of Synapse window",
                                                0, 50, 10,
-                                               GLib.ParamFlags.READABLE);
+                                               GLib.ParamFlags.READWRITE);
 
       var width = new GLib.ParamSpecInt ("ui-width",
                                          "Width",
                                          "The width of the content in supported themes",
                                          0, 1024, 560,
-                                         GLib.ParamFlags.READABLE);
+                                         GLib.ParamFlags.READWRITE);
+
       var spacing = new GLib.ParamSpecInt ("pane-spacing",
                                              "Pane Spacing",
                                              "The space between panes in supported themes",
                                              5, 100, 30,
-                                             GLib.ParamFlags.READABLE);
+                                             GLib.ParamFlags.READWRITE);
 
       var icon_size = new GLib.ParamSpecInt ("icon-size",
                                              "Icon Size",
                                              "The size of focused icon in supported themes",
                                              32, 256, 96,
-                                             GLib.ParamFlags.READABLE);
+                                             GLib.ParamFlags.READWRITE);
+
       var title_max = new GLib.ParamSpecString ("title-size",
                                                 "Title Font Size",
                                                 "The standard size the match title in Pango absolute sizes (string)",
                                                 "large",
-                                                GLib.ParamFlags.READABLE);
+                                                GLib.ParamFlags.READWRITE);
       var title_min = new GLib.ParamSpecString ("title-min-size",
                                                 "Title minimum Font Size",
                                                 "The minimum size the match title in Pango absolute sizes (string)",
                                                 "medium",
-                                                GLib.ParamFlags.READABLE);
+                                                GLib.ParamFlags.READWRITE);
       var descr_max = new GLib.ParamSpecString ("description-size",
                                                 "Description Font Size",
                                                 "The standard size the match description in Pango absolute sizes (string)",
                                                 "small",
-                                                GLib.ParamFlags.READABLE);
+                                                GLib.ParamFlags.READWRITE);
       var descr_min = new GLib.ParamSpecString ("description-min-size",
                                                 "Description minimum Font Size",
                                                 "The minimum size the match description in Pango absolute sizes (string)",
                                                 "small",
-                                                GLib.ParamFlags.READABLE);
+                                                GLib.ParamFlags.READWRITE);
       var cat_max = new GLib.ParamSpecString ("selected-category-size",
                                                 "Selected Category Font Size",
                                                 "Font size of selected category in Pango absolute sizes (string)",
                                                 "small",
-                                                GLib.ParamFlags.READABLE);
+                                                GLib.ParamFlags.READWRITE);
       var cat_min = new GLib.ParamSpecString ("unselected-category-size",
                                                 "Unselected Category Font Size",
                                                 "Font size of unselected categories in Pango absolute sizes (string)",
                                                 "x-small",
-                                                GLib.ParamFlags.READABLE);
+                                                GLib.ParamFlags.READWRITE);
       
       install_style_property (width);
+      install_style_property (spacing);
       install_style_property (icon_size);
       install_style_property (title_max);
       install_style_property (title_min);
