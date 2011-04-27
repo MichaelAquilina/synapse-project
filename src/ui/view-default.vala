@@ -158,7 +158,6 @@ namespace Synapse.Gui
       vb.pack_end (description_label, false);
       vb.pack_end (focus_label, false);
       var hsep = new Gtk.HSeparator ();
-      hsep.set_size_request (-1, 2);
       vb.pack_end (hsep, false, true, 3);
       vb.pack_end (categories_hbox, false);
       

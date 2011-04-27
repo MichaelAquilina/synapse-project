@@ -93,14 +93,24 @@ namespace Synapse
                                                 "medium",
                                                 GLib.ParamFlags.READABLE);
       var descr_max = new GLib.ParamSpecString ("description-size",
-                                                "Title Font Size",
-                                                "The standard size the match title in Pango absolute sizes (string)",
+                                                "Description Font Size",
+                                                "The standard size the match description in Pango absolute sizes (string)",
                                                 "small",
                                                 GLib.ParamFlags.READABLE);
       var descr_min = new GLib.ParamSpecString ("description-min-size",
-                                                "Title minimum Font Size",
-                                                "The minimum size the match title in Pango absolute sizes (string)",
+                                                "Description minimum Font Size",
+                                                "The minimum size the match description in Pango absolute sizes (string)",
                                                 "small",
+                                                GLib.ParamFlags.READABLE);
+      var cat_max = new GLib.ParamSpecString ("selected-category-size",
+                                                "Selected Category Font Size",
+                                                "Font size of selected category in Pango absolute sizes (string)",
+                                                "small",
+                                                GLib.ParamFlags.READABLE);
+      var cat_min = new GLib.ParamSpecString ("unselected-category-size",
+                                                "Unselected Category Font Size",
+                                                "Font size of unselected categories in Pango absolute sizes (string)",
+                                                "x-small",
                                                 GLib.ParamFlags.READABLE);
       
       install_style_property (width);
@@ -109,6 +119,8 @@ namespace Synapse
       install_style_property (title_min);
       install_style_property (descr_max);
       install_style_property (descr_min);
+      install_style_property (cat_max);
+      install_style_property (cat_min);
       install_style_property (border_radius);
       install_style_property (shadow_size);
     }
@@ -199,8 +211,8 @@ namespace Synapse
     {
       base.style_set (old);
       string dmax, dmin;
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "description-size", out dmax);
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "description-min-size", out dmin);
+      this.style.get (typeof(Synapse.Gui.ViewEssential), "selected-category-size", out dmax);
+      this.style.get (typeof(Synapse.Gui.ViewEssential), "unselected-category-size", out dmin);
       flag_selector.selected_markup = "<span size=\"%s\"><b>%s</b></span>".printf (
                                                       SmartLabel.size_to_string[SmartLabel.string_to_size (dmax)], "%s");
       flag_selector.unselected_markup = "<span size=\"%s\">%s</span>".printf (
