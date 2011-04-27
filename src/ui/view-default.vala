@@ -126,11 +126,12 @@ namespace Synapse.Gui
       focus_label.set_ellipsize (Pango.EllipsizeMode.END);
       focus_label.size = SmartLabel.Size.LARGE;
       focus_label.min_size = SmartLabel.Size.MEDIUM;
-      focus_label.set_state (StateType.SELECTED);
+      focus_label.xpad = 3;
       description_label = new SmartLabel ();
       description_label.size = SmartLabel.Size.SMALL;
       description_label.set_animation_enabled (true);
       description_label.set_state (StateType.SELECTED);
+      description_label.xpad = 8;
       ldescription_label = new SmartLabel ();
       ldescription_label.xalign = 1.0f;
       ldescription_label.size = SmartLabel.Size.SMALL;
@@ -156,9 +157,11 @@ namespace Synapse.Gui
 
       var vb = new VBox (false, 0);
       vb.pack_end (description_label, false);
-      vb.pack_end (focus_label, false);
-      var hsep = new Gtk.HSeparator ();
-      vb.pack_end (hsep, false, true, 3);
+      var fi = new FakeInput ();
+      fi.border_radius = 5;
+      fi.border_width = 5;
+      fi.add (focus_label);
+      vb.pack_end (fi, false, false, 5);
       vb.pack_end (categories_hbox, false);
       
       var sensitive = new SensitiveWidget (icon_container);
