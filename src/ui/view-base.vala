@@ -81,7 +81,7 @@ namespace Synapse
       var icon_size = new GLib.ParamSpecInt ("icon-size",
                                              "Icon Size",
                                              "The size of focused icon in supported themes",
-                                             32, 256, 96,
+                                             32, 256, 128,
                                              GLib.ParamFlags.READWRITE);
 
       var title_max = new GLib.ParamSpecString ("title-size",
