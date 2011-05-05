@@ -249,7 +249,8 @@ namespace Synapse.Gui
   {
     /* Animation stuffs */
     private uint tid;
-    private static const int ANIM_TIMEOUT = 1000 / 26;
+    private static const int ANIM_TIMEOUT = 1000 / 30;
+    private static const int ANIM_STEPS = 180 / ANIM_TIMEOUT;
     public bool animation_enabled {
       get; set; default = true;
     }
@@ -259,6 +260,9 @@ namespace Synapse.Gui
 
     private int soffset; //current selection offset
     private int tsoffset; //target selection offset
+    
+    private int astep; // animation step for offset
+    private int sstep; // animation step for selection
     
     private int row_height; //fixed row height (usually icon_size + 4)
 
@@ -437,6 +441,7 @@ namespace Synapse.Gui
       this.visible_window = false;
       this.offset = this.toffset = 0;
       this.soffset = this.tsoffset = 0;
+      this.astep = this.sstep = 1;
       this.goto_index = 0;
       this.select_index = -1;
       this.row_height = renderer.get_row_height_request ();
@@ -508,32 +513,40 @@ namespace Synapse.Gui
       }
       if (inhibit_move) return false;
       bool needs_animation = false;
+      /* Offset animation */
       if (this.offset != this.toffset)
       {
         needs_animation = true;
-        int inc = (int) Math.fabs (this.toffset - this.offset);
-        if (inc < 4)
+        int diff = (int)Math.fabs (this.offset - this.toffset);
+        if (this.astep > 0)
         {
-          this.offset = this.toffset;
+          if (diff < this.astep)
+          {
+            this.offset = this.toffset;
+          }
+          else
+          {
+            this.offset += this.offset < this.toffset ? this.astep : - this.astep;
+          }
         }
         else
         {
-          inc = int.max (1, inc >> 1);
-          this.offset += this.toffset > this.offset ? inc : - inc;
+          diff = int.max (1, diff >> 2);
+          this.offset += this.toffset > this.offset ? diff : - diff;
         }
       }
+      /* Selection animation */
       if (this.soffset != this.tsoffset && this.selection_enabled)
       {
         needs_animation = true;
-        int inc = (int) Math.fabs (this.tsoffset - this.soffset);
-        if (inc < 4)
+        int diff = (int)Math.fabs (this.soffset - this.tsoffset);
+        if (diff < this.sstep)
         {
           this.soffset = this.tsoffset;
         }
         else
         {
-          inc = int.max (1, inc >> 1);
-          this.soffset += this.tsoffset > this.soffset ? inc : - inc;
+          this.soffset += this.soffset < this.tsoffset ? this.sstep : - this.sstep;
         }
       }
       if (needs_animation)
@@ -575,6 +588,13 @@ namespace Synapse.Gui
       }
       // update also selection
       this.tsoffset = this.select_index * this.row_height - this.toffset;
+      int diff = (int) Math.fabs (this.toffset - this.offset);
+      if (diff < this.row_height * 3)
+        this.astep = int.max (1, diff / ANIM_STEPS );
+      else // use special animation if the diff is too much
+        this.astep = -1;
+      this.sstep = int.max (1, (int) (Math.fabs (this.tsoffset - this.soffset) / ANIM_STEPS ));
+      
       update_current_offsets ();
     }
     
