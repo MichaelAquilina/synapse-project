@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-07 15:37+0200\n"
+"POT-Creation-Date: 2011-05-05 16:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -26,86 +27,74 @@ msgid "Synapse"
 msgstr ""
 
 #. activate has to stay in first position!
-#: ../src/ui/synapse-main.vala:101 ../src/ui/settings.vala:244
+#: ../src/ui/synapse-main.vala:105 ../src/ui/settings.vala:243
 msgid "Activate"
 msgstr ""
 
-#: ../src/ui/cairo-gtk-virgilio.vala:385 ../src/ui/cairo-gtk-virgilio.vala:404
-#: ../src/ui/widgets-matchlistview.vala:848
-#, c-format
-msgid "<b>%d of %d</b>"
-msgstr ""
-
-#: ../src/ui/cairo-gtk-virgilio.vala:417 ../src/ui/cairo-gtk-virgilio.vala:451
-#: ../src/ui/widgets-matchlistview.vala:842
-#, c-format
-msgid "<b>1 of %d</b>"
-msgstr ""
-
-#: ../src/ui/ui-interface.vala:31 ../src/ui/ui-interface.vala:72
-#: ../src/ui/ui-interface.vala:134
+#: ../src/ui/category.vala:31 ../src/ui/category.vala:72
+#: ../src/ui/category.vala:134
 msgid "All"
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:69 ../src/ui/ui-interface.vala:111
+#: ../src/ui/category.vala:69 ../src/ui/category.vala:111
 msgid "Actions"
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:70 ../src/ui/ui-interface.vala:113
+#: ../src/ui/category.vala:70 ../src/ui/category.vala:113
 msgid "Audio"
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:71 ../src/ui/ui-interface.vala:114
+#: ../src/ui/category.vala:71 ../src/ui/category.vala:114
 msgid "Applications"
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:73 ../src/ui/ui-interface.vala:115
+#: ../src/ui/category.vala:73 ../src/ui/category.vala:115
 msgid "Documents"
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:74 ../src/ui/ui-interface.vala:116
+#: ../src/ui/category.vala:74 ../src/ui/category.vala:116
 msgid "Images"
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:75 ../src/ui/ui-interface.vala:117
+#: ../src/ui/category.vala:75 ../src/ui/category.vala:117
 msgid "Video"
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:76 ../src/ui/ui-interface.vala:118
+#: ../src/ui/category.vala:76 ../src/ui/category.vala:118
 msgid "Internet"
 msgstr ""
 
 #. _labels.set (QueryFlags.ALL, _("All")); // Do not remove!
-#: ../src/ui/ui-interface.vala:110
+#: ../src/ui/category.vala:110
 msgid "Include remote content"
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:112
+#: ../src/ui/category.vala:112
 msgid "Folders"
 msgstr ""
 
 #. _labels.set (QueryFlags.FILES, _("Files"));
-#: ../src/ui/ui-interface.vala:120
+#: ../src/ui/category.vala:120
 msgid "Uncategorized"
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:674
+#: ../src/ui/controller.vala:30
 msgid "Searching..."
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:675
+#: ../src/ui/controller.vala:31
 msgid "No results found."
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:676
+#: ../src/ui/controller.vala:32
 msgid "No recent activities found."
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:677
+#: ../src/ui/controller.vala:33
 msgid "Type to search..."
 msgstr ""
 
-#: ../src/ui/ui-interface.vala:775
+#: ../src/ui/controller.vala:494
 msgid "...or press down key to browse recent activities"
 msgstr ""
 
@@ -125,11 +114,11 @@ msgstr ""
 msgid "About this plugin"
 msgstr ""
 
-#: ../src/ui/settings.vala:72 ../src/ui/settings.vala:211
+#: ../src/ui/settings.vala:72 ../src/ui/settings.vala:210
 msgid "Configure plugin"
 msgstr ""
 
-#: ../src/ui/settings.vala:88 ../src/ui/settings.vala:463
+#: ../src/ui/settings.vala:88 ../src/ui/settings.vala:462
 msgid "Disabled"
 msgstr ""
 
@@ -146,165 +135,179 @@ msgid "Default"
 msgstr ""
 
 #: ../src/ui/settings.vala:169
-msgid "Mini"
+msgid "Essential"
 msgstr ""
 
 #: ../src/ui/settings.vala:170
-msgid "Dual"
+msgid "Doish"
 msgstr ""
 
 #: ../src/ui/settings.vala:171
-msgid "Virgilio"
+msgid "Side Doish"
 msgstr ""
 
-#: ../src/ui/settings.vala:172
-msgid "Do-ish"
-msgstr ""
-
-#: ../src/ui/settings.vala:245
+#: ../src/ui/settings.vala:244
 msgid "Execute"
 msgstr ""
 
-#: ../src/ui/settings.vala:246
+#: ../src/ui/settings.vala:245
 msgid "Execute without hiding"
 msgstr ""
 
-#: ../src/ui/settings.vala:247
+#: ../src/ui/settings.vala:246
 msgid "Alternative Delete"
 msgstr ""
 
-#: ../src/ui/settings.vala:248
+#: ../src/ui/settings.vala:247
 msgid "Next Result"
 msgstr ""
 
-#: ../src/ui/settings.vala:249
+#: ../src/ui/settings.vala:248
 msgid "Previous Result"
 msgstr ""
 
-#: ../src/ui/settings.vala:250
+#: ../src/ui/settings.vala:249
 msgid "First Result"
 msgstr ""
 
-#: ../src/ui/settings.vala:251
+#: ../src/ui/settings.vala:250
 msgid "Last Result"
 msgstr ""
 
-#: ../src/ui/settings.vala:252
+#: ../src/ui/settings.vala:251
 msgid "Next 5 Results"
 msgstr ""
 
-#: ../src/ui/settings.vala:253
+#: ../src/ui/settings.vala:252
 msgid "Previous 5 Results"
 msgstr ""
 
-#: ../src/ui/settings.vala:254
+#: ../src/ui/settings.vala:253
 msgid "Next Category"
 msgstr ""
 
-#: ../src/ui/settings.vala:255
+#: ../src/ui/settings.vala:254
 msgid "Previous Category"
 msgstr ""
 
-#: ../src/ui/settings.vala:256
+#: ../src/ui/settings.vala:255
 msgid "Next Pane"
 msgstr ""
 
-#: ../src/ui/settings.vala:257
+#: ../src/ui/settings.vala:256
 msgid "Previous Pane"
 msgstr ""
 
-#: ../src/ui/settings.vala:258
+#: ../src/ui/settings.vala:257
 msgid "Paste"
 msgstr ""
 
-#: ../src/ui/settings.vala:272
+#: ../src/ui/settings.vala:271
 msgid "Shortcut already in use"
 msgstr ""
 
-#: ../src/ui/settings.vala:298
+#: ../src/ui/settings.vala:297
 msgid "General"
 msgstr ""
 
-#: ../src/ui/settings.vala:299
+#: ../src/ui/settings.vala:298
 msgid "Plugins"
 msgstr ""
 
-#: ../src/ui/settings.vala:305
+#: ../src/ui/settings.vala:304
 msgid "Behavior & Look"
 msgstr ""
 
-#: ../src/ui/settings.vala:317
+#: ../src/ui/settings.vala:316
 msgid "Theme:"
 msgstr ""
 
 #. Autostart checkbox
-#: ../src/ui/settings.vala:322
+#: ../src/ui/settings.vala:321
 msgid "Startup on login"
 msgstr ""
 
 #. Notification icon
-#: ../src/ui/settings.vala:328
+#: ../src/ui/settings.vala:327
 msgid "Show notification icon"
 msgstr ""
 
-#: ../src/ui/settings.vala:343
+#: ../src/ui/settings.vala:342
 msgid "Shortcuts"
 msgstr ""
 
-#: ../src/ui/settings.vala:365
+#: ../src/ui/settings.vala:364
 msgid "Action"
 msgstr ""
 
-#: ../src/ui/settings.vala:402
+#: ../src/ui/settings.vala:401
 msgid "Shortcut"
 msgstr ""
 
-#: ../src/ui/settings.vala:421
+#: ../src/ui/settings.vala:420
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr ""
 
-#: ../src/ui/widgets-matchlistview.vala:827
-#: ../src/ui/widgets-matchlistview.vala:840
+#: ../src/ui/widgets-matchlistview.vala:894
+#: ../src/ui/widgets-matchlistview.vala:908
 msgid "No results."
 msgstr ""
 
-#: ../src/core/common-actions.vala:68
+#: ../src/ui/widgets-matchlistview.vala:913
+#, c-format
+msgid "<b>1 of %d</b>"
+msgstr ""
+
+#: ../src/ui/widgets-matchlistview.vala:921
+#, c-format
+msgid "<b>%d of %d</b>"
+msgstr ""
+
+#: ../src/ui/utils.vala:111
+msgid "Home"
+msgstr ""
+
+#: ../src/ui/utils.vala:115
+msgid "Root"
+msgstr ""
+
+#: ../src/core/common-actions.vala:77
 msgid "Run"
 msgstr ""
 
-#: ../src/core/common-actions.vala:69
+#: ../src/core/common-actions.vala:78
 msgid "Run an application, action or script"
 msgstr ""
 
-#: ../src/core/common-actions.vala:123
+#: ../src/core/common-actions.vala:132
 msgid "Run in Terminal"
 msgstr ""
 
-#: ../src/core/common-actions.vala:124
+#: ../src/core/common-actions.vala:133
 msgid "Run application or command in terminal"
 msgstr ""
 
-#: ../src/core/common-actions.vala:171
+#: ../src/core/common-actions.vala:180
 msgid "Open"
 msgstr ""
 
-#: ../src/core/common-actions.vala:172
+#: ../src/core/common-actions.vala:181
 msgid "Open using default application"
 msgstr ""
 
-#: ../src/core/common-actions.vala:241
+#: ../src/core/common-actions.vala:250
 msgid "Open folder"
 msgstr ""
 
-#: ../src/core/common-actions.vala:242
+#: ../src/core/common-actions.vala:251
 msgid "Open folder containing this file"
 msgstr ""
 
-#: ../src/core/common-actions.vala:281
+#: ../src/core/common-actions.vala:290
 msgid "Copy to Clipboard"
 msgstr ""
 
-#: ../src/core/common-actions.vala:282
+#: ../src/core/common-actions.vala:291
 msgid "Copy selection to clipboard"
 msgstr ""
 
@@ -382,6 +385,30 @@ msgstr ""
 msgid "bc is not installed"
 msgstr ""
 
+#: ../src/plugins/chat-actions-plugin.vala:42
+msgid "Open chat"
+msgstr ""
+
+#: ../src/plugins/chat-actions-plugin.vala:43
+msgid "Open a chat with selected contact"
+msgstr ""
+
+#: ../src/plugins/chat-actions-plugin.vala:66
+msgid "Send a message"
+msgstr ""
+
+#: ../src/plugins/chat-actions-plugin.vala:67
+msgid "Send a message to the contact"
+msgstr ""
+
+#: ../src/plugins/chat-actions-plugin.vala:100
+msgid "Chat actions"
+msgstr ""
+
+#: ../src/plugins/chat-actions-plugin.vala:101
+msgid "Open chat, or send a message with your favorite IM"
+msgstr ""
+
 #: ../src/plugins/command-plugin.vala:56
 msgid "Run command"
 msgstr ""
@@ -440,6 +467,32 @@ msgstr ""
 msgid "Open commonly used directories."
 msgstr ""
 
+#: ../src/plugins/file-op-plugin.vala:77
+msgid "Rename to"
+msgstr ""
+
+#: ../src/plugins/file-op-plugin.vala:78
+msgid "Rename the file to..."
+msgstr ""
+
+#: ../src/plugins/file-op-plugin.vala:95 ../src/plugins/pidgin-plugin.vala:186
+#, c-format
+msgid "File \"%s\"does not exist."
+msgstr ""
+
+#: ../src/plugins/file-op-plugin.vala:107
+#, c-format
+msgid "Cannot move \"%s\" to \"%s\""
+msgstr ""
+
+#: ../src/plugins/file-op-plugin.vala:137
+msgid "File Operations"
+msgstr ""
+
+#: ../src/plugins/file-op-plugin.vala:138
+msgid "Copy, Cut, Paste and Delete files"
+msgstr ""
+
 #: ../src/plugins/gnome-screensaver-plugin.vala:60
 msgid "Lock Screen"
 msgstr ""
@@ -460,35 +513,43 @@ msgstr ""
 msgid "Improve results returned by the Zeitgeist plugin by looking "
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:50
+#: ../src/plugins/imgur-plugin.vala:51
 msgid "Upload to imgur"
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:51
+#: ../src/plugins/imgur-plugin.vala:52
 msgid "Upload selection to imgur image sharer"
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:163
+#: ../src/plugins/imgur-plugin.vala:164
 #: ../src/plugins/pastebin-plugin.vala:152
 msgid ""
 "The selection was successfully uploaded and its URL was copied to clipboard."
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:167
+#: ../src/plugins/imgur-plugin.vala:168
 #: ../src/plugins/pastebin-plugin.vala:156
 msgid ""
 "An error occurred during upload, please check the log for more information."
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:175
+#: ../src/plugins/imgur-plugin.vala:176
 msgid "Synapse - Imgur"
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:231
+#: ../src/plugins/imgur-plugin.vala:232
+msgid "Upload to imgur to contact.."
+msgstr ""
+
+#: ../src/plugins/imgur-plugin.vala:233
+msgid "Upload selection to imgur image sharer, and send the link to contact"
+msgstr ""
+
+#: ../src/plugins/imgur-plugin.vala:266
 msgid "Imgur"
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:232
+#: ../src/plugins/imgur-plugin.vala:267
 msgid "Share images using imgur."
 msgstr ""
 
@@ -567,11 +628,12 @@ msgid "Search using Google Maps"
 msgstr ""
 
 #: ../src/plugins/pastebin-plugin.vala:42
-#: ../src/plugins/pastebin-plugin.vala:228
+#: ../src/plugins/pastebin-plugin.vala:262
 msgid "Pastebin"
 msgstr ""
 
 #: ../src/plugins/pastebin-plugin.vala:43
+#: ../src/plugins/pastebin-plugin.vala:229
 msgid "Pastebin selection"
 msgstr ""
 
@@ -579,12 +641,32 @@ msgstr ""
 msgid "Synapse - Pastebin"
 msgstr ""
 
-#: ../src/plugins/pastebin-plugin.vala:229
+#: ../src/plugins/pastebin-plugin.vala:228
+msgid "Pastebin to contact.."
+msgstr ""
+
+#: ../src/plugins/pastebin-plugin.vala:263
 msgid "Upload files to pastebin."
 msgstr ""
 
-#: ../src/plugins/pastebin-plugin.vala:233
+#: ../src/plugins/pastebin-plugin.vala:267
 msgid "Unable to find \"pastebinit\" program"
+msgstr ""
+
+#: ../src/plugins/pidgin-plugin.vala:78
+msgid "Get access to your Pidgin contacts"
+msgstr ""
+
+#: ../src/plugins/pidgin-plugin.vala:82
+msgid "Pidgin is not installed."
+msgstr ""
+
+#: ../src/plugins/pidgin-plugin.vala:95
+msgid "Send in chat to.."
+msgstr ""
+
+#: ../src/plugins/pidgin-plugin.vala:96
+msgid "Send selected file within Pidgin"
 msgstr ""
 
 #: ../src/plugins/rhythmbox-plugin.vala:86
