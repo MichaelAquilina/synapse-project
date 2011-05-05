@@ -30,17 +30,19 @@ namespace Synapse.Gui
     
     public static string markup_string_with_search (string text, string pattern, string size = "xx-large", bool show_not_found = false)
     {
-    	string _size = size;
+    	string markup = "%s";
     	if (size != "")
-    		_size = " size=\"%s\"".printf (size);
+    	{
+    	  markup = "<span size=\"%s\">%s</span>".printf (size, "%s");
+      }
       if (pattern == "")
       {
-        return "<span%s>%s</span>".printf (_size, Markup.escape_text(text));
+        return markup.printf (Markup.escape_text(text));
       }
       // if no text found, use pattern
       if (text == "")
       {
-        return "<span%s>%s</span>".printf (_size, Markup.escape_text(pattern));
+        return markup.printf (Markup.escape_text(pattern));
       }
 
       var matchers = Query.get_matchers_for_query (
@@ -75,14 +77,14 @@ namespace Synapse.Gui
       }
       if (highlighted != null)
       {
-        return "<span%s>%s</span>".printf (_size, highlighted);
+        return markup.printf (highlighted);
       }
       else
       {
       	if (show_not_found)
-      		return "<span%s>%s <small><small>(%s)</small></small></span>".printf (_size, Markup.escape_text(text), Markup.escape_text(pattern));
+      	  return markup.printf ("%s <small><small>(%s)</small></small>").printf (Markup.escape_text(text), Markup.escape_text(pattern));
        	else
-       		return "<span%s>%s</span>".printf (_size, Markup.escape_text(text));
+       		return markup.printf (Markup.escape_text(text));
       }
     }
     
@@ -94,17 +96,11 @@ namespace Synapse.Gui
       
       if (!m.uri.has_prefix("file://")) return m.uri; //fix only local files
       
-      unowned string? desc = m.get_data<string> ("printable-description");
-      if (desc != null) return desc; // already fixed
+      //unowned string? desc = m.get_data<string> ("printable-description");
+      //if (desc != null) return desc; // already fixed
 
       string desc_fixed = m.description;
       
-      /* // remove filename from path if the title is equal
-      if (m.description.has_suffix(m.title))
-      {
-        desc_fixed = m.description.substring (0, m.description.length - m.title.length);
-      } */
-
       if (home_directory == null)
     	{
     		home_directory = Environment.get_home_dir ();
@@ -123,7 +119,7 @@ namespace Synapse.Gui
     	string[] parts = Regex.split_simple ("/", desc_fixed);
     	desc_fixed = string.joinv (" > ", parts);
 
-    	m.set_data<string> ("printable-description", desc_fixed);
+    	//m.set_data<string> ("printable-description", desc_fixed);
 
     	return desc_fixed;
     }
@@ -143,6 +139,29 @@ namespace Synapse.Gui
         layout.get_context ().set_base_dir (Pango.Direction.LTR);
       }
       layout.context_changed ();
+    }
+    
+    public static void get_draw_position (out int x, out int y,
+                                          out int width, out int height,
+                                          Pango.Layout layout, bool rtl,
+                                          int area_width, int area_height,
+                                          float xalign, float yalign)
+    {
+      if (rtl) xalign = 1.0f - xalign;
+
+      Pango.Rectangle logical_rect;
+      layout.get_pixel_extents (null, out logical_rect);
+      
+      layout.get_pixel_size (out width, out height);
+      
+      y = (int) (yalign * (area_height - height));
+      x = (int) (xalign * (area_width - width));
+      
+      if (rtl)
+        x = int.min (x, area_width);
+      else
+        x = int.max (x, 0);
+      x -= logical_rect.x;
     }
     
     public static void make_transparent_bg (Gtk.Widget widget)
@@ -228,7 +247,27 @@ namespace Synapse.Gui
       if (b >= 0.5) b /= 4; else b = 1 - b / 4;
     }
     
-    private void cairo_rounded_rect (Cairo.Context ctx, double x, double y, double w, double h, double r)
+    public static void cairo_arrow (Cairo.Context ctx, bool rtl, double x, double y, double w, double h)
+    {
+      double xh = x + w / 2;
+      double yh = y + h / 2;
+      ctx.new_path ();
+      if (rtl)
+      {
+        ctx.move_to (x + w, y);
+        ctx.curve_to (xh, yh, xh, yh, x + w, y + h);
+        ctx.line_to (x, yh);
+      }
+      else
+      {
+        ctx.move_to (x, y);
+        ctx.curve_to (xh, yh, xh, yh, x, y + h);
+        ctx.line_to (x + w, yh);
+      }
+      ctx.close_path ();
+    }
+    
+    public static void cairo_rounded_rect (Cairo.Context ctx, double x, double y, double w, double h, double r)
     {
       double y2 = y+h, x2 = x+w;
       ctx.move_to (x, y2 - r);
@@ -238,7 +277,7 @@ namespace Synapse.Gui
       ctx.arc (x+r, y2-r, r, Math.PI * 0.5, Math.PI);
     }
     
-    private void add_shadow_stops (Cairo.Pattern pat, double r, double g, double b, double size, double alpha)
+    private static void add_shadow_stops (Cairo.Pattern pat, double r, double g, double b, double size, double alpha)
     {
       /* Let's make a nice shadow */
       pat.add_color_stop_rgba (1.0, r, g, b, 0);
@@ -249,7 +288,7 @@ namespace Synapse.Gui
       pat.add_color_stop_rgba (0.0, r, g, b, alpha);
     }
 
-    private void cairo_make_shadow_for_rect (Cairo.Context ctx, double x1, double y1, double w, double h, double rad,
+    public static void cairo_make_shadow_for_rect (Cairo.Context ctx, double x1, double y1, double w, double h, double rad,
                                              double r, double g, double b, double size)
     {
       if (size < 1) return;

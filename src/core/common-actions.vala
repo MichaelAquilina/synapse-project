@@ -39,11 +39,20 @@ namespace Synapse
       return default_relevancy;
     }
 
-    public abstract void do_execute (Match? match);
-    public void execute (Match? match)
+    public abstract void do_execute (Match? source, Match? target = null);
+    public void execute_with_target (Match? source, Match? target = null)
     {
-      do_execute (match);
-      if (notify_match) match.executed ();
+      do_execute (source, target);
+      if (notify_match) source.executed ();
+    }
+    
+    public virtual bool needs_target () {
+      return false;
+    }
+    
+    public virtual QueryFlags target_flags ()
+    {
+      return QueryFlags.ALL;
     }
   }
 
@@ -72,7 +81,7 @@ namespace Synapse
                 default_relevancy: Match.Score.EXCELLENT);
       }
 
-      public override void do_execute (Match? match)
+      public override void do_execute (Match? match, Match? target = null)
       {
         if (match.match_type == MatchType.APPLICATION)
         {
@@ -127,7 +136,7 @@ namespace Synapse
                 default_relevancy: Match.Score.BELOW_AVERAGE);
       }
 
-      public override void do_execute (Match? match)
+      public override void do_execute (Match? match, Match? target = null)
       {
         if (match.match_type == MatchType.APPLICATION)
         {
@@ -175,7 +184,7 @@ namespace Synapse
                 default_relevancy: Match.Score.GOOD);
       }
 
-      public override void do_execute (Match? match)
+      public override void do_execute (Match? match, Match? target = null)
       {
         UriMatch uri_match = match as UriMatch;
 
@@ -245,7 +254,7 @@ namespace Synapse
                 default_relevancy: Match.Score.AVERAGE);
       }
 
-      public override void do_execute (Match? match)
+      public override void do_execute (Match? match, Match? target = null)
       {
         UriMatch uri_match = match as UriMatch;
         return_if_fail (uri_match != null);
@@ -285,7 +294,7 @@ namespace Synapse
                 default_relevancy: Match.Score.AVERAGE);
       }
 
-      public override void do_execute (Match? match)
+      public override void do_execute (Match? match, Match? target = null)
       {
         var cb = Gtk.Clipboard.get (Gdk.Atom.NONE);
         if (match.match_type == MatchType.GENERIC_URI)

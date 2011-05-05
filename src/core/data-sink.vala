@@ -500,7 +500,7 @@ namespace Synapse
       {
         var unknown_match = new DefaultMatch (query);
         bool add_to_rs = false;
-        if (QueryFlags.ACTIONS in flags)
+        if (QueryFlags.ACTIONS in flags || QueryFlags.TEXT in flags)
         {
           // FIXME: maybe we should also check here if there are any matches
           add_to_rs = true;

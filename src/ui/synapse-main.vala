@@ -39,7 +39,6 @@ namespace Synapse
       }
     };
     
-    private UIInterface? ui;
     private SettingsWindow settings;
     private DataSink data_sink;
     private Gui.KeyComboConfig key_combo_config;
@@ -51,10 +50,10 @@ namespace Synapse
 #else
     private StatusIcon status_icon;
 #endif
+    private Gui.IController controller;
     
     public UILauncher ()
     {
-      ui = null;
       config = ConfigService.get_default ();
       data_sink = new DataSink ();
       key_combo_config = (Gui.KeyComboConfig) config.bind_config ("ui", "shortcuts", typeof (Gui.KeyComboConfig));
@@ -66,24 +65,12 @@ namespace Synapse
       
       bind_keyboard_shortcut ();
       
-      init_ui (settings.get_current_theme ());
-      if (!is_startup) this.show_ui (Gtk.get_current_event_time ());
-      
-      settings.theme_selected.connect (init_ui);
-      init_indicator ();
-    }
-    
-    ~UILauncher ()
-    {
-      config.save ();
-    }
-    
-    private void init_ui (Type t)
-    {
-      ui = GLib.Object.new (t, "data-sink", data_sink,
-                               "key-combo-config", key_combo_config,
-                               "category-config", category_config) as UIInterface;
-      ui.show_settings_clicked.connect (()=>{
+      controller = GLib.Object.new (typeof (Gui.Controller), 
+                                    "data-sink", data_sink,
+                                    "key-combo-config", key_combo_config,
+                                    "category-config", category_config) as Gui.IController;
+
+      controller.show_settings_requested.connect (()=>{
         settings.show ();
         uint32 timestamp = Gtk.get_current_event_time ();
         /* Make sure that the settings window is showed */
@@ -91,8 +78,25 @@ namespace Synapse
         settings.present_with_time (timestamp);
         settings.get_window ().raise ();
         settings.get_window ().focus (timestamp);
-        ui.hide ();
+        controller.summon_or_vanish ();
       });
+
+      init_ui (settings.get_current_theme ());
+
+      if (!is_startup) controller.summon_or_vanish ();
+      
+      settings.theme_selected.connect (init_ui);
+      init_indicator ();
+    }
+    
+    private void init_ui (Type t)
+    {
+      controller.set_view (t);
+    }
+    
+    ~UILauncher ()
+    {
+      config.save ();
     }
     
     private void init_indicator ()
@@ -171,6 +175,9 @@ namespace Synapse
         typeof (CalculatorPlugin),
         typeof (SelectionPlugin),
         typeof (SshPlugin),
+        // typeof (FileOpPlugin),
+        // typeof (PidginPlugin),
+        // typeof (ChatActions),
 #if HAVE_ZEITGEIST
         typeof (ZeitgeistPlugin),
 #endif
@@ -192,8 +199,10 @@ namespace Synapse
     
     protected void show_ui (uint32 event_time)
     {
-      if (this.ui == null) return;
-      this.ui.show_hide_with_time (event_time);
+      //if (this.ui == null) return;
+      //this.ui.show_hide_with_time (event_time);
+      if (this.controller == null) return;
+      this.controller.summon_or_vanish ();
     }
     
     private void bind_keyboard_shortcut ()

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by Michal Hruby <michal.mhr@gmail.com>
- *
+ *             Alberto Aldegheri <albyrock87+dev@gmail.com>
  */
 
 namespace Synapse
@@ -27,7 +27,8 @@ namespace Synapse
     APPLICATION,
     GENERIC_URI,
     ACTION,
-    SEARCH
+    SEARCH,
+    CONTACT
   }
 
   public interface Match: Object
@@ -64,6 +65,21 @@ namespace Synapse
       Utils.Logger.error (this, "execute () is not implemented");
     }
     
+    public virtual void execute_with_target (Match? source, Match? target = null)
+    {
+      if (target == null) execute (source);
+      else Utils.Logger.error (this, "execute () is not implemented");
+    }
+    
+    public virtual bool needs_target () {
+      return false;
+    }
+    
+    public virtual QueryFlags target_flags ()
+    {
+      return QueryFlags.ALL;
+    }
+    
     public signal void executed ();
   }
   
@@ -79,6 +95,12 @@ namespace Synapse
     public abstract string uri { get; set; }
     public abstract QueryFlags file_type { get; set; }
     public abstract string mime_type { get; set; }
+  }
+  
+  public interface ContactMatch: Match
+  {
+    public abstract void send_message (string message, bool present);
+    public abstract void open_chat ();
   }
 
   public interface ExtendedInfo: Match

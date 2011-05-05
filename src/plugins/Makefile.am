@@ -32,7 +32,9 @@ libplugins_la_LIBADD = \
 libplugins_la_VALASOURCES = \
 	banshee-plugin.vala \
 	calculator-plugin.vala \
+	chat-actions-plugin.vala \
 	command-plugin.vala \
+	file-op-plugin.vala \
 	desktop-file-plugin.vala \
 	devhelp-search.vala \
 	ssh-plugin.vala \
@@ -46,6 +48,7 @@ libplugins_la_VALASOURCES = \
 	locate-plugin.vala \
 	opensearch.vala \
 	pastebin-plugin.vala \
+	pidgin-plugin.vala \
 	rhythmbox-plugin.vala \
 	selection-plugin.vala \
 	test-slow-plugin.vala \

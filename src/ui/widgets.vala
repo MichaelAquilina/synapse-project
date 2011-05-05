@@ -36,421 +36,564 @@ namespace Synapse.Gui
     public bool animation_enabled { get; set; default = true; }
     public bool extended_info_enabled { get; set; default = true; }
   }
-
-
-  public class ContainerOverlayed: Gtk.Container
+  
+  public class CloneWidget : Gtk.Widget
   {
-    private Widget widgets[5];
-    private float scale[5];
+    private Widget clone;
+    public CloneWidget (Widget to_clone)
+    {
+      this.clone = to_clone;
+      this.set_has_window (false);
+    }
+    public override void size_request (out Gtk.Requisition req)
+    {
+      clone.size_request (out req);
+    }
+  }
 
-    public enum Position
+  public class SmartLabel : Gtk.Misc
+  {
+    public static string[] size_to_string = {
+      "xx-small",
+      "x-small",
+      "small",
+      "medium",
+      "large",
+      "x-large",
+      "xx-large"
+    };
+    
+    public static Size string_to_size (string sizename)
     {
-      MAIN,
-      TOP_LEFT,
-      TOP_RIGHT,
-      BOTTOM_RIGHT,
-      BOTTOM_LEFT
+      Size s = Size.MEDIUM;
+      for (uint i = 0; i < size_to_string.length; i++)
+      {
+        if (size_to_string[i] == sizename) return (Size)i;
+      }
+      return s;
+    }
+    
+    protected static double[] size_to_scale = {
+      Pango.Scale.XX_SMALL,
+      Pango.Scale.X_SMALL,
+      Pango.Scale.SMALL,
+      Pango.Scale.MEDIUM,
+      Pango.Scale.LARGE,
+      Pango.Scale.X_LARGE,
+      Pango.Scale.XX_LARGE
+    };
+
+    public enum Size
+    {
+      XX_SMALL,
+      X_SMALL,
+      SMALL,
+      MEDIUM,
+      LARGE,
+      X_LARGE,
+      XX_LARGE
+    }
+    
+    public bool natural_requisition {
+      get; set; default = false;
+    }
+    
+    public Size size {
+      get; set; default = Size.MEDIUM;
     }
 
-    public ContainerOverlayed ()
-    {
-      scale = {0, 0.5f, 0.5f, 0.5f, 0.5f};
-      widgets = {null, null, null, null, null};
-      set_has_window(false);
-      set_redraw_on_allocate(false);
+    public Size min_size {
+      get; set; default = Size.MEDIUM;
     }
-    public void set_scale_for_pos (float s, Position pos)
+    
+    private string text = "";
+    
+    private Size real_size = Size.MEDIUM;
+    private Requisition last_req;
+    private Pango.Layout layout;
+    private Utils.ColorHelper ch;
+    private Pango.EllipsizeMode ellipsize = Pango.EllipsizeMode.NONE;
+    
+    private uint tid = 0;
+    private static const int INITIAL_TIMEOUT = 1750;
+    private static const int SPACING = 50;
+    private int offset = 0;
+    private bool animate = false;
+
+    construct
     {
-      if (pos == Position.MAIN)
-        return;
-      if (s != scale[pos])
+      layout = this.create_pango_layout ("");
+      ch = new Utils.ColorHelper (this);
+      last_req = {0, 0};
+      this.set_has_window (false);
+      this.notify["size"].connect (sizes_changed);
+      this.notify["min-size"].connect (sizes_changed);
+      this.xalign = 0.0f;
+      this.yalign = 1.0f;
+
+      //do not remove this, it's important to create the first scale attr
+      this.set_text ("");
+    }
+
+    private void sizes_changed ()
+    {
+      if (min_size > size) this._min_size = this._size;
+      this.real_size = size;
+      queue_resize ();
+    }
+    
+    public void set_animation_enabled (bool b)
+    {
+      this.animate = b;
+
+      if (b)
       {
-        scale[pos] = float.max (0.0f, float.min (0.5f, s));
-        this.queue_resize ();
+        this.ellipsize = Pango.EllipsizeMode.NONE;
+        sizes_changed ();
+      }
+      else
+      {
+        if (tid != 0) stop_animation ();
+        sizes_changed ();
       }
     }
-    public override void size_request (out Requisition requisition)
+    
+    public void set_text (string s)
     {
-      if (widgets[Position.MAIN] != null)
-      {
-        widgets[Position.MAIN].size_request (out requisition);
-        return;
-      }
-      Requisition req = {0, 0};
-      for (int i = 1; i < 5; ++i)
-      {
-        if (widgets[i] != null)
-        {
-          widgets[i].size_request (out req);
-          requisition.width = int.max (requisition.width, req.width);
-          requisition.height = int.max (requisition.height, req.height);
-        }
-      }
+      string m = Markup.escape_text (s);
+      if (m == text) return;
+      text = m;
+      text_updated ();
     }
+    
+    public void set_markup (string m)
+    {
+      if (m == text) return;
+      text = m;
+      text_updated ();
+    }
+    
+    private void stop_animation ()
+    {
+      Source.remove (tid);
+      tid = 0;
+      offset = 0;
+    }
+    
+    int _anim_width = 0;
+    private void start_animation ()
+    {
+      if (tid != 0) return;
+
+      tid = Timeout.add (40, ()=>{
+        offset = (offset - 1) % (_anim_width);
+        queue_draw ();
+        return true;
+      });
+    }
+    
+    public void set_ellipsize (Pango.EllipsizeMode mode)
+    {
+      if (animate) this.ellipsize = Pango.EllipsizeMode.NONE;
+      else this.ellipsize = mode;
+    }
+    
+    private void text_updated ()
+    {
+      real_size = _size;
+      queue_resize ();
+      if (tid != 0) stop_animation ();
+    }
+    
     public override void size_allocate (Gdk.Rectangle allocation)
     {
-      Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
-      set_allocation (alloc);    
-      if (widgets[Position.MAIN] != null)
+      base.size_allocate (allocation);
+
+      /* size_allocate is called after size_request */
+      /* so last_req is filled with the standard requisition */
+
+      if (allocation.width >= last_req.width || ((!animate) && real_size == _min_size))
       {
-        widgets[Position.MAIN].size_allocate (allocation);
+        /* That's good, we have enough space for default size */
+        if (tid != 0) stop_animation ();
+        return;
       }
-      if (widgets[Position.TOP_LEFT] != null)
+      /* Mh, bad, let's start shrinking */
+      Requisition req;
+
+      var attrs = layout.get_attributes ();
+      var iter = attrs.get_iterator (); //the first iterator is a scale
+      unowned Pango.Attribute? attr = iter.get (Pango.AttrType.SCALE);
+      unowned Pango.AttrFloat a = (Pango.AttrFloat) attr;
+
+      bool needs_animation = true;
+      while (real_size > _min_size)
       {
-        allocation.width = (int)(alloc.width * scale[Position.TOP_LEFT]);
-        allocation.height = (int)(alloc.height * scale[Position.TOP_LEFT]);
-        widgets[Position.TOP_LEFT].size_allocate (allocation);
+        real_size = real_size - 1;
+        a.value = this.size_to_scale[real_size];
+        layout.context_changed ();
+        requistion_for_size (out req, null, real_size, true);
+
+        if (allocation.width >= req.width)
+        {
+          needs_animation = false;
+          break;
+        }
       }
-      if (widgets[Position.TOP_RIGHT] != null)
+
+      if (animate && needs_animation)
       {
-        allocation.width = (int)(alloc.width * scale[Position.TOP_RIGHT]);
-        allocation.height = (int)(alloc.height * scale[Position.TOP_RIGHT]);
-        allocation.x = alloc.x + alloc.width - allocation.width;
-        widgets[Position.TOP_RIGHT].size_allocate (allocation);
+        if (tid == 0)
+        {
+          tid = Timeout.add (INITIAL_TIMEOUT, ()=>{
+            tid = 0;
+            start_animation ();
+            return false;
+          });
+        }
       }
-      if (widgets[Position.BOTTOM_RIGHT] != null)
+      else
       {
-        allocation.width = (int)(alloc.width * scale[Position.BOTTOM_RIGHT]);
-        allocation.height = (int)(alloc.height * scale[Position.BOTTOM_RIGHT]);
-        allocation.x = alloc.x + alloc.width - allocation.width;
-        allocation.y = alloc.y + alloc.height - allocation.height;
-        widgets[Position.BOTTOM_RIGHT].size_allocate (allocation);
-      }
-      if (widgets[Position.BOTTOM_LEFT] != null)
-      {
-        allocation.width = (int)(alloc.width * scale[Position.BOTTOM_LEFT]);
-        allocation.height = (int)(alloc.height * scale[Position.BOTTOM_LEFT]);
-        allocation.x = alloc.x;
-        allocation.y = alloc.y + alloc.height - allocation.height;
-        widgets[Position.BOTTOM_LEFT].size_allocate (allocation);
+        if (tid != 0) stop_animation ();
       }
     }
-    public override void forall_internal (bool b, Gtk.Callback callback)
+    
+    public override bool expose_event (Gdk.EventExpose event)
     {
-      for (int i = 0; i < 5; ++i)
+      int h = this.allocation.height - this.ypad * 2;
+      int w = this.allocation.width - this.xpad * 2;
+      Cairo.Context ctx = Gdk.cairo_create (this.window);
+      ctx.translate (this.allocation.x + this.xpad, this.allocation.y + this.ypad);
+      ctx.rectangle (0, 0, w, h);
+      ctx.clip ();
+      
+      bool rtl = this.get_direction () == Gtk.TextDirection.RTL;
+
+      int x, y, width, height;
+      
+      if (animate && tid != 0)
       {
-        if (widgets[i] != null)
-          callback (widgets[i]);
+        ctx.translate (offset, 0);
       }
-    }
-    public void set_widget_in_position (Widget widget, Position pos)
-    {
-      if (widgets[pos] != null)
-        widgets[pos].unparent ();
-      widgets[pos] = widget;
-      if (widget != null)
-        widget.set_parent (this);
-    }
-    public void swapif (Widget w, Position pos1, Position pos2)
-    {
-      if (widgets[pos1] == w)
-        swap (pos1, pos2);
-    }
-    public void swap (Position pos1, Position pos2)
-    {
-      Widget t = widgets[pos1];
-      widgets[pos1] = widgets[pos2];
-      widgets[pos2] = t;
-      this.queue_resize ();
+      else
+      {
+        if (ellipsize != Pango.EllipsizeMode.NONE)
+        {
+          layout.set_width (w * Pango.SCALE);
+          layout.set_ellipsize (ellipsize);
+        }
+      }
+      
+      Gui.Utils.get_draw_position (out x, out y, out width, out height, layout, rtl,
+                                   w, h, this.xalign, this.yalign);
+      ctx.translate (x, y);
+      
+      ctx.set_operator (Cairo.Operator.OVER);
+      ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, this.get_state ());
+      
+      Pango.cairo_show_layout (ctx, layout);
+      
+      width += SPACING;
+      _anim_width = width;
+      int rotate = (offset + width);
+      if (rtl) rotate = offset;
+      if (animate && tid != 0 && rotate < w)
+      {
+        ctx.translate (width, 0);
+        Pango.cairo_show_layout (ctx, layout);
+      }
+
+      return true;
     }
 
-    public override void add (Widget widget)
+    protected void requistion_for_size (out Requisition req, out int char_width, Size s, bool return_only_width = false)
     {
-      //TODO
+      req.width = this.xpad * 2;
+      req.height = this.ypad * 2;
+
+      Pango.Rectangle logical_rect;
+      layout.set_width (-1);
+      layout.set_ellipsize (Pango.EllipsizeMode.NONE);
+      layout.get_extents (null, out logical_rect);
+      
+      req.width += logical_rect.width / Pango.SCALE;
+      if (return_only_width) return;
+      
+      Pango.Context ctx = layout.get_context ();
+      Pango.FontDescription fdesc = new Pango.FontDescription ();
+      fdesc.merge_static (this.style.font_desc, true);
+
+      fdesc.set_size ((int)(this.size_to_scale[s] * (double)fdesc.get_size()));
+      var metrics = ctx.get_metrics (fdesc, ctx.get_language ());
+
+      req.height += (metrics.get_ascent () + metrics.get_descent ()) / Pango.SCALE;
+      char_width = int.max (metrics.get_approximate_char_width (), metrics.get_approximate_digit_width ()) / Pango.SCALE;
     }
-    public override void remove (Widget widget)
+    
+    public override void size_request (out Requisition req)
     {
-      //TODO
+      layout.set_markup ("<span size=\"%s\">%s</span>".printf (size_to_string[_size], this.text), -1);
+      int char_width;
+      this.requistion_for_size (out req, out char_width, this._size);
+      last_req.width = req.width;
+      last_req.height = req.height;
+      if (!this.natural_requisition && (this.ellipsize != Pango.EllipsizeMode.NONE || animate))
+        req.width = char_width * 3;
     }
   }
   
-  /* HSelectionContainer */
-  public class HSelectionContainer: Gtk.Container
+  public class SchemaContainer: Gtk.Container
   {
-    public delegate void SelectWidget (Widget w, bool select);
-    private ArrayList<Widget> childs;
-    
-    private SelectWidget func;
-    private int padding;
-    private int selection = 0;
-    private int[] allocations = {};
-    private bool[] visibles = {};
-    private bool direction = true;
-    private HSeparator sep;
-    private Label left;
-    private Label right;
-    private bool show_arrows;
-    
-    public enum SelectionAlign
+    public class Schema : GLib.Object
     {
-      LEFT = 0,
-      CENTER = 1,
-      RIGHT = 2
-    }
-    private int align;
-    
-    
-    public HSelectionContainer (SelectWidget? func, int padding)
-    {
-      this.func = func;
-      this.padding = padding;
-      this.align = SelectionAlign.CENTER;
-      childs = new ArrayList<Widget>();
-      set_has_window(false);
-      set_redraw_on_allocate(false);
-      sep = new HSeparator();
-      sep.set_parent (this);
-      sep.show ();
-      show_arrows = false;
-      left = new Label (null);
-      left.set_markup ("<span size=\"small\">&lt;&lt;</span>");
-      left.set_parent (this);
-      left.sensitive = false;
-      right = new Label (null);
-      right.set_markup ("<span size=\"small\">&gt;&gt;</span>");
-      right.set_parent (this);
-      right.sensitive = false;
-    }
-    
-    public void set_arrows_visible (bool b)
-    {
-      show_arrows = b;
-      this.queue_resize ();
-    }
-    
-    public void set_separator_visible (bool b)
-    {
-      sep.set_visible (b);
-      this.queue_resize ();
-    }
-    
-    public void set_selection_align (SelectionAlign align)
-    {
-      this.align = align;
-    }
-    
-    public void select_next_circular ()
-    {
-      int sel = selection;
-      sel += direction ? 1 : -1;
-      if (sel < 0)
+      private Allocation[] _positions = {};
+      public Allocation[] positions { get {return _positions;} }
+      public Schema ()
       {
-        sel = 1;
-        direction = true;
+
       }
-      else if (sel >= childs.size)
+      public void add_allocation (Allocation alloc)
       {
-        sel = childs.size - 2;
-        direction = false;
+        alloc.x = int.max (0, alloc.x);
+        alloc.y = int.max (0, alloc.y);
+        alloc.width = int.max (0, alloc.width);
+        alloc.height = int.max (0, alloc.height);
+
+        this._positions += alloc;
       }
-      select (sel);
-    }
-    public void select_next () {select(selection+1);}
-    public void select_prev () {select(selection-1);}
-    
-    public void select (int index)
-    {
-      if (index < 0 || childs.size <= index)
-        return;
-      
-      if (func != null)
-      {
-        func (childs.get(selection), false);
-        func (childs.get(index), true);
-      }
-      this.selection = index;
-      this.queue_resize();
-      foreach (Widget w in childs)
-        w.queue_draw();
     }
     
-    public int get_selected ()
-    {
-      return selection;
+    protected Gee.List<Schema> schemas;
+    protected Gee.List<Widget> children;
+    private int active_schema = 0;
+    private int[] render_order = null;
+    
+    public int xpad { get; set; default = 0; }
+    public int ypad { get; set; default = 0; }
+    
+    public int scale_size {
+      get; set; default = 128;
     }
     
-    public override void size_request (out Requisition requisition)
+    public bool fixed_height {
+      get; set; default = false;
+    }
+    
+    public bool fixed_width {
+      get; set; default = false;
+    }
+    
+    public SchemaContainer (int scale_size)
     {
-      Requisition req = {0, 0};
-      requisition.width = 1;
-      requisition.height = 1;
-      foreach (Widget w in childs)
-      {
-        w.size_request (out req);
-        requisition.width = int.max(req.width, requisition.width);
-        requisition.height = int.max(req.height, requisition.height);
-      }
-      left.size_request (out req);
-      if (show_arrows)
-      {
-        requisition.width += req.width * 2 + padding * 2;
-        requisition.height = int.max (req.height, requisition.height);
-      }
-      sep.size_request (out req);
-      if (sep.visible)
-        requisition.height += req.height * 2;
+      this.scale_size = scale_size;
+      schemas = new Gee.ArrayList<Schema> ();
+      children = new Gee.ArrayList<Widget> ();
+      set_has_window (false);
+      set_redraw_on_allocate (false);
+      this.notify["scale-size"].connect (this.queue_resize);
+      this.notify["fixed-width"].connect (this.queue_resize);
+      this.notify["fixed-height"].connect (this.queue_resize);
+      this.notify["xpad"].connect (this.queue_resize);
+      this.notify["ypad"].connect (this.queue_resize);
+    }
+    
+    public void set_render_order (int[]? order)
+    {
+      this.render_order = order;
+      this.queue_draw ();
     }
 
-    public override void size_allocate (Gdk.Rectangle allocation)
+    public new void set_size_request (int width, int height)
     {
-      Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
-      set_allocation (alloc);
-      int lastx = 0;
-      int min_x = 0;
-      int max_x = allocation.width;
-      Requisition req = {0, 0};
-      sep.size_request (out req);
-      int sep_space = sep.visible ? req.height * 2 : 0;
-      if (show_arrows)
-      {
-        left.size_request (out req);
-        lastx = req.width + padding;
-        max_x = max_x - req.width - padding;
-        min_x = lastx;
-        allocation.x = alloc.x;
-        allocation.y = alloc.y + (alloc.height - sep_space - req.height) / 2;
-        allocation.height = req.height;
-        allocation.width = req.width;
-        left.size_allocate (allocation);
-        right.size_request (out req);
-        allocation.x = alloc.x + max_x + padding;
-        allocation.y = alloc.y + (alloc.height - sep_space - req.height) / 2;
-        allocation.height = req.height;
-        allocation.width = req.width;
-        right.size_allocate (allocation);
-      }
-      int i = 0;
-      // update relative coords
-      foreach (Widget w in childs)
-      {
-        w.size_request (out req);
-        this.allocations[i] = lastx;
-        lastx += padding + req.width;
-        ++i;
-      }
-      int offset = 0;
-      switch (this.align)
-      {
-        case SelectionAlign.LEFT:
-          offset = - allocations[selection];
-          break;
-        case SelectionAlign.RIGHT:
-          offset = max_x - allocations[selection];
-          childs.get (selection).size_request (out req);
-          offset -= req.width;
-          break;
-        default:
-          offset = alloc.width / 2 - allocations[selection];
-          childs.get (selection).size_request (out req);
-          offset -= req.width / 2;
-          break;
-      }
-      // update widget allocations and visibility
-      i = 0;
-      int pos = 0;
-      foreach (Widget w in childs)
-      {
-        w.size_request (out req);
-        pos = offset + allocations[i];
-        if (pos < min_x || pos + req.width > max_x)
-        {
-          visibles[i] = false;
-          w.hide ();
-        }
-        else
-        {
-          visibles[i] = true;
-          allocation.x = alloc.x + pos;
-          allocation.width = req.width;
-          allocation.height = req.height;
-          allocation.y = alloc.y + (alloc.height - sep_space - req.height) / 2;
-          w.size_allocate (allocation);
-          w.show_all ();
-        }
-        ++i;
-      }
-      left.visible = show_arrows && (!visibles[0]);
-      right.visible = show_arrows && (!visibles[childs.size - 1]);
-      allocation.x = alloc.x;
-      allocation.y = alloc.y + alloc.height - sep_space * 3 / 2;
-      allocation.height = sep_space;
-      allocation.width = alloc.width;
-      sep.size_allocate (allocation);
+      if (width <= 0) width = 1;
+      if (height <= 0) height = 1;
+      
+      base.set_size_request (width, height);
     }
+    
+    public void add_schema (Schema s)
+    {
+      schemas.add (s);
+      if (schemas.size == 1) select_schema (0);
+    }
+    
+    public void select_schema (int i)
+    {
+      if (i < 0) return;
+      if (i >= schemas.size) return;
+      active_schema = i;
+      if (!this.is_realized ()) return;
+      size_allocate ({
+        this.allocation.x, this.allocation.y,
+        this.allocation.width, this.allocation.height
+      });
+      queue_resize ();
+    }
+    
+    
+    
     public override void forall_internal (bool b, Gtk.Callback callback)
     {
-      int i = 0;
-      if (b)
+      if (render_order == null)
       {
-        callback (sep);
-        callback (left);
-        callback (right);
-      }
-      if (childs.size == 0)
-        return;
-      if (this.align == SelectionAlign.LEFT)
-      {
-        for (i = childs.size - 1; i >= 0; ++i)
+        foreach (var child in children)
         {
-          if ( visibles[i] )
-            callback (childs.get(i));
+          callback (child);
         }
       }
-      else if (this.align == SelectionAlign.RIGHT)
+      else
       {
-        foreach (Widget w in childs)
-        {
-          if ( visibles[i] )
-            callback (w);
-          ++i;
-        }
-      }
-      else //align center
-      {
-        int j;
-        j = i = selection;
-        ArrayList<Widget> reordered = new ArrayList<Widget>();
-        reordered.add (childs.get(i));
-        while (j >= 0 || i < childs.size)
-        {
-          --j;
-          ++i;
-          if (j >= 0)
-            reordered.add (childs.get(j));
-          if (i < childs.size)
-            reordered.add (childs.get(i));
-        }
-        for (i = reordered.size - 1; i >= 0; --i)
-          callback (reordered.get(i));
+        for (int i = 0; i < render_order.length; i++)
+          callback (children.get (render_order[i]));
       }
     }
-
+    
     public override void add (Widget widget)
     {
-      childs.add (widget);
+      this.children.add (widget);
       widget.set_parent (this);
-      this.allocations += 0;
-      this.visibles += true;
-      if (childs.size==1)
-      {
-        this.selection = 0;
-        if (func != null)
-          func (widget, true);
-      }
-      else if (func != null)      
-        func (widget, false);
     }
     
     public override void remove (Widget widget)
     {
-      if (childs.remove (widget))
+      // cannot remove for now :P TODO
+    }
+    
+    public override void size_request (out Gtk.Requisition req)
+    {
+      req = {0, 0};
+      int i = 0;
+      Allocation[] alloc = schemas.get (active_schema).positions;
+
+      foreach (Widget child in children)
       {
-        widget.unparent ();
-        this.allocations.resize (this.allocations.length);
-        this.visibles.resize (this.visibles.length);
+        if (alloc.length > i)
+        {
+          req.width = int.max ((alloc[i].x+alloc[i].width)*_scale_size/100, req.width);
+          req.height = int.max ((alloc[i].y+alloc[i].height)*_scale_size/100, req.height);
+          child.visible = true;
+        }
+        else
+        {
+          child.visible = false;
+        }
+        i++;
+      }
+      if (this._fixed_height) req.height = this._scale_size;
+      if (this._fixed_width) req.width = this._scale_size;
+      req.width += _xpad * 2;
+      req.height += _ypad * 2;
+    }
+    
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      base.size_allocate (allocation);
+      
+      if (schemas.size <= 0)
+      {
+        foreach (Widget child in children)
+          child.hide ();
+        return;
+      }
+      Allocation[] alloc = schemas.get (active_schema).positions;
+      
+      int i = 0;
+      int x = allocation.x + _xpad;
+      int y = allocation.y + _ypad;
+      bool rtl = this.get_direction () == Gtk.TextDirection.RTL;
+      foreach (Widget child in children)
+      {
+        Gdk.Rectangle a;
+        if (alloc.length <= i)
+        {
+          a = {
+            0, 0, 0, 0
+          };
+        }
+        else
+        {
+          a = {
+            x + alloc[i].x * this._scale_size / 100,
+            y + alloc[i].y * this._scale_size / 100,
+            alloc[i].width * this._scale_size / 100,
+            alloc[i].height * this._scale_size / 100
+          };
+        }
+        if (rtl) a.x = 2 * allocation.x + allocation.width - a.x - a.width;
+        child.size_allocate (a);
+        i++;
       }
     }
   }
+  
+  public class SelectionContainer: Gtk.Container
+  {
+    protected Gee.List<Widget> children;
+    private int active_child = 0;
+    
+    public SelectionContainer ()
+    {
+      children = new Gee.ArrayList<Widget> ();
+      set_has_window (false);
+      set_redraw_on_allocate (false);
+    }
+    
+    public void select_child (int i)
+    {
+      if (i < 0) return;
+      if (i >= children.size) return;
+      active_child = i;
+      i = 0;
+      foreach (var child in children)
+      {
+        if (i == active_child)
+        {
+          if (!child.visible) child.show ();
+        }
+        else
+        {
+          if (child.visible) child.hide ();
+        }
+        
+        i++;
+      }
+      if (!this.is_realized ()) return;
+      queue_resize ();
+    }
+    
+    public override void forall_internal (bool b, Gtk.Callback callback)
+    {
+      foreach (var child in children)
+        callback (child);
+    }
+    
+    public override void add (Widget widget)
+    {
+      this.children.add (widget);
+      widget.set_parent (this);
+    }
+    
+    public override void remove (Widget widget)
+    {
+      this.children.remove (widget);
+      widget.unparent ();
+    }
+    
+    public override void size_allocate (Gdk.Rectangle allocation)
+    {
+      base.size_allocate (allocation);
+      if (active_child >= children.size) return;
+      children.get (active_child).size_allocate (allocation);
+    }
+    
+    public override void size_request (out Requisition req)
+    {
+      req = {0, 0};
+      if (active_child >= children.size) return;
+      children.get (active_child).size_request (out req);
+    }
+  }
+
   public class Throbber: Spinner
   {
     construct
@@ -467,6 +610,7 @@ namespace Synapse.Gui
       return true;
     }
   }
+  
   public class SensitiveWidget: Gtk.EventBox
   {
     private Widget _widget;
@@ -494,11 +638,29 @@ namespace Synapse.Gui
     public string not_found_name {get; set; default = "unknown";}
     private string current;
     private IconSize current_size;
-
+    
     construct
     {
       current = "";
       current_size = IconSize.DIALOG;
+    }
+    
+    public override void size_request (out Requisition req)
+    {
+      req = {
+        this.width_request,
+        this.height_request
+      };
+      if (req.width <= 0 && req.height <= 0)
+      {
+        req.width = xpad * 2;
+        req.height = ypad * 2;
+        if (pixel_size >= 0)
+        {
+          req.width += pixel_size;
+          req.height += pixel_size;
+        }
+      }
     }
 
     public override bool expose_event (Gdk.EventExpose event)
@@ -507,16 +669,20 @@ namespace Synapse.Gui
       var ctx = Gdk.cairo_create (this.window);
       ctx.set_operator (Cairo.Operator.OVER);
 
-      ctx.translate (this.allocation.x, this.allocation.y);
-      ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
+      int w = this.allocation.width - this.xpad * 2;
+      int h = this.allocation.height - this.ypad * 2;
+      ctx.translate (this.allocation.x + this.xpad, this.allocation.y + this.ypad);
+      ctx.rectangle (0, 0, w, h);
       ctx.clip ();
 
-      Gdk.Pixbuf icon_pixbuf = IconCacheService.get_default ().get_icon (current, pixel_size);
+      Gdk.Pixbuf icon_pixbuf = IconCacheService.get_default ().get_icon (
+            current, pixel_size <= 0 ? int.min (this.allocation.width, this.allocation.height) : pixel_size);
+
       if (icon_pixbuf == null) return true;
 
       Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 
-          (this.allocation.width - icon_pixbuf.get_width ()) / 2, 
-          (this.allocation.height - icon_pixbuf.get_height ()) / 2);
+          (w - icon_pixbuf.get_width ()) / 2, 
+          (h - icon_pixbuf.get_height ()) / 2);
       ctx.paint ();
 
       return true;
@@ -526,7 +692,7 @@ namespace Synapse.Gui
       current = "";
       this.queue_draw ();
     }
-    public void set_icon_name (string? name, IconSize size)
+    public void set_icon_name (string? name, IconSize size = IconSize.DND)
     {
       if (name == null)
         name = "";
@@ -659,6 +825,7 @@ namespace Synapse.Gui
       return base.expose_event (event);
     }
   }
+  
   public class MenuThrobber: MenuButton
   {
     private Gtk.Spinner throbber;
@@ -869,148 +1036,6 @@ namespace Synapse.Gui
     }
   }
 
-  public class ShrinkingLabel: Gtk.Label
-  {
-    private const double STEP = 1.0466351393921056; // (1.2)^1/4
-    
-    public string default_size { get; set; default = "x-large"; }
-    public string min_size { get; set; default = "medium"; }
-    private double min_scale = 1.0;
-
-    construct
-    {
-      this.notify["min-size"].connect (this.min_size_changed);
-    }
-    
-    private void min_size_changed ()
-    {
-      switch (min_size)
-      {
-        case "xx-small":
-          min_scale = Pango.Scale.XX_SMALL;
-          break;
-        case "x-small":
-          min_scale = Pango.Scale.X_SMALL;
-          break;
-        case "small":
-          min_scale = Pango.Scale.SMALL;
-          break;
-        case "medium":
-          min_scale = Pango.Scale.MEDIUM;
-          break;
-        case "large":
-          min_scale = Pango.Scale.LARGE;
-          break;
-        case "x-large":
-          min_scale = Pango.Scale.X_LARGE;
-          break;
-        case "xx-large":
-          min_scale = Pango.Scale.XX_LARGE;
-          break;
-        default:
-          warning ("\"%s\" is not valid for min-size property", min_size);
-          min_scale = 1.0;
-          break;
-      }
-    }
-    
-    private Gtk.Requisition base_req;
-    private Gtk.Requisition small_req;
-    
-    protected override void size_request (out Gtk.Requisition req)
-    {
-      req.width = base_req.width;
-      req.height = base_req.height;
-    }
-
-    protected override void size_allocate (Gdk.Rectangle alloc)
-    {
-      base.size_allocate (alloc);
-      
-      var layout = this.get_layout ();
-      Utils.update_layout_rtl (layout, get_default_direction ());
-      if (this.get_ellipsize () != Pango.EllipsizeMode.NONE)
-      {
-        int width = (int) ((alloc.width - this.xpad * 2) * Pango.SCALE);
-        Pango.Rectangle logical;
-        
-        layout.set_width (-1);
-        layout.get_extents (null, out logical);
-
-        while (logical.width > width && downscale ())
-        {
-          layout.get_extents (null, out logical);
-        }
-
-        // careful this seems to call layout.set_width
-        base.size_request (out small_req);
-        
-        if (logical.width > width) layout.set_width (width);
-      }
-    }
-
-    protected override bool expose_event (Gdk.EventExpose event)
-    {
-      // fool our base class to keep correct align
-      this.requisition.width = small_req.width;
-      this.requisition.height = small_req.height;
-
-      bool ret = base.expose_event (event);
-
-      this.requisition.width = base_req.width;
-      this.requisition.height = base_req.height;
-
-      return ret;
-    }
-    
-    public new void set_markup (string markup)
-    {
-      base.set_markup ("<span size=\"%s\">%s</span>".printf (default_size,
-                                                             markup));
-      base.size_request (out base_req);
-      small_req = base_req;
-      if (this.allocation.width > 1 && this.allocation.height > 1)
-      {
-        this.size_allocate ((Gdk.Rectangle) this.allocation);
-      }
-    }
-    
-    private bool downscale ()
-    {
-      bool changed = false;
-      var context = this.get_layout ();
-      var attrs = context.get_attributes ();
-      Pango.AttrIterator iter = attrs.get_iterator ();
-      do
-      {
-        unowned Pango.Attribute? attr = iter.get (Pango.AttrType.SCALE);
-        if (attr != null)
-        {
-          unowned Pango.AttrFloat a = (Pango.AttrFloat) attr;
-          if (a.value > min_scale)
-          {
-            a.value /= STEP;
-            changed = true;
-          }
-        }
-      } while (iter.next ());
-      
-      if (changed) context.context_changed (); // force recomputation
-      return changed;
-    }
-    
-    public ShrinkingLabel ()
-    {
-      GLib.Object (label: null);
-    }
-  }
-  public class LabelWithOriginal: Label
-  {
-    public string original_string {
-      get; set; default = "";
-    }
-  }
-  
   public class SynapseAboutDialog: Gtk.AboutDialog
   {
     public SynapseAboutDialog ()
@@ -1098,6 +1123,10 @@ namespace Synapse.Gui
           tid = Timeout.add (30, ()=>{
             return update_current_offset ();
           });
+      });
+      this.notify["sensitive"].connect (()=>{
+        update_cached_surface ();
+        queue_draw ();
       });
       this.realize.connect (this._global_update);
       this.notify["selected-markup"].connect (_global_update);
@@ -1233,7 +1262,10 @@ namespace Synapse.Gui
       /* Arrows */
       if (!this.show_arrows)
         return;
-      ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.SELECTED);
+      if (this.get_state () == StateType.SELECTED)
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.NORMAL);
+      else
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.SELECTED);
       txt = texts.get (_selected);
       double asize = double.min (ARROW_SIZE, h);
       double px, py = h / 2;
