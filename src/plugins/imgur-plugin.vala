@@ -36,7 +36,7 @@ namespace Synapse
     public void activate ()
     {
       actions.add (new ImgUrAction ());
-      actions.add (new ImgUrToContactAction ());
+      //actions.add (new ImgUrToContactAction ());
     }
 
     public void deactivate ()
@@ -292,9 +292,9 @@ namespace Synapse
 
       if (query_empty)
       {
-        int rel = actions[1].default_relevancy;
-        results.add (actions[0], rel);
-        results.add (actions[1], rel);
+        int rel = actions[0].default_relevancy;
+        foreach (var action in actions)
+          results.add (action, rel);
       }
       else
       {

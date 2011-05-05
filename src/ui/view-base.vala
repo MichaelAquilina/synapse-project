@@ -58,12 +58,12 @@ namespace Synapse
       var border_radius = new GLib.ParamSpecInt ("border-radius",
                                                  "Border Radius",
                                                  "Border Radius of Synapse window",
-                                                 0, 50, 10,
+                                                 0, 50, 12,
                                                  GLib.ParamFlags.READWRITE);
       var shadow_size = new GLib.ParamSpecInt ("shadow-size",
                                                "Shadow Size",
                                                "Shadow size of Synapse window",
-                                               0, 50, 10,
+                                               0, 50, 13,
                                                GLib.ParamFlags.READWRITE);
 
       var width = new GLib.ParamSpecInt ("ui-width",
@@ -97,7 +97,7 @@ namespace Synapse
       var descr_max = new GLib.ParamSpecString ("description-size",
                                                 "Description Font Size",
                                                 "The standard size the match description in Pango absolute sizes (string)",
-                                                "small",
+                                                "medium",
                                                 GLib.ParamFlags.READWRITE);
       var descr_min = new GLib.ParamSpecString ("description-min-size",
                                                 "Description minimum Font Size",
@@ -131,7 +131,7 @@ namespace Synapse
     construct
     {
       update_wm ();
-      if (is_kwin) Synapse.Utils.Logger.log (this, "Using KWin compatibiliy mode.");
+      if (is_kwin) Synapse.Utils.Logger.log (this, "Using KWin compatibility mode.");
       
       cache_enabled = true;
       bg_cache = new Gee.HashMap<string, Cairo.Surface> ();
@@ -165,6 +165,10 @@ namespace Synapse
       
       ch = new Gui.Utils.ColorHelper (this);
       
+      // only needed to execute the static construct of SmartLabel
+      var initialize_smartlabel = new SmartLabel ();
+      
+      // init the category selector
       flag_selector = new HTextSelector ();
       foreach (CategoryConfig.Category c in controller.category_config.categories)
       {
@@ -319,13 +323,13 @@ namespace Synapse
       return true;
     }
     
-    protected virtual void prepare_results_container (out SelectionContainer results_container,
+    protected virtual void prepare_results_container (out SelectionContainer? results_container,
                                                       out ResultBox results_sources,
                                                       out ResultBox results_actions,
                                                       out ResultBox results_targets,
-                                                      Gtk.StateType state_type = Gtk.StateType.NORMAL)
+                                                      Gtk.StateType state_type = Gtk.StateType.NORMAL,
+                                                      bool add_to_container = true)
     {
-      results_container = new SelectionContainer ();
       results_sources = new ResultBox (100);
       results_actions = new ResultBox (100);
       results_targets = new ResultBox (100);
@@ -341,9 +345,13 @@ namespace Synapse
       results_actions.get_match_list_view ().fire_item.connect (controller.fire_focus);
       results_targets.get_match_list_view ().fire_item.connect (controller.fire_focus);
 
-      results_container.add (results_sources);
-      results_container.add (results_actions);
-      results_container.add (results_targets);
+      if (add_to_container)
+      {
+        results_container = new SelectionContainer ();
+        results_container.add (results_sources);
+        results_container.add (results_actions);
+        results_container.add (results_targets);
+      }
       
       results_sources.set_state (state_type);
       results_actions.set_state (state_type);
@@ -378,6 +386,7 @@ namespace Synapse
       Gui.Utils.unpresent_window (this);
       this.hide ();
       this.vanished ();
+      IconCacheService.get_default ().reduce_cache ();
     }
 
     public virtual void summon_or_vanish ()

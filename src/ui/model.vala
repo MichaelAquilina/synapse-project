@@ -45,7 +45,7 @@ namespace Synapse.Gui
     {
       return results[searching_for] != null && results[searching_for].size > 0;
     }
-        
+
     public Entry<int, Match> get_actual_focus ()
     {
       return focus[searching_for];

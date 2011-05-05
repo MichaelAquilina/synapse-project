@@ -575,7 +575,8 @@ namespace Synapse.Gui
     
     public override void remove (Widget widget)
     {
-      //TODO
+      this.children.remove (widget);
+      widget.unparent ();
     }
     
     public override void size_allocate (Gdk.Rectangle allocation)

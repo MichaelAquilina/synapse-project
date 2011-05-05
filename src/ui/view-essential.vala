@@ -36,7 +36,7 @@ namespace Synapse.Gui
       base.style_set (old);
 
       int width, icon_size;
-      string tmax, tmin, dmax, dmin;
+      string tmax, tmin;
       this.style.get (typeof(Synapse.Gui.ViewEssential), "ui-width", out width);
       this.style.get (typeof(Synapse.Gui.ViewEssential), "icon-size", out icon_size);
       this.style.get (typeof(Synapse.Gui.ViewEssential), "title-size", out tmax);
@@ -54,7 +54,6 @@ namespace Synapse.Gui
     private NamedIcon target_icon;
     
     private SmartLabel focus_label;
-    private SmartLabel description_label;
     
     private SchemaContainer icon_container;
     
@@ -314,7 +313,10 @@ namespace Synapse.Gui
       else if (m.value == null) source_icon.set_icon_name ("");
       else
       {
-        source_icon.set_icon_name (m.value.icon_name);
+        if (m.value.has_thumbnail)
+          source_icon.set_icon_name (m.value.thumbnail_path);
+        else
+          source_icon.set_icon_name (m.value.icon_name);
         results_sources.move_selection_to_index (m.key);
       }
       if (model.searching_for == SearchingFor.SOURCES) update_labels ();

@@ -405,6 +405,12 @@ namespace Synapse.Gui
     
     private MatchViewRendererBase renderer;
     private Utils.ColorHelper ch;
+    
+    public MatchViewRendererBase get_renderer ()
+    {
+      return renderer;
+    }
+    
     public MatchListView (MatchViewRendererBase mr)
     {
       ch = new Utils.ColorHelper (this);
@@ -769,6 +775,16 @@ namespace Synapse.Gui
     
     private Utils.ColorHelper ch;
     
+    public bool use_base_colors
+    {
+      get; set; default = true;
+    }
+    
+    public bool show_no_results
+    {
+      get; set; default = true;
+    }
+    
     public ResultBox (int width, int nrows = 5)
     {
       this.mwidth = width;
@@ -778,6 +794,18 @@ namespace Synapse.Gui
       this.visible_window = false;
       ch = new Utils.ColorHelper (this);
       build_ui();
+      this.notify["use-base-colors"].connect (()=>{
+        view.use_base_colors = use_base_colors;
+        if (use_base_colors)
+        {
+          set_state (Gtk.StateType.SELECTED);
+        }
+        else
+        {
+          set_state (Gtk.StateType.NORMAL);
+        }
+        this.queue_draw ();
+      });
     }
 
 		private MatchListView view;
@@ -794,6 +822,8 @@ namespace Synapse.Gui
 		
 		public override bool expose_event (Gdk.EventExpose event)
 		{
+		  if (_use_base_colors)
+		  {
         var ctx = Gdk.cairo_create (this.get_window ());
         ctx.set_operator (Cairo.Operator.OVER);
         ctx.translate (this.allocation.x, status.allocation.y);
@@ -808,11 +838,11 @@ namespace Synapse.Gui
         /* Prepare and draw top bg's rect */
         ctx.set_source (pat);
         ctx.paint ();
-
-        /* Propagate Expose */               
-        this.propagate_expose (this.get_child(), event);
-        
-        return true;
+      }
+      /* Propagate Expose */               
+      this.propagate_expose (this.get_child(), event);
+      
+      return true;
     }
     
     public MatchListView get_match_list_view ()
@@ -854,9 +884,15 @@ namespace Synapse.Gui
     {
       view.set_list (rs);
       if (rs==null || rs.size == 0)
+      {
         status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
+        status.visible = _show_no_results;
+      }
       else
+      {
         status.set_markup (Markup.printf_escaped (_("<b>1 of %d</b>"), view.get_list_size ()));
+        status.visible = true;
+      }
     }
     
     public void move_selection_to_index (int i)

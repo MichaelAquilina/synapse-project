@@ -25,7 +25,7 @@ using Cairo;
 
 namespace Synapse.Gui
 {
-  public class ViewDoish : Synapse.Gui.View
+  public class ViewSideDoish : Synapse.Gui.View
   {
     construct {
       
@@ -37,8 +37,13 @@ namespace Synapse.Gui
       var icon_size = new GLib.ParamSpecInt ("icon-size",
                                              "Icon Size",
                                              "The size of focused icon in supported themes",
-                                             32, 256, 128,
+                                             32, 64, 48,
                                              GLib.ParamFlags.READWRITE);
+      var width = new GLib.ParamSpecInt ("ui-width",
+                                         "Width",
+                                         "The width of the content in supported themes",
+                                         0, 1024, 450,
+                                         GLib.ParamFlags.READWRITE);
       var title_max = new GLib.ParamSpecString ("title-size",
                                                 "Title Font Size",
                                                 "The standard size the match title in Pango absolute sizes (string)",
@@ -47,40 +52,40 @@ namespace Synapse.Gui
       var title_min = new GLib.ParamSpecString ("title-min-size",
                                                 "Title minimum Font Size",
                                                 "The minimum size the match title in Pango absolute sizes (string)",
-                                                "small",
+                                                "medium",
                                                 GLib.ParamFlags.READWRITE);
-      var descr_max = new GLib.ParamSpecString ("description-size",
-                                                "Description Font Size",
-                                                "The standard size the match description in Pango absolute sizes (string)",
-                                                "small",
-                                                GLib.ParamFlags.READWRITE);
-      var descr_min = new GLib.ParamSpecString ("description-min-size",
-                                                "Description minimum Font Size",
-                                                "The minimum size the match description in Pango absolute sizes (string)",
-                                                "small",
-                                                GLib.ParamFlags.READWRITE);
-      install_style_property (icon_size);
+      var spacing = new GLib.ParamSpecInt ("pane-spacing",
+                                             "Pane Spacing",
+                                             "The space between panes in supported themes",
+                                             5, 40, 15,
+                                             GLib.ParamFlags.READWRITE);
       install_style_property (title_max);
       install_style_property (title_min);
-      install_style_property (descr_max);
-      install_style_property (descr_min);
+      install_style_property (icon_size);
+      install_style_property (width);
+      install_style_property (spacing);
     }
     
     public override void style_set (Gtk.Style? old)
     {
       base.style_set (old);
 
-      int spacing, icon_size;
+      int spacing, icon_size, width;
       string tmax, tmin, dmax, dmin;
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "pane-spacing", out spacing);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "icon-size", out icon_size);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "title-size", out tmax);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "title-min-size", out tmin);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "description-size", out dmax);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "description-min-size", out dmin);
+      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "ui-width", out width);
+      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "pane-spacing", out spacing);
+      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "icon-size", out icon_size);
+      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "title-size", out tmax);
+      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "title-min-size", out tmin);
+      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "description-size", out dmax);
+      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "description-min-size", out dmin);
       
       sp1.set_size_request (spacing, -1);
       sp2.set_size_request (spacing, -1);
+      
+      container.set_size_request (width, -1);
+      action_label.set_size_request ((width - spacing) / 2 - icon_size - 10, -1);
+      target_container.set_size_request (width / 2, -1);
 
       source_icon.set_pixel_size (icon_size);
       action_icon.set_pixel_size (icon_size);
@@ -135,12 +140,9 @@ namespace Synapse.Gui
       action_icon.clear ();
       target_icon.set_icon_name ("");
       
-      source_icon.set_pixel_size (128);
-      source_icon.xpad = 15;
-      action_icon.set_pixel_size (128);
-      action_icon.xpad = 15;
-      target_icon.set_pixel_size (128);
-      target_icon.xpad = 15;
+      source_icon.set_pixel_size (48);
+      action_icon.set_pixel_size (48);
+      target_icon.set_pixel_size (48);
       
       /* Labels */
       source_label = new SmartLabel ();
@@ -148,19 +150,22 @@ namespace Synapse.Gui
       source_label.size = SmartLabel.Size.MEDIUM;
       source_label.min_size = SmartLabel.Size.SMALL;
       source_label.set_state (StateType.SELECTED);
-      source_label.xalign = 0.5f;
+      source_label.xalign = 0.0f;
+      source_label.yalign = 0.5f;
       action_label = new SmartLabel ();
       action_label.set_ellipsize (Pango.EllipsizeMode.END);
       action_label.size = SmartLabel.Size.MEDIUM;
       action_label.min_size = SmartLabel.Size.SMALL;
       action_label.set_state (StateType.SELECTED);
-      action_label.xalign = 0.5f;
+      action_label.xalign = 0.0f;
+      action_label.yalign = 0.5f;
       target_label = new SmartLabel ();
       target_label.set_ellipsize (Pango.EllipsizeMode.END);
       target_label.size = SmartLabel.Size.MEDIUM;
       target_label.min_size = SmartLabel.Size.SMALL;
       target_label.set_state (StateType.SELECTED);
-      target_label.xalign = 0.5f;
+      target_label.xalign = 0.0f;
+      target_label.yalign = 0.5f;
       description_label = new SmartLabel ();
       description_label.size = SmartLabel.Size.SMALL;
       description_label.set_animation_enabled (true);
@@ -190,35 +195,35 @@ namespace Synapse.Gui
       sp2 = new Label (null);
 
       /* Source Pane */
-      spane = new VBox (false, 0);
+      spane = new HBox (false, 0);
       spane.border_width = 5;
       var sensitive = new SensitiveWidget (source_icon);
       this.make_draggable (sensitive);
       spane.pack_start (sensitive, false);
-      spane.pack_start (source_label, false);
+      spane.pack_start (source_label, true, true, 3);
       
       /* Action Pane */
-      apane = new VBox (false, 0);
+      apane = new HBox (false, 0);
       apane.border_width = 5;
       apane.pack_start (action_icon, false);
-      apane.pack_start (action_label, false);
+      apane.pack_start (action_label, false, false, 3);
       
-      hbox_panes.pack_start (spane, false);
-      hbox_panes.pack_start (sp1, true);
-      hbox_panes.pack_start (apane, true);
+      hbox_panes.pack_start (spane, true);
+      hbox_panes.pack_start (sp1, false);
+      hbox_panes.pack_start (apane, false);
 
       /* Target Pane */
-      tpane = new VBox (false, 0);
+      tpane = new HBox (false, 0);
       tpane.border_width = 5;
       sensitive = new SensitiveWidget (target_icon);
       this.make_draggable (sensitive);
       tpane.pack_start (sensitive, false);
-      tpane.pack_start (target_label, false);
+      tpane.pack_start (target_label, true, true, 3);
       
       target_container = new VBox (false, 0);
       var hb = new HBox (false, 0);
       hb.pack_start (sp2, false);
-      hb.pack_start (tpane, false, false);
+      hb.pack_start (tpane);
       target_container.pack_start (new CloneWidget (categories_hbox), false);
       target_container.pack_start (hb, false, true, 5);
       target_container.pack_start (new Label (null), true);
@@ -265,6 +270,7 @@ namespace Synapse.Gui
     {
       update_labels ();
       results_container.select_child (model.searching_for);
+      action_label.visible = model.searching_for > SearchingFor.SOURCES;
       queue_draw ();
     }
     
@@ -370,14 +376,14 @@ namespace Synapse.Gui
       ctx.set_operator (Operator.OVER);
       ctx.new_path ();
       ctx.move_to (0, 0);
-      ctx.rel_line_to (0.0, height / 3.0);
+      ctx.rel_line_to (0.0, height / 2.0);
       ctx.rel_curve_to (width / 4.0, -height / 10.0, width / 4.0 * 3.0, -height / 10.0, width, 0.0);
-      ctx.rel_line_to (0.0, -height / 3.0);
+      ctx.rel_line_to (0.0, -height / 2.0);
       ctx.close_path ();
-      pat = new Pattern.linear (0, height / 10.0, 0, height / 3.0);
+      pat = new Pattern.linear (0, height / 10.0, 0, height / 2.0);
       ch.add_color_stop_rgba (pat, 0.0, 0.0, ch.StyleType.FG, StateType.SELECTED);
-      ch.add_color_stop_rgba (pat, 0.7, 0.4, ch.StyleType.FG, StateType.SELECTED);
-      ch.add_color_stop_rgba (pat, 1.0, 0.9, ch.StyleType.FG, StateType.SELECTED);
+      ch.add_color_stop_rgba (pat, 0.7, 0.1, ch.StyleType.FG, StateType.SELECTED);
+      ch.add_color_stop_rgba (pat, 1.0, 0.3, ch.StyleType.FG, StateType.SELECTED);
       ctx.set_source (pat);
       ctx.clip ();
       ctx.paint ();

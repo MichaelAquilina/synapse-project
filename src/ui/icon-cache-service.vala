@@ -68,21 +68,39 @@ namespace Synapse.Gui
     public void clear_cache ()
     {
       map.clear ();
+      Synapse.Utils.Logger.debug (this, "Icon Cache cleared.");
+    }
+    
+    public void reduce_cache ()
+    {
+      Gee.List<string> keys = new Gee.ArrayList<string> ();
+      keys.add_all (map.keys);
+      int i = 0;
+      // remove all non-themed icons
+      foreach (var key in keys)
+      {
+        if (key.has_prefix ("/") || key.has_prefix ("~"))
+        {
+          map.unset (key);
+          i++;
+        }
+      }
+      keys.clear ();
+      Synapse.Utils.Logger.debug (this, "Cache freed/size: %d/%d", i, map.size);
     }
     
     public Gdk.Pixbuf? get_icon (string name, int pixel_size)
     {
-      string key = "%d|%s".printf (pixel_size, name);
+      if (name == "") return null;
+      string key = "%s|%d".printf (name,pixel_size);
       PixbufInfo? info = map.get (key);
       if (info == null)
       {
-        //debug ("cant find %s" , key);
         var pixbuf = get_pixbuf (name, pixel_size);
         if (pixbuf == null) get_pixbuf ("unknown", pixel_size);
         if (pixbuf == null) return null;
         info = new PixbufInfo (pixbuf);
         map.set (key, info);
-        //debug ("ms: %d", map.size);
       }
       return info.pixbuf;
     }

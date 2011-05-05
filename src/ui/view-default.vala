@@ -343,7 +343,7 @@ namespace Synapse.Gui
           {
             icon_container.select_schema (2);
           }
-          icon_container.set_render_order ({0, 2, 1});
+          icon_container.set_render_order ({1, 2, 0});
           flag_selector.sensitive = true;
           ldescription_label.set_text (model.focus[SearchingFor.SOURCES].value.title);
           adescription_label.visible = false;
@@ -365,7 +365,10 @@ namespace Synapse.Gui
       else if (m.value == null) source_icon.set_icon_name ("");
       else
       {
-        source_icon.set_icon_name (m.value.icon_name);
+        if (m.value.has_thumbnail)
+          source_icon.set_icon_name (m.value.thumbnail_path);
+        else
+          source_icon.set_icon_name (m.value.icon_name);
         results_sources.move_selection_to_index (m.key);
       }
       if (model.searching_for == SearchingFor.SOURCES) update_labels ();
