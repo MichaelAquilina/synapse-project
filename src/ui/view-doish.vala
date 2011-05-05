@@ -375,9 +375,9 @@ namespace Synapse.Gui
       ctx.rel_line_to (0.0, -height / 3.0);
       ctx.close_path ();
       pat = new Pattern.linear (0, height / 10.0, 0, height / 3.0);
-      ch.add_color_stop_rgba (pat, 0.0, 0.0, ch.StyleType.FG, StateType.SELECTED);
-      ch.add_color_stop_rgba (pat, 0.7, 0.4, ch.StyleType.FG, StateType.SELECTED);
-      ch.add_color_stop_rgba (pat, 1.0, 0.9, ch.StyleType.FG, StateType.SELECTED);
+      pat.add_color_stop_rgba (0.0, 1.0, 1.0, 1.0, 0.0);
+      pat.add_color_stop_rgba (0.7, 1.0, 1.0, 1.0, 0.4);
+      pat.add_color_stop_rgba (1.0, 1.0, 1.0, 1.0, 0.9);
       ctx.set_source (pat);
       ctx.clip ();
       ctx.paint ();
