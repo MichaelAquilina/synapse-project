@@ -34,7 +34,8 @@ namespace Synapse.Gui
     public override void style_set (Gtk.Style? old)
     {
       base.style_set (old);
-
+      update_bg_state ();
+      
       int width, icon_size;
       string tmax, tmin;
       this.style.get (typeof(Synapse.Gui.ViewEssential), "ui-width", out width);
@@ -47,6 +48,15 @@ namespace Synapse.Gui
       spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
       focus_label.size = SmartLabel.string_to_size (tmax);
       focus_label.min_size = SmartLabel.string_to_size (tmin);
+    }
+    
+    private void update_bg_state ()
+    {
+      flag_selector.set_state (this.bg_state);
+      results_sources.set_state (this.bg_state);
+      results_actions.set_state (this.bg_state);
+      results_targets.set_state (this.bg_state);
+      menuthrobber.set_state (this.bg_state);
     }
     
     private NamedIcon source_icon;
@@ -235,18 +245,34 @@ namespace Synapse.Gui
       ctx.save ();
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
-      r = g = b = 0.5;
-      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
-      pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
-      r = g = b = 0.15;
-      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
-      pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
+      if (this.bg_state == Gtk.StateType.SELECTED)
+      {
+        r = g = b = 0.5;
+        ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, this.bg_state);
+        pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
+        r = g = b = 0.15;
+        ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, this.bg_state);
+        pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
+      }
+      else
+      {
+        ch.add_color_stop_rgba (pat, 0.0, 0.95, ch.StyleType.BG, this.bg_state, ch.Mod.LIGHTER);
+        ch.add_color_stop_rgba (pat, 1.0, 1.0, ch.StyleType.BG, this.bg_state, ch.Mod.NORMAL);
+      }
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
       ctx.set_source (pat);
       ctx.set_operator (Operator.SOURCE);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();
+      
+      //border
+      ctx.translate (- 0.5, - 0.5);      
+      Utils.cairo_rounded_rect (ctx, 0, 0, width + 1, height + 1, BORDER_RADIUS);
+      ctx.set_line_width (1.0);
+      ctx.set_operator (Cairo.Operator.OVER);
+      ctx.set_source_rgba (0.0, 0.0, 0.0, 0.5);
+      ctx.stroke ();
 
       ctx.restore ();
     }

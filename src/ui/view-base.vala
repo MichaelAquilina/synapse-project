@@ -49,12 +49,19 @@ namespace Synapse
 
     protected int BORDER_RADIUS;
     protected int SHADOW_SIZE;
+    protected Gtk.StateType bg_state;
     
     protected bool cache_enabled;
     protected Gee.Map<string, Cairo.Surface> bg_cache;
     
     static construct
     {
+      var bg_style = new GLib.ParamSpecBoolean ("use-selected-color",
+                                                "Use selected color",
+                                                "Use selected color for the background of Synapse in supported themes",
+                                                false,
+                                                GLib.ParamFlags.READWRITE);
+
       var border_radius = new GLib.ParamSpecInt ("border-radius",
                                                  "Border Radius",
                                                  "Border Radius of Synapse window",
@@ -116,6 +123,7 @@ namespace Synapse
                                                 GLib.ParamFlags.READWRITE);
       
       install_style_property (width);
+      install_style_property (bg_style);
       install_style_property (spacing);
       install_style_property (icon_size);
       install_style_property (title_max);
@@ -135,6 +143,7 @@ namespace Synapse
       
       cache_enabled = true;
       bg_cache = new Gee.HashMap<string, Cairo.Surface> ();
+      bg_state = Gtk.StateType.SELECTED;
       
       req_target = {0, 0};
       req_current = {0, 0};
@@ -218,8 +227,11 @@ namespace Synapse
     {
       base.style_set (old);
       string dmax, dmin;
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "selected-category-size", out dmax);
-      this.style.get (typeof(Synapse.Gui.ViewEssential), "unselected-category-size", out dmin);
+      bool bgselected;
+      this.style.get (typeof(Synapse.Gui.View), "use-selected-color", out bgselected);
+      this.style.get (typeof(Synapse.Gui.View), "selected-category-size", out dmax);
+      this.style.get (typeof(Synapse.Gui.View), "unselected-category-size", out dmin);
+      this.bg_state = bgselected ? StateType.SELECTED : StateType.NORMAL;
       flag_selector.selected_markup = "<span size=\"%s\"><b>%s</b></span>".printf (
                                                       SmartLabel.size_to_string[SmartLabel.string_to_size (dmax)], "%s");
       flag_selector.unselected_markup = "<span size=\"%s\">%s</span>".printf (
