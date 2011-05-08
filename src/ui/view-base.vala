@@ -135,9 +135,12 @@ namespace Synapse
       install_style_property (border_radius);
       install_style_property (shadow_size);
     }
+    
+    private Requisition old_alloc;
 
     construct
     {
+      old_alloc = {1, 1};
       update_wm ();
       if (is_kwin) Synapse.Utils.Logger.log (this, "Using KWin compatibility mode.");
       
@@ -206,6 +209,22 @@ namespace Synapse
       
     }
     
+    public override void size_allocate (Gdk.Rectangle alloc)
+    {
+      base.size_allocate (alloc);
+      if (this.is_kwin && 
+          (old_alloc.width != this.allocation.width || 
+           old_alloc.height != this.allocation.height)
+         )
+      {
+        this.add_kde_compatibility (this, this.allocation.width, this.allocation.height);
+        this.old_alloc = {
+          this.allocation.width,
+          this.allocation.height
+        };
+      }
+    }
+    
     public override void composited_changed ()
     {
       Gdk.Screen screen = this.get_screen ();
@@ -221,6 +240,19 @@ namespace Synapse
 
       update_wm ();
       update_border_and_shadow ();
+    }
+    
+    protected void add_kde_compatibility (Gtk.Window window, int w, int h)
+    {
+      /* Fix to the horrible shadow glitches in KDE 4 */
+      /* If shape mask is set, KWin will not add that horrible shadow */
+      var bitmap = new Gdk.Pixmap (null, w, h, 1);
+      var ctx = Gdk.cairo_create (bitmap);
+      ctx.set_source_rgba (0, 0, 0, 1);
+      ctx.set_operator (Cairo.Operator.SOURCE);
+      ctx.paint ();
+      window.shape_combine_mask (null, 0, 0);
+      window.shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
     }
     
     public override void style_set (Gtk.Style? old)
@@ -388,6 +420,7 @@ namespace Synapse
       Gui.Utils.move_window_to_center (this);
       this.set_list_visible (false);
       this.show ();
+      if (this.is_kwin) this.add_kde_compatibility (this, this.allocation.width, this.allocation.height);
       Gui.Utils.present_window (this);
       this.queue_draw ();
       this.summoned ();

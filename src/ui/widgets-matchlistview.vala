@@ -249,8 +249,8 @@ namespace Synapse.Gui
   {
     /* Animation stuffs */
     private uint tid;
-    private static const int ANIM_TIMEOUT = 1000 / 30;
-    private static const int ANIM_STEPS = 180 / ANIM_TIMEOUT;
+    private static const int ANIM_TIMEOUT = 1000 / 26;
+    private static const int ANIM_STEPS = 190 / ANIM_TIMEOUT;
     public bool animation_enabled {
       get; set; default = true;
     }
