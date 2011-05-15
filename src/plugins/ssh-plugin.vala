@@ -26,17 +26,20 @@ namespace Synapse
   public class SshPlugin: Object, Activatable, ItemProvider
   {
     public  bool      enabled { get; set; default = true; }
-    private bool      has_ssh;
-    private ArrayList<string> hosts;
+    private ArrayList<SshHost> hosts;
 
     static construct
     {
       register_plugin ();
     }
+    
+    construct
+    {
+      hosts = new ArrayList<SshHost> ();
+    }
 
     public void activate ()
     {
-      has_ssh = (Environment.find_program_in_path ("ssh") != null);
       parse_ssh_config.begin ();
     }
 
@@ -60,33 +63,38 @@ namespace Synapse
     {
       var file = File.new_for_path (Environment.get_home_dir () + "/.ssh/config");
 
-      hosts = new ArrayList<string> ();
+      hosts.clear ();
 
       try
       {
         var dis = new DataInputStream (file.read ());
 
         // TODO: match key boundary
-        Regex host_key_re = new Regex ("(HostName|Host)", RegexCompileFlags.OPTIMIZE);
+        Regex host_key_re = new Regex ("(host\\s)", RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
         Regex comment_re  = new Regex ("#.*$", RegexCompileFlags.OPTIMIZE);
+        Regex ws_re = new Regex ("[\\s]+", RegexCompileFlags.OPTIMIZE);
 
         string line;
 
         while ((line = yield dis.read_line_async (Priority.DEFAULT)) != null)
         {
+          /* Delete comments */
           line = comment_re.replace (line, -1, 0, "");
           if (host_key_re.match (line))
           {
+            /* remove "Host" key */
             line = host_key_re.replace (line, -1, 0, "");
+            /* Replace multiple whitespaces with a single space char */
+            line = ws_re.replace (line, -1, 0, " ").strip ();
+            /* split to find multiple host definition */
             foreach (var host in line.split (" "))
             {
               string host_stripped = host.strip ();
-              if (host_stripped != "" && host_stripped.index_of ("*") == -1)
+              if (host_stripped != ""/* && host_stripped.index_of ("*") == -1*/)
               {
                 // TODO: no dupes
-                // FIXME: handle wildcard hosts somehow
-                Utils.Logger.debug (this, "host added: %s\n", host);
-                hosts.add (host);
+                Utils.Logger.debug (this, "host added: %s\n", host_stripped);
+                hosts.add (new SshHost (host_stripped));
               }
             }
           }
@@ -100,37 +108,35 @@ namespace Synapse
 
     public bool handles_query (Query query)
     {
-      return (QueryFlags.ACTIONS in query.query_type ||
-        QueryFlags.INTERNET in query.query_type);
+      return hosts.size > 0 && 
+            ( QueryFlags.ACTIONS in query.query_type ||
+              QueryFlags.INTERNET in query.query_type);
     }
 
-    public async ResultSet? search (Query query) throws SearchError
+    public async ResultSet? search (Query q) throws SearchError
     {
       Idle.add (search.callback);
       yield;
-      query.check_cancellable ();
+      q.check_cancellable ();
 
       var results = new ResultSet ();
+      
+      var matchers = Query.get_matchers_for_query (q.query_string, 0,
+        RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
 
       foreach (var host in hosts)
       {
-        int score = 0;
-        if (host == query.query_string)
+        foreach (var matcher in matchers)
         {
-          score = Match.Score.GOOD;
+          if (matcher.key.match (host.host_query))
+          {
+            results.add (host, matcher.value - Match.Score.INCREMENT_SMALL);
+            break;
+          }
         }
-        else if (host.has_prefix (query.query_string))
-        {
-          score = Match.Score.BELOW_AVERAGE;
-        }
-        else
-        {
-          continue;
-        }
-        results.add (new SshHost (host), score);
       }
 
-      query.check_cancellable ();
+      q.check_cancellable ();
 
       return results;
     }
@@ -142,6 +148,7 @@ namespace Synapse
       public string icon_name       { get; construct set; }
       public bool   has_thumbnail   { get; construct set; }
       public string thumbnail_path  { get; construct set; }
+      public string host_query      { get; construct set; }
       public MatchType match_type   { get; construct set; }
 
       public void execute (Match? match)
@@ -166,8 +173,11 @@ namespace Synapse
           title: host_name,
           description: _("Connect with SSH"),
           has_thumbnail: false,
-          icon_name: "terminal"
+          icon_name: "terminal",
+          // FIXME: handle wildcard hosts somehow better than now
+          host_query: host_name.replace ("?", " ").replace ("*", "").strip ()
         );
+        
       }
     }
   }
