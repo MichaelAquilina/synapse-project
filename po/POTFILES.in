@@ -10,6 +10,7 @@ src/ui/view-essential.vala
 src/ui/view-default.vala
 src/ui/view-doish.vala
 src/ui/view-side-doish.vala
+src/ui/view-virgilio.vala
 src/ui/settings.vala
 src/ui/widgets.vala
 src/ui/widgets-matchlistview.vala

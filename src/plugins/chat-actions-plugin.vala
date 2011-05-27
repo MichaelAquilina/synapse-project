@@ -93,6 +93,42 @@ namespace Synapse
       }
     }
     
+    private class SendMessageTo: BaseAction
+    {
+      public SendMessageTo ()
+      {
+        Object (title: _ ("Send message to.."),
+                description: _ ("Send a message to a contact"),
+                icon_name: "message", has_thumbnail: false,
+                match_type: MatchType.ACTION,
+                default_relevancy: Match.Score.VERY_GOOD);
+      }
+      
+      public override void do_execute (Match? match, Match? target = null)
+      {
+        if ( match == null || target == null ) return;
+        ContactMatch? cm = target as ContactMatch;
+        TextMatch? text = match as TextMatch;
+        if ( cm == null || text == null ) return;
+        cm.send_message (text.get_text (), false);
+      }
+      
+      public override bool valid_for_match (Match match)
+      {
+        return match.match_type == MatchType.TEXT;
+      }
+      
+            
+      public override bool needs_target () {
+        return true;
+      }
+      
+      public override QueryFlags target_flags ()
+      {
+        return QueryFlags.CONTACTS;
+      }
+    }
+    
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -117,6 +153,7 @@ namespace Synapse
 
       actions.add (new OpenChat ());
       actions.add (new SendMessage ());
+      actions.add (new SendMessageTo ());
     }
 
     public ResultSet? find_for_match (Query query, Match match)

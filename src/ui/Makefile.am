@@ -73,6 +73,7 @@ synapse_VALASOURCES = \
 	view-essential.vala \
 	view-doish.vala \
 	view-side-doish.vala \
+	view-virgilio.vala \
 	widgets.vala \
 	widgets-matchlistview.vala \
 	icon-cache-service.vala \

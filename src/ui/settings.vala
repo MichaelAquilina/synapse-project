@@ -169,6 +169,7 @@ namespace Synapse.Gui
       themes["essential"] = Theme (_("Essential"), "", typeof (Synapse.Gui.ViewEssential));
       themes["doish"] = Theme (_("Doish"), "", typeof (Synapse.Gui.ViewDoish));
       themes["side-doish"] = Theme (_("Side Doish"), "", typeof (Synapse.Gui.ViewSideDoish));
+      themes["virgilio"] = Theme (_("Virgilio"), "", typeof (Synapse.Gui.ViewVirgilio));
 
       selected_theme = config.ui_type;
     }

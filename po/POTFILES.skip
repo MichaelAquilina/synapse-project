@@ -9,6 +9,7 @@ src/ui/view-essential.c
 src/ui/view-default.c
 src/ui/view-doish.c
 src/ui/view-side-doish.c
+src/ui/view-virgilio.c
 src/ui/settings.c
 src/ui/widgets.c
 src/ui/widgets-matchlistview.c

@@ -94,7 +94,7 @@ namespace Synapse
       var title_max = new GLib.ParamSpecString ("title-size",
                                                 "Title Font Size",
                                                 "The standard size the match title in Pango absolute sizes (string)",
-                                                "large",
+                                                "x-large",
                                                 GLib.ParamFlags.READWRITE);
       var title_min = new GLib.ParamSpecString ("title-min-size",
                                                 "Title minimum Font Size",
@@ -114,12 +114,12 @@ namespace Synapse
       var cat_max = new GLib.ParamSpecString ("selected-category-size",
                                                 "Selected Category Font Size",
                                                 "Font size of selected category in Pango absolute sizes (string)",
-                                                "small",
+                                                "medium",
                                                 GLib.ParamFlags.READWRITE);
       var cat_min = new GLib.ParamSpecString ("unselected-category-size",
                                                 "Unselected Category Font Size",
                                                 "Font size of unselected categories in Pango absolute sizes (string)",
-                                                "x-small",
+                                                "small",
                                                 GLib.ParamFlags.READWRITE);
       
       install_style_property (width);
@@ -140,6 +140,7 @@ namespace Synapse
 
     construct
     {
+      model = controller_model;
       old_alloc = {1, 1};
       update_wm ();
       if (is_kwin) Synapse.Utils.Logger.log (this, "Using KWin compatibility mode.");
@@ -200,8 +201,6 @@ namespace Synapse
         menu.get_menu ().show.connect (this.force_grab);
         menu.settings_clicked.connect (()=>{ controller.show_settings_requested (); });
       }
-      
-      model = controller_model;
     }
     
     protected virtual void build_ui ()

@@ -249,8 +249,8 @@ namespace Synapse.Gui
   {
     /* Animation stuffs */
     private uint tid;
-    private static const int ANIM_TIMEOUT = 1000 / 26;
-    private static const int ANIM_STEPS = 190 / ANIM_TIMEOUT;
+    private static const int ANIM_TIMEOUT = 1000 / 25;
+    private static const int ANIM_STEPS = 180 / ANIM_TIMEOUT;
     public bool animation_enabled {
       get; set; default = true;
     }
@@ -407,7 +407,7 @@ namespace Synapse.Gui
       
     }
     
-    private MatchViewRendererBase renderer;
+    protected MatchViewRendererBase renderer;
     private Utils.ColorHelper ch;
     
     public MatchViewRendererBase get_renderer ()
@@ -598,11 +598,13 @@ namespace Synapse.Gui
       update_current_offsets ();
     }
     
-    public void set_list (Gee.List<Match>? list, int targetted_index = 0, int selected_index = -1)
+    public virtual void set_list (Gee.List<Match>? list, int targetted_index = 0, int selected_index = -1)
     {
       this.items = list;
       this.select_index = selected_index;
       this.goto_index = targetted_index;
+      int maxoffset = list == null ? 0 : this.row_height * list.size;
+      if (this.offset > maxoffset) this.offset = maxoffset;
       inhibit_move = false;
       this.update_target_offsets ();
       this.queue_draw ();
@@ -919,6 +921,132 @@ namespace Synapse.Gui
     {
       view.set_indexes (i, i);
       status.set_markup (Markup.printf_escaped (_("<b>%d of %d</b>"), i + 1, view.get_list_size ()));
+    }
+  }
+  
+  public class SpecificMatchList: MatchListView
+  {
+    protected IController controller;
+    protected Model model;
+    protected SearchingFor sf;
+    
+    private class LabelMatch : GLib.Object, Match
+    {
+      // for Match interface
+      public string title { get; construct set; }
+      public string description { get; set; default = ""; }
+      public string icon_name { get; construct set; default = ""; }
+      public bool has_thumbnail { get; construct set; default = false; }
+      public string thumbnail_path { get; construct set; }
+      public MatchType match_type { get; construct set; }
+
+      public LabelMatch (string title, string description, string icon_name)
+      {
+        GLib.Object (match_type: MatchType.ACTION,
+                     title: title,
+                     description: description,
+                     icon_name: icon_name,
+                     has_thumbnail: false);
+      }
+    }
+    
+    private static bool lists_initialized = false;
+    private static Gee.List<Match>? tts = null;
+    private static Gee.List<Match>? nores = null;
+    private static Gee.List<Match>? noact = null;
+
+
+    private bool has_results = false;
+    private MatchViewRenderer rend;
+    public MatchViewRenderer get_match_renderer () {return rend;}
+    
+    public SpecificMatchList (IController controller, Model model, SearchingFor sf)
+    {
+      base (new MatchViewRenderer ());
+      this.rend = renderer as MatchViewRenderer;
+      this.rend.hilight_on_selected = true;
+      this.sf = sf;
+      this.controller = controller;
+      this.model = model;
+      if (!lists_initialized)
+      {
+        lists_initialized = true;
+        
+        tts = new Gee.ArrayList<Match>();
+        nores = new Gee.ArrayList<Match>();
+        noact = new Gee.ArrayList<Match>();
+        Match m = null;
+        m = new LabelMatch (controller.NO_RESULTS,
+                            "",
+                            "missing-image");
+        nores.add (m);
+        m = new LabelMatch (controller.NO_RECENT_ACTIVITIES,
+                            "",
+                            "missing-image");
+        noact.add (m);
+        m = new LabelMatch (controller.TYPE_TO_SEARCH,
+                            controller.DOWN_TO_SEE_RECENT,
+                            "search");
+        tts.add (m);
+        this.controller.handle_recent_activities.connect ((b)=>{
+          m.description = controller.DOWN_TO_SEE_RECENT;
+          queue_draw ();
+        });
+      }
+    }
+    
+    public void update_searching_for ()
+    {
+      if (controller.is_in_initial_state ())
+      {
+        this.selection_enabled = false;
+        this.min_visible_rows = sf == SearchingFor.SOURCES ? 1 : 0;
+      }
+      else if (model.searching_for == sf)
+      {
+        this.min_visible_rows = 5;
+        this.selection_enabled = has_results;
+      }
+      else
+      {
+        this.selection_enabled = false;
+        this.min_visible_rows = sf != SearchingFor.TARGETS ? 1 : has_results ? 1 : 0;
+      }
+    }
+
+    public override void set_list (Gee.List<Match>? list, int targetted_index = 0, int selected_index = -1)
+    {
+      if (list == null || list.size == 0)
+      {
+        has_results = false;
+        switch (this.sf)
+        {
+          case SearchingFor.SOURCES:
+            if (controller.is_in_initial_state ()) base.set_list (tts);
+            else if (controller.is_searching_for_recent ()) base.set_list (noact);
+            else base.set_list (nores);
+            break;
+          case SearchingFor.ACTIONS:
+            if (model.focus[SearchingFor.SOURCES].value != null)
+              base.set_list (nores);
+            else
+              base.set_list (null);
+            break;
+          default: //TARGETS
+            if (!model.needs_target ()) base.set_list (null);
+            else if (controller.is_searching_for_recent ()) base.set_list (noact);
+            else base.set_list (nores);
+            break;
+        }
+        this.rend.pattern = "";
+      }
+      else
+      {
+        has_results = true;
+        base.set_list (list, targetted_index, selected_index);
+        this.rend.pattern = model.query[sf];
+      }
+      update_searching_for ();
     }
   }
 }

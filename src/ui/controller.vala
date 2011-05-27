@@ -493,6 +493,7 @@ namespace Synapse.Gui
       handle_empty = plugin != null && (plugin as ItemProvider).enabled;
       DOWN_TO_SEE_RECENT = handle_empty ? _("...or press down key to browse recent activities") : "";
       if (view != null) view.update_focused_source (model.focus[SearchingFor.SOURCES]);
+      handle_recent_activities (handle_empty);
     }
     
     /**

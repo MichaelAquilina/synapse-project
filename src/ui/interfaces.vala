@@ -47,7 +47,7 @@ namespace Synapse.Gui
     public abstract CategoryConfig category_config { get; construct set; }
     
     public static const int RESULTS_PER_PAGE = 5;
-    public static const int PARTIAL_RESULT_TIMEOUT = 110;
+    public static const int PARTIAL_RESULT_TIMEOUT = 120;
     
     /* Events called by View */
     
@@ -78,6 +78,9 @@ namespace Synapse.Gui
     
     /* Tells at synapse main, that the user wants to configure synapse */
     public signal void show_settings_requested ();
+    
+    /* Tells to views that now it can/cant search for recent activities */
+    public signal void handle_recent_activities (bool can);
   }
   
   public interface IView : Object
