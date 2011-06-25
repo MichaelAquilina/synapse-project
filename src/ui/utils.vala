@@ -92,7 +92,10 @@ namespace Synapse.Gui
     {
       UriMatch? m = match as UriMatch;
       
-      if (m == null) return match.description; // not an UriMatch
+      if (m == null || m.match_type != MatchType.GENERIC_URI)
+      {
+        return match.description; // not an UriMatch
+      }
       
       if (!m.uri.has_prefix("file://")) return m.uri; //fix only local files
       
