@@ -4,6 +4,8 @@ desktopdir = $(datarootdir)/applications
 desktop_DATA = synapse.desktop
 @INTLTOOL_DESKTOP_RULE@
 
+dist_man_MANS = synapse.1
+
 svgicondir = $(datadir)/icons/hicolor/scalable/apps
 svgicon_DATA = synapse.svg
 #icons = sezen-16.png sezen-22.png sezen-24.png sezen-32.png
