@@ -377,6 +377,15 @@ namespace Synapse
     {
       try
       {
+#if VALA_0_14
+        uint8[] file_contents;
+        bool success = yield file.load_contents_async (null, out file_contents);
+        if (success)
+        {
+          var keyfile = new KeyFile ();
+          keyfile.load_from_data ((string) file_contents,
+                                  file_contents.length, 0);
+#else
         size_t len;
         string contents;
         bool success = yield file.load_contents_async (null, 
@@ -385,6 +394,7 @@ namespace Synapse
         {
           var keyfile = new KeyFile ();
           keyfile.load_from_data (contents, len, 0);
+#endif
           var dfi = new DesktopFileInfo.for_keyfile (file.get_path (), keyfile);
           if (dfi.is_valid)
           {
