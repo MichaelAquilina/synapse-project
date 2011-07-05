@@ -269,7 +269,9 @@ namespace Synapse
       }
     }
 
-    private bool has_unknown_handlers = false;
+    public bool has_empty_handlers { get; set; default = false; }
+    public bool has_unknown_handlers { get; set; default = false; }
+
     private bool plugins_loaded = false;
 
     public signal void plugin_registered (Object plugin);
@@ -284,7 +286,9 @@ namespace Synapse
       }
       if (plugin is ItemProvider)
       {
-        item_plugins.add (plugin as ItemProvider);
+        ItemProvider item_plugin = plugin as ItemProvider;
+        item_plugins.add (item_plugin);
+        has_empty_handlers |= item_plugin.handles_empty_query ();
       }
 
       plugin_registered (plugin);
@@ -292,17 +296,32 @@ namespace Synapse
     
     private void update_has_unknown_handlers ()
     {
-      has_unknown_handlers = false;
+      bool tmp = false;
       foreach (var action in action_plugins)
       {
         if (action.enabled && action.handles_unknown ())
         {
-          has_unknown_handlers = true;
-          return;
+          tmp = true;
+          break;
         }
       }
+      has_unknown_handlers = tmp;
     }
-    
+
+    private void update_has_empty_handlers ()
+    {
+      bool tmp = false;
+      foreach (var item_plugin in item_plugins)
+      {
+        if (item_plugin.enabled && item_plugin.handles_empty_query ())
+        {
+          tmp = true;
+          break;
+        }
+      }
+      has_empty_handlers = tmp;
+    }
+
     private Object? create_plugin (Type t)
     {
       var obj_class = (ObjectClass) t.class_ref ();
@@ -379,7 +398,7 @@ namespace Synapse
       // save it into our config object
       config.set_plugin_enabled (plugin_type, enabled);
       ConfigService.get_default ().set_config ("data-sink", "global", config);
-      
+
       foreach (var plugin in item_plugins)
       {
         if (plugin.get_type () == plugin_type)
@@ -387,6 +406,7 @@ namespace Synapse
           plugin.enabled = enabled;
           if (enabled) plugin.activate ();
           else plugin.deactivate ();
+          update_has_empty_handlers ();
           return;
         }
       }

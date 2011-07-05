@@ -468,29 +468,13 @@ namespace Synapse.Gui
       qf = category_config.categories.get (category_config.default_category_index).flags;
       last_result_set = null;
       
-      var plugin = data_sink.get_plugin("SynapseZeitgeistPlugin");
-      if (plugin != null)
-      {
-        plugin_registered_handler (plugin);
-      }
-      data_sink.plugin_registered.connect (plugin_registered_handler);
+      data_sink.notify["has-empty-handlers"].connect (update_handle_empty);
       update_handle_empty ();
-    }
-    
-    private void plugin_registered_handler (Object plugin)
-    {
-      // FIXME: expose this as prop of data-sink
-      if (plugin.get_type ().name () == "SynapseZeitgeistPlugin")
-      {
-        plugin.notify["enabled"].connect (update_handle_empty);
-        update_handle_empty ();
-      }
     }
     
     private void update_handle_empty ()
     {
-      var plugin = data_sink.get_plugin ("SynapseZeitgeistPlugin");
-      handle_empty = plugin != null && (plugin as ItemProvider).enabled;
+      handle_empty = data_sink.has_empty_handlers;
       DOWN_TO_SEE_RECENT = handle_empty ? _("...or press down key to browse recent activities") : "";
       if (view != null) view.update_focused_source (model.focus[SearchingFor.SOURCES]);
       handle_recent_activities (handle_empty);
