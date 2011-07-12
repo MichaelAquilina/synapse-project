@@ -46,6 +46,8 @@ namespace Synapse
     protected Gui.Utils.ColorHelper ch;
     protected HTextSelector flag_selector;
     protected MenuButton menu;
+    
+    protected Label spacer;
 
     protected int BORDER_RADIUS;
     protected int SHADOW_SIZE;
@@ -192,6 +194,12 @@ namespace Synapse
         controller.category_changed_event (flag_selector.selected);
       });
       
+      /* Use the spacer to separate the list from the main section of the window
+       * the spacer will fill up the space equal to the rounded border plus the shadow
+       */
+      spacer = new Label (null);
+      spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
+      
       menu = null;
       
       build_ui ();
@@ -277,6 +285,7 @@ namespace Synapse
       {
         this.style.get (typeof(Synapse.Gui.View), "border-radius", out BORDER_RADIUS);
         this.style.get (typeof(Synapse.Gui.View), "shadow-size", out SHADOW_SIZE);
+        
       }
       else
       {
@@ -285,6 +294,7 @@ namespace Synapse
       }
 
       this.border_width = BORDER_RADIUS + SHADOW_SIZE;
+      this.spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
 
       this.queue_resize ();
       this.queue_draw ();

@@ -81,8 +81,6 @@ namespace Synapse.Gui
     
     private SchemaContainer icon_container;
     
-    private Label spacer;
-    
     private VBox container;
     
     private SelectionContainer results_container;
@@ -197,8 +195,6 @@ namespace Synapse.Gui
       hb.pack_start (vb, true);
       
       container.pack_start (hb, false);
-      spacer = new Label (null);
-      spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
       container.pack_start (spacer, false);
       
       /* list */

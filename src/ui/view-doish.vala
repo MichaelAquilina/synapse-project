@@ -105,8 +105,6 @@ namespace Synapse.Gui
     private SmartLabel target_label;
     private SmartLabel description_label;
     
-    private Label spacer;
-    
     private SelectionContainer results_container;
     
     private ResultBox results_sources;
@@ -224,8 +222,6 @@ namespace Synapse.Gui
       target_container.pack_start (new Label (null), true);
 
       /* list */
-      spacer = new Label (null);
-      spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
       this.prepare_results_container (out results_container, out results_sources,
                                       out results_actions, out results_targets, StateType.SELECTED);
 
