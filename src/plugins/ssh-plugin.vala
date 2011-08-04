@@ -183,5 +183,5 @@ namespace Synapse
   }
 }
 
-// vim: expandtab softtabsstop tabstop=2
+// vim: expandtab softtabstop tabstop=2
 
