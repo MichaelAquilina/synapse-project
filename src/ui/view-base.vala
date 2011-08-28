@@ -176,7 +176,6 @@ namespace Synapse
                                           | Gdk.EventMask.KEY_PRESS_MASK);
 
       Gui.Utils.ensure_transparent_bg (this);
-      composited_changed ();
       
       ch = new Gui.Utils.ColorHelper (this);
       
@@ -204,6 +203,8 @@ namespace Synapse
       
       build_ui ();
       
+      composited_changed ();
+
       if (menu != null)
       {
         menu.get_menu ().show.connect (this.force_grab);
