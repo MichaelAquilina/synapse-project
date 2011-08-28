@@ -267,6 +267,7 @@ namespace Synapse
       uint query_id = q.query_id;
       bool folder_query_only = (q.query_type & QueryFlags.LOCAL_CONTENT) == QueryFlags.PLACES;
       // wait for our signal or cancellable
+      ResultSet? zg_rs = null;
       ulong sig_id = this.zeitgeist_search_complete.connect ((rs, q_id) =>
       {
         if (q_id != query_id) return;
@@ -274,6 +275,7 @@ namespace Synapse
         if (rs != null)
         {
           directories = extract_directories (rs);
+          zg_rs = rs;
         }
         search.callback ();
       });
@@ -284,7 +286,7 @@ namespace Synapse
         Idle.add (search.callback);
       });
 
-      if (data_sink.is_plugin_enabled (Type.from_name ("SynapseZeitgeistPlugin")))
+      if (data_sink.is_plugin_enabled (Type.from_name ("SynapseZeitgeistPlugin")) && folder_query_only == false)
       {
         // wait for results from ZeitgeistPlugin
         yield;
@@ -305,7 +307,7 @@ namespace Synapse
       foreach (var entry in directory_info_map.values)
       {
         // do we have this result already?
-        if (rs.contains_uri (entry.match_obj.uri)) continue;
+        if (zg_rs.contains_uri (entry.match_obj.uri)) continue;
 
         if (entry.name_folded == q.query_string_folded)
         {
