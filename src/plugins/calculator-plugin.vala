@@ -85,9 +85,9 @@ namespace Synapse
       */
       try
       {
-        regex = new Regex ("^\\(*(-?\\d+(\\.\\d+)?)([*/+-^]\\(*(-?\\d+(\\.\\d+)?)\\)*)+$",
+        regex = new Regex ("^\\(*(-?\\d+([.,]\\d+)?)([*/+-^]\\(*(-?\\d+([.,]\\d+)?)\\)*)+$",
                          RegexCompileFlags.OPTIMIZE);
-      }catch (Error e) {
+      } catch (Error e) {
         Utils.Logger.error (this, "Error creating regexp.");
       }
     }
@@ -99,7 +99,7 @@ namespace Synapse
 
     public async ResultSet? search (Query query) throws SearchError
     { 
-      string input = query.query_string.replace (" ", "");
+      string input = query.query_string.replace (" ", "").replace (",", ".");
       bool matched = regex.match (input);
       if (!matched && input.length > 1)
       {
