@@ -307,7 +307,7 @@ namespace Synapse
       foreach (var entry in directory_info_map.values)
       {
         // do we have this result already?
-        if (zg_rs.contains_uri (entry.match_obj.uri)) continue;
+        if (zg_rs != null && zg_rs.contains_uri (entry.match_obj.uri)) continue;
 
         if (entry.name_folded == q.query_string_folded)
         {
