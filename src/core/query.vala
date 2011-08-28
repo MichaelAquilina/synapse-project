@@ -60,10 +60,12 @@ namespace Synapse
       IMAGES          = 1 << 7,
     FILES           = AUDIO | VIDEO | DOCUMENTS | IMAGES,
     
-    FOLDERS         = 1 << 8,
+    PLACES          = 1 << 8,
 
+    // FIXME: shouldn't this be FILES | INCLUDE_REMOTE?
     INTERNET        = 1 << 9,
     
+    // FIXME: Text Query flag? kinda weird, why do we have this here?
     TEXT            = 1 << 10,
     
     CONTACTS        = 1 << 11,

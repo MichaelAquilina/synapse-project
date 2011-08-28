@@ -70,6 +70,7 @@ namespace Synapse.Gui
         Category.name_query_to_string ( _("Audio"), QueryFlags.AUDIO ),
         Category.name_query_to_string ( _("Applications"), QueryFlags.APPLICATIONS ),
         Category.name_query_to_string ( _("All"), QueryFlags.ALL ),
+        Category.name_query_to_string ( _("Places"), QueryFlags.PLACES ),
         Category.name_query_to_string ( _("Documents"), QueryFlags.DOCUMENTS ),
         Category.name_query_to_string ( _("Images"), QueryFlags.IMAGES ),
         Category.name_query_to_string ( _("Video"), QueryFlags.VIDEO ),
@@ -109,7 +110,7 @@ namespace Synapse.Gui
       
       _labels.set (QueryFlags.INCLUDE_REMOTE, _("Include remote content"));
       _labels.set (QueryFlags.ACTIONS, _("Actions"));
-      _labels.set (QueryFlags.FOLDERS, _("Folders"));
+      _labels.set (QueryFlags.PLACES, _("Places"));
       _labels.set (QueryFlags.AUDIO, _("Audio"));
       _labels.set (QueryFlags.APPLICATIONS, _("Applications"));
       _labels.set (QueryFlags.DOCUMENTS, _("Documents"));

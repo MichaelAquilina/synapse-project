@@ -106,26 +106,37 @@ namespace Synapse.Gui
       string desc_fixed = m.description;
       
       if (home_directory == null)
-    	{
-    		home_directory = Environment.get_home_dir ();
-    		home_directory_length = home_directory.length;
-    	}
-    	if (desc_fixed.has_prefix (home_directory)) //if is home dir
-    	{
-    	  desc_fixed = _("Home") + desc_fixed.substring (home_directory_length);
-    	}
-    	else // is root
-    	{
-    	  desc_fixed = _("Root") + desc_fixed;
-    	}
-    	
-    	// convert "/" to " > "
-    	string[] parts = Regex.split_simple ("/", desc_fixed);
-    	desc_fixed = string.joinv (" > ", parts);
+      {
+        home_directory = Environment.get_home_dir ();
+        home_directory_length = home_directory.length;
+      }
+      if (desc_fixed.has_prefix (home_directory)) //if is home dir
+      {
+        desc_fixed = _("Home") + desc_fixed.substring (home_directory_length);
+      }
+      else // is root
+      {
+        var vs = VolumeService.get_default ();
+        string? volume_path;
+        string? volume_name = vs.uri_to_volume_name (m.uri, out volume_path);
 
-    	//m.set_data<string> ("printable-description", desc_fixed);
+        if (volume_path != null && desc_fixed.has_prefix (volume_path))
+        {
+          desc_fixed = volume_name + desc_fixed.substring (volume_path.length);
+        }
+        else
+        {
+          desc_fixed = _("Root") + desc_fixed;
+        }
+      }
+      
+      // convert "/" to " > "
+      string[] parts = Regex.split_simple ("/", desc_fixed);
+      desc_fixed = string.joinv (" > ", parts);
 
-    	return desc_fixed;
+      //m.set_data<string> ("printable-description", desc_fixed);
+
+      return desc_fixed;
     }
     
     public static void update_layout_rtl (Pango.Layout layout, Gtk.TextDirection rtl)

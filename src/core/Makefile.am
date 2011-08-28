@@ -30,6 +30,7 @@ libsynapsecore_la_VALASOURCES = \
 	relevancy-service.vala \
 	result-set.vala \
 	utils.vala \
+	volume-service.vala \
 	$(NULL)
 
 if HAVE_ZEITGEIST

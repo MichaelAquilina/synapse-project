@@ -122,6 +122,7 @@ namespace Synapse
         {
           Log.set_handler (domain, levels, handler);
         }
+        Log.set_handler (null, levels, handler);
 
         show_debug = Environment.get_variable ("SYNAPSE_DEBUG") != null;
         initialized = true;

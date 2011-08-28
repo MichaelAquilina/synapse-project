@@ -192,7 +192,7 @@ namespace Synapse
         var parent = f.get_parent ();
         var parent_uri = parent.get_uri ();
         if (parent_uri in directories) continue;
-        
+
         directories.add (parent_uri);
       }
 
@@ -256,18 +256,25 @@ namespace Synapse
       }
     }
 
+    public bool handles_query (Query q)
+    {
+      return (QueryFlags.PLACES in q.query_type);
+    }
+
     public async ResultSet? search (Query q) throws SearchError
     {
-      if (!(QueryFlags.FOLDERS in q.query_type)) return null;
-
       Gee.Collection<string>? directories = null;
       uint query_id = q.query_id;
+      bool folder_query_only = (q.query_type & QueryFlags.LOCAL_CONTENT) == QueryFlags.PLACES;
       // wait for our signal or cancellable
       ulong sig_id = this.zeitgeist_search_complete.connect ((rs, q_id) =>
       {
         if (q_id != query_id) return;
         // let's mine directories ZG is aware of
-        if (rs != null) directories = extract_directories (rs);
+        if (rs != null)
+        {
+          directories = extract_directories (rs);
+        }
         search.callback ();
       });
       ulong canc_sig_id = CancellableFix.connect (q.cancellable, () =>
@@ -297,6 +304,9 @@ namespace Synapse
       var rs = new ResultSet ();
       foreach (var entry in directory_info_map.values)
       {
+        // do we have this result already?
+        if (rs.contains_uri (entry.match_obj.uri)) continue;
+
         if (entry.name_folded == q.query_string_folded)
         {
           // exact match

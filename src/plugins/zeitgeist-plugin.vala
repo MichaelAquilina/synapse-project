@@ -36,6 +36,8 @@ namespace Synapse
       
     }
 
+    public unowned DataSink data_sink { get; set; }
+
     private const string UNIQUE_NAME = "org.gnome.zeitgeist.Engine";
     private class MatchObject: Object, 
       Match, UriMatch, ApplicationMatch, ExtendedInfo
@@ -64,26 +66,35 @@ namespace Synapse
       public MatchObject (Zeitgeist.Event event,
                           string? thumbnail_path,
                           string? icon,
-                          bool is_application = false)
+                          QueryFlags obj_type = QueryFlags.FILES)
       {
         Object (match_type: MatchType.GENERIC_URI,
                 has_thumbnail: thumbnail_path != null,
                 icon_name: icon ?? "",
                 thumbnail_path: thumbnail_path ?? "");
 
-        if (!is_application) init_from_event (event);
-        else init_from_app_event (event);
+        if (QueryFlags.FILES in obj_type)
+          init_from_event (event);
+        else if (QueryFlags.APPLICATIONS in obj_type)
+          init_from_app_event (event);
+        else if (QueryFlags.PLACES in obj_type)
+          init_from_event (event, true);
       }
 
-      private void init_from_event (Zeitgeist.Event event)
+      private void init_from_event (Zeitgeist.Event event,
+                                    bool use_origin = false)
       {
         var subject = event.get_subject (0);
-        this.uri = subject.get_uri ();
+        this.uri = use_origin ? subject.get_origin () : subject.get_uri ();
         var f = File.new_for_uri (this.uri);
         this.description = f.get_parse_name ();
 
         unowned string text = subject.get_text ();
-        if (text == null || text == "")
+        if (use_origin)
+        {
+          this.title = Path.get_basename (f.get_parse_name ());
+        }
+        else if (text == null || text == "")
         {
           this.title = this.description;
         }
@@ -225,7 +236,8 @@ namespace Synapse
                                         Zeitgeist.ResultSet events,
                                         Cancellable cancellable,
                                         ResultSet real_results,
-                                        bool local_only)
+                                        bool local_only,
+                                        bool places_search)
     {
       Gee.Set<string> uris = new Gee.HashSet<string> ();
 
@@ -243,7 +255,8 @@ namespace Synapse
       {
         if (event.num_subjects () <= 0) continue;
         var subject = event.get_subject (0);
-        unowned string uri = subject.get_uri ();
+        unowned string uri = places_search ?
+          subject.get_origin () : subject.get_uri ();
         if (uri == null || uri == "") continue;
         // make sure we don't add the same uri twice
         if (!(uri in uris))
@@ -315,9 +328,11 @@ namespace Synapse
             }
           }
 
+          var match_type = places_search ? QueryFlags.PLACES : QueryFlags.FILES;
           var match_obj = new MatchObject (event,
                                            thumbnail_path,
-                                           icon);
+                                           icon,
+                                           match_type);
           bool match_found = false;
           foreach (var matcher in matchers)
           {
@@ -362,10 +377,11 @@ namespace Synapse
     private async void process_recent_results (Zeitgeist.ResultSet events,
                                                Cancellable cancellable,
                                                ResultSet results,
-                                               bool local_only)
+                                               bool local_only,
+                                               bool places_search)
     {
       Gee.Set<string> uris = new Gee.HashSet<string> ();
-      
+
       uint events_size = events.size ();
       uint event_index = 0;
 
@@ -374,7 +390,8 @@ namespace Synapse
         event_index++;
         if (event.num_subjects () <= 0) continue;
         var subject = event.get_subject (0);
-        unowned string uri = subject.get_uri ();
+        unowned string uri = places_search ?
+          subject.get_origin () : subject.get_uri ();
         if (!(uri in uris))
         {
           bool is_application = uri.has_prefix ("application://");
@@ -430,10 +447,13 @@ namespace Synapse
             }
           }
 
+          QueryFlags match_type = (is_application ?
+            QueryFlags.APPLICATIONS : (places_search ?
+              QueryFlags.PLACES : QueryFlags.FILES));
           var match_obj = new MatchObject (event,
                                            thumbnail_path,
                                            icon,
-                                           is_application);
+                                           match_type);
           match_obj.init_extended_info_from_event (event);
 
           int relevancy = (int) ((events_size - event_index) / 
@@ -474,7 +494,7 @@ namespace Synapse
 
         return templates; // this is the only template we need
       }
-      
+
       if (QueryFlags.APPLICATIONS in flags)
       {
         subject = new Zeitgeist.Subject ();
@@ -573,6 +593,16 @@ namespace Synapse
         templates.add (event);
       }
 
+      if (QueryFlags.PLACES in flags)
+      {
+        event = new Zeitgeist.Event ();
+        subject = new Zeitgeist.Subject ();
+        subject.set_interpretation ("!" + Zeitgeist.NFO_WEBSITE);
+        event.add_subject (subject);
+
+        templates.add (event);
+      }
+
       return templates;
     }
     
@@ -604,20 +634,27 @@ namespace Synapse
       {
         Zeitgeist.ResultSet rs;
         bool only_local = !(QueryFlags.INCLUDE_REMOTE in q.query_type);
+        bool places_search = (q.query_type & QueryFlags.LOCAL_CONTENT) == QueryFlags.PLACES;
+        // we want origin grouping for PLACES
+        Zeitgeist.ResultType rt = places_search ?
+          Zeitgeist.ResultType.MOST_RECENT_ORIGIN :
+          Zeitgeist.ResultType.MOST_RECENT_SUBJECTS;
+
+        // special case empty searches
         if (empty_query)
         {
-          // special case empty searches
-          int64 start_ts = Zeitgeist.Timestamp.now () - Zeitgeist.Timestamp.WEEK * 4;
+          int64 start_ts = Zeitgeist.Timestamp.now () - Zeitgeist.Timestamp.WEEK * 24;
           rs = yield zg_log.find_events (new Zeitgeist.TimeRange (start_ts, int64.MAX),
                                          (owned) templates,
                                          Zeitgeist.StorageState.ANY,
                                          q.max_results,
-                                         Zeitgeist.ResultType.MOST_RECENT_SUBJECTS,
+                                         rt,
                                          q.cancellable);
 
           if (!q.is_cancelled ())
           {
-            yield process_recent_results (rs, q.cancellable, result, only_local);
+            yield process_recent_results (rs, q.cancellable, result,
+                                          only_local, places_search);
           }
         }
         else
@@ -629,13 +666,13 @@ namespace Synapse
                                       (owned) templates,
                                       0,
                                       q.max_results,
-                                      Zeitgeist.ResultType.MOST_RECENT_SUBJECTS,
+                                      rt,
                                       q.cancellable);
 
           if (!q.is_cancelled ())
           {
             yield process_results (q.query_string, rs, q.cancellable, result,
-                                   only_local);
+                                   only_local, places_search);
           }
         }
       }
