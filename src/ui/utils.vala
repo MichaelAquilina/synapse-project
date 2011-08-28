@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by Michal Hruby <michal.mhr@gmail.com>
- *						 Alberto Aldegheri <albyrock87+dev@gmail.com>
+ *             Alberto Aldegheri <albyrock87+dev@gmail.com>
  *
  */
 
@@ -28,12 +28,13 @@ namespace Synapse.Gui
     private static string home_directory = null;
     private static long home_directory_length = 0;
     
-    public static string markup_string_with_search (string text, string pattern, string size = "xx-large", bool show_not_found = false)
+    public static string markup_string_with_search (string text,
+      string pattern, string size = "xx-large", bool show_not_found = false)
     {
-    	string markup = "%s";
-    	if (size != "")
-    	{
-    	  markup = "<span size=\"%s\">%s</span>".printf (size, "%s");
+      string markup = "%s";
+      if (size != "")
+      {
+        markup = "<span size=\"%s\">%s</span>".printf (size, "%s");
       }
       if (pattern == "")
       {
@@ -81,10 +82,10 @@ namespace Synapse.Gui
       }
       else
       {
-      	if (show_not_found)
-      	  return markup.printf ("%s <small><small>(%s)</small></small>").printf (Markup.escape_text(text), Markup.escape_text(pattern));
-       	else
-       		return markup.printf (Markup.escape_text(text));
+        if (show_not_found)
+          return markup.printf ("%s <small><small>(%s)</small></small>").printf (Markup.escape_text(text), Markup.escape_text(pattern));
+         else
+           return markup.printf (Markup.escape_text(text));
       }
     }
     
@@ -215,21 +216,21 @@ namespace Synapse.Gui
     
     private static Gdk.Rectangle get_current_monitor_geometry (Gdk.Screen screen) 
     {
-    	var display = screen.get_display ();
-    	int x = 0, y = 0;
-    	Gdk.Screen screen_for_pointer = null;
-    	display.get_pointer (out screen_for_pointer, out x, out y, null);
-    	
-    	Gdk.Rectangle rect = {0, 0};
-    	screen_for_pointer.get_monitor_geometry (screen_for_pointer.get_monitor_at_point (x, y), out rect);
-    	
-    	return rect;
+      var display = screen.get_display ();
+      int x = 0, y = 0;
+      Gdk.Screen screen_for_pointer = null;
+      display.get_pointer (out screen_for_pointer, out x, out y, null);
+      
+      Gdk.Rectangle rect = {0, 0};
+      screen_for_pointer.get_monitor_geometry (screen_for_pointer.get_monitor_at_point (x, y), out rect);
+      
+      return rect;
     }
     public static void move_window_to_center (Gtk.Window win)
     {
       Gdk.Screen screen = win.get_screen () ?? Gdk.Screen.get_default ();
       if (screen == null)
-      	return;
+        return;
       var rect = get_current_monitor_geometry (screen);
       Gtk.Requisition req = {0, 0};
       win.size_request (out req);
@@ -417,8 +418,8 @@ namespace Synapse.Gui
 
       public ColorHelper (Gtk.Widget for_widget)
       {
-      	this.colormap = new Gee.HashMap <string, Color> ();
-      	this.widget = for_widget;
+        this.colormap = new Gee.HashMap <string, Color> ();
+        this.widget = for_widget;
         this.widget.style_set.connect (()=>{
           colormap.clear ();
         });
@@ -435,35 +436,35 @@ namespace Synapse.Gui
         blue = b;
       }
       
-			private Color get_color_from_map (StyleType t, Gtk.StateType st, Mod mod)
-			{
-				Color col;
+      private Color get_color_from_map (StyleType t, Gtk.StateType st, Mod mod)
+      {
+        Color col;
         string key = "%d%d%d".printf (t, st, mod);
         if (this.colormap.has_key (key))
-        	col = this.colormap.get (key);
+          col = this.colormap.get (key);
         else
         {
-        	col = new Color ();
-        	switch (t)
-        	{
-        		case StyleType.BG:
-        			col.init_from_gdk_color (widget.style.bg[st]);
-        			break;
-        		case StyleType.FG:
-        			col.init_from_gdk_color (widget.style.fg[st]);
-        			break;
-        		case StyleType.BASE:
-        			col.init_from_gdk_color (widget.style.base[st]);
-        			break;
-        		case StyleType.TEXT:
-        			col.init_from_gdk_color (widget.style.text[st]);
-        			break;
-        	}
-        	col.apply_mod (mod);
-        	this.colormap.set (key, col);
+          col = new Color ();
+          switch (t)
+          {
+            case StyleType.BG:
+              col.init_from_gdk_color (widget.style.bg[st]);
+              break;
+            case StyleType.FG:
+              col.init_from_gdk_color (widget.style.fg[st]);
+              break;
+            case StyleType.BASE:
+              col.init_from_gdk_color (widget.style.base[st]);
+              break;
+            case StyleType.TEXT:
+              col.init_from_gdk_color (widget.style.text[st]);
+              break;
+          }
+          col.apply_mod (mod);
+          this.colormap.set (key, col);
         }
         return col;
-			}
+      }
       public void set_source_rgba (Cairo.Context ctx, double alpha, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
       {
         Color col = get_color_from_map (t, st, mod);
@@ -546,17 +547,17 @@ namespace Synapse.Gui
               Utils.rgb_invert_color (ref this.r, ref this.g, ref this.b);
               break;
             case Mod.LIGHTER:
-            	shade (ref this.r, ref this.g, ref this.b, 1.08);
-            	break;
-           	case Mod.DARKER:
-           		shade (ref this.r, ref this.g, ref this.b, 0.92);
-           		break;
-           	case Mod.LIGHTEST:
-            	shade (ref this.r, ref this.g, ref this.b, 1.2);
-            	break;
-           	case Mod.DARKEST:
-           		shade (ref this.r, ref this.g, ref this.b, 0.8);
-           		break;
+              shade (ref this.r, ref this.g, ref this.b, 1.08);
+              break;
+             case Mod.DARKER:
+               shade (ref this.r, ref this.g, ref this.b, 0.92);
+               break;
+             case Mod.LIGHTEST:
+              shade (ref this.r, ref this.g, ref this.b, 1.2);
+              break;
+             case Mod.DARKEST:
+               shade (ref this.r, ref this.g, ref this.b, 0.8);
+               break;
             default:
               break;
           }
@@ -564,16 +565,16 @@ namespace Synapse.Gui
         
         public bool is_dark_color ()
         {
-        	double h;
-	        double l;
-	        double s;
+          double h;
+          double l;
+          double s;
 
-	        h = r;
-	        l = g;
-	        s = b;
-	        
-	        murrine_rgb_to_hls (&h, &l, &s);
-	        return l < 0.40;
+          h = r;
+          l = g;
+          s = b;
+          
+          murrine_rgb_to_hls (&h, &l, &s);
+          return l < 0.40;
         }
         
         public static void colorize (double *r, double *g, double *b,
@@ -593,189 +594,189 @@ namespace Synapse.Gui
          * Copyright (C) 2006-2007-2008-2009 Andrea Cimitan
          */
         public static void murrine_rgb_to_hls (double *r,
-								                               double *g,
-								                               double *b)
+                                               double *g,
+                                               double *b)
         {
-	        double min;
-	        double max;
-	        double red;
-	        double green;
-	        double blue;
-	        double h = 0, l = 0, s = 0;
-	        double delta;
+          double min;
+          double max;
+          double red;
+          double green;
+          double blue;
+          double h = 0, l = 0, s = 0;
+          double delta;
 
-	        red = *r;
-	        green = *g;
-	        blue = *b;
+          red = *r;
+          green = *g;
+          blue = *b;
 
-	        if (red > green)
-	        {
-		        if (red > blue)
-			        max = red;
-		        else
-			        max = blue;
+          if (red > green)
+          {
+            if (red > blue)
+              max = red;
+            else
+              max = blue;
 
-		        if (green < blue)
-			        min = green;
-		        else
-			        min = blue;
-	        }
-	        else
-	        {
-		        if (green > blue)
-			        max = green;
-		        else
-			        max = blue;
+            if (green < blue)
+              min = green;
+            else
+              min = blue;
+          }
+          else
+          {
+            if (green > blue)
+              max = green;
+            else
+              max = blue;
 
-		        if (red < blue)
-			        min = red;
-		        else
-			        min = blue;
-	        }
+            if (red < blue)
+              min = red;
+            else
+              min = blue;
+          }
 
-	        l = (max+min)/2;
-	        if (Math.fabs (max-min) < 0.0001)
-	        {
-		        h = 0;
-		        s = 0;
-	        }
-	        else
-	        {
-		        if (l <= 0.5)
-			        s = (max-min)/(max+min);
-		        else
-			        s = (max-min)/(2-max-min);
+          l = (max+min)/2;
+          if (Math.fabs (max-min) < 0.0001)
+          {
+            h = 0;
+            s = 0;
+          }
+          else
+          {
+            if (l <= 0.5)
+              s = (max-min)/(max+min);
+            else
+              s = (max-min)/(2-max-min);
 
-		        delta = max -min;
-		        if (red == max)
-			        h = (green-blue)/delta;
-		        else if (green == max)
-			        h = 2+(blue-red)/delta;
-		        else if (blue == max)
-			        h = 4+(red-green)/delta;
+            delta = max -min;
+            if (red == max)
+              h = (green-blue)/delta;
+            else if (green == max)
+              h = 2+(blue-red)/delta;
+            else if (blue == max)
+              h = 4+(red-green)/delta;
 
-		        h *= 60;
-		        if (h < 0.0)
-			        h += 360;
-	        }
+            h *= 60;
+            if (h < 0.0)
+              h += 360;
+          }
 
-	        *r = h;
-	        *g = l;
-	        *b = s;
+          *r = h;
+          *g = l;
+          *b = s;
         }
 
         public static void murrine_hls_to_rgb (double *h,
-								                               double *l,
-								                               double *s)
+                                               double *l,
+                                               double *s)
         {
-	        double hue;
-	        double lightness;
-	        double saturation;
-	        double m1, m2;
-	        double r = 0, g = 0, b = 0;
+          double hue;
+          double lightness;
+          double saturation;
+          double m1, m2;
+          double r = 0, g = 0, b = 0;
 
-	        lightness = *l;
-	        saturation = *s;
+          lightness = *l;
+          saturation = *s;
 
-	        if (lightness <= 0.5)
-		        m2 = lightness*(1+saturation);
-	        else
-		        m2 = lightness+saturation-lightness*saturation;
+          if (lightness <= 0.5)
+            m2 = lightness*(1+saturation);
+          else
+            m2 = lightness+saturation-lightness*saturation;
 
-	        m1 = 2*lightness-m2;
+          m1 = 2*lightness-m2;
 
-	        if (saturation == 0)
-	        {
-		        *h = lightness;
-		        *l = lightness;
-		        *s = lightness;
-	        }
-	        else
-	        {
-		        hue = *h+120;
-		        while (hue > 360)
-			        hue -= 360;
-		        while (hue < 0)
-			        hue += 360;
+          if (saturation == 0)
+          {
+            *h = lightness;
+            *l = lightness;
+            *s = lightness;
+          }
+          else
+          {
+            hue = *h+120;
+            while (hue > 360)
+              hue -= 360;
+            while (hue < 0)
+              hue += 360;
 
-		        if (hue < 60)
-			        r = m1+(m2-m1)*hue/60;
-		        else if (hue < 180)
-			        r = m2;
-		        else if (hue < 240)
-			        r = m1+(m2-m1)*(240-hue)/60;
-		        else
-			        r = m1;
+            if (hue < 60)
+              r = m1+(m2-m1)*hue/60;
+            else if (hue < 180)
+              r = m2;
+            else if (hue < 240)
+              r = m1+(m2-m1)*(240-hue)/60;
+            else
+              r = m1;
 
-		        hue = *h;
-		        while (hue > 360)
-			        hue -= 360;
-		        while (hue < 0)
-			        hue += 360;
+            hue = *h;
+            while (hue > 360)
+              hue -= 360;
+            while (hue < 0)
+              hue += 360;
 
-		        if (hue < 60)
-			        g = m1+(m2-m1)*hue/60;
-		        else if (hue < 180)
-			        g = m2;
-		        else if (hue < 240)
-			        g = m1+(m2-m1)*(240-hue)/60;
-		        else
-			        g = m1;
+            if (hue < 60)
+              g = m1+(m2-m1)*hue/60;
+            else if (hue < 180)
+              g = m2;
+            else if (hue < 240)
+              g = m1+(m2-m1)*(240-hue)/60;
+            else
+              g = m1;
 
-		        hue = *h-120;
-		        while (hue > 360)
-			        hue -= 360;
-		        while (hue < 0)
-			        hue += 360;
+            hue = *h-120;
+            while (hue > 360)
+              hue -= 360;
+            while (hue < 0)
+              hue += 360;
 
-		        if (hue < 60)
-			        b = m1+(m2-m1)*hue/60;
-		        else if (hue < 180)
-			        b = m2;
-		        else if (hue < 240)
-			        b = m1+(m2-m1)*(240-hue)/60;
-		        else
-			        b = m1;
+            if (hue < 60)
+              b = m1+(m2-m1)*hue/60;
+            else if (hue < 180)
+              b = m2;
+            else if (hue < 240)
+              b = m1+(m2-m1)*(240-hue)/60;
+            else
+              b = m1;
 
-		        *h = r;
-		        *l = g;
-		        *s = b;
-	        }
+            *h = r;
+            *l = g;
+            *s = b;
+          }
         }
 
         private static void shade (ref double r, ref double g, ref double b, double k)
         {
-        	if (k == 1.0) return;
+          if (k == 1.0) return;
 
-	        double red;
-	        double green;
-	        double blue;
+          double red;
+          double green;
+          double blue;
 
-	        red   = r;
-	        green = g;
-	        blue  = b;
+          red   = r;
+          green = g;
+          blue  = b;
 
-	        murrine_rgb_to_hls (&red, &green, &blue);
-	        
-	        k -= 1.0;
+          murrine_rgb_to_hls (&red, &green, &blue);
+          
+          k -= 1.0;
 
-	        green += k;
-	        if (green > 1.0)
-		        green = 1.0;
-	        else if (green < 0.0)
-		        green = 0.0;
+          green += k;
+          if (green > 1.0)
+            green = 1.0;
+          else if (green < 0.0)
+            green = 0.0;
 
-	        blue += k;
-	        if (blue > 1.0)
-		        blue = 1.0;
-	        else if (blue < 0.0)
-		        blue = 0.0;
+          blue += k;
+          if (blue > 1.0)
+            blue = 1.0;
+          else if (blue < 0.0)
+            blue = 0.0;
 
-	        murrine_hls_to_rgb (&red, &green, &blue);
+          murrine_hls_to_rgb (&red, &green, &blue);
 
-	        r = red;
-	        g = green;
-	        b = blue;
+          r = red;
+          g = green;
+          b = blue;
         }
       }
     }
