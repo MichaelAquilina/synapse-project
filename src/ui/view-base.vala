@@ -111,7 +111,7 @@ namespace Synapse
       var descr_min = new GLib.ParamSpecString ("description-min-size",
                                                 "Description minimum Font Size",
                                                 "The minimum size the match description in Pango absolute sizes (string)",
-                                                "small",
+                                                "medium",
                                                 GLib.ParamFlags.READWRITE);
       var cat_max = new GLib.ParamSpecString ("selected-category-size",
                                                 "Selected Category Font Size",
