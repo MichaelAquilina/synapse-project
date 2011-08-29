@@ -473,7 +473,12 @@ namespace Synapse
       Zeitgeist.Subject subject;
 
       var flags_intersect = flags & QueryFlags.LOCAL_CONTENT;
-      if (flags_intersect == QueryFlags.LOCAL_CONTENT) // "All" category
+      // search method forcefully removes the APPS type sometimes,
+      // so we need this "fix"
+      QueryFlags almost_all = QueryFlags.APPLICATIONS in flags ?
+        QueryFlags.LOCAL_CONTENT :
+        QueryFlags.LOCAL_CONTENT ^ QueryFlags.APPLICATIONS;
+      if (flags_intersect == almost_all) // "All" category
       {
         subject = new Zeitgeist.Subject ();
         subject.set_manifestation (manifestation);
