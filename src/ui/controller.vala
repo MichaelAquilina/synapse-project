@@ -434,8 +434,9 @@ namespace Synapse.Gui
     }
     
     /* Tells if the controller is searching for recent activities in current searching for */
-    public bool is_searching_for_recent ()
+    public bool searched_for_recent ()
     {
+      if (searching[model.searching_for]) return false; //search in progress..
       switch (model.searching_for)
       {
         case SearchingFor.SOURCES: return search_recent_activities;
@@ -452,6 +453,7 @@ namespace Synapse.Gui
     private Cancellable current_cancellable[3];
     private uint tid[3];
     private bool partial_result_sent[3];
+    private bool searching[3];
     
     private ResultSet last_result_set; //FIXME: is this really needed here?!
     
@@ -462,6 +464,7 @@ namespace Synapse.Gui
         current_cancellable[i] = new Cancellable ();
         tid[i] = 0;
         partial_result_sent[i] = false;
+        searching[i] = false;
       }
       model.clear (category_config.default_category_index);
 
@@ -498,6 +501,7 @@ namespace Synapse.Gui
           tid[i] = 0;
         }
         partial_result_sent[i] = false;
+        searching[i] = false;
       }
       search_recent_activities = false;
       model.clear ();
@@ -566,6 +570,8 @@ namespace Synapse.Gui
             return false;
         });
       }
+      
+      searching[what] = true;
       
       search_provider.search (model.query[what],
                               what == what.SOURCES ? qf : model.focus[SearchingFor.ACTIONS].value.target_flags (),
@@ -653,10 +659,14 @@ namespace Synapse.Gui
         Source.remove (tid[what]);
         tid[what] = 0;
       }
+      
+      searching[what] = false;
+      
       if (tid[SearchingFor.SOURCES] == 0 && tid[SearchingFor.TARGETS] == 0)
       {
         view.set_throbber_visible (false);
       }
+      
       if (model.results[what].size > 0)
       {
         if (model.focus[what].value != null)

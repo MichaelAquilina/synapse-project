@@ -1023,7 +1023,7 @@ namespace Synapse.Gui
         {
           case SearchingFor.SOURCES:
             if (controller.is_in_initial_state ()) base.set_list (tts);
-            else if (controller.is_searching_for_recent ()) base.set_list (noact);
+            else if (controller.searched_for_recent ()) base.set_list (noact);
             else base.set_list (nores);
             break;
           case SearchingFor.ACTIONS:
@@ -1034,7 +1034,7 @@ namespace Synapse.Gui
             break;
           default: //TARGETS
             if (!model.needs_target ()) base.set_list (null);
-            else if (controller.is_searching_for_recent ()) base.set_list (noact);
+            else if (controller.searched_for_recent ()) base.set_list (noact);
             else base.set_list (nores);
             break;
         }

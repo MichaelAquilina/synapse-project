@@ -282,7 +282,7 @@ namespace Synapse.Gui
         {
           focus_label.set_text (controller.TYPE_TO_SEARCH);
         }
-        else if (controller.is_searching_for_recent ())
+        else if (controller.searched_for_recent ())
         {
           focus_label.set_text ("");
         }
