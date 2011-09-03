@@ -286,7 +286,7 @@ namespace Synapse
         Idle.add (search.callback);
       });
 
-      if (data_sink.is_plugin_enabled (Type.from_name ("SynapseZeitgeistPlugin")) && folder_query_only == false)
+      if (data_sink.is_plugin_enabled (Type.from_name ("SynapseZeitgeistPlugin")))
       {
         // wait for results from ZeitgeistPlugin
         yield;
