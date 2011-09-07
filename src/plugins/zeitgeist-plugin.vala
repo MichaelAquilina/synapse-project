@@ -616,6 +616,9 @@ namespace Synapse
       return true;
     }
 
+
+    public bool search_in_progress { get; private set; default = false; }
+
     public async ResultSet? search (Query q) throws SearchError
     {
       var search_query = q.query_string.strip ();
@@ -635,6 +638,22 @@ namespace Synapse
 
       var result = new ResultSet ();
 
+      // FIXME: move into separate method and add a cancellable
+      while (search_in_progress)
+      {
+        // wait for the current search to finish
+        ulong sig_id;
+        sig_id = this.notify["search-in-progress"].connect (() =>
+        {
+          if (search_in_progress) return;
+          search.callback ();
+        });
+        yield;
+
+        SignalHandler.disconnect (this, sig_id);
+        q.check_cancellable ();
+      }
+
       try
       {
         Zeitgeist.ResultSet rs;
@@ -645,6 +664,25 @@ namespace Synapse
           Zeitgeist.ResultType.MOST_RECENT_ORIGIN :
           Zeitgeist.ResultType.MOST_RECENT_SUBJECTS;
 
+        search_in_progress = true;
+
+        /*
+          There's a bit of magic here - we don't pass our cancellable to
+          libzeitgeist, which means we always wait for the dbus call to finish
+          This is done so that we know when zeitgeist actually finishes
+          a search, and we dont start a new search until this happens.
+
+          This way if user types "abcdef", we ask zg to search for "a",
+          then we wait, and once that finishes we search for "abcdef".
+          (although in reality it depends on your typing speed and it's more
+          like "a", "abcd", "abcde", "abcdef").
+          This also has the added bonus of (almost)immediate response without
+          any artificial timers to wait for more input.
+
+          Without this we'd always ask zeitgeist to search for "a", "ab",
+          "abc", etc.
+        */
+
         // special case empty searches
         if (empty_query)
         {
@@ -654,7 +692,7 @@ namespace Synapse
                                          Zeitgeist.StorageState.ANY,
                                          q.max_results,
                                          rt,
-                                         q.cancellable);
+                                         null);
 
           if (!q.is_cancelled ())
           {
@@ -672,7 +710,7 @@ namespace Synapse
                                       0,
                                       q.max_results,
                                       rt,
-                                      q.cancellable);
+                                      null);
 
           if (!q.is_cancelled ())
           {
@@ -689,6 +727,8 @@ namespace Synapse
           Utils.Logger.warning (this, "Zeitgeist search failed: %s", err.message);
         }
       }
+
+      search_in_progress = false;
 
       q.check_cancellable ();
 

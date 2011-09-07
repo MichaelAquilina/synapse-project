@@ -265,7 +265,7 @@ namespace Synapse
     {
       Gee.Collection<string>? directories = null;
       uint query_id = q.query_id;
-      bool folder_query_only = (q.query_type & QueryFlags.LOCAL_CONTENT) == QueryFlags.PLACES;
+      //bool folder_query_only = (q.query_type & QueryFlags.LOCAL_CONTENT) == QueryFlags.PLACES;
       // wait for our signal or cancellable
       ResultSet? zg_rs = null;
       ulong sig_id = this.zeitgeist_search_complete.connect ((rs, q_id) =>
