@@ -160,6 +160,14 @@ namespace Synapse
                                                                   "NotShowIn"));
           show_in = EnvironmentType.ALL ^ not_show;
         }
+        
+        // special case these, people are using them quite often and wonder
+        // why they don't appear
+        if (filename.has_suffix ("gconf-editor.desktop") ||
+            filename.has_suffix ("dconf-editor.desktop"))
+        {
+          is_hidden = false;
+        }
       }
       catch (Error err)
       {
@@ -274,7 +282,11 @@ namespace Synapse
       try
       {
         string path = directory.get_path ();
-        if (path != null && path.has_suffix ("menu-xdg")) return; // lp:686624
+        // we need to skip menu-xdg directory, see lp:686624
+        if (path != null && path.has_suffix ("menu-xdg")) return;
+        // screensavers don't interest us, skip those
+        if (path != null && path.has_suffix ("/screensavers")) return;
+
         Synapse.Utils.Logger.debug (this, "Searching for desktop files in: %s", path);
         bool exists = yield Utils.query_exists_async (directory);
         if (!exists) return;
