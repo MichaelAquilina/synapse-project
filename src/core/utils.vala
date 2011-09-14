@@ -94,10 +94,13 @@ namespace Synapse
       private static void log_internal (Object? obj, LogLevelFlags level, string format, va_list args)
       {
         if (!initialized) initialize ();
-        Type obj_type = obj != null ? obj.get_type () : typeof (Logger);
-        string obj_class = extract_type_name (obj_type);
-        string pretty_obj = "%s[%s]%s ".printf (MAGENTA, obj_class, RESET);
-        logv ("Synapse", level, pretty_obj + format, args);
+        string desc = "";
+        if (obj != null)
+        {
+          string obj_class = extract_type_name (obj.get_type ());
+          desc = "%s[%s]%s ".printf (MAGENTA, obj_class, RESET);
+        }
+        logv ("Synapse", level, desc + format, args);
       }
       
       private static void initialize ()

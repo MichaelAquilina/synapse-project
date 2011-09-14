@@ -226,6 +226,9 @@ namespace Synapse
 
     private async void initialize_caches ()
     {
+      Idle.add_full (Priority.LOW, initialize_caches.callback);
+      yield;
+
       int initialized_components = 0;
       int NUM_COMPONENTS = 2;
 

@@ -222,8 +222,12 @@ namespace Synapse
     {
       get_environment_type ();
       DesktopAppInfo.set_desktop_env (session_type_str);
+
+      Idle.add_full (Priority.LOW, initialize.callback);
+      yield;
+
       yield load_all_desktop_files ();
-      
+
       initialized = true;
       initialization_done ();
     }

@@ -278,6 +278,7 @@ namespace Synapse
     public void run ()
     {
       Environment.unset_variable ("DESKTOP_AUTOSTART_ID");
+      Gdk.Window.process_all_updates ();
       Gtk.main ();
     }
 
@@ -288,9 +289,13 @@ namespace Synapse
                              "synapse",
                              "gtkrc");
 
-      Gtk.rc_add_default_file (custom_gtkrc);
-      Gtk.rc_reparse_all ();
+      if (FileUtils.test (custom_gtkrc, FileTest.EXISTS))
+      {
+        Gtk.rc_add_default_file (custom_gtkrc);
+        Gtk.rc_reparse_all ();
+      }
     }
+
     private static void ibus_fix ()
     {
       /* try to fix IBUS input method adding synapse to no-snooper-apps */
@@ -309,6 +314,7 @@ namespace Synapse
     }
     public static int main (string[] argv)
     {
+      Utils.Logger.log (null, "Starting up...");
       ibus_fix ();
       Intl.bindtextdomain ("synapse", Config.DATADIR + "/locale");
       var context = new OptionContext (" - Synapse");
@@ -349,6 +355,7 @@ namespace Synapse
       {
         warning ("%s", err.message);
       }
+
       return 0;
     }
   }
