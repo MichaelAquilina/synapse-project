@@ -122,7 +122,7 @@ namespace Synapse
   
   public interface SearchMatch: Match, SearchProvider
   {
-
+    public abstract Match search_source { get; set; }
   }
 
   public class DefaultMatch: Object, Match

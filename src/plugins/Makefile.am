@@ -56,7 +56,7 @@ libplugins_la_VALASOURCES = \
 	$(NULL)
 
 if HAVE_ZEITGEIST
-libplugins_la_VALASOURCES += zeitgeist-plugin.vala
+libplugins_la_VALASOURCES += zeitgeist-plugin.vala zeitgeist-related.vala
 libplugins_la_VALAFLAGS += --pkg zeitgeist-1.0 -D HAVE_ZEITGEIST
 libplugins_la_CFLAGS += $(ZEITGEIST_CFLAGS)
 libplugins_la_LIBADD += $(ZEITGEIST_LIBS)

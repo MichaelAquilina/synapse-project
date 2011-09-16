@@ -209,7 +209,7 @@ namespace Synapse
     {
     }
 
-    private int compute_relevancy (string uri, int base_relevancy)
+    private static int compute_relevancy (string uri, int base_relevancy)
     {
       var rs = RelevancyService.get_default ();
       float pop = rs.get_uri_popularity (uri);
@@ -217,7 +217,8 @@ namespace Synapse
       return RelevancyService.compute_relevancy (base_relevancy, pop);
     }
     
-    private static void update_min_max (string uri, ref long minimum, ref long maximum)
+    private static void update_min_max (string uri,
+        ref long minimum, ref long maximum)
     {
       long len = uri.length;
 
@@ -225,19 +226,16 @@ namespace Synapse
       if (len < minimum) minimum = len;
     }
 
-    private string interesting_attributes =
+    private static string interesting_attributes =
       string.join (",", FILE_ATTRIBUTE_STANDARD_TYPE,
                         FILE_ATTRIBUTE_STANDARD_ICON,
                         FILE_ATTRIBUTE_THUMBNAIL_PATH,
                         FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
                         null);
 
-    private async void process_results (string query,
-                                        Zeitgeist.ResultSet events,
-                                        Cancellable cancellable,
-                                        ResultSet real_results,
-                                        bool local_only,
-                                        bool places_search)
+    public static async void process_results (string query,
+        Zeitgeist.ResultSet events, Cancellable cancellable,
+        ResultSet real_results, bool local_only, bool places_search)
     {
       Gee.Set<string> uris = new Gee.HashSet<string> ();
 
@@ -261,6 +259,7 @@ namespace Synapse
         // make sure we don't add the same uri twice
         if (!(uri in uris))
         {
+          bool is_application = uri.has_prefix ("application://");
           int relevancy_penalty = Match.Score.URI_PENALTY;
           string? thumbnail_path = null;
           string? icon = null;
@@ -309,9 +308,14 @@ namespace Synapse
             
             icon = ContentType.get_icon ("application/x-note").to_string ();
           }
-          else if (local_only)
+          else if (local_only && !is_application)
           {
             continue;
+          }
+          else if (is_application)
+          {
+            var dfs = DesktopFileService.get_default ();
+            if (dfs.get_desktop_file_for_id (uri.substring (14)) == null) continue;
           }
           else // non native (mostly remote uris)
           {
@@ -328,7 +332,10 @@ namespace Synapse
             }
           }
 
-          var match_type = places_search ? QueryFlags.PLACES : QueryFlags.FILES;
+          QueryFlags match_type = (is_application ?
+            QueryFlags.APPLICATIONS : (places_search ?
+              QueryFlags.PLACES : QueryFlags.FILES));
+
           var match_obj = new MatchObject (event,
                                            thumbnail_path,
                                            icon,
@@ -463,7 +470,8 @@ namespace Synapse
       }
     }
 
-    private GenericArray<Zeitgeist.Event> create_templates (QueryFlags flags)
+    public static GenericArray<Zeitgeist.Event> create_templates (
+        QueryFlags flags)
     {
       var templates = new GenericArray<Zeitgeist.Event> ();
       var manifestation = QueryFlags.INCLUDE_REMOTE in flags ?
@@ -615,7 +623,6 @@ namespace Synapse
     {
       return true;
     }
-
 
     public bool search_in_progress { get; private set; default = false; }
 

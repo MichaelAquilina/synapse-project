@@ -197,11 +197,14 @@ namespace Synapse.Gui
       var action = this.model.focus[SearchingFor.ACTIONS].value;
       var target = this.model.focus[SearchingFor.TARGETS].value;
       
-      if (action is SearchProvider)
+      if (action is SearchMatch)
       {
+        var sm = action as SearchMatch;
+        sm.search_source = source;
+
         model.searching_for = SearchingFor.SOURCES;
         view.update_searching_for ();
-        search_for_matches (SearchingFor.SOURCES, false, action as SearchProvider);
+        search_for_matches (SearchingFor.SOURCES, false, sm);
         return;
       }
       

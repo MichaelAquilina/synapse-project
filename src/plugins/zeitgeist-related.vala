@@ -19,9 +19,11 @@
  *
  */
 
+using Zeitgeist;
+
 namespace Synapse
 {
-  public class LocatePlugin: Object, Activatable, ActionProvider
+  public class ZeitgeistRelated: Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -59,7 +61,7 @@ namespace Synapse
       }
     }
 
-    private class LocateItem: Object, SearchProvider, Match, SearchMatch
+    private class RelatedItem: Object, SearchProvider, Match, SearchMatch
     {
       // for Match interface
       public string title { get; construct set; }
@@ -79,21 +81,21 @@ namespace Synapse
       {
         var q = Query (0, query, flags);
         q.cancellable = cancellable;
-        ResultSet? results = yield plugin.locate (q);
+        ResultSet? results = yield plugin.find_related (q, search_source);
         dest_result_set.add_all (results);
 
         return dest_result_set.get_sorted_list ();
       }
 
-      private unowned LocatePlugin plugin;
+      private unowned ZeitgeistRelated plugin;
 
-      public LocateItem (LocatePlugin plugin)
+      public RelatedItem (ZeitgeistRelated plugin)
       {
         Object (match_type: MatchType.SEARCH,
                 has_thumbnail: false,
                 icon_name: "search",
-                title: _ ("Locate"),
-                description: _ ("Locate files with this name on the filesystem"));
+                title: _ ("Find related"),
+                description: _ ("Find resources related to this result"));
         this.plugin = plugin;
       }
     }
@@ -101,13 +103,13 @@ namespace Synapse
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
-        typeof (LocatePlugin),
-        _ ("Locate"),
-        _ ("Runs locate command to find files on the filesystem."),
+        typeof (ZeitgeistRelated),
+        _ ("Related files"),
+        _ ("Finds files related to other search results using Zeitgeist."),
         "search",
         register_plugin,
-        Environment.find_program_in_path ("locate") != null,
-        _ ("Unable to find \"locate\" binary")
+        DBusService.get_default ().name_is_activatable ("org.gnome.zeitgeist.Engine"),
+        _ ("Zeitgeist is not installed")
       );
     }
 
@@ -116,98 +118,98 @@ namespace Synapse
       register_plugin ();
     }
 
-    LocateItem action;
+    RelatedItem action;
+    Zeitgeist.Log zg_log;
 
     construct
     {
-      action = new LocateItem (this);
+      action = new RelatedItem (this);
+      zg_log = new Zeitgeist.Log ();
     }
 
-    public bool handles_unknown ()
+    public async ResultSet? find_related (Query q, Match m) throws SearchError
     {
-      return true;
-    }
+      Event e;
+      Subject s;
+      if (!(m is UriMatch)) return null;
 
-    public async ResultSet? locate (Query q) throws SearchError
-    {
-      var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
-        | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
+      var um = m as UriMatch;
+      Utils.Logger.debug (this, "searching for items related to %s", um.uri);
 
-      var common_flags = q.query_type & our_results;
-      // strip query
-      q.query_string = q.query_string.strip ();
-      // ignore short searches
-      if (common_flags == 0 || q.query_string.length <= 1) return null;
+      GenericArray<Event> templates = new GenericArray<Event> ();
+      PtrArray event_templates = new PtrArray ();
+      PtrArray result_templates = new PtrArray ();
 
-      q.check_cancellable ();
+      s = new Subject ();
+      s.set_uri (um.uri);
+      e = new Event ();
+      e.add_subject (s);
 
-      q.max_results = 256;
-      string regex = Regex.escape_string (q.query_string);
-      // FIXME: split pattern into words and search using --regexp?
-      string[] argv = {"locate", "-i", "-l", "%u".printf (q.max_results),
-                       "*%s*".printf (regex.replace (" ", "*"))};
-
-      Gee.Set<string> uris = new Gee.HashSet<string> ();
+      templates.add (e);
+      event_templates.add (e);
 
       try
       {
-        Pid pid;
-        int read_fd;
+        string[] uris;
+        uris = yield zg_log.find_related_uris (new TimeRange.anytime (),
+            (owned) event_templates, (owned) result_templates,
+            StorageState.ANY, q.max_results, ResultType.MOST_RECENT_EVENTS,
+            q.cancellable);
 
-        // FIXME: fork on every letter... yey!
-        Process.spawn_async_with_pipes (null, argv, null,
-                                        SpawnFlags.SEARCH_PATH,
-                                        null, out pid, null, out read_fd);
-
-        UnixInputStream read_stream = new UnixInputStream (read_fd, true);
-        DataInputStream locate_output = new DataInputStream (read_stream);
-        string? line = null;
-
-        Regex filter_re = new Regex ("/\\."); // hidden file/directory
-        do
+        if (uris == null || uris.length == 0)
         {
-          line = yield locate_output.read_line_async (Priority.DEFAULT_IDLE, q.cancellable);
-          if (line != null)
-          {
-            if (filter_re.match (line)) continue;
-            var file = File.new_for_path (line);
-            uris.add (file.get_uri ());
-          }
-        } while (line != null);
+          q.check_cancellable ();
+          return null;
+        }
+
+        templates = new GenericArray<Event> ();
+        event_templates = new PtrArray ();
+
+        foreach (unowned string uri in uris)
+        {
+          s = new Subject ();
+          s.set_uri (uri);
+          e = new Event ();
+          e.add_subject (s);
+
+          event_templates.add (e);
+          templates.add (e);
+        }
+
+        var rs = yield zg_log.find_events (new TimeRange.anytime (),
+                                           (owned) event_templates,
+                                           StorageState.ANY,
+                                           q.max_results,
+                                           ResultType.MOST_RECENT_SUBJECTS,
+                                           q.cancellable);
+
+        ResultSet results = new ResultSet ();
+        yield ZeitgeistPlugin.process_results ("", rs, q.cancellable, results,
+                                               false, false);
+
+        return results;
       }
       catch (Error err)
       {
-        if (!q.is_cancelled ()) warning ("%s", err.message);
+        Utils.Logger.warning (this, "%s", err.message);
       }
 
       q.check_cancellable ();
 
-      var result = new ResultSet ();
-
-      foreach (string s in uris)
-      {
-        var fi = new Utils.FileInfo (s, typeof (MatchObject));
-        yield fi.initialize ();
-        if (fi.match_obj != null && fi.file_type in q.query_type)
-        {
-          int relevancy = Match.Score.INCREMENT_SMALL; // FIXME: relevancy
-          if (fi.uri.has_prefix ("file:///home/")) relevancy += Match.Score.INCREMENT_MINOR;
-          result.add (fi.match_obj, relevancy);
-        }
-        q.check_cancellable ();
-      }
-
-      return result;
+      return null;
     }
 
     public ResultSet? find_for_match (Query q, Match match)
     {
-      var our_results = QueryFlags.AUDIO | QueryFlags.DOCUMENTS
-        | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED | QueryFlags.VIDEO;
+      /*
+      var our_results = QueryFlags.APPLICATIONS | QueryFlags.AUDIO
+        | QueryFlags.DOCUMENTS | QueryFlags.IMAGES | QueryFlags.UNCATEGORIZED
+        | QueryFlags.VIDEO | QueryFlags.PLACES;
+      */
 
-      var common_flags = q.query_type & our_results;
-      // ignore short searches
-      if (common_flags == 0 || match.match_type != MatchType.UNKNOWN) return null;
+      if (q.query_type == QueryFlags.ACTIONS) return null;
+      if (match.match_type != MatchType.GENERIC_URI
+        && match.match_type != MatchType.APPLICATION) return null;
 
       // strip query
       q.query_string = q.query_string.strip ();

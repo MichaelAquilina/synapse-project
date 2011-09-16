@@ -180,6 +180,7 @@ namespace Synapse
         // typeof (ChatActions),
 #if HAVE_ZEITGEIST
         typeof (ZeitgeistPlugin),
+        typeof (ZeitgeistRelated),
 #endif
 #if HAVE_LIBREST
         typeof (ImgUrPlugin),
