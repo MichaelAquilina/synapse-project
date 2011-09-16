@@ -279,6 +279,20 @@ namespace Synapse
         warning ("Desktop session type is not recognized, assuming GNOME.");
       }
     }
+
+    private string? get_cache_file_name (string dir_name)
+    {
+      // FIXME: should we use this? it's Ubuntu-specific
+      string? locale = Intl.setlocale (LocaleCategory.MESSAGES, null);
+      if (locale == null) return null;
+
+      // even though this is what the patch in gnome-menus does, the name 
+      // of the file is different here (utf is uppercase)
+      string filename = "desktop.%s.cache".printf (
+        locale.replace (".UTF-8", ".utf8"));
+
+      return Path.build_filename (dir_name, filename, null);
+    }
     
     private async void process_directory (File directory,
                                           Gee.Set<File> monitored_dirs)
@@ -291,7 +305,7 @@ namespace Synapse
         // screensavers don't interest us, skip those
         if (path != null && path.has_suffix ("/screensavers")) return;
 
-        Synapse.Utils.Logger.debug (this, "Searching for desktop files in: %s", path);
+        Utils.Logger.debug (this, "Searching for desktop files in: %s", path);
         bool exists = yield Utils.query_exists_async (directory);
         if (!exists) return;
         /* Check if we already scanned this directory // lp:686624 */
