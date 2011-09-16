@@ -204,10 +204,10 @@ namespace Synapse.Gui
 
         model.searching_for = SearchingFor.SOURCES;
         view.update_searching_for ();
-        search_for_matches (SearchingFor.SOURCES, false, sm);
+        search_for_matches (SearchingFor.SOURCES, true, sm);
         return;
       }
-      
+
       if ( (action.needs_target () && target == null) ||
            (!action.needs_target () && target != null)
          ) return; // can't do that
