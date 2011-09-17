@@ -414,6 +414,9 @@ namespace Synapse.Gui
             reset_search (true, true);
             view.set_list_visible (false);
             break;
+          case KeyComboConfig.Commands.EXIT_SYNAPSE:
+            Gtk.main_quit ();
+            break;
           case KeyComboConfig.Commands.PASTE:
             var display = Gdk.Screen.get_default ().get_display ();
             var clipboard = Gtk.Clipboard.get_for_display (display, Gdk.SELECTION_CLIPBOARD);

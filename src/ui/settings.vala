@@ -255,7 +255,9 @@ namespace Synapse.Gui
         {"prev-category", _("Previous Category")},
         {"next-search-type", _("Next Pane")},
         {"prev-search-type", _("Previous Pane")},
-        {"paste", _("Paste")}
+        {"paste", _("Paste")},
+        {"alt_paste", _("Alternate Paste")},
+        {"exit", _("Quit")}
       };
 
     private UI.Widgets.TileView tile_view;

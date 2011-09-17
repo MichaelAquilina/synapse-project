@@ -45,6 +45,7 @@ namespace Synapse.Gui
       LAST_RESULT,
       CLEAR_SEARCH_OR_HIDE,
       PASTE,
+      EXIT_SYNAPSE,
       
       TOTAL_COMMANDS
     }
@@ -66,6 +67,8 @@ namespace Synapse.Gui
     public string prev_search_type { get; set; default = "<Shift>ISO_Left_Tab"; }
     public string cancel { get; set; default = "Escape"; }
     public string paste { get; set; default = "<Control>v"; }
+    public string alt_paste { get; set; default = "<Shift>Insert"; }
+    public string exit { get; set; default = "<Control>q"; }
     
     private class KeyComboStorage: GLib.Object
     {
@@ -188,6 +191,10 @@ namespace Synapse.Gui
       kcs.set_keycombo_command (keyval, mods, Commands.CLEAR_SEARCH_OR_HIDE);
       name_to_key_mod (paste, out keyval, out mods);
       kcs.set_keycombo_command (keyval, mods, Commands.PASTE);
+      name_to_key_mod (alt_paste, out keyval, out mods);
+      kcs.set_keycombo_command (keyval, mods, Commands.PASTE);
+      name_to_key_mod (exit, out keyval, out mods);
+      kcs.set_keycombo_command (keyval, mods, Commands.EXIT_SYNAPSE);
     }
     
     
