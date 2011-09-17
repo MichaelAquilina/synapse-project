@@ -39,4 +39,4 @@ src/plugins/selection-plugin.vala
 src/plugins/ssh-plugin.vala
 src/plugins/system-management.vala
 src/plugins/zeitgeist-plugin.vala
-
+src/plugins/zeitgeist-related.vala

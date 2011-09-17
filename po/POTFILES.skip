@@ -40,4 +40,5 @@ src/plugins/selection-plugin.c
 src/plugins/ssh-plugin.c
 src/plugins/system-management.c
 src/plugins/zeitgeist-plugin.c
+src/plugins/zeitgeist-related.c
 
