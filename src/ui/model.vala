@@ -77,13 +77,13 @@ namespace Synapse.Gui
         selected_category = default_category;
     }
     
-    public void clear_searching_for (SearchingFor i)
+    public void clear_searching_for (SearchingFor i, bool clear_query = true)
     {
       // Synapse.Utils.Logger.log (this, "CLEAR: %u", i);
       focus[i].key = 0;
       focus[i].value = null;
       results[i] = null;
-      query[i] = "";
+      if (clear_query) query[i] = "";
     }
     
     construct
