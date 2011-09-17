@@ -256,7 +256,7 @@ namespace Synapse.Gui
         {"next-search-type", _("Next Pane")},
         {"prev-search-type", _("Previous Pane")},
         {"paste", _("Paste")},
-        {"alt_paste", _("Alternate Paste")},
+        {"alt_paste", _("Paste current selection")},
         {"exit", _("Quit")}
       };
 
