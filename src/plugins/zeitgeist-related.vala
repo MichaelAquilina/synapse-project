@@ -131,19 +131,53 @@ namespace Synapse
     {
       Event e;
       Subject s;
-      if (!(m is UriMatch)) return null;
-
-      var um = m as UriMatch;
-      Utils.Logger.debug (this, "searching for items related to %s", um.uri);
+      if (!(m is UriMatch) && !(m is ApplicationMatch)) return null;
 
       GenericArray<Event> templates = new GenericArray<Event> ();
       PtrArray event_templates = new PtrArray ();
       PtrArray result_templates = new PtrArray ();
 
-      s = new Subject ();
-      s.set_uri (um.uri);
-      e = new Event ();
-      e.add_subject (s);
+      if (m is UriMatch)
+      {
+        var um = m as UriMatch;
+        Utils.Logger.debug (this, "searching for items related to %s", um.uri);
+
+        s = new Subject ();
+        s.set_uri (um.uri);
+        e = new Event ();
+        e.add_subject (s);
+      }
+      else if (m is ApplicationMatch)
+      {
+        string app_id;
+        var app_info = (m as ApplicationMatch).app_info;
+        if (app_info != null)
+        {
+          app_id = app_info.get_id () ?? "";
+          if (app_id == "" && app_info is DesktopAppInfo)
+          {
+            app_id = (app_info as DesktopAppInfo).get_filename () ?? "";
+            app_id = Path.get_basename (app_id);
+          }
+        }
+        else
+        {
+          app_id = Path.get_basename ((m as ApplicationMatch).filename);
+        }
+
+        if (app_id == null || app_id == "")
+        {
+          Utils.Logger.warning (this, "Unable to extract application id!");
+          return null;
+        }
+
+        app_id = "application://" + app_id;
+        Utils.Logger.debug (this, "searching for items related to %s", app_id);
+
+        e = new Event ();
+        e.set_actor (app_id);
+      }
+      else return null;
 
       templates.add (e);
       event_templates.add (e);
@@ -151,7 +185,9 @@ namespace Synapse
       try
       {
         string[] uris;
-        uris = yield zg_log.find_related_uris (new TimeRange.anytime (),
+        int64 end = Zeitgeist.Timestamp.now ();
+        int64 start = end - Zeitgeist.Timestamp.WEEK * 8;
+        uris = yield zg_log.find_related_uris (new TimeRange (start, end),
             (owned) event_templates, (owned) result_templates,
             StorageState.ANY, q.max_results, ResultType.MOST_RECENT_EVENTS,
             q.cancellable);

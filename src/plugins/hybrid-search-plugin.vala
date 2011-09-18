@@ -110,13 +110,13 @@ namespace Synapse
       data_sink.search_done["SynapseZeitgeistPlugin"].connect (this.zg_plugin_search_done);
     }
 
-    private const string RECENT_XML_NAME = ".recently-used.xbel";
+    private const string RECENT_XML_NAME = "recently-used.xbel";
     private const int MAX_RECENT_DIRS = 10;
 
     private async void analyze_recent_documents ()
     {
       var recent = File.new_for_path (Path.build_filename (
-        Environment.get_home_dir (), RECENT_XML_NAME, null));
+        Environment.get_home_dir (), "." + RECENT_XML_NAME, null));
 
       try
       {
@@ -206,7 +206,7 @@ namespace Synapse
       }
       catch (Error err)
       {
-        Utils.Logger.warning (this, "Unable to parse ~/%s", RECENT_XML_NAME);
+        Utils.Logger.warning (this, "Unable to parse %s", recent.get_path ());
       }
 
       initialization_done = true;

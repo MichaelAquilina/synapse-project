@@ -1045,10 +1045,11 @@ namespace Synapse.Gui
       artists += "Ian Cylkowski <designbyizo@gmail.com>";
       GLib.Object (artists : artists,
                    authors : devs,
-                   copyright : "Copyright (C) 2010 Michal Hruby <michal.mhr@gmail.com>",
+                   copyright : "Copyright (C) 2010-2011 Michal Hruby <michal.mhr@gmail.com>\nAlberto Aldegheri <albyrock87+dev@gmail.com>",
                    program_name: "Synapse",
                    logo_icon_name : "synapse",
-                   version: Config.VERSION);
+                   version: Config.VERSION,
+                   website: "http://launchpad.net/synapse-project");
     }
   }
   
