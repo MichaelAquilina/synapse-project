@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-05 16:56+0200\n"
+"POT-Creation-Date: 2011-09-18 21:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,54 +27,54 @@ msgid "Synapse"
 msgstr ""
 
 #. activate has to stay in first position!
-#: ../src/ui/synapse-main.vala:105 ../src/ui/settings.vala:243
+#: ../src/ui/synapse-main.vala:105 ../src/ui/settings.vala:244
 msgid "Activate"
 msgstr ""
 
 #: ../src/ui/category.vala:31 ../src/ui/category.vala:72
-#: ../src/ui/category.vala:134
+#: ../src/ui/category.vala:135
 msgid "All"
 msgstr ""
 
-#: ../src/ui/category.vala:69 ../src/ui/category.vala:111
+#: ../src/ui/category.vala:69 ../src/ui/category.vala:112
 msgid "Actions"
 msgstr ""
 
-#: ../src/ui/category.vala:70 ../src/ui/category.vala:113
+#: ../src/ui/category.vala:70 ../src/ui/category.vala:114
 msgid "Audio"
 msgstr ""
 
-#: ../src/ui/category.vala:71 ../src/ui/category.vala:114
+#: ../src/ui/category.vala:71 ../src/ui/category.vala:115
 msgid "Applications"
 msgstr ""
 
-#: ../src/ui/category.vala:73 ../src/ui/category.vala:115
-msgid "Documents"
+#: ../src/ui/category.vala:73 ../src/ui/category.vala:113
+msgid "Places"
 msgstr ""
 
 #: ../src/ui/category.vala:74 ../src/ui/category.vala:116
-msgid "Images"
+msgid "Documents"
 msgstr ""
 
 #: ../src/ui/category.vala:75 ../src/ui/category.vala:117
-msgid "Video"
+msgid "Images"
 msgstr ""
 
 #: ../src/ui/category.vala:76 ../src/ui/category.vala:118
+msgid "Video"
+msgstr ""
+
+#: ../src/ui/category.vala:77 ../src/ui/category.vala:119
 msgid "Internet"
 msgstr ""
 
 #. _labels.set (QueryFlags.ALL, _("All")); // Do not remove!
-#: ../src/ui/category.vala:110
+#: ../src/ui/category.vala:111
 msgid "Include remote content"
 msgstr ""
 
-#: ../src/ui/category.vala:112
-msgid "Folders"
-msgstr ""
-
 #. _labels.set (QueryFlags.FILES, _("Files"));
-#: ../src/ui/category.vala:120
+#: ../src/ui/category.vala:121
 msgid "Uncategorized"
 msgstr ""
 
@@ -94,8 +94,13 @@ msgstr ""
 msgid "Type to search..."
 msgstr ""
 
-#: ../src/ui/controller.vala:494
+#: ../src/ui/controller.vala:517
 msgid "...or press down key to browse recent activities"
+msgstr ""
+
+#: ../src/ui/view-virgilio.vala:188 ../src/ui/widgets-matchlistview.vala:923
+#, c-format
+msgid "<b>%d of %d</b>"
 msgstr ""
 
 #: ../src/ui/settings.vala:48
@@ -114,11 +119,11 @@ msgstr ""
 msgid "About this plugin"
 msgstr ""
 
-#: ../src/ui/settings.vala:72 ../src/ui/settings.vala:210
+#: ../src/ui/settings.vala:72 ../src/ui/settings.vala:211
 msgid "Configure plugin"
 msgstr ""
 
-#: ../src/ui/settings.vala:88 ../src/ui/settings.vala:462
+#: ../src/ui/settings.vala:88 ../src/ui/settings.vala:465
 msgid "Disabled"
 msgstr ""
 
@@ -146,128 +151,135 @@ msgstr ""
 msgid "Side Doish"
 msgstr ""
 
-#: ../src/ui/settings.vala:244
-msgid "Execute"
+#: ../src/ui/settings.vala:172
+msgid "Virgilio"
 msgstr ""
 
 #: ../src/ui/settings.vala:245
-msgid "Execute without hiding"
+msgid "Execute"
 msgstr ""
 
 #: ../src/ui/settings.vala:246
-msgid "Alternative Delete"
+msgid "Execute without hiding"
 msgstr ""
 
 #: ../src/ui/settings.vala:247
-msgid "Next Result"
+msgid "Alternative Delete"
 msgstr ""
 
 #: ../src/ui/settings.vala:248
-msgid "Previous Result"
+msgid "Next Result"
 msgstr ""
 
 #: ../src/ui/settings.vala:249
-msgid "First Result"
+msgid "Previous Result"
 msgstr ""
 
 #: ../src/ui/settings.vala:250
-msgid "Last Result"
+msgid "First Result"
 msgstr ""
 
 #: ../src/ui/settings.vala:251
-msgid "Next 5 Results"
+msgid "Last Result"
 msgstr ""
 
 #: ../src/ui/settings.vala:252
-msgid "Previous 5 Results"
+msgid "Next 5 Results"
 msgstr ""
 
 #: ../src/ui/settings.vala:253
-msgid "Next Category"
+msgid "Previous 5 Results"
 msgstr ""
 
 #: ../src/ui/settings.vala:254
-msgid "Previous Category"
+msgid "Next Category"
 msgstr ""
 
 #: ../src/ui/settings.vala:255
-msgid "Next Pane"
+msgid "Previous Category"
 msgstr ""
 
 #: ../src/ui/settings.vala:256
-msgid "Previous Pane"
+msgid "Next Pane"
 msgstr ""
 
 #: ../src/ui/settings.vala:257
+msgid "Previous Pane"
+msgstr ""
+
+#: ../src/ui/settings.vala:258
 msgid "Paste"
 msgstr ""
 
-#: ../src/ui/settings.vala:271
+#: ../src/ui/settings.vala:259
+msgid "Paste current selection"
+msgstr ""
+
+#: ../src/ui/settings.vala:260
+msgid "Quit"
+msgstr ""
+
+#: ../src/ui/settings.vala:274
 msgid "Shortcut already in use"
 msgstr ""
 
-#: ../src/ui/settings.vala:297
+#: ../src/ui/settings.vala:300
 msgid "General"
 msgstr ""
 
-#: ../src/ui/settings.vala:298
+#: ../src/ui/settings.vala:301
 msgid "Plugins"
 msgstr ""
 
-#: ../src/ui/settings.vala:304
+#: ../src/ui/settings.vala:307
 msgid "Behavior & Look"
 msgstr ""
 
-#: ../src/ui/settings.vala:316
+#: ../src/ui/settings.vala:319
 msgid "Theme:"
 msgstr ""
 
 #. Autostart checkbox
-#: ../src/ui/settings.vala:321
+#: ../src/ui/settings.vala:324
 msgid "Startup on login"
 msgstr ""
 
 #. Notification icon
-#: ../src/ui/settings.vala:327
+#: ../src/ui/settings.vala:330
 msgid "Show notification icon"
 msgstr ""
 
-#: ../src/ui/settings.vala:342
+#: ../src/ui/settings.vala:345
 msgid "Shortcuts"
 msgstr ""
 
-#: ../src/ui/settings.vala:364
+#: ../src/ui/settings.vala:367
 msgid "Action"
 msgstr ""
 
-#: ../src/ui/settings.vala:401
+#: ../src/ui/settings.vala:404
 msgid "Shortcut"
 msgstr ""
 
-#: ../src/ui/settings.vala:420
+#: ../src/ui/settings.vala:423
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr ""
 
-#: ../src/ui/widgets-matchlistview.vala:894
-#: ../src/ui/widgets-matchlistview.vala:908
+#: ../src/ui/widgets-matchlistview.vala:896
+#: ../src/ui/widgets-matchlistview.vala:910
 msgid "No results."
 msgstr ""
 
-#: ../src/ui/widgets-matchlistview.vala:913
+#: ../src/ui/widgets-matchlistview.vala:915
 #, c-format
 msgid "<b>1 of %d</b>"
 msgstr ""
 
-#: ../src/ui/widgets-matchlistview.vala:921
-#, c-format
-msgid "<b>%d of %d</b>"
-msgstr ""
-
-#: ../src/ui/utils.vala:111
+#: ../src/ui/utils.vala:115
 msgid "Home"
 msgstr ""
 
-#: ../src/ui/utils.vala:115
+#: ../src/ui/utils.vala:129
 msgid "Root"
 msgstr ""
 
@@ -402,10 +414,18 @@ msgid "Send a message to the contact"
 msgstr ""
 
 #: ../src/plugins/chat-actions-plugin.vala:100
-msgid "Chat actions"
+msgid "Send message to.."
 msgstr ""
 
 #: ../src/plugins/chat-actions-plugin.vala:101
+msgid "Send a message to a contact"
+msgstr ""
+
+#: ../src/plugins/chat-actions-plugin.vala:136
+msgid "Chat actions"
+msgstr ""
+
+#: ../src/plugins/chat-actions-plugin.vala:137
 msgid "Open chat, or send a message with your favorite IM"
 msgstr ""
 
@@ -591,19 +611,19 @@ msgstr ""
 msgid "Launchpad: Bug #%s"
 msgstr ""
 
-#: ../src/plugins/locate-plugin.vala:94 ../src/plugins/locate-plugin.vala:104
+#: ../src/plugins/locate-plugin.vala:95 ../src/plugins/locate-plugin.vala:105
 msgid "Locate"
 msgstr ""
 
-#: ../src/plugins/locate-plugin.vala:95
+#: ../src/plugins/locate-plugin.vala:96
 msgid "Locate files with this name on the filesystem"
 msgstr ""
 
-#: ../src/plugins/locate-plugin.vala:105
+#: ../src/plugins/locate-plugin.vala:106
 msgid "Runs locate command to find files on the filesystem."
 msgstr ""
 
-#: ../src/plugins/locate-plugin.vala:109
+#: ../src/plugins/locate-plugin.vala:110
 msgid "Unable to find \"locate\" binary"
 msgstr ""
 
@@ -719,15 +739,15 @@ msgid "Selected text"
 msgstr ""
 
 #. Plugin title
-#: ../src/plugins/ssh-plugin.vala:50
+#: ../src/plugins/ssh-plugin.vala:53
 msgid "Connect to host with SSH"
 msgstr ""
 
-#: ../src/plugins/ssh-plugin.vala:55
+#: ../src/plugins/ssh-plugin.vala:58
 msgid "ssh is not installed"
 msgstr ""
 
-#: ../src/plugins/ssh-plugin.vala:167
+#: ../src/plugins/ssh-plugin.vala:174
 msgid "Connect with SSH"
 msgstr ""
 
@@ -771,42 +791,59 @@ msgstr ""
 msgid "ConsoleKit wasn't found"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:147
+#: ../src/plugins/zeitgeist-plugin.vala:158
 msgid "few moments ago"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:152
+#: ../src/plugins/zeitgeist-plugin.vala:163
 #, c-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:157
+#: ../src/plugins/zeitgeist-plugin.vala:168
 #, c-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:162
+#: ../src/plugins/zeitgeist-plugin.vala:173
 #, c-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:167
+#: ../src/plugins/zeitgeist-plugin.vala:178
 #, c-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:181
+#: ../src/plugins/zeitgeist-plugin.vala:192
 msgid "Search various items logged by Zeitgeist."
 msgstr ""
 
-#: ../src/plugins/zeitgeist-plugin.vala:185
+#: ../src/plugins/zeitgeist-plugin.vala:196
+#: ../src/plugins/zeitgeist-related.vala:112
 msgid "Zeitgeist is not installed"
+msgstr ""
+
+#: ../src/plugins/zeitgeist-related.vala:97
+msgid "Find related"
+msgstr ""
+
+#: ../src/plugins/zeitgeist-related.vala:98
+msgid "Find resources related to this result"
+msgstr ""
+
+#: ../src/plugins/zeitgeist-related.vala:107
+msgid "Related files"
+msgstr ""
+
+#: ../src/plugins/zeitgeist-related.vala:108
+msgid "Finds files related to other search results using Zeitgeist."
 msgstr ""
