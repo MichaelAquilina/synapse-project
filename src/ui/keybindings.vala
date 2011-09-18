@@ -45,6 +45,7 @@ namespace Synapse.Gui
       LAST_RESULT,
       CLEAR_SEARCH_OR_HIDE,
       PASTE,
+      PASTE_SELECTION,
       EXIT_SYNAPSE,
       
       TOTAL_COMMANDS
@@ -192,7 +193,7 @@ namespace Synapse.Gui
       name_to_key_mod (paste, out keyval, out mods);
       kcs.set_keycombo_command (keyval, mods, Commands.PASTE);
       name_to_key_mod (alt_paste, out keyval, out mods);
-      kcs.set_keycombo_command (keyval, mods, Commands.PASTE);
+      kcs.set_keycombo_command (keyval, mods, Commands.PASTE_SELECTION);
       name_to_key_mod (exit, out keyval, out mods);
       kcs.set_keycombo_command (keyval, mods, Commands.EXIT_SYNAPSE);
     }

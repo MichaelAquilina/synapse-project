@@ -418,8 +418,36 @@ namespace Synapse.Gui
             Gtk.main_quit ();
             break;
           case KeyComboConfig.Commands.PASTE:
-            var display = Gdk.Screen.get_default ().get_display ();
-            var clipboard = Gtk.Clipboard.get_for_display (display, Gdk.SELECTION_CLIPBOARD);
+            Gdk.Display? display = null;
+            if (view is Gtk.Widget)
+            {
+              display = (view as Gtk.Widget).get_display ();
+            }
+            if (display == null)
+            {
+              display = Gdk.Screen.get_default ().get_display ();
+            }
+            var clipboard = Gtk.Clipboard.get_for_display (display, 
+              Gdk.SELECTION_CLIPBOARD);
+            // Get text from clipboard
+            string text = clipboard.wait_for_text ();
+            if (text != null && text != "")
+            {
+              search_add_delete_char (text);
+            }
+            break;
+          case KeyComboConfig.Commands.PASTE_SELECTION:
+            Gdk.Display? display = null;
+            if (view is Gtk.Widget)
+            {
+              display = (view as Gtk.Widget).get_display ();
+            }
+            if (display == null)
+            {
+              display = Gdk.Screen.get_default ().get_display ();
+            }
+            var clipboard = Gtk.Clipboard.get_for_display (display, 
+              Gdk.SELECTION_PRIMARY);
             // Get text from clipboard
             string text = clipboard.wait_for_text ();
             if (text != null && text != "")
