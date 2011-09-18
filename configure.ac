@@ -1,5 +1,5 @@
-AC_INIT([synapse], [0.2.7])
-AC_DEFINE(RELEASE_NAME, "Aspartate", "Codename of this release")
+AC_INIT([synapse], [0.2.8])
+AC_DEFINE(RELEASE_NAME, "Bombesin", "Codename of this release")
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([.])
@@ -37,7 +37,7 @@ AC_STDC_HEADERS
 dnl ==============================================
 dnl Check for Vala
 dnl ==============================================
-AM_PROG_VALAC([0.11.5])
+AM_PROG_VALAC([0.12.0])
 if test "x$VALAC" = "x"; then
 	AC_MSG_ERROR([You need Vala compiler])
 fi
