@@ -15,6 +15,7 @@ synapse_VALAFLAGS = \
 	--pkg gee-1.0 \
 	--pkg json-glib-1.0 \
 	--pkg unique-1.0 \
+	--pkg libnotify \
 	--vapidir $(top_builddir)/src/core \
 	--pkg synapse-core \
 	--vapidir $(top_builddir)/src/plugins \

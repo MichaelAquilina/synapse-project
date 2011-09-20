@@ -328,6 +328,7 @@ namespace Synapse
         /* Custom style loading must be done before Gtk.init */
         load_custom_style ();
         Gtk.init (ref argv);
+        Notify.init ("synapse");
         
         var app = new Unique.App ("org.gnome.Synapse", null);
         if (app.is_running)
