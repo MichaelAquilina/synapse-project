@@ -46,7 +46,9 @@ namespace Synapse
       parse_ssh_config.begin ();
       
       this.monitor = config_file.monitor_file(FileMonitorFlags.NONE);
-      this.monitor.changed.connect(handle_ssh_config_update);
+      this.monitor.changed.connect((m, f, of, type) => { 
+        handle_ssh_config_update(m, f, of, type); 
+      });
     }
 
     public void deactivate () {}
@@ -112,10 +114,13 @@ namespace Synapse
       }
     }
     
-    public void handle_ssh_config_update()
+    public void handle_ssh_config_update(FileMonitor monitor, File file, File? other_file, FileMonitorEvent event_type)
     {
-      Utils.Logger.log(this, "ssh_config is changed, reparsing");
-      parse_ssh_config.begin ();
+      if (event_type == FileMonitorEvent.CHANGED & FileMonitorEvent.CHANGES_DONE_HINT)
+      {
+        Utils.Logger.log(this, "ssh_config is changed, reparsing");
+        parse_ssh_config.begin ();
+      }
     }
 
     public bool handles_query (Query query)
