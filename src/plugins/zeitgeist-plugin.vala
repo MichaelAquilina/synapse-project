@@ -399,6 +399,8 @@ namespace Synapse
         var subject = event.get_subject (0);
         unowned string uri = places_search ?
           subject.get_origin () : subject.get_uri ();
+        if (uri == null || uri == "") continue;
+
         if (!(uri in uris))
         {
           bool is_application = uri.has_prefix ("application://");
