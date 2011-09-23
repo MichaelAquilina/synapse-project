@@ -43,12 +43,21 @@ namespace Synapse
 
     public void activate ()
     {
+      this.config_file = File.new_for_path (Environment.get_home_dir () + "/.ssh/config");
+
       parse_ssh_config.begin ();
       
-      this.monitor = config_file.monitor_file(FileMonitorFlags.NONE);
-      this.monitor.changed.connect((m, f, of, type) => { 
-        handle_ssh_config_update(m, f, of, type); 
-      });
+      try 
+      {
+        this.monitor = config_file.monitor_file(FileMonitorFlags.NONE);
+        this.monitor.changed.connect((m, f, of, type) => { 
+          handle_ssh_config_update(m, f, of, type); 
+        });
+      }
+      catch (IOError e)
+      {
+        Utils.Logger.warning(this, "Failed to start monitoring changes of ssh client config file");
+      }
     }
 
     public void deactivate () {}
@@ -69,8 +78,6 @@ namespace Synapse
 
     private async void parse_ssh_config ()
     {
-      this.config_file = File.new_for_path (Environment.get_home_dir () + "/.ssh/config");
-
       hosts.clear ();
 
       try
@@ -116,7 +123,7 @@ namespace Synapse
     
     public void handle_ssh_config_update(FileMonitor monitor, File file, File? other_file, FileMonitorEvent event_type)
     {
-      if (event_type == FileMonitorEvent.CHANGED & FileMonitorEvent.CHANGES_DONE_HINT)
+      if (event_type == FileMonitorEvent.CHANGES_DONE_HINT)
       {
         Utils.Logger.log(this, "ssh_config is changed, reparsing");
         parse_ssh_config.begin ();
