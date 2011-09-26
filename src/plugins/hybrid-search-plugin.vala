@@ -120,15 +120,16 @@ namespace Synapse
 
       try
       {
+        uint8[] file_contents;
         string contents;
         size_t len;
+
         bool load_ok;
 
         try
         {
           load_ok = yield recent.load_contents_async (null,
-                                                      out contents,
-                                                      out len);
+                                                      out file_contents);
         }
         catch (GLib.Error load_error)
         {
@@ -140,14 +141,15 @@ namespace Synapse
         {
           recent = File.new_for_path (Path.build_filename (
             Environment.get_user_data_dir (), RECENT_XML_NAME, null));
-
           load_ok = yield recent.load_contents_async (null,
-                                                      out contents,
-                                                      out len);
+                                                      out file_contents);
         }
 
         if (load_ok)
         {
+          contents = (string) file_contents;
+          len = file_contents.length;
+
           // load all uris from recently-used bookmark file
           var bf = new BookmarkFile ();
           bf.load_from_data (contents, len);

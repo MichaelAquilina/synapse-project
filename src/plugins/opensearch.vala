@@ -313,10 +313,13 @@ namespace Synapse
         var f = File.new_for_path (xml_path);
         try
         {
+          uint8[] file_contents;
           string contents;
           size_t len;
+          yield f.load_contents_async (null, out file_contents, null);
+          contents = (string) file_contents;
+          len = file_contents.length;
           
-          yield f.load_contents_async (null, out contents, out len, null);
           parser = new OpenSearchParser ();
           parser.parse (contents);
           if (parser.has_valid_result ())
@@ -339,7 +342,7 @@ namespace Synapse
       return true;
     }
 
-    public ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (ref Query query, Match match)
     {
       if (match.match_type != MatchType.UNKNOWN &&
           match.match_type != MatchType.TEXT)

@@ -552,7 +552,7 @@ namespace Synapse
       {
         if (!action_plugin.enabled) continue;
         if (!action_plugin.handles_unknown ()) continue;
-        rs.add_all (action_plugin.find_for_match (q, match));
+        rs.add_all (action_plugin.find_for_match (ref q, match));
       }
 
       return rs.get_sorted_list ();
@@ -566,7 +566,7 @@ namespace Synapse
       foreach (var action_plugin in action_plugins)
       {
         if (!action_plugin.enabled) continue;
-        rs.add_all (action_plugin.find_for_match (q, match));
+        rs.add_all (action_plugin.find_for_match (ref q, match));
       }
       
       return rs.get_sorted_list ();

@@ -288,7 +288,7 @@ namespace Synapse
     
     private Gee.Map<string, Gee.List<OpenWithAction> > mimetype_map;
 
-    public ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (ref Query query, Match match)
     {
       if (match.match_type != MatchType.GENERIC_URI) return null;
 

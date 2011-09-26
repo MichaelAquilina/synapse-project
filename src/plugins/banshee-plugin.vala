@@ -25,30 +25,27 @@ namespace Synapse
   interface BansheePlayerEngine : Object {
       public const string UNIQUE_NAME = "org.bansheeproject.Banshee";
       public const string OBJECT_PATH = "/org/bansheeproject/Banshee/PlayerEngine";
-      public const string INTERFACE_NAME = "org.bansheeproject.Banshee.PlayerEngine";
       
-      public abstract void play () throws DBus.Error;
-      public abstract void pause () throws DBus.Error;
-      public abstract void open (string uri) throws DBus.Error;
+      public abstract void play () throws IOError;
+      public abstract void pause () throws IOError;
+      public abstract void open (string uri) throws IOError;
   }
   
   [DBus (name = "org.bansheeproject.Banshee.PlaybackController")]
   interface BansheePlaybackController : Object {
       public const string UNIQUE_NAME = "org.bansheeproject.Banshee";
       public const string OBJECT_PATH = "/org/bansheeproject/Banshee/PlaybackController";
-      public const string INTERFACE_NAME = "org.bansheeproject.Banshee.PlaybackController";
       
-      public abstract void next (bool restart) throws DBus.Error;
-      public abstract void previous (bool restart) throws DBus.Error;
+      public abstract void next (bool restart) throws IOError;
+      public abstract void previous (bool restart) throws IOError;
   }
   
   [DBus (name = "org.bansheeproject.Banshee.PlayQueue")]
   interface BansheePlayQueue : Object {
       public const string UNIQUE_NAME = "org.bansheeproject.Banshee";
       public const string OBJECT_PATH = "/org/bansheeproject/Banshee/SourceManager/PlayQueue";
-      public const string INTERFACE_NAME = "org.bansheeproject.Banshee.PlayQueue";
       
-      public abstract void enqueue_uri (string uri, bool prepend) throws DBus.Error;
+      public abstract void enqueue_uri (string uri, bool prepend) throws IOError;
   }
   
   public class BansheeActions: Object, Activatable, ItemProvider, ActionProvider
@@ -150,12 +147,12 @@ namespace Synapse
       public override void do_action ()
       {
         try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (BansheePlayerEngine) conn.get_object (BansheePlayerEngine.UNIQUE_NAME,
-                                                              BansheePlayerEngine.OBJECT_PATH,
-                                                              BansheePlayerEngine.INTERFACE_NAME);
+          BansheePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
+                                           BansheePlayerEngine.UNIQUE_NAME,
+                                           BansheePlayerEngine.OBJECT_PATH);
+
           player.play ();
-        } catch (DBus.Error e) {
+        } catch (IOError e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
@@ -177,12 +174,11 @@ namespace Synapse
       public override void do_action ()
       {
         try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (BansheePlayerEngine) conn.get_object (BansheePlayerEngine.UNIQUE_NAME,
-                                                              BansheePlayerEngine.OBJECT_PATH,
-                                                              BansheePlayerEngine.INTERFACE_NAME);
+          BansheePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
+                                           BansheePlayerEngine.UNIQUE_NAME,
+                                           BansheePlayerEngine.OBJECT_PATH);
           player.pause ();
-        } catch (DBus.Error e) {
+        } catch (IOError e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
@@ -200,12 +196,12 @@ namespace Synapse
       public override void do_action ()
       {
         try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (BansheePlaybackController) conn.get_object (BansheePlaybackController.UNIQUE_NAME,
-                                                                    BansheePlaybackController.OBJECT_PATH,
-                                                                    BansheePlaybackController.INTERFACE_NAME);
+          BansheePlaybackController player = Bus.get_proxy_sync (BusType.SESSION,
+                                           BansheePlaybackController.UNIQUE_NAME,
+                                           BansheePlaybackController.OBJECT_PATH);
+          
           player.next (false);
-        } catch (DBus.Error e) {
+        } catch (IOError e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
@@ -223,12 +219,11 @@ namespace Synapse
       public override void do_action ()
       {
         try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (BansheePlaybackController) conn.get_object (BansheePlaybackController.UNIQUE_NAME,
-                                                                    BansheePlaybackController.OBJECT_PATH,
-                                                                    BansheePlaybackController.INTERFACE_NAME);
+          BansheePlaybackController player = Bus.get_proxy_sync (BusType.SESSION,
+                                           BansheePlaybackController.UNIQUE_NAME,
+                                           BansheePlaybackController.OBJECT_PATH);
           player.previous (false);
-        } catch (DBus.Error e) {
+        } catch (IOError e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
@@ -252,12 +247,12 @@ namespace Synapse
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0 ||
                         (uri.file_type & QueryFlags.VIDEO) != 0);
         try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (BansheePlayQueue) conn.get_object (BansheePlayQueue.UNIQUE_NAME,
-                                                           BansheePlayQueue.OBJECT_PATH,
-                                                           BansheePlayQueue.INTERFACE_NAME);
+          BansheePlayQueue player = Bus.get_proxy_sync (BusType.SESSION,
+                                           BansheePlayQueue.UNIQUE_NAME,
+                                           BansheePlayQueue.OBJECT_PATH);
+
           player.enqueue_uri (uri.uri, false);
-        } catch (DBus.Error e) {
+        } catch (IOError e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
@@ -295,13 +290,12 @@ namespace Synapse
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0 ||
                         (uri.file_type & QueryFlags.VIDEO) != 0);
         try {
-          var conn = DBus.Bus.get(DBus.BusType.SESSION);
-          var player = (BansheePlayerEngine) conn.get_object (BansheePlayerEngine.UNIQUE_NAME,
-                                                              BansheePlayerEngine.OBJECT_PATH,
-                                                              BansheePlayerEngine.INTERFACE_NAME);
+          BansheePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
+                                           BansheePlayerEngine.UNIQUE_NAME,
+                                           BansheePlayerEngine.OBJECT_PATH);
           player.open (uri.uri);
           player.play ();
-        } catch (DBus.Error e) {
+        } catch (IOError e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
@@ -367,7 +361,7 @@ namespace Synapse
       return result;
     }
 
-    public ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (ref Query query, Match match)
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();

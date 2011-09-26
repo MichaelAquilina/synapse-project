@@ -107,12 +107,6 @@ namespace Synapse
       // we will only search in the "Actions" category
       return (QueryFlags.ACTIONS in query.query_type);
     }
-    
-#if VALA_0_12
-    // strangely enough the 0.10 variant is correct here
-    // FIXME: remove once official 0.12 is out and 0.11.x aren't used anymore
-    private delegate void ClipboardTextReceivedFunc (Gtk.Clipboard cb, string? text);
-#endif
 
     public async ResultSet? search (Query query) throws SearchError
     {
@@ -134,21 +128,11 @@ namespace Synapse
       
       if (cb_changed)
       {
-#if VALA_0_12
-        ClipboardTextReceivedFunc f = (cb, text) =>
-        {
-          cb_text = text;
-          search.callback ();
-        };
-
-        clipboard.request_text ((Gtk.ClipboardTextReceivedFunc) f);
-#else
         clipboard.request_text ((cb, text) =>
         {
           cb_text = text;
           search.callback ();
         });
-#endif
       }
       else
       {

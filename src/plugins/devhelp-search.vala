@@ -115,7 +115,7 @@ namespace Synapse
     
     private Regex symbol_re;
 
-    public ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (ref Query query, Match match)
     {
       if (!has_devhelp || match.match_type != MatchType.UNKNOWN ||
           !(QueryFlags.ACTIONS in query.query_type))

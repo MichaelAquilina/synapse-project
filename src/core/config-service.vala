@@ -56,7 +56,7 @@ namespace Synapse
       
       var parser = new Parser ();
       config_file_name = 
-        Path.build_filename (Environment.get_user_config_dir (), "synapse",
+        GLib.Path.build_filename (Environment.get_user_config_dir (), "synapse",
                              "config.json");
       try
       {
@@ -177,7 +177,7 @@ namespace Synapse
       generator.pretty = true;
       generator.set_root (root_node);
 
-      DirUtils.create_with_parents (Path.get_dirname (config_file_name), 0755);
+      DirUtils.create_with_parents (GLib.Path.get_dirname (config_file_name), 0755);
       generator.to_file (config_file_name);
     }
   }

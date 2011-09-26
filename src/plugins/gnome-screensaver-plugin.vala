@@ -26,9 +26,8 @@ namespace Synapse
   {
     public const string UNIQUE_NAME = "org.gnome.ScreenSaver";
     public const string OBJECT_PATH = "/org/gnome/ScreenSaver";
-    public const string INTERFACE_NAME = "org.gnome.ScreenSaver";
     
-    public abstract async void lock () throws DBus.Error;
+    public abstract async void lock () throws IOError;
   }
 
   public class GnomeScreenSaverPlugin: Object, Activatable, ItemProvider
@@ -70,12 +69,9 @@ namespace Synapse
     
     public static void lock_screen ()
     {
-      var connection = DBusService.get_session_bus ();
-      var dbus_interface = (GnomeScreenSaver)
-        connection.get_object (GnomeScreenSaver.UNIQUE_NAME,
-                               GnomeScreenSaver.OBJECT_PATH,
-                               GnomeScreenSaver.INTERFACE_NAME);
-
+      GnomeScreenSaver dbus_interface = Bus.get_proxy_sync (BusType.SESSION,
+                                               GnomeScreenSaver.UNIQUE_NAME,
+                                               GnomeScreenSaver.OBJECT_PATH);
       // we need the async variant cause Screensaver doesn't send the reply
       dbus_interface.lock.begin ();
     }

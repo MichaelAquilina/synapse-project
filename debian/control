@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 7.0.50~),
  automake,
  libtool,
  pkg-config,
- valac-0.12 (>= 0.12.0),
+ valac-0.14 (>= 0.14.0),
  libzeitgeist-dev (>= 0.2.14),
  libdbus-glib-1-dev,
  libgtk2.0-dev (>= 2.20.0),
@@ -31,7 +31,7 @@ Depends: ${shlibs:Depends},
          ${misc:Depends},
 #Hard-code version for Lucid, ${shlibs:Depends} doesn't work for libs in the PPA
          libjson-glib-1.0-0 (>= 0.10.0),
-         libgee2 (>= 0.5.2),
+         libgee2 (>= 0.6.0),
          libzeitgeist-1.0-0 (>= 0.2.14) | libzeitgeist-1.0-1 (>= 0.3.2)
 Recommends: zeitgeist (>= 0.6.0~) | zeitgeist-core (>= 0.6.0~),
             zeitgeist-fts-extension | zeitgeist-extension-fts

@@ -348,7 +348,7 @@ namespace Synapse
       return result;
     }
     
-    public ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (ref Query query, Match match)
     {
       return null;
     }

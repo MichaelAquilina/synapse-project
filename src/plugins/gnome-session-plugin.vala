@@ -26,12 +26,11 @@ namespace Synapse
   {
     public const string UNIQUE_NAME = "org.gnome.SessionManager";
     public const string OBJECT_PATH = "/org/gnome/SessionManager";
-    public const string INTERFACE_NAME = "org.gnome.SessionManager";
 
-    public abstract bool can_shutdown () throws DBus.Error;
-    public abstract void shutdown () throws DBus.Error;
-    public abstract void request_reboot () throws DBus.Error;
-    public abstract void logout (uint32 mode = 0) throws DBus.Error;
+    public abstract bool can_shutdown () throws IOError;
+    public abstract void shutdown () throws IOError;
+    public abstract void request_reboot () throws IOError;
+    public abstract void logout (uint32 mode = 0) throws IOError;
   }
 
   public class GnomeSessionPlugin: Object, Activatable, ItemProvider
@@ -69,15 +68,13 @@ namespace Synapse
       {
         try
         {
-          var connection = DBus.Bus.get (DBus.BusType.SESSION);
-          var dbus_interface = (GnomeSessionManager)
-            connection.get_object (GnomeSessionManager.UNIQUE_NAME,
-                                   GnomeSessionManager.OBJECT_PATH,
-                                   GnomeSessionManager.INTERFACE_NAME);
+          GnomeSessionManager dbus_interface = Bus.get_proxy_sync (BusType.SESSION,
+                                                   GnomeSessionManager.UNIQUE_NAME,
+                                                   GnomeSessionManager.OBJECT_PATH);
 
           dbus_interface.shutdown ();
         }
-        catch (DBus.Error err)
+        catch (IOError err)
         {
           warning ("%s", err.message);
         }
@@ -105,15 +102,13 @@ namespace Synapse
       {
         try
         {
-          var connection = DBus.Bus.get (DBus.BusType.SESSION);
-          var dbus_interface = (GnomeSessionManager)
-            connection.get_object (GnomeSessionManager.UNIQUE_NAME,
-                                   GnomeSessionManager.OBJECT_PATH,
-                                   GnomeSessionManager.INTERFACE_NAME);
+          GnomeSessionManager dbus_interface = Bus.get_proxy_sync (BusType.SESSION,
+                                                   GnomeSessionManager.UNIQUE_NAME,
+                                                   GnomeSessionManager.OBJECT_PATH);
 
           dbus_interface.request_reboot ();
         }
-        catch (DBus.Error err)
+        catch (IOError err)
         {
           warning ("%s", err.message);
         }
@@ -141,11 +136,9 @@ namespace Synapse
       {
         try
         {
-          var connection = DBusService.get_session_bus ();
-          var dbus_interface = (GnomeSessionManager)
-            connection.get_object (GnomeSessionManager.UNIQUE_NAME,
-                                   GnomeSessionManager.OBJECT_PATH,
-                                   GnomeSessionManager.INTERFACE_NAME);
+          GnomeSessionManager dbus_interface = Bus.get_proxy_sync (BusType.SESSION,
+                                                   GnomeSessionManager.UNIQUE_NAME,
+                                                   GnomeSessionManager.OBJECT_PATH);
 
           /*
            * 0: Normal.
@@ -154,7 +147,7 @@ namespace Synapse
            */
           dbus_interface.logout (1);
         }
-        catch (DBus.Error err)
+        catch (IOError err)
         {
           warning ("%s", err.message);
         }

@@ -26,16 +26,15 @@ namespace Synapse
   interface RhythmboxShell : Object {
       public const string UNIQUE_NAME = "org.gnome.Rhythmbox";
       public const string OBJECT_PATH = "/org/gnome/Rhythmbox/Shell";
-      public const string INTERFACE_NAME = "org.gnome.Rhythmbox.Shell";
       
       [DBus (name = "addToQueue")]
-      public abstract void add_to_queue (string uri) throws DBus.Error;
+      public abstract void add_to_queue (string uri) throws IOError;
       /*
       [DBus (name = "clearQueue")]
-      public abstract void clear_queue () throws DBus.Error;
+      public abstract void clear_queue () throws IOError;
       */
       [DBus (name = "loadURI")]
-      public abstract void load_uri (string uri, bool b) throws DBus.Error;
+      public abstract void load_uri (string uri, bool b) throws IOError;
       
   }
 
@@ -43,16 +42,15 @@ namespace Synapse
   interface RhythmboxPlayer : Object {
       public const string UNIQUE_NAME = "org.gnome.Rhythmbox";
       public const string OBJECT_PATH = "/org/gnome/Rhythmbox/Player";
-      public const string INTERFACE_NAME = "org.gnome.Rhythmbox.Shell";
       
       [DBus (name = "getPlaying")]
-      public abstract bool get_playing () throws DBus.Error;
+      public abstract bool get_playing () throws IOError;
       [DBus (name = "next")]
-      public abstract void next () throws DBus.Error;
+      public abstract void next () throws IOError;
       [DBus (name = "previous")]
-      public abstract void previous () throws DBus.Error;
+      public abstract void previous () throws IOError;
       [DBus (name = "playPause")]
-      public abstract void play_pause (bool b) throws DBus.Error;
+      public abstract void play_pause (bool b) throws IOError;
   }
   
   public class RhythmboxActions: Object, Activatable, ItemProvider, ActionProvider
@@ -163,10 +161,10 @@ namespace Synapse
         try
         {
           bool player_opened = DBusService.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
-          var conn = DBusService.get_session_bus ();
-          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
-                                                          RhythmboxPlayer.OBJECT_PATH,
-                                                          RhythmboxPlayer.INTERFACE_NAME);
+          RhythmboxPlayer player = Bus.get_proxy_sync (BusType.SESSION,
+                                           RhythmboxPlayer.UNIQUE_NAME,
+                                           RhythmboxPlayer.OBJECT_PATH);
+
           player.play_pause (true);
           if (!player_opened)
           {
@@ -188,7 +186,7 @@ namespace Synapse
             });
           }
         }
-        catch (DBus.Error e)
+        catch (IOError e)
         {
           Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
         }
@@ -228,12 +226,12 @@ namespace Synapse
       public override void do_action ()
       {
         try {
-          var conn = DBusService.get_session_bus ();
-          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
-                                                          RhythmboxPlayer.OBJECT_PATH,
-                                                          RhythmboxPlayer.INTERFACE_NAME);
+          RhythmboxPlayer player = Bus.get_proxy_sync (BusType.SESSION,
+                                           RhythmboxPlayer.UNIQUE_NAME,
+                                           RhythmboxPlayer.OBJECT_PATH);
+
           player.next ();
-        } catch (DBus.Error e) {
+        } catch (IOError e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
       }
@@ -251,13 +249,13 @@ namespace Synapse
       public override void do_action ()
       {
         try {
-          var conn = DBusService.get_session_bus ();
-          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
-                                                          RhythmboxPlayer.OBJECT_PATH,
-                                                          RhythmboxPlayer.INTERFACE_NAME);
+          RhythmboxPlayer player = Bus.get_proxy_sync (BusType.SESSION,
+                                           RhythmboxPlayer.UNIQUE_NAME,
+                                           RhythmboxPlayer.OBJECT_PATH);
+
           player.previous ();
           player.previous ();
-        } catch (DBus.Error e) {
+        } catch (IOError e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
       }
@@ -280,17 +278,18 @@ namespace Synapse
         UriMatch uri = match as UriMatch;
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
         try {
-          var conn = DBusService.get_session_bus ();
-          var shell = (RhythmboxShell) conn.get_object (RhythmboxShell.UNIQUE_NAME,
-                                                        RhythmboxShell.OBJECT_PATH,
-                                                        RhythmboxShell.INTERFACE_NAME);
-          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
-                                                          RhythmboxPlayer.OBJECT_PATH,
-                                                          RhythmboxPlayer.INTERFACE_NAME);
+          RhythmboxShell shell = Bus.get_proxy_sync (BusType.SESSION,
+                                           RhythmboxShell.UNIQUE_NAME,
+                                           RhythmboxShell.OBJECT_PATH);
+
+          RhythmboxPlayer player = Bus.get_proxy_sync (BusType.SESSION,
+                                           RhythmboxPlayer.UNIQUE_NAME,
+                                           RhythmboxPlayer.OBJECT_PATH);
+
           shell.add_to_queue (uri.uri);
           if (!player.get_playing())
             player.play_pause (true);
-        } catch (DBus.Error e) {
+        } catch (IOError e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
       }
@@ -327,17 +326,17 @@ namespace Synapse
         UriMatch uri = match as UriMatch;
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
         try {
-          var conn = DBusService.get_session_bus ();
-          var shell = (RhythmboxShell) conn.get_object (RhythmboxShell.UNIQUE_NAME,
-                                                        RhythmboxShell.OBJECT_PATH,
-                                                        RhythmboxShell.INTERFACE_NAME);
-          var player = (RhythmboxPlayer) conn.get_object (RhythmboxPlayer.UNIQUE_NAME,
-                                                          RhythmboxPlayer.OBJECT_PATH,
-                                                          RhythmboxPlayer.INTERFACE_NAME);
+          RhythmboxShell shell = Bus.get_proxy_sync (BusType.SESSION,
+                                           RhythmboxShell.UNIQUE_NAME,
+                                           RhythmboxShell.OBJECT_PATH);
+
+          RhythmboxPlayer player = Bus.get_proxy_sync (BusType.SESSION,
+                                           RhythmboxPlayer.UNIQUE_NAME,
+                                           RhythmboxPlayer.OBJECT_PATH);
           if (!player.get_playing())
             player.play_pause (true);
           shell.load_uri (uri.uri, true);
-        } catch (DBus.Error e) {
+        } catch (IOError e) {
           stderr.printf ("Rythmbox is not available.\n%s", e.message);
         }
       }
@@ -392,7 +391,7 @@ namespace Synapse
       return result;
     }
 
-    public ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (ref Query query, Match match)
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();

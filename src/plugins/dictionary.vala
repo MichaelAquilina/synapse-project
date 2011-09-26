@@ -103,7 +103,7 @@ namespace Synapse
       return has_dictionary;
     }
 
-    public ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (ref Query query, Match match)
     {
       if (!has_dictionary || match.match_type != MatchType.UNKNOWN ||
           !(QueryFlags.ACTIONS in query.query_type))

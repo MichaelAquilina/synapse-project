@@ -25,23 +25,21 @@ namespace Synapse
   {
     public const string UNIQUE_NAME = "org.freedesktop.DBus";
     public const string OBJECT_PATH = "/org/freedesktop/DBus";
-    public const string INTERFACE_NAME = "org.freedesktop.DBus";
 
-    public abstract async string[] list_queued_owners (string name) throws DBus.Error;
-    public abstract async string[] list_names () throws DBus.Error;
-    public abstract async string[] list_activatable_names () throws DBus.Error;
-    public abstract async bool name_has_owner (string name) throws DBus.Error;
+    public abstract async string[] list_queued_owners (string name) throws IOError;
+    public abstract async string[] list_names () throws IOError;
+    public abstract async string[] list_activatable_names () throws IOError;
+    public abstract async bool name_has_owner (string name) throws IOError;
     public signal void name_owner_changed (string name,
                                            string old_owner,
                                            string new_owner);
     public abstract async uint32 start_service_by_name (string name,
-                                               uint32 flags) throws DBus.Error;
-    public abstract async string get_name_owner (string name) throws DBus.Error;
+                                               uint32 flags) throws IOError;
+    public abstract async string get_name_owner (string name) throws IOError;
   }
   
   public class DBusService : Object
   {
-    private DBus.Connection connection;
     private FreeDesktopDBus proxy;
     private Gee.Set<string> owned_names;
     private Gee.Set<string> activatable_names;
@@ -110,11 +108,6 @@ namespace Synapse
     {
       return name in system_activatable_names;
     }
-    
-    public static DBus.Connection get_session_bus ()
-    {
-      return get_default ().connection;
-    }
 
     public signal void initialization_done ();
     
@@ -123,11 +116,9 @@ namespace Synapse
       string[] names;
       try
       {
-        connection = DBus.Bus.get (DBus.BusType.SESSION);
-        proxy = (FreeDesktopDBus)
-          connection.get_object (FreeDesktopDBus.UNIQUE_NAME,
-                                 FreeDesktopDBus.OBJECT_PATH,
-                                 FreeDesktopDBus.INTERFACE_NAME);
+        proxy = Bus.get_proxy_sync (BusType.SESSION,
+                                    FreeDesktopDBus.UNIQUE_NAME,
+                                    FreeDesktopDBus.OBJECT_PATH);
 
         proxy.name_owner_changed.connect (this.name_owner_changed);
         names = yield proxy.list_names ();
@@ -150,11 +141,10 @@ namespace Synapse
 
       try
       {
-        var sys_connection = DBus.Bus.get (DBus.BusType.SYSTEM);
-        var sys_proxy = (FreeDesktopDBus)
-          sys_connection.get_object (FreeDesktopDBus.UNIQUE_NAME,
-                                     FreeDesktopDBus.OBJECT_PATH,
-                                     FreeDesktopDBus.INTERFACE_NAME);
+        FreeDesktopDBus sys_proxy = Bus.get_proxy_sync (
+                                            BusType.SYSTEM,
+                                            FreeDesktopDBus.UNIQUE_NAME,
+                                            FreeDesktopDBus.OBJECT_PATH);
 
         names = yield sys_proxy.list_activatable_names ();
         foreach (unowned string system_act in names)

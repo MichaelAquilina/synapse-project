@@ -155,7 +155,7 @@ namespace Synapse
       actions.add (new RenameTo ());
     }
 
-    public ResultSet? find_for_match (Query query, Match match)
+    public ResultSet? find_for_match (ref Query query, Match match)
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();

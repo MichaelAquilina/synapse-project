@@ -235,7 +235,7 @@ namespace Synapse
       return null;
     }
 
-    public ResultSet? find_for_match (Query q, Match match)
+    public ResultSet? find_for_match (ref Query q, Match match)
     {
       /*
       var our_results = QueryFlags.APPLICATIONS | QueryFlags.AUDIO

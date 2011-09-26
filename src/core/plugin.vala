@@ -49,7 +49,7 @@ namespace Synapse
 
   public interface ActionProvider : Activatable
   {
-    public abstract ResultSet? find_for_match (Query query, Match match);
+    public abstract ResultSet? find_for_match (ref Query query, Match match);
     public virtual bool handles_unknown ()
     {
       return false;

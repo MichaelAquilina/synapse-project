@@ -282,7 +282,7 @@ namespace Synapse
       //actions.add (new PastebinToContactAction ());
     }
 
-    public ResultSet? find_for_match (Query q, Match match)
+    public ResultSet? find_for_match (ref Query q, Match match)
     {
       if (!actions[0].valid_for_match (match)) return null;
 

@@ -37,7 +37,7 @@ AC_STDC_HEADERS
 dnl ==============================================
 dnl Check for Vala
 dnl ==============================================
-AM_PROG_VALAC([0.12.0])
+AM_PROG_VALAC([0.14.0])
 if test "x$VALAC" = "x"; then
 	AC_MSG_ERROR([You need Vala compiler])
 fi
@@ -61,7 +61,6 @@ PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   gobject-2.0 \
   gee-1.0 >= $MIN_GEE_VERSION \
   gio-unix-2.0 \
-  dbus-glib-1 \
   json-glib-1.0 >= $MIN_JSON_VERSION \
   libnotify \
   unique-1.0 \
