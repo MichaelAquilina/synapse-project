@@ -1,4 +1,4 @@
-AC_INIT([synapse], [0.2.9])
+AC_INIT([synapse], [0.2.8.1])
 AC_DEFINE(RELEASE_NAME, "Bombesin", "Codename of this release")
 
 AC_CONFIG_MACRO_DIR([m4])
