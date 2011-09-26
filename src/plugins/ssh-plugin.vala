@@ -27,6 +27,9 @@ namespace Synapse
   {
     public  bool      enabled { get; set; default = true; }
     private ArrayList<SshHost> hosts;
+    
+    protected File config_file;
+    protected FileMonitor monitor;
 
     static construct
     {
@@ -40,7 +43,18 @@ namespace Synapse
 
     public void activate ()
     {
+      this.config_file = File.new_for_path (Environment.get_home_dir () + "/.ssh/config");
+
       parse_ssh_config.begin ();
+
+      try {
+        this.monitor = config_file.monitor_file (FileMonitorFlags.NONE);
+        this.monitor.changed.connect (this.handle_ssh_config_update);
+      }
+      catch (IOError e)
+      {
+        Utils.Logger.warning (this, "Failed to start monitoring changes of ssh client config file");
+      }
     }
 
     public void deactivate () {}
@@ -61,13 +75,11 @@ namespace Synapse
 
     private async void parse_ssh_config ()
     {
-      var file = File.new_for_path (Environment.get_home_dir () + "/.ssh/config");
-
       hosts.clear ();
 
       try
       {
-        var dis = new DataInputStream (file.read ());
+        var dis = new DataInputStream (config_file.read ());
 
         // TODO: match key boundary
         Regex host_key_re = new Regex ("(host\\s)", RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
@@ -102,7 +114,19 @@ namespace Synapse
       }
       catch (Error e)
       {
-        Utils.Logger.warning (this, "%s: %s", file.get_path (), e.message);
+        Utils.Logger.warning (this, "%s: %s", config_file.get_path (), e.message);
+      }
+    }
+    
+    public void handle_ssh_config_update (FileMonitor monitor,
+                                          File file,
+                                          File? other_file,
+                                          FileMonitorEvent event_type)
+    {
+      if (event_type == FileMonitorEvent.CHANGES_DONE_HINT)
+      {
+        Utils.Logger.log (this, "ssh_config is changed, reparsing");
+        parse_ssh_config.begin ();
       }
     }
 
