@@ -38,8 +38,9 @@ namespace Synapse
       ROX   = 1 << 3,
       XFCE  = 1 << 4,
       OLD   = 1 << 5,
+      UNITY = 1 << 6,
 
-      ALL   = 0x3F
+      ALL   = 0x7F
     }
     
     public string name { get; construct set; }
@@ -88,6 +89,7 @@ namespace Synapse
           case "XFCE": result |= EnvironmentType.XFCE; break;
           case "ROX": result |= EnvironmentType.ROX; break;
           case "OLD": result |= EnvironmentType.OLD; break;
+          case "UNITY": result |= EnvironmentType.UNITY; break;
           default: warning ("%s is not understood", env); break;
         }
       }
@@ -259,10 +261,15 @@ namespace Synapse
         session_type = DesktopFileInfo.EnvironmentType.GNOME;
         session_type_str = "GNOME";
       }
+      else if (session.has_prefix ("ubuntu"))
+      {
+        session_type = DesktopFileInfo.EnvironmentType.UNITY;
+        session_type_str = "Unity";
+      }
       else if (session.has_prefix ("lx"))
       {
         session_type = DesktopFileInfo.EnvironmentType.LXDE;
-        session_type_str = "XFCE"; // FIXME: does GDesktopApp understand LXDE?
+        session_type_str = "LXDE";
       }
       else if (session.has_prefix ("xfce"))
       {
