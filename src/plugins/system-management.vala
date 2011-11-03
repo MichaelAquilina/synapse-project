@@ -125,7 +125,11 @@ namespace Synapse
                                            UPowerObject.UNIQUE_NAME,
                                            UPowerObject.OBJECT_PATH);
 
-          yield dbus_interface.about_to_sleep ();
+          try
+          {
+            yield dbus_interface.about_to_sleep ();
+          }
+          catch (IOError not_there_error) { }
           // yea kinda nasty
           GnomeScreenSaverPlugin.lock_screen ();
           // wait 2 seconds
@@ -191,7 +195,11 @@ namespace Synapse
                                            UPowerObject.UNIQUE_NAME,
                                            UPowerObject.OBJECT_PATH);
 
-          yield dbus_interface.about_to_sleep ();
+          try
+          {
+            yield dbus_interface.about_to_sleep ();
+          }
+          catch (IOError not_there_error) { }
           // yea kinda nasty
           GnomeScreenSaverPlugin.lock_screen ();
           // wait 2 seconds

@@ -12,3 +12,7 @@ EXTRA_DIST = \
 	COPYING.GPL2 \
 	COPYING.LGPL2.1 \
 	$(NULL)
+
+# make sure we have translations in the tarball
+dist-hook:
+	@test -n "$(wildcard $(top_srcdir)/po/*.po)" || (echo "Translations are missing!" && exit 1)
