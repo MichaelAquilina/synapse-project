@@ -102,10 +102,11 @@ namespace Synapse
                                            UPowerObject.UNIQUE_NAME,
                                            UPowerObject.OBJECT_PATH);
 
-          allowed = yield dbus_interface.hibernate_allowed ();
+          allowed = yield dbus_interface.suspend_allowed ();
         }
         catch (IOError err)
         {
+          warning ("%s", err.message);
           allowed = false;
         }
       }
@@ -176,6 +177,7 @@ namespace Synapse
         }
         catch (IOError err)
         {
+          warning ("%s", err.message);
           allowed = false;
         }
       }
@@ -245,6 +247,7 @@ namespace Synapse
         }
         catch (IOError err)
         {
+          warning ("%s", err.message);
           allowed = false;
         }
       }
@@ -299,6 +302,7 @@ namespace Synapse
         }
         catch (IOError err)
         {
+          warning ("%s", err.message);
           allowed = false;
         }
       }

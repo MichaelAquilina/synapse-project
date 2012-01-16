@@ -173,6 +173,7 @@ namespace Synapse
       }
       catch (Error err)
       {
+        Utils.Logger.warning (this, "%s", err.message);
         is_valid = false;
       }
     }
