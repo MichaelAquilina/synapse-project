@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
  *
- * Authored by Alberto Aldegheri <albyrock87+dev@gmail.com>
+ * Authored by Jörn Magens <shuerhaaken@googlemail.com>
  *
  */
 
@@ -27,16 +27,16 @@ namespace Synapse
     public const string UNIQUE_NAME = "org.gtk.xnoise.PlayerEngine";
     public const string OBJECT_PATH = "/PlayerEngine";
     
-    public abstract void Quit ()              throws IOError;
-    public abstract void Raise ()             throws IOError;
+    public abstract void quit ()              throws IOError;
+    public abstract void raise ()             throws IOError;
     
-    public abstract void Next ()              throws IOError;
-    public abstract void Previous ()          throws IOError;
-    public abstract void Pause ()             throws IOError;
-    public abstract void TogglePlaying ()     throws IOError;
-    public abstract void Stop ()              throws IOError;
-    public abstract void Play ()              throws IOError;
-    public abstract void OpenUri (string Uri) throws IOError;
+    public abstract void next ()              throws IOError;
+    public abstract void previous ()          throws IOError;
+    public abstract void pause ()             throws IOError;
+    public abstract void toggle_playing ()     throws IOError;
+    public abstract void stop ()              throws IOError;
+    public abstract void play ()              throws IOError;
+    public abstract void open_uri (string uri) throws IOError;
   }
   
   public class XnoiseActions: Object, Activatable, ItemProvider, ActionProvider
@@ -66,7 +66,6 @@ namespace Synapse
     
     static construct
     {
-      print("static construct xnoise plugin\n");
       register_plugin ();
     }
     
@@ -141,9 +140,9 @@ namespace Synapse
           XnoisePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
-          player.Quit ();
+          player.quit ();
         } catch (IOError e) {
-          stderr.printf ("Xnoise is not available.\n%s", e.message);
+          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -166,9 +165,9 @@ namespace Synapse
           XnoisePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
-          player.Raise ();
+          player.raise ();
         } catch (IOError e) {
-          stderr.printf ("Xnoise is not available.\n%s", e.message);
+          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -191,9 +190,9 @@ namespace Synapse
           XnoisePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
-          player.Play ();
+          player.play ();
         } catch (IOError e) {
-          stderr.printf ("Xnoise is not available.\n%s", e.message);
+          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -216,9 +215,9 @@ namespace Synapse
           XnoisePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
-          player.TogglePlaying ();
+          player.toggle_playing ();
         } catch (IOError e) {
-          stderr.printf ("Xnoise is not available.\n%s", e.message);
+          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
         }
       }
 
@@ -246,9 +245,9 @@ namespace Synapse
           XnoisePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
-          player.Pause ();
+          player.pause ();
         } catch (IOError e) {
-          stderr.printf ("Xnoise is not available.\n%s", e.message);
+          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -272,9 +271,9 @@ namespace Synapse
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
           
-          player.Next ();
+          player.next ();
         } catch (IOError e) {
-          stderr.printf ("Xnoise is not available.\n%s", e.message);
+          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -297,9 +296,9 @@ namespace Synapse
           XnoisePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
-          player.Previous ();
+          player.previous ();
         } catch (IOError e) {
-          stderr.printf ("Xnoise is not available.\n%s", e.message);
+          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -322,9 +321,9 @@ namespace Synapse
           XnoisePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
-          player.Stop ();
+          player.stop ();
         } catch (IOError e) {
-          stderr.printf ("Xnoise is not available.\n%s", e.message);
+          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -353,10 +352,10 @@ namespace Synapse
           XnoisePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
-          player.OpenUri (uri.uri);
-          player.Play ();
+          player.open_uri (uri.uri);
+          player.play ();
         } catch (IOError e) {
-          stderr.printf ("Xnoise is not available.\n%s", e.message);
+          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
         }
       }
       
