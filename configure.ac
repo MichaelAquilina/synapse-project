@@ -47,9 +47,9 @@ AM_SILENT_RULES([yes])
 dnl ==============================================
 dnl Check that we meet the dependencies
 dnl ==============================================
-MIN_GLIB_VERSION=2.22.0
+MIN_GLIB_VERSION=2.26.0
 MIN_GTK_VERSION=2.20.0
-MIN_ZEITGEIST_VERSION=0.2.14
+MIN_ZEITGEIST_VERSION=0.3.14
 MIN_GEE_VERSION=0.5.2
 MIN_JSON_VERSION=0.10.0
 APPINDICATOR_REQUIRED=0.0.7
