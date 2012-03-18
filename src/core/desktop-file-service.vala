@@ -116,8 +116,16 @@ namespace Synapse
           }
         }
 
-        name = keyfile.get_locale_string (GROUP, "Name");
-        exec = keyfile.get_string (GROUP, "Exec");
+        DesktopAppInfo app_info;
+        app_info = new DesktopAppInfo.from_keyfile (keyfile);
+
+        if (app_info == null)
+        {
+          throw new DesktopFileError.UNINTERESTING_ENTRY ("Unable to create AppInfo");
+        }
+
+        name = app_info.get_name ();
+        exec = app_info.get_executable ();
 
         // check for hidden desktop files
         if (keyfile.has_key (GROUP, "Hidden") &&
@@ -130,21 +138,13 @@ namespace Synapse
         {
           is_hidden = true;
         }
-        if (keyfile.has_key (GROUP, "Comment"))
-        {
-          comment = keyfile.get_locale_string (GROUP, "Comment");
-        }
-        if (keyfile.has_key (GROUP, "Icon"))
-        {
-          icon_name = keyfile.get_locale_string (GROUP, "Icon");
-          if (!Path.is_absolute (icon_name) &&
-              (icon_name.has_suffix (".png") ||
-              icon_name.has_suffix (".svg") ||
-              icon_name.has_suffix (".xpm")))
-          {
-            icon_name = icon_name.substring (0, icon_name.length - 4);
-          }
-        }
+
+        comment = app_info.get_description () ?? "";
+
+        var icon = app_info.get_icon () ??
+          new ThemedIcon ("application-default-icon");
+        icon_name = icon.to_string ();
+
         if (keyfile.has_key (GROUP, "MimeType"))
         {
           mime_types = keyfile.get_string_list (GROUP, "MimeType");
