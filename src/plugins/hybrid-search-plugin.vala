@@ -129,7 +129,7 @@ namespace Synapse
         try
         {
           load_ok = yield recent.load_contents_async (null,
-                                                      out file_contents);
+                                                      out file_contents, null);
         }
         catch (GLib.Error load_error)
         {
@@ -142,7 +142,7 @@ namespace Synapse
           recent = File.new_for_path (Path.build_filename (
             Environment.get_user_data_dir (), RECENT_XML_NAME, null));
           load_ok = yield recent.load_contents_async (null,
-                                                      out file_contents);
+                                                      out file_contents, null);
         }
 
         if (load_ok)
@@ -398,8 +398,12 @@ namespace Synapse
         try
         {
           var dir_info = yield dir.query_info_async ("time::*", 0, 0, null);
+#if VALA_0_16
+          var t = dir_info.get_modification_time ();
+#else
           var t = TimeVal ();
           dir_info.get_modification_time (out t);
+#endif
           if (t.tv_sec > di.last_update.tv_sec)
           {
             // the directory was changed, let's update

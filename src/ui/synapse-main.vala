@@ -101,7 +101,7 @@ namespace Synapse
     
     private void init_indicator ()
     {
-      var indicator_menu = new Menu ();
+      var indicator_menu = new Gtk.Menu ();
       var activate_item = new ImageMenuItem.with_label (_ ("Activate"));
       activate_item.set_image (new Gtk.Image.from_stock (Gtk.Stock.EXECUTE, Gtk.IconSize.MENU));
       activate_item.activate.connect (() =>

@@ -416,7 +416,8 @@ namespace Synapse
       try
       {
         uint8[] file_contents;
-        bool success = yield file.load_contents_async (null, out file_contents);
+        bool success = yield file.load_contents_async (null, out file_contents,
+                                                       null);
         if (success)
         {
           var keyfile = new KeyFile ();
