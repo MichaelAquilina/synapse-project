@@ -113,12 +113,6 @@ if test "x$enable_librest" = "xauto" ; then
 	PKG_CHECK_EXISTS([$REST_PKG_NAME],
 	                 enable_librest="yes",
 	                 enable_librest="no")
-	if test "x$enable_librest" = "xno" ; then
-		REST_PKG_NAME=rest-0.6
-		PKG_CHECK_EXISTS([$REST_PKG_NAME],
-		                 enable_librest="yes",
-		                 enable_librest="no")
-	fi
 fi
 
 if test "x$enable_librest" = "xyes" ; then
@@ -161,7 +155,7 @@ ${PACKAGE}-${VERSION}
     Zeitgeist support:  ${enable_zeitgeist}
 
   Optional dependencies
-    Rest:               ${enable_librest} (${REST_PKG_NAME})
+    Rest:               ${enable_librest}
     AppIndicator:       ${enable_indicator}
 
 EOF
