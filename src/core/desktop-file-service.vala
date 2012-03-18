@@ -248,13 +248,23 @@ namespace Synapse
     
     private void get_environment_type ()
     {
-      unowned string? session_var = Environment.get_variable ("DESKTOP_SESSION");
-      
+      unowned string? session_var;
+      session_var = Environment.get_variable ("XDG_CURRENT_DESKTOP");
+      if (session_var == null)
+      {
+        session_var = Environment.get_variable ("DESKTOP_SESSION");
+      }
+
       if (session_var == null) return;
 
       string session = session_var.down ();
 
-      if (session.has_prefix ("kde"))
+      if (session.has_prefix ("unity"))
+      {
+        session_type = DesktopFileInfo.EnvironmentType.UNITY;
+        session_type_str = "Unity";
+      }
+      else if (session.has_prefix ("kde"))
       {
         session_type = DesktopFileInfo.EnvironmentType.KDE;
         session_type_str = "KDE";
