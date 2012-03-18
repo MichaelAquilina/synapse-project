@@ -547,7 +547,7 @@ namespace Synapse
         original_rs = rs;
         search.callback ();
       });
-      ulong canc_sig_id = CancellableFix.connect (q.cancellable, () =>
+      ulong canc_sig_id = q.cancellable.connect (() =>
       {
         // who knows what thread this runs in
         SignalHandler.block (this, sig_id); // is this thread-safe?

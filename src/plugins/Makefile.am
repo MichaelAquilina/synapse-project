@@ -17,7 +17,6 @@ libplugins_la_VALAFLAGS = \
 	--pkg synapse-core \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
-	$(VAPIDIR)/cancellable-fix.vapi \
 	$(NULL)
 
 libplugins_la_CFLAGS = \

@@ -507,7 +507,7 @@ namespace Synapse
       
       if (cancellable != null)
       {
-        CancellableFix.connect (cancellable, () =>
+        cancellable.connect (() =>
         {
           foreach (var c in cancellables) c.cancel ();
         });

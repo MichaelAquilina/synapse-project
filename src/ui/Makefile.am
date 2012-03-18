@@ -25,7 +25,6 @@ synapse_VALAFLAGS = \
 	--vapidir $(VAPIDIR) \
 	--pkg gtkhotkey-1.0 \
 	$(VAPIDIR)/keysyms.vapi \
-	$(VAPIDIR)/cancellable-fix.vapi \
 	$(VAPIDIR)/config.vapi \
 	$(NULL)
 
