@@ -1,5 +1,5 @@
-AC_INIT([synapse], [0.2.9])
-AC_DEFINE(RELEASE_NAME, "Bombesin", "Codename of this release")
+AC_INIT([synapse], [0.2.10])
+AC_DEFINE(RELEASE_NAME, "Cholecystokinin", "Codename of this release")
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([.])
