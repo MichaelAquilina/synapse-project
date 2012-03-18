@@ -85,7 +85,7 @@ namespace Synapse
                                     bool use_origin = false)
       {
         var subject = event.get_subject (0);
-        this.uri = use_origin ? subject.get_origin () : subject.get_uri ();
+        this.uri = use_origin ? subject.get_origin () : subject.get_current_uri ();
         var f = File.new_for_uri (this.uri);
         this.description = f.get_parse_name ();
 
@@ -254,7 +254,7 @@ namespace Synapse
         if (event.num_subjects () <= 0) continue;
         var subject = event.get_subject (0);
         unowned string uri = places_search ?
-          subject.get_origin () : subject.get_uri ();
+          subject.get_origin () : subject.get_current_uri ();
         if (uri == null || uri == "") continue;
         // make sure we don't add the same uri twice
         if (!(uri in uris))
@@ -398,7 +398,7 @@ namespace Synapse
         if (event.num_subjects () <= 0) continue;
         var subject = event.get_subject (0);
         unowned string uri = places_search ?
-          subject.get_origin () : subject.get_uri ();
+          subject.get_origin () : subject.get_current_uri ();
         if (uri == null || uri == "") continue;
 
         if (!(uri in uris))
@@ -409,6 +409,7 @@ namespace Synapse
           string? icon = null;
           uris.add (uri);
           var f = File.new_for_uri (uri);
+          // this screws up gio, we better skip it
           if (f.get_uri_scheme () == "data") continue;
           if (f.is_native ())
           {
