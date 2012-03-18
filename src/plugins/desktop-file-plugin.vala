@@ -78,7 +78,7 @@ namespace Synapse
         this.needs_terminal = info.needs_terminal;
         this.title_folded = info.get_name_folded ();
         this.title_unaccented = Utils.remove_accents (this.title_folded);
-        this.desktop_id = "application://" + Path.get_basename (this.filename);
+        this.desktop_id = "application://" + info.desktop_id;
       }
     }
 
