@@ -42,7 +42,8 @@ namespace Synapse
 
       ALL   = 0x7F
     }
-    
+   
+    public string desktop_id { get; construct set; } 
     public string name { get; construct set; }
     public string comment { get; set; default = ""; }
     public string icon_name { get; construct set; default = ""; }
@@ -68,13 +69,14 @@ namespace Synapse
 
     private static const string GROUP = "Desktop Entry";
 
-    public DesktopFileInfo.for_keyfile (string path, KeyFile keyfile)
+    public DesktopFileInfo.for_keyfile (string path, KeyFile keyfile,
+                                        string desktop_id)
     {
-      Object (filename: path);
+      Object (filename: path, desktop_id: desktop_id);
 
       init_from_keyfile (keyfile);
     }
-    
+
     private EnvironmentType parse_environments (string[] environments)
     {
       EnvironmentType result = 0;
@@ -303,6 +305,7 @@ namespace Synapse
     }
     
     private async void process_directory (File directory,
+                                          string id_prefix,
                                           Gee.Set<File> monitored_dirs)
     {
       try
@@ -332,7 +335,9 @@ namespace Synapse
           if (f.get_file_type () == FileType.DIRECTORY)
           {
             // FIXME: this could cause too many open files error, or?
-            yield process_directory (directory.get_child (name), monitored_dirs);
+            var subdir = directory.get_child (name);
+            var new_prefix = "%s%s-".printf (id_prefix, subdir.get_basename ());
+            yield process_directory (subdir, new_prefix, monitored_dirs);
           }
           else
           {
@@ -340,7 +345,7 @@ namespace Synapse
             if (name.has_suffix ("synapse.desktop")) continue;
             if (name.has_suffix (".desktop"))
             {
-              yield load_desktop_file (directory.get_child (name));
+              yield load_desktop_file (directory.get_child (name), id_prefix);
             }
           }
         }
@@ -364,7 +369,7 @@ namespace Synapse
       {
         string dir_path = Path.build_filename (data_dir, "applications", null);
         var directory = File.new_for_path (dir_path);
-        yield process_directory (directory, desktop_file_dirs);
+        yield process_directory (directory, "", desktop_file_dirs);
         dir_path = Path.build_filename (data_dir, "mime", "subclasses");
         yield load_mime_parents_from_file (dir_path);
       }
@@ -411,7 +416,7 @@ namespace Synapse
       reload_done ();
     }
 
-    private async void load_desktop_file (File file)
+    private async void load_desktop_file (File file, string id_prefix)
     {
       try
       {
@@ -424,7 +429,10 @@ namespace Synapse
           keyfile.load_from_data ((string) file_contents,
                                   file_contents.length, 0);
 
-          var dfi = new DesktopFileInfo.for_keyfile (file.get_path (), keyfile);
+          var desktop_id = "%s%s".printf (id_prefix, file.get_basename ());
+          var dfi = new DesktopFileInfo.for_keyfile (file.get_path (),
+                                                     keyfile,
+                                                     desktop_id);
           if (dfi.is_valid)
           {
             all_desktop_files.add (dfi);
@@ -486,7 +494,8 @@ namespace Synapse
         exec_list.add (dfi);
 
         // update desktop id map
-        desktop_id_map[Path.get_basename (dfi.filename)] = dfi;
+        var desktop_id = dfi.desktop_id ?? Path.get_basename (dfi.filename);
+        desktop_id_map[desktop_id] = dfi;
 
         // update mimetype map
         if (dfi.is_hidden || dfi.mime_types == null) continue;
