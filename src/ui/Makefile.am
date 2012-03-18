@@ -11,7 +11,6 @@ synapse_VALAFLAGS = \
 	--pkg gdk-x11-2.0 \
 	--pkg gio-2.0 \
 	--pkg gio-unix-2.0 \
-	--pkg zeitgeist-1.0 \
 	--pkg gee-1.0 \
 	--pkg json-glib-1.0 \
 	--pkg unique-1.0 \
