@@ -97,7 +97,7 @@ namespace Synapse.Gui
       if (info == null)
       {
         var pixbuf = get_pixbuf (name, pixel_size);
-        if (pixbuf == null) get_pixbuf ("unknown", pixel_size);
+        if (pixbuf == null) pixbuf = get_pixbuf ("unknown", pixel_size);
         if (pixbuf == null) return null;
         info = new PixbufInfo (pixbuf);
         map.set (key, info);
