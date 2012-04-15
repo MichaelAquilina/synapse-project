@@ -125,7 +125,11 @@ namespace Synapse
         }
 
         name = app_info.get_name ();
-        exec = app_info.get_executable ();
+        exec = app_info.get_commandline ();
+        if (exec == null)
+        {
+          throw new DesktopFileError.UNINTERESTING_ENTRY ("Unable to get exec for %s".printf (name));
+        }
 
         // check for hidden desktop files
         if (keyfile.has_key (GROUP, "Hidden") &&
