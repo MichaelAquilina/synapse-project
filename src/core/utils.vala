@@ -20,7 +20,7 @@
 
 namespace Synapse
 {
-  //[CCode (gir_namespace = "SynapseUtils", gir_version = "1.0")]
+  [CCode (gir_namespace = "SynapseUtils", gir_version = "1.0")]
   namespace Utils
   {
     /* Make sure setlocale was called before calling this function
@@ -59,7 +59,7 @@ namespace Synapse
       bool exists;
       try
       {
-        yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_TYPE, 0, 0, null);
+        yield f.query_info_async (FileAttribute.STANDARD_TYPE, 0, 0, null);
         exists = true;
       }
       catch (Error err)
@@ -211,13 +211,13 @@ namespace Synapse
       static construct
       {
         interesting_attributes =
-          string.join (",", FILE_ATTRIBUTE_STANDARD_TYPE,
-                            FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
-                            FILE_ATTRIBUTE_STANDARD_IS_BACKUP,
-                            FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
-                            FILE_ATTRIBUTE_STANDARD_ICON,
-                            FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
-                            FILE_ATTRIBUTE_THUMBNAIL_PATH,
+          string.join (",", FileAttribute.STANDARD_TYPE,
+                            FileAttribute.STANDARD_IS_HIDDEN,
+                            FileAttribute.STANDARD_IS_BACKUP,
+                            FileAttribute.STANDARD_DISPLAY_NAME,
+                            FileAttribute.STANDARD_ICON,
+                            FileAttribute.STANDARD_FAST_CONTENT_TYPE,
+                            FileAttribute.THUMBNAIL_PATH,
                             null);
       }
 
@@ -259,7 +259,7 @@ namespace Synapse
               !fi.get_is_backup ())
           {
             match_obj = (UriMatch) Object.new (match_obj_type,
-              "thumbnail-path", fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH),
+              "thumbnail-path", fi.get_attribute_byte_string (FileAttribute.THUMBNAIL_PATH),
               "icon-name", fi.get_icon ().to_string (),
               "uri", uri,
               "title", fi.get_display_name (),
@@ -270,7 +270,7 @@ namespace Synapse
             
             // let's determine the file type
             unowned string mime_type = 
-              fi.get_attribute_string (FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
+              fi.get_attribute_string (FileAttribute.STANDARD_FAST_CONTENT_TYPE);
             if (ContentType.is_unknown (mime_type))
             {
               file_type = QueryFlags.UNCATEGORIZED;

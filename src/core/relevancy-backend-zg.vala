@@ -45,18 +45,25 @@ namespace Synapse
     private async void check_data_sources ()
     {
       zg_dsr = new Zeitgeist.DataSourceRegistry ();
-      var ptr_arr = yield zg_dsr.get_data_sources (null);
-
-      for (uint i=0; i < ptr_arr.len; i++)
+      try
       {
-        unowned Zeitgeist.DataSource ds;
-        ds = (Zeitgeist.DataSource) ptr_arr.index (i);
-        if (ds.get_unique_id () == "com.zeitgeist-project,datahub,gio-launch-listener"
-            && ds.is_enabled ())
+        var ptr_arr = yield zg_dsr.get_data_sources (null);
+
+        for (uint i=0; i < ptr_arr.len; i++)
         {
-          has_datahub_gio_module = true;
-          break;
+          unowned Zeitgeist.DataSource ds;
+          ds = (Zeitgeist.DataSource) ptr_arr.index (i);
+          if (ds.get_unique_id () == "com.zeitgeist-project,datahub,gio-launch-listener"
+              && ds.is_enabled ())
+          {
+            has_datahub_gio_module = true;
+            break;
+          }
         }
+      }
+      catch (Error err)
+      {
+        warning ("Unable to check Zeitgeist data sources: %s", err.message);
       }
     }
 
@@ -210,7 +217,7 @@ namespace Synapse
     
     public float get_application_popularity (string desktop_id)
     {
-      if (desktop_id in application_popularity)
+      if (application_popularity.has_key (desktop_id))
       {
         return application_popularity[desktop_id] / MULTIPLIER;
       }
@@ -220,7 +227,7 @@ namespace Synapse
     
     public float get_uri_popularity (string uri)
     {
-      if (uri in uri_popularity)
+      if (uri_popularity.has_key (uri))
       {
         return uri_popularity[uri] / MULTIPLIER;
       }

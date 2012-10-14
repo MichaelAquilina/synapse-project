@@ -227,10 +227,10 @@ namespace Synapse
     }
 
     private static string interesting_attributes =
-      string.join (",", FILE_ATTRIBUTE_STANDARD_TYPE,
-                        FILE_ATTRIBUTE_STANDARD_ICON,
-                        FILE_ATTRIBUTE_THUMBNAIL_PATH,
-                        FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
+      string.join (",", FileAttribute.STANDARD_TYPE,
+                        FileAttribute.STANDARD_ICON,
+                        FileAttribute.THUMBNAIL_PATH,
+                        FileAttribute.STANDARD_IS_HIDDEN,
                         null);
 
     public static async void process_results (string query,
@@ -277,10 +277,10 @@ namespace Synapse
                                                  cancellable);
 
               icon = fi.get_icon ().to_string ();
-              if (fi.has_attribute (FILE_ATTRIBUTE_THUMBNAIL_PATH))
+              if (fi.has_attribute (FileAttribute.THUMBNAIL_PATH))
               {
                 thumbnail_path =
-                  fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH);
+                  fi.get_attribute_byte_string (FileAttribute.THUMBNAIL_PATH);
               }
               // decrease relevancy of hidden files
               if (fi.get_is_hidden ())
@@ -421,10 +421,10 @@ namespace Synapse
                                                  cancellable);
 
               icon = fi.get_icon ().to_string ();
-              if (fi.has_attribute (FILE_ATTRIBUTE_THUMBNAIL_PATH))
+              if (fi.has_attribute (FileAttribute.THUMBNAIL_PATH))
               {
                 thumbnail_path =
-                  fi.get_attribute_byte_string (FILE_ATTRIBUTE_THUMBNAIL_PATH);
+                  fi.get_attribute_byte_string (FileAttribute.THUMBNAIL_PATH);
               }
               // decrease relevancy of hidden files
               if (fi.get_is_hidden ())

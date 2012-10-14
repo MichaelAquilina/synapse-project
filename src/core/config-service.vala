@@ -178,7 +178,14 @@ namespace Synapse
       generator.set_root (root_node);
 
       DirUtils.create_with_parents (GLib.Path.get_dirname (config_file_name), 0755);
-      generator.to_file (config_file_name);
+      try
+      {
+        generator.to_file (config_file_name);
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
     }
   }
 }

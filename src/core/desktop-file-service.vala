@@ -356,7 +356,7 @@ namespace Synapse
         }
         monitored_dirs.add (directory);
         var enumerator = yield directory.enumerate_children_async (
-          FILE_ATTRIBUTE_STANDARD_NAME + "," + FILE_ATTRIBUTE_STANDARD_TYPE,
+          FileAttribute.STANDARD_NAME + "," + FileAttribute.STANDARD_TYPE,
           0, 0);
         var files = yield enumerator.next_files_async (1024, 0);
         foreach (var f in files)
@@ -409,9 +409,16 @@ namespace Synapse
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
       foreach (File d in desktop_file_dirs)
       {
-        FileMonitor monitor = d.monitor_directory (0, null);
-        monitor.changed.connect (this.desktop_file_directory_changed);
-        directory_monitors.add (monitor);
+        try
+        {
+          FileMonitor monitor = d.monitor_directory (0, null);
+          monitor.changed.connect (this.desktop_file_directory_changed);
+          directory_monitors.add (monitor);
+        }
+        catch (Error err)
+        {
+          warning ("Unable to monitor directory: %s", err.message);
+        }
       }
     }
     

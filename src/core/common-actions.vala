@@ -145,12 +145,12 @@ namespace Synapse
 
           AppInfo original = app_match.app_info ??
             new DesktopAppInfo.from_filename (app_match.filename);
-          AppInfo app = AppInfo.create_from_commandline (
-            original.get_commandline (), original.get_name (),
-            AppInfoCreateFlags.NEEDS_TERMINAL);
 
           try
           {
+            AppInfo app = AppInfo.create_from_commandline (
+              original.get_commandline (), original.get_name (),
+              AppInfoCreateFlags.NEEDS_TERMINAL);
             app.launch (null, new Gdk.AppLaunchContext ());
           }
           catch (Error err)

@@ -236,7 +236,7 @@ namespace Synapse
         {
           if (f.is_native ())
           {
-            var fi = yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_TYPE,
+            var fi = yield f.query_info_async (FileAttribute.STANDARD_TYPE,
                                                0, 0, null);
             if (fi.get_file_type () == FileType.REGULAR)
             {
@@ -254,7 +254,7 @@ namespace Synapse
       int q_len = current_query == null ? 1 : (int) current_query.length;
       foreach (var dir in dirs)
       {
-        if (dir in directory_hits)
+        if (directory_hits.has_key (dir))
         {
           int hit_count = directory_hits[dir];
           directory_hits[dir] = hit_count + q_len;
@@ -335,7 +335,7 @@ namespace Synapse
     {
       Utils.Logger.debug (this, "Scanning %s", directory.get_path ());
       var enumerator = yield directory.enumerate_children_async (
-        FILE_ATTRIBUTE_STANDARD_NAME, 0, 0);
+        FileAttribute.STANDARD_NAME, 0, 0);
       var files = yield enumerator.next_files_async (1024, 0);
 
       di.files.clear ();
@@ -350,7 +350,7 @@ namespace Synapse
         try
         {
           DirectoryInfo di;
-          if (dir_path in directory_contents)
+          if (directory_contents.has_key (dir_path))
           {
             var cur_time = TimeVal ();
             di = directory_contents[dir_path];

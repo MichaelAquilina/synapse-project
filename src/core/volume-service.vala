@@ -59,7 +59,7 @@ namespace Synapse
       });
       vm.volume_removed.connect ((volume) =>
       {
-        volumes.remove (volume);
+        volumes.unset (volume);
       });
       vm.mount_added.connect ((mount) => 
       {

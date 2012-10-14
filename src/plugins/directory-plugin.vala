@@ -89,8 +89,8 @@ namespace Synapse
         var f = File.new_for_uri (match_obj.uri);
         try
         {
-          var fi = yield f.query_info_async (FILE_ATTRIBUTE_STANDARD_ICON + "," +
-                                             FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME + "," +
+          var fi = yield f.query_info_async (FileAttribute.STANDARD_ICON + "," +
+                                             FileAttribute.STANDARD_DISPLAY_NAME + "," +
                                              ATTRIBUTE_CUSTOM_ICON,
                                              0, Priority.DEFAULT, null);
           this.name = fi.get_display_name ();
@@ -162,7 +162,7 @@ namespace Synapse
         if (path == null) continue;
         var f = File.new_for_path (path);
         var uri = f.get_uri ();
-        if (uri in directory_info_map) continue;
+        if (directory_info_map.has_key (uri)) continue;
 
         var info = new DirectoryInfo (uri);
         yield info.initialize ();
@@ -240,14 +240,14 @@ namespace Synapse
 
       foreach (var dir in dirs)
       {
-        if (dir in directory_info_map) continue;
+        if (directory_info_map.has_key (dir)) continue;
         if (config.home_dir_children_only &&
             !dir.has_prefix (home_dir_uri)) continue;
 
         string[] directories = get_dir_parents (dir, true);
         foreach (unowned string dir_uri in directories)
         {
-          if (dir_uri in directory_info_map) continue;
+          if (directory_info_map.has_key (dir_uri)) continue;
 
           var info = new DirectoryInfo (dir_uri);
           yield info.initialize ();
