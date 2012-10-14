@@ -35,12 +35,15 @@ namespace Synapse
       GNOME = 1 << 0,
       KDE   = 1 << 1,
       LXDE  = 1 << 2,
-      ROX   = 1 << 3,
-      XFCE  = 1 << 4,
-      OLD   = 1 << 5,
-      UNITY = 1 << 6,
+      MATE  = 1 << 3,
+      RAZOR = 1 << 4,
+      ROX   = 1 << 5,
+      TDE   = 1 << 6,
+      UNITY = 1 << 7,
+      XFCE  = 1 << 8,
+      OLD   = 1 << 9,
 
-      ALL   = 0x7F
+      ALL   = 0x3FF
     }
    
     public string desktop_id { get; construct set; } 
@@ -88,10 +91,13 @@ namespace Synapse
           case "GNOME": result |= EnvironmentType.GNOME; break;
           case "KDE": result |= EnvironmentType.KDE; break;
           case "LXDE": result |= EnvironmentType.LXDE; break;
-          case "XFCE": result |= EnvironmentType.XFCE; break;
+          case "MATE": result |= EnvironmentType.MATE; break;
+          case "RAZOR": result |= EnvironmentType.RAZOR; break;
           case "ROX": result |= EnvironmentType.ROX; break;
-          case "OLD": result |= EnvironmentType.OLD; break;
+          case "TDE": result |= EnvironmentType.TDE; break;
           case "UNITY": result |= EnvironmentType.UNITY; break;
+          case "XFCE": result |= EnvironmentType.XFCE; break;
+          case "OLD": result |= EnvironmentType.OLD; break;
           default: warning ("%s is not understood", env); break;
         }
       }
@@ -263,7 +269,7 @@ namespace Synapse
 
       string session = session_var.down ();
 
-      if (session.has_prefix ("unity"))
+      if (session.has_prefix ("unity") || session.has_prefix ("ubuntu"))
       {
         session_type = DesktopFileInfo.EnvironmentType.UNITY;
         session_type_str = "Unity";
@@ -278,11 +284,6 @@ namespace Synapse
         session_type = DesktopFileInfo.EnvironmentType.GNOME;
         session_type_str = "GNOME";
       }
-      else if (session.has_prefix ("ubuntu"))
-      {
-        session_type = DesktopFileInfo.EnvironmentType.UNITY;
-        session_type_str = "Unity";
-      }
       else if (session.has_prefix ("lx"))
       {
         session_type = DesktopFileInfo.EnvironmentType.LXDE;
@@ -292,6 +293,21 @@ namespace Synapse
       {
         session_type = DesktopFileInfo.EnvironmentType.XFCE;
         session_type_str = "XFCE";
+      }
+      else if (session.has_prefix ("mate"))
+      {
+        session_type = DesktopFileInfo.EnvironmentType.MATE;
+        session_type_str = "MATE";
+      }
+      else if (session.has_prefix ("razor"))
+      {
+        session_type = DesktopFileInfo.EnvironmentType.RAZOR;
+        session_type_str = "Razor";
+      }
+      else if (session.has_prefix ("tde"))
+      {
+        session_type = DesktopFileInfo.EnvironmentType.TDE;
+        session_type_str = "TDE";
       }
       else if (session.has_prefix ("rox"))
       {
