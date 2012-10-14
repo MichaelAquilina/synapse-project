@@ -167,7 +167,9 @@ namespace Synapse
         string header;
         string domain_str = "";
         if (domain != null && domain != "Synapse") domain_str = domain + "-";
-        string cur_time = TimeVal ().to_iso8601 ().substring (11, 15);
+        var time_val = TimeVal ();
+        long time_str_len = time_val.tv_usec != 0 ? 15 : 8;
+        string cur_time = time_val.to_iso8601 ().substring (11, time_str_len);
         if (level == LogLevelFlags.LEVEL_DEBUG)
         {
           if (!show_debug && domain_str == "") return;
