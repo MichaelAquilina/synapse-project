@@ -26,7 +26,7 @@ namespace Synapse
   public class SshPlugin: Object, Activatable, ItemProvider
   {
     public  bool      enabled { get; set; default = true; }
-    private ArrayList<SshHost> hosts;
+    private HashMap<string, SshHost> hosts;
     
     protected File config_file;
     protected FileMonitor monitor;
@@ -38,7 +38,7 @@ namespace Synapse
     
     construct
     {
-      hosts = new ArrayList<SshHost> ();
+      hosts = new HashMap<string, SshHost> ();
     }
 
     public void activate ()
@@ -102,11 +102,10 @@ namespace Synapse
             foreach (var host in line.split (" "))
             {
               string host_stripped = host.strip ();
-              if (host_stripped != ""/* && host_stripped.index_of ("*") == -1*/)
+              if (host_stripped != "" && host_stripped.index_of ("*") == -1 && host_stripped.index_of ("?") == -1)
               {
-                // TODO: no dupes
                 Utils.Logger.debug (this, "host added: %s\n", host_stripped);
-                hosts.add (new SshHost (host_stripped));
+                hosts.set (host_stripped, new SshHost (host_stripped));
               }
             }
           }
@@ -148,7 +147,7 @@ namespace Synapse
       var matchers = Query.get_matchers_for_query (q.query_string, 0,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
 
-      foreach (var host in hosts)
+      foreach (var host in hosts.values) //workaround for missing HashMap.iterator() method
       {
         foreach (var matcher in matchers)
         {
@@ -198,8 +197,7 @@ namespace Synapse
           description: _("Connect with SSH"),
           has_thumbnail: false,
           icon_name: "terminal",
-          // FIXME: handle wildcard hosts somehow better than now
-          host_query: host_name.replace ("?", " ").replace ("*", "").strip ()
+          host_query: host_name
         );
         
       }
