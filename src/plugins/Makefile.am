@@ -32,6 +32,7 @@ libplugins_la_VALASOURCES = \
 	banshee-plugin.vala \
 	calculator-plugin.vala \
 	chat-actions-plugin.vala \
+	chromium-plugin.vala \
 	command-plugin.vala \
 	file-op-plugin.vala \
 	desktop-file-plugin.vala \
