@@ -44,7 +44,7 @@ synapse_LDADD = \
 	$(NULL)
 
 if HAVE_INDICATOR
-synapse_VALAFLAGS += --pkg appindicator-0.1 -D HAVE_INDICATOR
+synapse_VALAFLAGS += --pkg appindicator3-0.1 -D HAVE_INDICATOR
 synapse_CFLAGS += $(APP_INDICATOR_CFLAGS)
 synapse_LDADD += $(APP_INDICATOR_LIBS)
 endif

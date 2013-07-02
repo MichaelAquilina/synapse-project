@@ -124,15 +124,15 @@ namespace Synapse
       // Why Category.OTHER? See >
       // https://bugs.launchpad.net/synapse-project/+bug/685634/comments/13
       indicator = new AppIndicator.Indicator ("synapse", "synapse",
-                                              AppIndicator.Category.OTHER);
+                                              AppIndicator.IndicatorCategory.OTHER);
 
       indicator.set_menu (indicator_menu);
-      if (settings.indicator_active) indicator.set_status (AppIndicator.Status.ACTIVE);
+      if (settings.indicator_active) indicator.set_status (AppIndicator.IndicatorStatus.ACTIVE);
 
       settings.notify["indicator-active"].connect (() =>
       {
         indicator.set_status (settings.indicator_active ?
-          AppIndicator.Status.ACTIVE : AppIndicator.Status.PASSIVE);
+          AppIndicator.IndicatorStatus.ACTIVE : AppIndicator.IndicatorStatus.PASSIVE);
       });
 #else
       status_icon = new StatusIcon.from_icon_name ("synapse");
