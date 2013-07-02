@@ -24,7 +24,6 @@ namespace Synapse.Gui
 {
   namespace Utils
   {
-    private static Gdk.Pixmap transparent_pixmap = null;
     private static string home_directory = null;
     private static long home_directory_length = 0;
     
@@ -181,7 +180,7 @@ namespace Synapse.Gui
     
     public static void make_transparent_bg (Gtk.Widget widget)
     {
-      unowned Gdk.Window window = widget.get_window ();
+      /*TODO unowned Gdk.Window window = widget.get_window ();
       if (window == null) return;
       
       if (widget.is_composited ())
@@ -194,9 +193,9 @@ namespace Synapse.Gui
           cr.paint ();
         }
         window.set_back_pixmap (transparent_pixmap, false);
-      }
+      }*/
     }
-    
+     
     private static void on_style_set (Gtk.Widget widget, Gtk.Style? prev_style)
     {
       if (widget.get_realized ()) 
@@ -243,9 +242,12 @@ namespace Synapse.Gui
       if (screen == null)
         return;
       var rect = get_current_monitor_geometry (screen);
-      Gtk.Requisition req = {0, 0};
-      win.size_request (out req);
-      win.move (rect.x + (rect.width - req.width) / 2, rect.y + (rect.height - req.height) / 2);
+
+      int width, height;
+      win.get_preferred_width (out width, null);
+      win.get_preferred_height (out height, null);
+      win.move (rect.x + (rect.width - width) / 2,
+          rect.y + (rect.height - height) / 2);
     }
 
     public static void gdk_color_to_rgb (Gdk.Color col, out double r, out double g, out double b)
@@ -794,15 +796,15 @@ namespace Synapse.Gui
     
     public static bool is_point_in_mask (Gtk.Widget w, int x, int y)
     {
-      if (x < 0 || y < 0 || x >= w.allocation.width || y >= w.allocation.height) return false;
+      if (x < 0 || y < 0 || x >= w.get_allocated_width () || y >= w.get_allocated_height ()) return false;
       if (!w.is_composited ()) return true;
       
       // create an image surface to hold the rendered window
-      Cairo.ImageSurface mask = new Cairo.ImageSurface (Cairo.Format.ARGB32, w.allocation.width, w.allocation.height);
+      Cairo.ImageSurface mask = new Cairo.ImageSurface (Cairo.Format.ARGB32, w.get_allocated_width (), w.get_allocated_height ());
       Cairo.Context cr = new Cairo.Context (mask);
       cr.set_operator (Cairo.Operator.SOURCE);
       // copy the window content into the mask
-      Cairo.Context ctx = Gdk.cairo_create (w.window);
+      Cairo.Context ctx = Gdk.cairo_create (w.get_window ());
       cr.set_source_surface (ctx.get_target (), 0 ,0);
       cr.paint ();
       // check if the point alpha is != 0

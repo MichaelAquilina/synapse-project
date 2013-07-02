@@ -225,7 +225,7 @@ namespace Synapse.Gui
       this.prepare_results_container (out results_container, out results_sources,
                                       out results_actions, out results_targets, StateType.SELECTED);
 
-      container = new VBox (false, 0);
+      container = new Box (Gtk.Orientation.VERTICAL, 0);
       container.pack_start (categories_hbox, false);
       container.pack_start (hbox_panes, false, true, 5);
       container.pack_start (description_label, false);
@@ -274,27 +274,36 @@ namespace Synapse.Gui
       bool comp = this.is_composited ();
       double r = 0, b = 0, g = 0;
 
+      Gtk.Allocation spacer_allocation, flag_selector_allocation,
+        spane_allocation, apane_allocation;
+      spacer.get_allocation (out spacer_allocation);
+      flag_selector.get_allocation (out flag_selector_allocation);
+      spane.get_allocation (out spane_allocation);
+      apane.get_allocation (out apane_allocation);
+
       if (is_list_visible () || (!comp))
       {
         if (comp && is_list_visible ())
         {
+          Gtk.Allocation results_container_allocation;
+          results_container.get_allocation (out results_container_allocation);
           ctx.translate (0.5, 0.5);
           ctx.set_operator (Operator.OVER);
-          Utils.cairo_make_shadow_for_rect (ctx, results_container.allocation.x,
-                                                 results_container.allocation.y,
-                                                 results_container.allocation.width - 1,
-                                                 results_container.allocation.height - 1,
+          Utils.cairo_make_shadow_for_rect (ctx, results_container_allocation.x,
+                                                 results_container_allocation.y,
+                                                 results_container_allocation.width - 1,
+                                                 results_container_allocation.height - 1,
                                                  0, r, g, b, SHADOW_SIZE);
           ctx.translate (-0.5, -0.5);
         }
         ctx.set_operator (Operator.SOURCE);
         ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
-        ctx.rectangle (spacer.allocation.x, spacer.allocation.y + BORDER_RADIUS, spacer.allocation.width, SHADOW_SIZE);
+        ctx.rectangle (spacer_allocation.x, spacer_allocation.y + BORDER_RADIUS, spacer_allocation.width, SHADOW_SIZE);
         ctx.fill ();
       }
 
-      int width = this.allocation.width;
-      int height = spacer.allocation.y + BORDER_RADIUS + SHADOW_SIZE;
+      int width = this.get_allocated_width ();
+      int height = spacer_allocation.y + BORDER_RADIUS + SHADOW_SIZE;
       
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
@@ -309,20 +318,24 @@ namespace Synapse.Gui
 
       if (target_container.visible)
       {
-        width -= target_container.allocation.width;
+        Gtk.Allocation target_container_allocation, tpane_allocation;
+        target_container.get_allocation (out target_container_allocation);
+        tpane.get_allocation (out tpane_allocation);
+
+        width -= target_container_allocation.width;
         // draw background
         ctx.save ();
         ctx.translate (0.5, 0.5);
         ctx.set_operator (Operator.OVER);
-        Utils.cairo_make_shadow_for_rect (ctx, target_container.allocation.x - BORDER_RADIUS, 
-                                               tpane.allocation.y,
-                                               target_container.allocation.width - 1 + BORDER_RADIUS,
-                                               tpane.allocation.height - 1, 15, r, g, b, SHADOW_SIZE);
+        Utils.cairo_make_shadow_for_rect (ctx, target_container_allocation.x - BORDER_RADIUS, 
+                                               tpane_allocation.y,
+                                               target_container_allocation.width - 1 + BORDER_RADIUS,
+                                               tpane_allocation.height - 1, 15, r, g, b, SHADOW_SIZE);
         ctx.translate (-0.5, -0.5);
-        Utils.cairo_rounded_rect (ctx, target_container.allocation.x - BORDER_RADIUS, 
-                                       tpane.allocation.y,
-                                       target_container.allocation.width + BORDER_RADIUS,
-                                       tpane.allocation.height, 15);
+        Utils.cairo_rounded_rect (ctx, target_container_allocation.x - BORDER_RADIUS, 
+                                       tpane_allocation.y,
+                                       target_container_allocation.width + BORDER_RADIUS,
+                                       tpane_allocation.height, 15);
         ctx.set_operator (Operator.SOURCE);
         ctx.set_source (pat);
         ctx.clip ();
@@ -330,10 +343,10 @@ namespace Synapse.Gui
         if (model.searching_for == SearchingFor.TARGETS)
         {
           ctx.set_operator (Cairo.Operator.OVER);
-          Utils.cairo_rounded_rect (ctx, tpane.allocation.x,
-                                         tpane.allocation.y,
-                                         tpane.allocation.width,
-                                         tpane.allocation.height,
+          Utils.cairo_rounded_rect (ctx, tpane_allocation.x,
+                                         tpane_allocation.y,
+                                         tpane_allocation.width,
+                                         tpane_allocation.height,
                                          15);
           ch.set_source_rgba (ctx, 0.3,
                               ch.StyleType.FG, StateType.SELECTED);
@@ -343,7 +356,7 @@ namespace Synapse.Gui
         ctx.restore ();
       }
 
-      int delta = flag_selector.allocation.y - BORDER_RADIUS;
+      int delta = flag_selector_allocation.y - BORDER_RADIUS;
       if (!comp) delta = 0;
       
       ctx.save ();
@@ -383,10 +396,10 @@ namespace Synapse.Gui
       // icon bgs
       ctx.set_operator (Operator.OVER);
       ctx.save ();
-      Utils.cairo_rounded_rect (ctx, spane.allocation.x,
-                                     spane.allocation.y,
-                                     spane.allocation.width,
-                                     spane.allocation.height,
+      Utils.cairo_rounded_rect (ctx, spane_allocation.x,
+                                     spane_allocation.y,
+                                     spane_allocation.width,
+                                     spane_allocation.height,
                                      15);
       ch.set_source_rgba (ctx, model.searching_for == SearchingFor.SOURCES ? 0.3 : 0.08,
                           ch.StyleType.FG, StateType.SELECTED);
@@ -395,10 +408,10 @@ namespace Synapse.Gui
       ctx.restore ();
       
       ctx.save ();
-      Utils.cairo_rounded_rect (ctx, apane.allocation.x,
-                                     apane.allocation.y,
-                                     apane.allocation.width,
-                                     apane.allocation.height,
+      Utils.cairo_rounded_rect (ctx, apane_allocation.x,
+                                     apane_allocation.y,
+                                     apane_allocation.width,
+                                     apane_allocation.height,
                                      15);
       ch.set_source_rgba (ctx, model.searching_for == SearchingFor.ACTIONS ? 0.3 : 0.08,
                           ch.StyleType.FG, StateType.SELECTED);

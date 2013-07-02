@@ -7,13 +7,14 @@ VAPIDIR = $(top_srcdir)/vapi
 
 synapse_VALAFLAGS = \
 	--pkg dbus-glib-1 \
-	--pkg gtk+-2.0 \
-	--pkg gdk-x11-2.0 \
+	--pkg gtk+-3.0 \
+	--pkg gdk-x11-3.0 \
 	--pkg gio-2.0 \
 	--pkg gio-unix-2.0 \
+	--pkg unique-3.0 \
 	--pkg gee-1.0 \
 	--pkg json-glib-1.0 \
-	--pkg unique-1.0 \
+	--pkg keybinder-3.0 \
 	--pkg libnotify \
 	--vapidir $(top_builddir)/src/core \
 	--pkg synapse-core \
@@ -22,7 +23,6 @@ synapse_VALAFLAGS = \
 	--vapidir $(top_builddir)/src/tile-view \
 	--pkg tile-view \
 	--vapidir $(VAPIDIR) \
-	--pkg gtkhotkey-1.0 \
 	$(VAPIDIR)/keysyms.vapi \
 	$(VAPIDIR)/config.vapi \
 	$(NULL)

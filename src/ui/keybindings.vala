@@ -205,9 +205,9 @@ namespace Synapse.Gui
     public Commands get_command_from_eventkey (Gdk.EventKey event)
     {
       uint keyval = event.keyval;
-      if (keyval == Gdk.KeySyms.KP_Enter || keyval == Gdk.KeySyms.ISO_Enter)
+      if (keyval == Gdk.Key.KP_Enter || keyval == Gdk.Key.ISO_Enter)
       {
-        keyval = Gdk.KeySyms.Return;
+        keyval = Gdk.Key.Return;
       }
       Gdk.ModifierType mod = event.state & mod_normalize_mask;
       // Synapse.Utils.Logger.log (this, get_name_from_key (keyval, mod));
@@ -217,9 +217,9 @@ namespace Synapse.Gui
     public static string? get_name_from_key (uint keyval, Gdk.ModifierType mods)
     {
       mods = mods & mod_normalize_mask;
-      if (keyval == Gdk.KeySyms.KP_Enter || keyval == Gdk.KeySyms.ISO_Enter)
+      if (keyval == Gdk.Key.KP_Enter || keyval == Gdk.Key.ISO_Enter)
       {
-        keyval = Gdk.KeySyms.Return;
+        keyval = Gdk.Key.Return;
       }
       unowned string keyname = Gdk.keyval_name (Gdk.keyval_to_lower (keyval));
       if (keyname == null) return null;
@@ -288,9 +288,9 @@ namespace Synapse.Gui
           }
         }
       }
-      if (keyval == Gdk.KeySyms.KP_Enter || keyval == Gdk.KeySyms.ISO_Enter)
+      if (keyval == Gdk.Key.KP_Enter || keyval == Gdk.Key.ISO_Enter)
       {
-        keyval = Gdk.KeySyms.Return;
+        keyval = Gdk.Key.Return;
       }
     }
   }

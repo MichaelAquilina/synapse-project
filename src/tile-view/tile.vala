@@ -120,37 +120,40 @@ namespace UI.Widgets
     
     protected override void realize ()
     {
-      this.set_flags (WidgetFlags.NO_WINDOW);
+      this.set_has_window (false);
       this.set_window (this.get_parent ().get_window ());
       base.realize ();
     }
 
-    protected override bool expose_event (Gdk.EventExpose event)
+    protected override bool draw (Cairo.Context cr)
     {
+      Gtk.Allocation allocation;
+      this.get_allocation (out allocation);
+
       if (this.get_state () == StateType.SELECTED)
       {
-        bool had_focus = Gtk.WidgetFlags.HAS_FOCUS in this.get_flags ();
+        bool had_focus = this.has_focus;
         // fool theme engine to use proper bg color
-        if (!had_focus) this.set_flags (Gtk.WidgetFlags.HAS_FOCUS);
-        Gtk.paint_flat_box (this.style, event.window, this.get_state (),
-                            ShadowType.NONE, event.area, this, "cell_odd",
-                            this.allocation.x,
-                            this.allocation.y,
-                            this.allocation.width,
-                            this.allocation.height - (last ? 0 : 1));
-        if (!had_focus) this.unset_flags (Gtk.WidgetFlags.HAS_FOCUS);
+        if (!had_focus) this.has_focus = true;
+        //FIXME this is deprecated
+        Gtk.paint_flat_box (this.style, cr, this.get_state (),
+                            ShadowType.NONE, this, "cell_odd",
+                            allocation.x,
+                            allocation.y,
+                            allocation.width,
+                            allocation.height - (last ? 0 : 1));
+        if (!had_focus) this.has_focus = false;
       }
 
       if (!last)
       {
-        Gtk.paint_hline (this.style, event.window, StateType.NORMAL,
-                         event.area, this, null,
-                         this.allocation.x,
-                         this.allocation.x + this.allocation.width,
-                         this.allocation.y + this.allocation.height - 1);
+        this.get_style_context ().render_line (cr,
+                         allocation.x, allocation.y,
+                         allocation.x + allocation.width,
+                         allocation.y + allocation.height - 1);
       }
 
-      return base.expose_event (event);
+      return base.draw (cr);
     }
 
     public void update_state ()

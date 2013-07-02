@@ -201,9 +201,12 @@ namespace Synapse.Gui
     
     protected override void paint_background (Cairo.Context ctx)
     {
-      int width = container.allocation.width + BORDER_RADIUS * 2;
-      int height = container.allocation.height + BORDER_RADIUS * 2;
-      ctx.translate (container.allocation.x - BORDER_RADIUS, container.allocation.y - BORDER_RADIUS);
+      Gtk.Allocation container_allocation;
+      container.get_allocation (out container_allocation);
+
+      int width = container_allocation.width + BORDER_RADIUS * 2;
+      int height = container_allocation.height + BORDER_RADIUS * 2;
+      ctx.translate (container_allocation.x - BORDER_RADIUS, container_allocation.y - BORDER_RADIUS);
       if (this.is_composited ())
       {
         ctx.translate (0.5, 0.5);

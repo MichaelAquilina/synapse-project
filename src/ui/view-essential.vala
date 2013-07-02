@@ -203,29 +203,35 @@ namespace Synapse.Gui
       bool comp = this.is_composited ();
       double r = 0, b = 0, g = 0;
 
+      Gtk.Allocation spacer_allocation, flag_selector_allocation;
+      spacer.get_allocation (out spacer_allocation);
+      flag_selector.get_allocation (out flag_selector_allocation);
+
       if (is_list_visible () || (!comp))
       {
         if (comp && is_list_visible ())
         {
+          Gtk.Allocation results_container_allocation;
+          results_container.get_allocation (out results_container_allocation);
           ctx.translate (0.5, 0.5);
           ctx.set_operator (Operator.OVER);
-          Utils.cairo_make_shadow_for_rect (ctx, results_container.allocation.x,
-                                                 results_container.allocation.y,
-                                                 results_container.allocation.width - 1,
-                                                 results_container.allocation.height - 1,
+          Utils.cairo_make_shadow_for_rect (ctx, results_container_allocation.x,
+                                                 results_container_allocation.y,
+                                                 results_container_allocation.width - 1,
+                                                 results_container_allocation.height - 1,
                                                  0, r, g, b, SHADOW_SIZE);
           ctx.translate (-0.5, -0.5);
         }
         ctx.set_operator (Operator.SOURCE);
         ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
-        ctx.rectangle (spacer.allocation.x, spacer.allocation.y + BORDER_RADIUS, spacer.allocation.width, SHADOW_SIZE);
+        ctx.rectangle (spacer_allocation.x, spacer_allocation.y + BORDER_RADIUS, spacer_allocation.width, SHADOW_SIZE);
         ctx.fill ();
       }
 
-      int width = this.allocation.width;
-      int height = spacer.allocation.y + BORDER_RADIUS + SHADOW_SIZE;
+      int width = this.get_allocated_width ();
+      int height = spacer_allocation.y + BORDER_RADIUS + SHADOW_SIZE;
 
-      int delta = flag_selector.allocation.y - BORDER_RADIUS;
+      int delta = flag_selector_allocation.y - BORDER_RADIUS;
       if (!comp) delta = 0;
       
       ctx.save ();

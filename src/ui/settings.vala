@@ -210,7 +210,7 @@ namespace Synapse.Gui
           var widget = plugin.create_config_widget ();
           var dialog = new Gtk.Dialog.with_buttons (_("Configure plugin"),
                                                     this,
-                                                    Gtk.DialogFlags.MODAL | Gtk.DialogFlags.NO_SEPARATOR,
+                                                    Gtk.DialogFlags.MODAL,
                                                     Gtk.Stock.CLOSE, null);
           dialog.set_default_size (300, 200);
           (dialog.get_content_area () as Gtk.Container).add (widget);
@@ -470,31 +470,18 @@ namespace Synapse.Gui
 
     private ComboBox build_theme_combo ()
     {
-      var cb_themes = new ComboBox.text ();
-      /* Set the model */                  /* key */      /* Label */
-      var theme_list = new ListStore (2, typeof(string), typeof(string));
-      cb_themes.clear ();
-      cb_themes.set_model (theme_list);
-      /* Set the renderer only for the Label */
-      var ctxt = new CellRendererText();
-      cb_themes.pack_start (ctxt, true);
-      cb_themes.set_attributes (ctxt, "text", 1);
+      var cb_themes = new ComboBoxText ();
       /* Pack data into the model and select current theme */
       if (!themes.has_key (selected_theme)) selected_theme = "default";
-      TreeIter iter;
       foreach (Gee.Map.Entry<string,Theme?> e in themes.entries)
       {
-        theme_list.append (out iter);
-        theme_list.set (iter, 0, e.key, 1, e.value.name);
+        cb_themes.append (e.key, e.value.name);
         if (e.key == selected_theme)
-          cb_themes.set_active_iter (iter);
+          cb_themes.active_id = e.key;
       }
       /* Listen on value changed */
       cb_themes.changed.connect (() => {
-        TreeIter active_iter;
-        cb_themes.get_active_iter (out active_iter);
-        theme_list.get (active_iter, 0, out selected_theme);
-        config.ui_type = selected_theme;
+        config.ui_type = cb_themes.active_id;
         theme_selected (get_current_theme ());
       });
       
