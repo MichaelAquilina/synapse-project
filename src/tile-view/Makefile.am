@@ -8,7 +8,6 @@ VAPIDIR = $(top_srcdir)/vapi
 libtileview_la_VALAFLAGS = \
 	--pkg gtk+-3.0 \
 	--vapidir $(VAPIDIR) \
-	$(VAPIDIR)/keysyms.vapi \
 	$(VAPIDIR)/config.vapi \
 	$(NULL)
 

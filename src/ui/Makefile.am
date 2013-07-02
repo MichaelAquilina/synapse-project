@@ -23,7 +23,6 @@ synapse_VALAFLAGS = \
 	--vapidir $(top_builddir)/src/tile-view \
 	--pkg tile-view \
 	--vapidir $(VAPIDIR) \
-	$(VAPIDIR)/keysyms.vapi \
 	$(VAPIDIR)/config.vapi \
 	$(NULL)
 

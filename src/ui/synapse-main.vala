@@ -64,7 +64,6 @@ namespace Synapse
       settings.keybinding_changed.connect (this.change_keyboard_shortcut);
       
       Keybinder.init ();
-      print ("abc\n");
       bind_keyboard_shortcut ();
       
       controller = GLib.Object.new (typeof (Gui.Controller), 
@@ -212,7 +211,6 @@ namespace Synapse
     private void bind_keyboard_shortcut ()
     {
       current_shortcut = "<Control>space";
-      print ("hi\n");
       Utils.Logger.log (this, "Binding activation to %s", current_shortcut);
       settings.set_keybinding (current_shortcut, false);
 	    Keybinder.bind (current_shortcut, handle_shortcut, this);
