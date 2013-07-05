@@ -40,6 +40,8 @@ namespace UI.Widgets
       this.key_press_event.connect (this.on_key_press);
       box.show ();
       this.add (box);
+
+      style_updated ();
     }
 
     public virtual void append_tile (AbstractTileObject tile_obj)
@@ -131,15 +133,15 @@ namespace UI.Widgets
 
     private bool changing_style = false;
 
-    protected override void style_set (Gtk.Style? prev_style)
+    protected override void style_updated ()
     {
-      if (changing_style) return;
+      /*if (changing_style) return;
 
       changing_style = true;
-      base.style_set (prev_style);
+      base.style_updated ();
       unowned Widget p = this.get_parent ();
       p.modify_bg (StateType.NORMAL, style.@base[StateType.NORMAL]);
-      changing_style = false;
+      changing_style = false;*/
     }
 
     public virtual void on_tile_active_changed (Tile tile)
@@ -213,7 +215,7 @@ namespace UI.Widgets
         }
       }
 
-      this.queue_draw ();
+       this.queue_draw ();
 
       return false;
     }

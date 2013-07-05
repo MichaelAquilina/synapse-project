@@ -65,12 +65,13 @@ namespace UI.Widgets
       base.size_allocate (allocation);
     }
 
-	protected override void get_preferred_width (out int min_width, out int nat_width)
-	{
+    protected override void get_preferred_width (out int min_width, out int nat_width)
+    {
       base.get_preferred_width (out min_width, out nat_width);
+      min_width = nat_width = 30;
       if (_wrap) {
         min_width = nat_width = 1;
       }
-	}
+    }
   }
 }

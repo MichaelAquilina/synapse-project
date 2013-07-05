@@ -64,11 +64,13 @@ namespace UI.Widgets
 
     private void build_tile ()
     {
-      this.border_width = 5;
       this.row_spacing = 1;
       this.column_spacing = 5;
 
       tile_image = new Image ();
+      tile_image.margin_left = 5;
+      tile_image.margin_top = 5;
+      tile_image.margin_bottom = 10;
 
       tile_image.yalign = 0.0f;
       this.attach (tile_image, 0, 1, 0, 3,
@@ -78,6 +80,7 @@ namespace UI.Widgets
 
       title = new Label ("");
       title.xalign = 0.0f;
+      title.margin_top = 5;
       this.attach (title, 1, 3, 0, 1,
                    AttachOptions.FILL | AttachOptions.EXPAND,
                    AttachOptions.FILL | AttachOptions.EXPAND,
@@ -132,25 +135,14 @@ namespace UI.Widgets
 
       if (this.get_state () == StateType.SELECTED)
       {
-        bool had_focus = this.has_focus;
-        // fool theme engine to use proper bg color
-        if (!had_focus) this.has_focus = true;
-        //FIXME this is deprecated
-        Gtk.paint_flat_box (this.style, cr, this.get_state (),
-                            ShadowType.NONE, this, "cell_odd",
-                            allocation.x,
-                            allocation.y,
-                            allocation.width,
-                            allocation.height - (last ? 0 : 1));
-        if (!had_focus) this.has_focus = false;
+        get_style_context ().render_background (cr, 0, 0,
+          allocation.width, allocation.height);
       }
 
       if (!last)
       {
-        this.get_style_context ().render_line (cr,
-                         allocation.x, allocation.y,
-                         allocation.x + allocation.width,
-                         allocation.y + allocation.height - 1);
+        this.get_style_context ().render_line (cr, 0, allocation.height - 1,
+          allocation.width, allocation.height - 1);
       }
 
       return base.draw (cr);

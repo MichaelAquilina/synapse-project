@@ -180,20 +180,13 @@ namespace Synapse.Gui
     
     public static void make_transparent_bg (Gtk.Widget widget)
     {
-      /*TODO unowned Gdk.Window window = widget.get_window ();
+      var window = widget.get_window ();
       if (window == null) return;
       
       if (widget.is_composited ())
       {
-        if (transparent_pixmap == null)
-        {
-          transparent_pixmap = new Gdk.Pixmap (window, 1, 1, -1);
-          var cr = Gdk.cairo_create (transparent_pixmap);
-          cr.set_operator (Cairo.Operator.CLEAR);
-          cr.paint ();
-        }
-        window.set_back_pixmap (transparent_pixmap, false);
-      }*/
+        window.set_background_rgba ({0, 0, 0, 0});
+      }
     }
      
     private static void on_style_updated (Gtk.Widget widget)

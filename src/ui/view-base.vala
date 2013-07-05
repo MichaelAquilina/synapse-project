@@ -318,9 +318,6 @@ namespace Synapse
       return false;
     }
 
-    //FIXME removed that part which redrew things when the size-request changed.
-    // I don't think that's required anymore
-    
     public override bool draw (Cairo.Context ctx)
     {
       ctx.set_operator (Cairo.Operator.CLEAR);

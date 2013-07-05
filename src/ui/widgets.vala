@@ -817,7 +817,6 @@ namespace Synapse.Gui
         ctx.clip ();
         ctx.save ();
 
-        //FIXME removed alloc.x/y
         double x = this.left_padding,
                y = this.top_padding,
                w = this.get_allocated_width () - this.left_padding - this.right_padding - 3.0,
@@ -1389,8 +1388,6 @@ namespace Synapse.Gui
     {
       if (texts.size == 0 || this.cached_surface == null)
         return true;
-      //FIXME there was a translate(alloc.x, alloc.y) before,
-      // but I don't think we need that
       double w = this.get_allocated_width ();
       double h = this.get_allocated_height ();
       
