@@ -481,7 +481,7 @@ namespace Synapse.Gui
       }
       /* Listen on value changed */
       cb_themes.changed.connect (() => {
-        config.ui_type = cb_themes.active_id;
+        selected_theme = config.ui_type = cb_themes.active_id;
         theme_selected (get_current_theme ());
       });
       

@@ -55,9 +55,9 @@ namespace Synapse.Gui
       install_style_property (descr_max);
     }
     
-    public override void style_set (Gtk.Style? old)
+    public override void style_updated ()
     {
-      base.style_set (old);
+      base.style_updated ();
 
       int width, icon_size;
       string tmax, dmax;
@@ -104,7 +104,7 @@ namespace Synapse.Gui
       hb_status.pack_start (logo);
       
       /* Categories - Throbber and menu */
-      var categories_hbox = new HBox (false, 0);
+      var categories_hbox = new Box (Gtk.Orientation.HORIZONTAL, 0);
 
       menuthrobber = new MenuThrobber ();
       menu = (MenuButton) menuthrobber;
@@ -115,7 +115,7 @@ namespace Synapse.Gui
       categories_hbox.pack_start (menuthrobber, false);
       
       container.pack_start (categories_hbox, false, false, 2);
-      container.pack_start (new HSeparator(), false);
+      container.pack_start (create_separator (), false);
       
       /* Sources */
       results_sources = new SpecificMatchList (controller, model, SearchingFor.SOURCES);
@@ -129,16 +129,16 @@ namespace Synapse.Gui
       fix_listview_size (results_targets.get_match_renderer ());
 
       container.pack_start (results_sources);
-      container.pack_start (new HSeparator(), false, false, 0);
+      container.pack_start (create_separator (), false);
       
       action_box = new VBox (false, 0);
       action_box.pack_start (results_actions, false);
-      action_box.pack_start (new HSeparator(), false, false, 0);
+      action_box.pack_start (create_separator (), false);
       container.pack_start (action_box, false);
       
       target_box = new VBox (false, 0);
       target_box.pack_start (results_targets, false);
-      target_box.pack_start (new HSeparator(), false, false, 0);
+      target_box.pack_start (create_separator (), false);
       container.pack_start (target_box, false);
       
       container.pack_start (hb_status, false, false, 2);
@@ -147,6 +147,24 @@ namespace Synapse.Gui
 
       container.set_size_request (500, -1);
       this.add (container);
+    }
+
+    //FIXME GtkSeparators won't show up. Here we have a workaround
+    private Gtk.Widget create_separator ()
+    {
+      var separator = new Gtk.EventBox ();
+      separator.height_request = 2;
+      separator.width_request = 120;
+      separator.get_style_context ().add_class (Gtk.STYLE_CLASS_SEPARATOR);
+      separator.get_style_context ().add_class (Gtk.STYLE_CLASS_HORIZONTAL);
+      separator.draw.connect (draw_separator);
+      return separator;
+    }
+
+    private bool draw_separator (Gtk.Widget separator, Cairo.Context ctx)
+    {
+      separator.get_style_context ().render_frame (ctx, 0, 0, separator.get_allocated_width (), 2);
+      return false;
     }
     
     private void fix_listview_size (MatchViewRenderer rend, int iconsize = 48, string title = "large", string desc = "medium")
@@ -203,7 +221,7 @@ namespace Synapse.Gui
     {
       Gtk.Allocation container_allocation;
       container.get_allocation (out container_allocation);
-
+      
       int width = container_allocation.width + BORDER_RADIUS * 2;
       int height = container_allocation.height + BORDER_RADIUS * 2;
       ctx.translate (container_allocation.x - BORDER_RADIUS, container_allocation.y - BORDER_RADIUS);
@@ -218,9 +236,9 @@ namespace Synapse.Gui
       ctx.save ();
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
-      ch.add_color_stop_rgba (pat, 0.0, 0.95, ch.StyleType.BG, StateType.NORMAL, ch.Mod.LIGHTER);
-      ch.add_color_stop_rgba (pat, 0.2, 1.0, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
-      ch.add_color_stop_rgba (pat, 1.0, 1.0, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
+      ch.add_color_stop_rgba (pat, 0.0, 0.95, ch.StyleType.BG, StateFlags.NORMAL, ch.Mod.LIGHTER);
+      ch.add_color_stop_rgba (pat, 0.2, 1.0, ch.StyleType.BG, StateFlags.NORMAL, ch.Mod.NORMAL);
+      ch.add_color_stop_rgba (pat, 1.0, 1.0, ch.StyleType.BG, StateFlags.NORMAL, ch.Mod.DARKER);
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
       ctx.set_source (pat);
       ctx.set_operator (Operator.SOURCE);

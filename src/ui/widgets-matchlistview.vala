@@ -78,13 +78,13 @@ namespace Synapse.Gui
       ctx.set_operator (Cairo.Operator.OVER);
       //rtl = Gtk.TextDirection.RTL; // <-- uncomment to test RTL
       bool has_action = false;
-      Gtk.StateType state = Gtk.StateType.NORMAL;
+      Gtk.StateFlags state = Gtk.StateFlags.NORMAL;
       if (selected_pct > 1.0)
       {
-        state = Gtk.StateType.SELECTED;
+        state = Gtk.StateFlags.SELECTED;
         selected_pct = selected_pct - 1.0;
       }
-      if (state == Gtk.StateType.SELECTED && action != null) has_action = true;
+      if (state == Gtk.StateFlags.SELECTED && action != null) has_action = true;
 
       int x = 0, y = 0;
       int text_width = width - cell_hpadding * 4 - icon_size;
@@ -165,14 +165,14 @@ namespace Synapse.Gui
       ctx.restore ();
     }
 
-    private void draw_text (Cairo.Context ctx, Match m, int x, int y, int width, Gtk.StateType state, bool use_base, double selected_fill_pct)
+    private void draw_text (Cairo.Context ctx, Match m, int x, int y, int width, Gtk.StateFlags state, bool use_base, double selected_fill_pct)
     {
       ctx.save ();
       ctx.translate (x, y);
       ctx.rectangle (0, 0, width, text_height);
       ctx.clip ();
       
-      bool selected = (state == Gtk.StateType.SELECTED);
+      bool selected = (state == Gtk.StateFlags.SELECTED);
 
       var styletype = ch.StyleType.FG;
       if (use_base || selected) styletype = ch.StyleType.TEXT;
@@ -180,12 +180,14 @@ namespace Synapse.Gui
       if (selected && selected_fill_pct < 1.0)
       {
         double r = 0, g = 0, b = 0;
-        ch.get_rgb_from_mix (styletype, Gtk.StateType.NORMAL, ch.Mod.NORMAL,
-                             styletype, Gtk.StateType.SELECTED, ch.Mod.NORMAL,
-                             selected_fill_pct, out r, out g, out b);
+        ch.get_rgb_from_mix (styletype, Gtk.StateFlags.NORMAL, ch.Mod.NORMAL,
+                             styletype, Gtk.StateFlags.SELECTED, ch.Mod.NORMAL,
+							 selected_fill_pct, out r, out g, out b);
         ctx.set_source_rgba (r, g, b, 1.0);
       }
-      else ch.set_source_rgba (ctx, 1.0, styletype, state);
+      else {
+		  ch.set_source_rgba (ctx, 1.0, styletype, state, Utils.ColorHelper.Mod.NORMAL);
+	  }
 
       string s = "";
       /* ----------------------- draw title --------------------- */
@@ -382,7 +384,7 @@ namespace Synapse.Gui
       construct
       {
         rtl = Gtk.TextDirection.LTR;
-        ch = new Utils.ColorHelper (this);
+        ch = new Utils.ColorHelper ();
       }
 
       private int row_height_cached = 36;
@@ -391,10 +393,10 @@ namespace Synapse.Gui
         return this.row_height_cached;
       }
 
-      public override void style_set (Style? previous_style)
+      public override void style_updated ()
       {
         // calculate here the new row height
-        base.style_set (previous_style);
+        base.style_updated ();
         this.rtl = this.get_direction ();
         Utils.update_layout_rtl (this.get_layout (), rtl);
         this.get_layout ().set_ellipsize (Pango.EllipsizeMode.END);
@@ -420,7 +422,7 @@ namespace Synapse.Gui
     
     public MatchListView (MatchViewRendererBase mr)
     {
-      ch = new Utils.ColorHelper (this);
+      ch = new Utils.ColorHelper ();
       inhibit_move = false;
       renderer = mr;
       // Add the renderer to screen as a child, this way it will receive all events.
@@ -631,7 +633,7 @@ namespace Synapse.Gui
       
       if (this.use_base_colors)
       {
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateFlags.NORMAL, Utils.ColorHelper.Mod.NORMAL);
         ctx.paint ();
       }
       
@@ -652,15 +654,13 @@ namespace Synapse.Gui
           Gtk.Allocation allocation;
           this.get_allocation (out allocation);
 
-          bool had_focus = this.has_focus;
-          // fool theme engine to use proper bg color
-          if (!had_focus) this.has_focus = true;
           ypos = int.max (this.soffset, 0);
-          Gtk.paint_flat_box (this.style, ctx, StateType.SELECTED,
-                              ShadowType.NONE, this, "cell_odd",
-                              0, ypos,
-                              this.get_allocated_width (), this.row_height);
-          if (!had_focus) this.has_focus = false;
+		  var context = get_style_context ();
+		  context.save ();
+		  context.set_state (Gtk.StateFlags.SELECTED);
+          context.render_background (ctx, 0, ypos,
+            this.get_allocated_width (), this.row_height);
+		  context.restore ();
         }
       }
       double pct = 1.0;
@@ -820,17 +820,17 @@ namespace Synapse.Gui
       this.set_has_window (false);
       this.above_child = false;
       this.visible_window = false;
-      ch = new Utils.ColorHelper (this);
+      ch = new Utils.ColorHelper ();
       build_ui();
       this.notify["use-base-colors"].connect (()=>{
         view.use_base_colors = use_base_colors;
         if (use_base_colors)
         {
-          set_state (Gtk.StateType.SELECTED);
+          set_state (Gtk.StateFlags.SELECTED);
         }
         else
         {
-          set_state (Gtk.StateType.NORMAL);
+          set_state (Gtk.StateFlags.NORMAL);
         }
         this.queue_draw ();
       });
@@ -841,11 +841,11 @@ namespace Synapse.Gui
 		private Label status;
 		private Label logo;
 		
-		public new void set_state (Gtk.StateType state)
+		public new void set_state (Gtk.StateFlags state)
 		{
-		  base.set_state (state);
-		  status.set_state (state);
-		  logo.set_state (state);
+		  base.set_state_flags (state, false);
+		  status.set_state_flags (state, false);
+		  logo.set_state_flags (state, false);
 		}
 		
 		public override bool draw (Cairo.Context ctx)
@@ -856,23 +856,19 @@ namespace Synapse.Gui
         this.get_allocation (out allocation);
         status.get_allocation (out status_allocation);
 
-        //FIXME why is this clip here?
-        //ctx.translate (allocation.x, status_allocation.y);
-        //ctx.rectangle (0, 0, this.get_allocated_width (), status.get_allocated_height ());
-        //ctx.clip ();
         ctx.set_operator (Cairo.Operator.OVER);
-        /* Prepare bg's colors using GtkStyle */
+        /* Prepare bg's colors using GtkStyleContext */
         Pattern pat = new Pattern.linear(0, 0, 0, status.get_allocated_height ());
         
-        StateType t = this.get_state ();
+        StateFlags t = this.get_state_flags ();
         ch.add_color_stop_rgba (pat, 0.0, 0.95, ch.StyleType.BG, t);
         ch.add_color_stop_rgba (pat, 1.0, 0.95, ch.StyleType.BG, t, ch.Mod.DARKER);
         /* Prepare and draw top bg's rect */
         ctx.set_source (pat);
         ctx.paint ();
       }
-      /* Propagate Expose */               
-      this.propagate_draw (this.get_child(), ctx);
+      /* Propagate Draw */               
+      this.propagate_draw (this.get_child (), ctx);
       
       return true;
     }

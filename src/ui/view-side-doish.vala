@@ -66,9 +66,9 @@ namespace Synapse.Gui
       install_style_property (spacing);
     }
     
-    public override void style_set (Gtk.Style? old)
+    public override void style_updated ()
     {
-      base.style_set (old);
+      base.style_updated ();
 
       int spacing, icon_size, width;
       string tmax, tmin, dmax, dmin;
@@ -147,34 +147,34 @@ namespace Synapse.Gui
       source_label.set_ellipsize (Pango.EllipsizeMode.END);
       source_label.size = SmartLabel.Size.MEDIUM;
       source_label.min_size = SmartLabel.Size.SMALL;
-      source_label.set_state (StateType.SELECTED);
+      source_label.set_state_flags (StateFlags.SELECTED, false);
       source_label.xalign = 0.0f;
       source_label.yalign = 0.5f;
       action_label = new SmartLabel ();
       action_label.set_ellipsize (Pango.EllipsizeMode.END);
       action_label.size = SmartLabel.Size.MEDIUM;
       action_label.min_size = SmartLabel.Size.SMALL;
-      action_label.set_state (StateType.SELECTED);
+      action_label.set_state_flags (StateFlags.SELECTED, false);
       action_label.xalign = 0.0f;
       action_label.yalign = 0.5f;
       target_label = new SmartLabel ();
       target_label.set_ellipsize (Pango.EllipsizeMode.END);
       target_label.size = SmartLabel.Size.MEDIUM;
       target_label.min_size = SmartLabel.Size.SMALL;
-      target_label.set_state (StateType.SELECTED);
+      target_label.set_state_flags (StateFlags.SELECTED, false);
       target_label.xalign = 0.0f;
       target_label.yalign = 0.5f;
       description_label = new SmartLabel ();
       description_label.size = SmartLabel.Size.SMALL;
       description_label.set_animation_enabled (true);
-      description_label.set_state (StateType.SELECTED);
+      description_label.set_state_flags (StateFlags.SELECTED, false);
       description_label.xalign = 0.5f;
       
       /* Categories - Throbber and menu */ //#0C71D6
       var categories_hbox = new HBox (false, 0);
 
       menuthrobber = new MenuThrobber ();
-      menuthrobber.set_state (StateType.SELECTED);
+      menuthrobber.set_state_flags (StateFlags.SELECTED, false);
       menu = (MenuButton) menuthrobber;
       menuthrobber.set_size_request (14, 14);
       menuthrobber.button_scale = 0.75;
@@ -184,7 +184,7 @@ namespace Synapse.Gui
 
       flag_selector.selected_markup = "<span size=\"small\"><b>%s</b></span>";
       flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
-      flag_selector.set_state (StateType.SELECTED);
+      flag_selector.set_state_flags (StateFlags.SELECTED, false);
 
       var hbox_panes = new HBox (false, 0);
 
@@ -228,7 +228,7 @@ namespace Synapse.Gui
 
       /* list */
       this.prepare_results_container (out results_container, out results_sources,
-                                      out results_actions, out results_targets, StateType.SELECTED);
+                                      out results_actions, out results_targets, StateFlags.SELECTED);
 
       container = new VBox (false, 0);
       container.pack_start (categories_hbox, false);
@@ -306,7 +306,7 @@ namespace Synapse.Gui
           ctx.translate (-0.5, -0.5);
         }
         ctx.set_operator (Operator.SOURCE);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateFlags.NORMAL);
         ctx.rectangle (spacer_allocation.x, spacer_allocation.y + BORDER_RADIUS, spacer_allocation.width, SHADOW_SIZE);
         ctx.fill ();
       }
@@ -317,10 +317,10 @@ namespace Synapse.Gui
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
       r = g = b = 0.12;
-      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
+      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateFlags.SELECTED);
       pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
       r = g = b = 0.4;
-      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
+      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateFlags.SELECTED);
       pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
       
       r = g = b = 0.0;
@@ -348,13 +348,13 @@ namespace Synapse.Gui
         if (model.searching_for == SearchingFor.TARGETS)
         {
           ctx.set_operator (Cairo.Operator.OVER);
-          Utils.cairo_rounded_rect (ctx, tpane_allocation.x,
-                                         tpane_allocation.y,
-                                         tpane_allocation.width,
-                                         tpane_allocation.height,
+          Utils.cairo_rounded_rect (ctx, tpane_allocation.x - tpane.border_width,
+                                         tpane_allocation.y - tpane.border_width,
+                                         tpane_allocation.width + tpane.border_width * 2,
+                                         tpane_allocation.height + tpane.border_width * 2,
                                          15);
           ch.set_source_rgba (ctx, 0.3,
-                              ch.StyleType.FG, StateType.SELECTED);
+                              ch.StyleType.FG, StateFlags.SELECTED);
           ctx.clip ();
           ctx.paint ();
         }
@@ -401,25 +401,25 @@ namespace Synapse.Gui
       // icon bgs
       ctx.set_operator (Operator.OVER);
       ctx.save ();
-      Utils.cairo_rounded_rect (ctx, spane_allocation.x,
-                                     spane_allocation.y,
-                                     spane_allocation.width,
-                                     spane_allocation.height,
+      Utils.cairo_rounded_rect (ctx, spane_allocation.x - spane.border_width,
+                                     spane_allocation.y - spane.border_width,
+                                     spane_allocation.width + spane.border_width * 2,
+                                     spane_allocation.height + spane.border_width * 2,
                                      15);
       ch.set_source_rgba (ctx, model.searching_for == SearchingFor.SOURCES ? 0.3 : 0.08,
-                          ch.StyleType.FG, StateType.SELECTED);
+                          ch.StyleType.FG, StateFlags.SELECTED);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();
       
       ctx.save ();
-      Utils.cairo_rounded_rect (ctx, apane_allocation.x,
-                                     apane_allocation.y,
-                                     apane_allocation.width,
-                                     apane_allocation.height,
+      Utils.cairo_rounded_rect (ctx, apane_allocation.x - apane.border_width,
+                                     apane_allocation.y - apane.border_width,
+                                     apane_allocation.width + apane.border_width * 2,
+                                     apane_allocation.height + apane.border_width * 2,
                                      15);
       ch.set_source_rgba (ctx, model.searching_for == SearchingFor.ACTIONS ? 0.3 : 0.08,
-                          ch.StyleType.FG, StateType.SELECTED);
+                          ch.StyleType.FG, StateFlags.SELECTED);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();

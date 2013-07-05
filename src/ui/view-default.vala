@@ -31,9 +31,9 @@ namespace Synapse.Gui
       
     }
     
-    public override void style_set (Gtk.Style? old)
+    public override void style_updated ()
     {
-      base.style_set (old);
+      base.style_updated ();
       update_bg_state ();
 
       int width, icon_size;
@@ -60,14 +60,14 @@ namespace Synapse.Gui
     
     private void update_bg_state ()
     {
-      flag_selector.set_state (this.bg_state);
-      description_label.set_state (this.bg_state);
-      adescription_label.set_state (this.bg_state);
-      ldescription_label.set_state (this.bg_state);
-      results_sources.set_state (this.bg_state);
-      results_actions.set_state (this.bg_state);
-      results_targets.set_state (this.bg_state);
-      menuthrobber.set_state (this.bg_state);
+      flag_selector.set_state_flags (this.bg_state, false);
+      description_label.set_state_flags (this.bg_state, false);
+      adescription_label.set_state_flags (this.bg_state, false);
+      ldescription_label.set_state_flags (this.bg_state, false);
+      results_sources.set_state_flags (this.bg_state, false);
+      results_actions.set_state_flags (this.bg_state, false);
+      results_targets.set_state_flags (this.bg_state, false);
+      menuthrobber.set_state_flags (this.bg_state, false);
     }
     
     private NamedIcon source_icon;
@@ -141,24 +141,21 @@ namespace Synapse.Gui
       description_label = new SmartLabel ();
       description_label.size = SmartLabel.Size.SMALL;
       description_label.set_animation_enabled (true);
-      description_label.set_state (StateType.SELECTED);
       description_label.xpad = 8;
       ldescription_label = new SmartLabel ();
       ldescription_label.xalign = 1.0f;
       ldescription_label.size = SmartLabel.Size.SMALL;
       ldescription_label.set_animation_enabled (true);
-      ldescription_label.set_state (StateType.SELECTED);
       ldescription_label.set_ellipsize (Pango.EllipsizeMode.START);
       adescription_label = new SmartLabel ();
       adescription_label.xalign = 1.0f;
       adescription_label.size = SmartLabel.Size.SMALL;
-      adescription_label.set_state (StateType.SELECTED);
       
       /* Categories - Throbber and menu */ //#0C71D6
       var categories_hbox = new HBox (false, 0);
 
       menuthrobber = new MenuThrobber ();
-      menuthrobber.set_state (StateType.SELECTED);
+      menuthrobber.set_state_flags (StateFlags.SELECTED, false);
       menu = (MenuButton) menuthrobber;
       menuthrobber.set_size_request (14, 14);
       menuthrobber.button_scale = 0.75;
@@ -186,7 +183,6 @@ namespace Synapse.Gui
 
       flag_selector.selected_markup = "<span size=\"small\"><b>%s</b></span>";
       flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
-      flag_selector.set_state (StateType.SELECTED);
       
       /* Top Container */
       var hb = new HBox (false, 5);
@@ -199,7 +195,7 @@ namespace Synapse.Gui
       
       /* list */
       this.prepare_results_container (out results_container, out results_sources,
-                                      out results_actions, out results_targets, StateType.SELECTED);
+                                      out results_actions, out results_targets, StateFlags.SELECTED);
       container.pack_start (results_container, false);
       
       container.show_all ();
@@ -260,7 +256,7 @@ namespace Synapse.Gui
           ctx.translate (-0.5, -0.5);
         }
         ctx.set_operator (Operator.SOURCE);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateFlags.NORMAL);
         ctx.rectangle (spacer_allocation.x, spacer_allocation.y + BORDER_RADIUS, spacer_allocation.width, SHADOW_SIZE);
         ctx.fill ();
       }
@@ -284,7 +280,7 @@ namespace Synapse.Gui
       ctx.save ();
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
-      if (this.bg_state == Gtk.StateType.SELECTED)
+      if (this.bg_state == Gtk.StateFlags.SELECTED)
       {
         r = g = b = 0.5;
         ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, this.bg_state);

@@ -196,7 +196,7 @@ namespace Synapse.Gui
       }*/
     }
      
-    private static void on_style_set (Gtk.Widget widget, Gtk.Style? prev_style)
+    private static void on_style_updated (Gtk.Widget widget)
     {
       if (widget.get_realized ()) 
       {
@@ -208,7 +208,7 @@ namespace Synapse.Gui
     private static void on_composited_change (Gtk.Widget widget)
     {
       if (widget.is_composited ()) make_transparent_bg (widget);
-      else widget.modify_bg (Gtk.StateType.NORMAL, null);
+      else widget.override_background_color (Gtk.StateFlags.NORMAL, null);
     }
     
     public static void ensure_transparent_bg (Gtk.Widget widget)
@@ -216,11 +216,11 @@ namespace Synapse.Gui
       if (widget.get_realized ()) make_transparent_bg (widget);
       
       widget.realize.disconnect (make_transparent_bg);
-      widget.style_set.disconnect (on_style_set);
+      widget.style_updated.disconnect (on_style_updated);
       widget.composited_changed.disconnect (on_composited_change);
       
       widget.realize.connect (make_transparent_bg);
-      widget.style_set.connect (on_style_set);
+      widget.style_updated.connect (on_style_updated);
       widget.composited_changed.connect (on_composited_change);
     }
     
@@ -248,13 +248,6 @@ namespace Synapse.Gui
       win.get_preferred_height (out height, null);
       win.move (rect.x + (rect.width - width) / 2,
           rect.y + (rect.height - height) / 2);
-    }
-
-    public static void gdk_color_to_rgb (Gdk.Color col, out double r, out double g, out double b)
-    {
-      r = col.red / (double)65535;
-      g = col.green / (double)65535;
-      b = col.blue / (double)65535;
     }
 
     public static void rgb_invert_color (ref double r, ref double g, ref double b)
@@ -427,19 +420,34 @@ namespace Synapse.Gui
       }
 
       private Gee.Map <string, Color> colormap;
-      private Gtk.Widget widget;
+      private Gtk.StyleContext fg_context;
+      private Gtk.StyleContext bg_context;
 
-      public ColorHelper (Gtk.Widget for_widget)
+      public ColorHelper ()
       {
         this.colormap = new Gee.HashMap <string, Color> ();
-        this.widget = for_widget;
-        this.widget.style_set.connect (()=>{
-          colormap.clear ();
-        });
+
+        var path = new Gtk.WidgetPath ();
+        path.append_type (typeof (Gtk.Window));
+
+        var parent_context = new Gtk.StyleContext ();
+        parent_context.set_path (path);
+
+        var fg_path = path.copy ();
+        fg_path.append_type (typeof (Gtk.Label));
+        fg_context = new Gtk.StyleContext ();
+        fg_context.set_path (fg_path);
+        fg_context.set_parent (parent_context);
+
+        var bg_path = path.copy ();
+        bg_path.append_type (typeof (Gtk.EventBox));
+        bg_context = new Gtk.StyleContext ();
+        bg_context.set_path (bg_path);
+        bg_context.set_parent (parent_context);
       }
       
       public void get_color_colorized (ref double red, ref double green, ref double blue,
-                                       StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+                                       StyleType t, Gtk.StateFlags st, Mod mod = Mod.NORMAL)
       {
         Color col = get_color_from_map (t, st, mod);
         double r = red, g = green, b = blue;
@@ -449,7 +457,7 @@ namespace Synapse.Gui
         blue = b;
       }
       
-      private Color get_color_from_map (StyleType t, Gtk.StateType st, Mod mod)
+      private Color get_color_from_map (StyleType t, Gtk.StateFlags st, Mod mod)
       {
         Color col;
         string key = "%d%d%d".printf (t, st, mod);
@@ -460,17 +468,14 @@ namespace Synapse.Gui
           col = new Color ();
           switch (t)
           {
+            //FIXME no base and foreground colors in gtk3 anymore
             case StyleType.BG:
-              col.init_from_gdk_color (widget.style.bg[st]);
-              break;
-            case StyleType.FG:
-              col.init_from_gdk_color (widget.style.fg[st]);
-              break;
             case StyleType.BASE:
-              col.init_from_gdk_color (widget.style.base[st]);
+              col.init_from_gdk_color (bg_context.get_background_color (st));
               break;
             case StyleType.TEXT:
-              col.init_from_gdk_color (widget.style.text[st]);
+            case StyleType.FG:
+              col.init_from_gdk_color (fg_context.get_color (st));
               break;
           }
           col.apply_mod (mod);
@@ -478,18 +483,18 @@ namespace Synapse.Gui
         }
         return col;
       }
-      public void set_source_rgba (Cairo.Context ctx, double alpha, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      public void set_source_rgba (Cairo.Context ctx, double alpha, StyleType t, Gtk.StateFlags st, Mod mod = Mod.NORMAL)
       {
         Color col = get_color_from_map (t, st, mod);
         ctx.set_source_rgba (col.r, col.g, col.b, alpha);
       }
-      public void add_color_stop_rgba (Cairo.Pattern pat, double val, double alpha, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      public void add_color_stop_rgba (Cairo.Pattern pat, double val, double alpha, StyleType t, Gtk.StateFlags st, Mod mod = Mod.NORMAL)
       {
         Color col = get_color_from_map (t, st, mod);
         pat.add_color_stop_rgba (val, col.r, col.g, col.b, alpha);
       }
-      public void get_rgb_from_mix (StyleType t, Gtk.StateType st, Mod mod,
-                                    StyleType t2, Gtk.StateType st2, Mod mod2,
+      public void get_rgb_from_mix (StyleType t, Gtk.StateFlags st, Mod mod,
+                                    StyleType t2, Gtk.StateFlags st2, Mod mod2,
                                     double mix_pct,
                                     out double r, out double g, out double b)
       {
@@ -497,14 +502,14 @@ namespace Synapse.Gui
         Color col2 = get_color_from_map (t2, st2, mod2);
         col.mix (col2, mix_pct, out r, out g, out b);
       }
-      public void get_rgb (out double r, out double g, out double b, StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      public void get_rgb (out double r, out double g, out double b, StyleType t, Gtk.StateFlags st, Mod mod = Mod.NORMAL)
       {
         Color col = get_color_from_map (t, st, mod);
         r = col.r;
         g = col.g;
         b = col.b;
       }
-      public bool is_dark_color (StyleType t, Gtk.StateType st, Mod mod = Mod.NORMAL)
+      public bool is_dark_color (StyleType t, Gtk.StateFlags st, Mod mod = Mod.NORMAL)
       {
         Color col = get_color_from_map (t, st, mod);
         return col.is_dark_color ();
@@ -521,9 +526,11 @@ namespace Synapse.Gui
           this.g = 0;
           this.b = 0;
         }
-        public void init_from_gdk_color (Gdk.Color col)
+        public void init_from_gdk_color (Gdk.RGBA col)
         {
-          gdk_color_to_rgb (col, out this.r, out this.g, out this.b);
+          this.r = col.red;
+		  this.g = col.green;
+		  this.b = col.blue;
         }
         
         /*

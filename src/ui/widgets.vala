@@ -127,7 +127,7 @@ namespace Synapse.Gui
     construct
     {
       layout = this.create_pango_layout ("");
-      ch = new Utils.ColorHelper (this);
+      ch = new Utils.ColorHelper ();
       last_req = {0, 0};
       this.set_has_window (false);
       this.notify["size"].connect (sizes_changed);
@@ -292,7 +292,7 @@ namespace Synapse.Gui
       ctx.translate (x, y);
       
       ctx.set_operator (Cairo.Operator.OVER);
-      ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, this.get_state ());
+      ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, this.get_state_flags ());
       
       Pango.cairo_show_layout (ctx, layout);
       
@@ -797,7 +797,7 @@ namespace Synapse.Gui
     construct
     {
       _focus_widget = null;
-      ch = new Utils.ColorHelper (this);
+      ch = new Utils.ColorHelper ();
       this.notify["draw-input"].connect (this.queue_draw);
       this.notify["input-alpha"].connect (this.queue_draw);
       this.notify["border-radius"].connect (this.queue_draw);
@@ -823,15 +823,15 @@ namespace Synapse.Gui
                w = this.get_allocated_width () - this.left_padding - this.right_padding - 3.0,
                h = this.get_allocated_height () - this.top_padding - this.bottom_padding - 3.0;
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        if (!ch.is_dark_color (ch.StyleType.FG, StateType.NORMAL))
-          ch.set_source_rgba (ctx, input_alpha, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
+        if (!ch.is_dark_color (ch.StyleType.FG, StateFlags.NORMAL))
+          ch.set_source_rgba (ctx, input_alpha, ch.StyleType.BG, StateFlags.NORMAL, ch.Mod.DARKER);
         else
-          ch.set_source_rgba (ctx, input_alpha, ch.StyleType.FG, StateType.NORMAL, ch.Mod.INVERTED);
+          ch.set_source_rgba (ctx, input_alpha, ch.StyleType.FG, StateFlags.NORMAL, ch.Mod.INVERTED);
         ctx.fill_preserve ();
         var pat = new Cairo.Pattern.linear (0, y, 0, y + shadow_height);
-        ch.add_color_stop_rgba (pat, 0, 0.6 * input_alpha, ch.StyleType.FG, StateType.NORMAL);
-        ch.add_color_stop_rgba (pat, 0.3, 0.25 * input_alpha, ch.StyleType.FG, StateType.NORMAL);
-        ch.add_color_stop_rgba (pat, 1.0, 0, ch.StyleType.FG, StateType.NORMAL);
+        ch.add_color_stop_rgba (pat, 0, 0.6 * input_alpha, ch.StyleType.FG, StateFlags.NORMAL);
+        ch.add_color_stop_rgba (pat, 0.3, 0.25 * input_alpha, ch.StyleType.FG, StateFlags.NORMAL);
+        ch.add_color_stop_rgba (pat, 1.0, 0, ch.StyleType.FG, StateFlags.NORMAL);
         ctx.set_source (pat);
         ctx.fill ();
         if (_focus_widget != null)
@@ -874,14 +874,14 @@ namespace Synapse.Gui
           ctx.close_path ();
           ctx.clip ();
           pat = new Cairo.Pattern.linear (0, y2, 0, y1);
-          ch.add_color_stop_rgba (pat, 0, 1.0 * input_alpha, ch.StyleType.BG, StateType.SELECTED);
-          ch.add_color_stop_rgba (pat, 1, 0, ch.StyleType.BG, StateType.SELECTED);
+          ch.add_color_stop_rgba (pat, 0, 1.0 * input_alpha, ch.StyleType.BG, StateFlags.SELECTED);
+          ch.add_color_stop_rgba (pat, 1, 0, ch.StyleType.BG, StateFlags.SELECTED);
           ctx.set_source (pat);
           ctx.paint ();
         }
         ctx.restore ();
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
-        ch.set_source_rgba (ctx, 0.6 * input_alpha, ch.StyleType.FG, StateType.NORMAL);
+        ch.set_source_rgba (ctx, 0.6 * input_alpha, ch.StyleType.FG, StateFlags.NORMAL);
         ctx.stroke ();
       }
       return base.draw (ctx);
@@ -978,7 +978,7 @@ namespace Synapse.Gui
     private Utils.ColorHelper ch;
     public MenuButton ()
     {
-      ch = new Utils.ColorHelper (this);
+      ch = new Utils.ColorHelper ();
       entered = false;
       menu = new Gtk.Menu ();
       Gtk.MenuItem item = null;
@@ -1057,13 +1057,13 @@ namespace Synapse.Gui
       
       Pattern pat;
       pat = new Pattern.linear (0, 0, 0, this.get_allocated_height ());
-      if (entered || this.get_state () == StateType.SELECTED)
+      if (entered || this.get_state_flags () == StateFlags.SELECTED)
       {
-        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.SELECTED);
+        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateFlags.SELECTED);
       }
       else
       {
-        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.NORMAL);
+        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateFlags.NORMAL);
       }
       pat.add_color_stop_rgb (0.0,
                               double.max(r - 0.15, 0),
@@ -1071,7 +1071,7 @@ namespace Synapse.Gui
                               double.max(b - 0.15, 0));
       if (entered)
       {
-        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.NORMAL);
+        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateFlags.NORMAL);
       }
       pat.add_color_stop_rgb (1.0,
                               double.min(r + 0.15, 1),
@@ -1087,11 +1087,11 @@ namespace Synapse.Gui
 
       if (entered)
       {
-        ch.get_rgb (out r, out g, out b, ch.StyleType.FG, StateType.NORMAL);
+        ch.get_rgb (out r, out g, out b, ch.StyleType.FG, StateFlags.NORMAL);
       }
       else
       {
-        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateType.NORMAL);
+        ch.get_rgb (out r, out g, out b, ch.StyleType.BG, StateFlags.NORMAL);
       }
       
       ctx.set_source_rgb (r, g, b);
@@ -1176,12 +1176,12 @@ namespace Synapse.Gui
       this.add (label);
       this.set_events (Gdk.EventMask.BUTTON_PRESS_MASK |
                        Gdk.EventMask.SCROLL_MASK);
-      ch = new Utils.ColorHelper (label);
+      ch = new Utils.ColorHelper ();
       cached_surface = null;
       tid = 0;
       wmax = hmax = current_offset = 0;
       texts = new Gee.ArrayList<PangoReadyText> ();
-      this.label.style_set.connect (()=>{
+      this.label.style_updated.connect (()=>{
         update_all_sizes ();
         update_cached_surface ();
         queue_resize ();
@@ -1316,7 +1316,7 @@ namespace Synapse.Gui
 
       var layout = this.label.get_layout ();
       Pango.cairo_update_context (ctx, layout.get_context ());
-      ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, this.get_state ());
+      ch.set_source_rgba (ctx, 1.0, ch.StyleType.FG, this.get_state_flags ());
       ctx.set_operator (Cairo.Operator.OVER);
       string s;
       for (int i = 0; i < texts.size; i++)
@@ -1334,10 +1334,10 @@ namespace Synapse.Gui
       /* Arrows */
       if (!this.show_arrows)
         return;
-      if (this.get_state () == StateType.SELECTED)
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.NORMAL);
+      if (this.get_state_flags () == StateFlags.SELECTED)
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateFlags.NORMAL);
       else
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateType.SELECTED);
+        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BG, StateFlags.SELECTED);
       txt = texts.get (_selected);
       double asize = double.min (ARROW_SIZE, h);
       double px, py = h / 2;

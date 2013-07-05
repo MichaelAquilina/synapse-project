@@ -23,15 +23,11 @@ using Gtk;
 
 namespace Synapse
 {
-  /* Gtk+-2.0 base class */
+  /* Gtk+-3.0 base class */
   public class Gui.View : Gtk.Window, Synapse.Gui.IView
   {
-    /* --- base class for gtk+-2.0 --- */
-    /* In ~/.config/synapse/gtkrc  use:
-       widget_class "*SynapseGui*" style : highest "synapse" 
-       and set your custom colors
-    */
-    
+    /* --- base class for gtk+-3.0 --- */
+
     protected bool is_kwin = false;
     
     private void update_wm ()
@@ -51,7 +47,7 @@ namespace Synapse
 
     protected int BORDER_RADIUS;
     protected int SHADOW_SIZE;
-    protected Gtk.StateType bg_state;
+    protected Gtk.StateFlags bg_state;
     
     protected bool cache_enabled;
     protected Gee.Map<string, Cairo.Surface> bg_cache;
@@ -149,13 +145,13 @@ namespace Synapse
       
       cache_enabled = true;
       bg_cache = new Gee.HashMap<string, Cairo.Surface> ();
-      bg_state = Gtk.StateType.SELECTED;
+      bg_state = Gtk.StateFlags.SELECTED;
       
       req_target = {0, 0};
       req_current = {0, 0};
       
-      this.style.get (typeof(Synapse.Gui.View), "border-radius", out BORDER_RADIUS);
-      this.style.get (typeof(Synapse.Gui.View), "shadow-size", out SHADOW_SIZE);
+      style_get ("border-radius", out BORDER_RADIUS,
+        "shadow-size", out SHADOW_SIZE);
       
       this.set_app_paintable (true);
       this.skip_taskbar_hint = true;
@@ -177,7 +173,7 @@ namespace Synapse
 
       Gui.Utils.ensure_transparent_bg (this);
       
-      ch = new Gui.Utils.ColorHelper (this);
+      ch = new Gui.Utils.ColorHelper ();
       
       // only needed to execute the static construct of SmartLabel
       var initialize_smartlabel = new SmartLabel ();
@@ -210,6 +206,9 @@ namespace Synapse
         menu.get_menu ().show.connect (this.force_grab);
         menu.settings_clicked.connect (()=>{ controller.show_settings_requested (); });
       }
+
+	  // gtk3 no longer calls this itself on startup
+	  style_updated ();
     }
     
     protected virtual void build_ui ()
@@ -264,15 +263,14 @@ namespace Synapse
       gdkwin.shape_combine_region (region, 0, 0);
     }
     
-    public override void style_set (Gtk.Style? old)
+    public override void style_updated ()
     {
-      base.style_set (old);
+      base.style_updated ();
       string dmax, dmin;
       bool bgselected;
-      this.style.get (typeof(Synapse.Gui.View), "use-selected-color", out bgselected);
-      this.style.get (typeof(Synapse.Gui.View), "selected-category-size", out dmax);
-      this.style.get (typeof(Synapse.Gui.View), "unselected-category-size", out dmin);
-      this.bg_state = bgselected ? StateType.SELECTED : StateType.NORMAL;
+      style_get ("use-selected-color", out bgselected, "selected-category-size", out dmax,
+        "unselected-category-size", out dmin);
+      this.bg_state = bgselected ? StateFlags.SELECTED : StateFlags.NORMAL;
       flag_selector.selected_markup = "<span size=\"%s\"><b>%s</b></span>".printf (
                                                       SmartLabel.size_to_string[SmartLabel.string_to_size (dmax)], "%s");
       flag_selector.unselected_markup = "<span size=\"%s\">%s</span>".printf (
@@ -371,7 +369,7 @@ namespace Synapse
                                                       out ResultBox results_sources,
                                                       out ResultBox results_actions,
                                                       out ResultBox results_targets,
-                                                      Gtk.StateType state_type = Gtk.StateType.NORMAL,
+                                                      Gtk.StateFlags state_type = Gtk.StateFlags.NORMAL,
                                                       bool add_to_container = true)
     {
       results_sources = new ResultBox (100);
@@ -404,7 +402,7 @@ namespace Synapse
     
     protected virtual void paint_background (Cairo.Context ctx)
     {
-      ch.set_source_rgba (ctx, 0.9, ch.StyleType.BG, StateType.NORMAL);
+      ch.set_source_rgba (ctx, 0.9, ch.StyleType.BG, StateFlags.NORMAL);
       ctx.set_operator (Cairo.Operator.SOURCE);
       ctx.paint ();
     }
