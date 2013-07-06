@@ -72,13 +72,9 @@ namespace Synapse.Gui
 
       int spacing, icon_size, width;
       string tmax, tmin, dmax, dmin;
-      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "ui-width", out width);
-      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "pane-spacing", out spacing);
-      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "icon-size", out icon_size);
-      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "title-size", out tmax);
-      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "title-min-size", out tmin);
-      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "description-size", out dmax);
-      this.style.get (typeof(Synapse.Gui.ViewSideDoish), "description-min-size", out dmin);
+      style_get ("ui-width", out width, "pane-spacing", out spacing, "icon-size", out icon_size,
+          "title-size", out tmax, "title-min-size", out tmin, "description-size", out dmax,
+          "description-min-size", out dmin);
       
       sp1.set_size_request (spacing, -1);
       sp2.set_size_request (spacing, -1);

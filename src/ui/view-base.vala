@@ -283,9 +283,7 @@ namespace Synapse
     {
       if (this.is_composited ())
       {
-        this.style.get (typeof(Synapse.Gui.View), "border-radius", out BORDER_RADIUS);
-        this.style.get (typeof(Synapse.Gui.View), "shadow-size", out SHADOW_SIZE);
-        
+        style_get ("border-radius", out BORDER_RADIUS, "shadow-size", out SHADOW_SIZE);
       }
       else
       {

@@ -61,10 +61,8 @@ namespace Synapse.Gui
 
       int width, icon_size;
       string tmax, dmax;
-      this.style.get (typeof(Synapse.Gui.View), "ui-width", out width);
-      this.style.get (typeof(Synapse.Gui.ViewVirgilio), "icon-size", out icon_size);
-      this.style.get (typeof(Synapse.Gui.ViewVirgilio), "title-size", out tmax);
-      this.style.get (typeof(Synapse.Gui.ViewVirgilio), "description-size", out dmax);
+      style_get ("ui-width", out width, "icon-size", out icon_size,
+        "title-size", out tmax, "description-size", out dmax);
 
       container.set_size_request (width, -1);
       fix_listview_size (results_sources.get_match_renderer (), icon_size, tmax, dmax);

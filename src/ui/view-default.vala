@@ -38,12 +38,8 @@ namespace Synapse.Gui
 
       int width, icon_size;
       string tmax, tmin, dmax, dmin;
-      this.style.get (typeof(Synapse.Gui.View), "ui-width", out width);
-      this.style.get (typeof(Synapse.Gui.View), "icon-size", out icon_size);
-      this.style.get (typeof(Synapse.Gui.View), "title-size", out tmax);
-      this.style.get (typeof(Synapse.Gui.View), "title-min-size", out tmin);
-      this.style.get (typeof(Synapse.Gui.View), "description-size", out dmax);
-      this.style.get (typeof(Synapse.Gui.View), "description-min-size", out dmin);
+      style_get ("ui-width", out width, "icon-size", out icon_size, "title-size", out tmax,
+        "title-min-size", out tmin, "description-size", out dmax, "description-min-size", out dmin);
       
       icon_container.scale_size = icon_size;
       container.set_size_request (width, -1);
