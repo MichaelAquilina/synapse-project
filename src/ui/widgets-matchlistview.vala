@@ -182,12 +182,12 @@ namespace Synapse.Gui
         double r = 0, g = 0, b = 0;
         ch.get_rgb_from_mix (styletype, Gtk.StateFlags.NORMAL, ch.Mod.NORMAL,
                              styletype, Gtk.StateFlags.SELECTED, ch.Mod.NORMAL,
-							 selected_fill_pct, out r, out g, out b);
+               selected_fill_pct, out r, out g, out b);
         ctx.set_source_rgba (r, g, b, 1.0);
       }
       else {
-		  ch.set_source_rgba (ctx, 1.0, styletype, state, Utils.ColorHelper.Mod.NORMAL);
-	  }
+      ch.set_source_rgba (ctx, 1.0, styletype, state, Utils.ColorHelper.Mod.NORMAL);
+    }
 
       string s = "";
       /* ----------------------- draw title --------------------- */
@@ -384,7 +384,7 @@ namespace Synapse.Gui
       construct
       {
         rtl = Gtk.TextDirection.LTR;
-        ch = new Utils.ColorHelper ();
+        ch = Utils.ColorHelper.get_default ();
       }
 
       private int row_height_cached = 36;
@@ -422,7 +422,7 @@ namespace Synapse.Gui
     
     public MatchListView (MatchViewRendererBase mr)
     {
-      ch = new Utils.ColorHelper ();
+      ch = Utils.ColorHelper.get_default ();
       inhibit_move = false;
       renderer = mr;
       // Add the renderer to screen as a child, this way it will receive all events.
@@ -655,12 +655,12 @@ namespace Synapse.Gui
           this.get_allocation (out allocation);
 
           ypos = int.max (this.soffset, 0);
-		  var context = get_style_context ();
-		  context.save ();
-		  context.set_state (Gtk.StateFlags.SELECTED);
+      var context = get_style_context ();
+      context.save ();
+      context.set_state (Gtk.StateFlags.SELECTED);
           context.render_background (ctx, 0, ypos,
             this.get_allocated_width (), this.row_height);
-		  context.restore ();
+      context.restore ();
         }
       }
       double pct = 1.0;
@@ -820,7 +820,7 @@ namespace Synapse.Gui
       this.set_has_window (false);
       this.above_child = false;
       this.visible_window = false;
-      ch = new Utils.ColorHelper ();
+      ch = Utils.ColorHelper.get_default ();
       build_ui();
       this.notify["use-base-colors"].connect (()=>{
         view.use_base_colors = use_base_colors;
@@ -836,22 +836,22 @@ namespace Synapse.Gui
       });
     }
 
-		private MatchListView view;
-		private MatchViewRenderer rend;
-		private Label status;
-		private Label logo;
-		
-		public new void set_state (Gtk.StateFlags state)
-		{
-		  base.set_state_flags (state, false);
-		  status.set_state_flags (Gtk.StateFlags.NORMAL, true);
-		  logo.set_state_flags (Gtk.StateFlags.NORMAL, true);
-		}
-		
-		public override bool draw (Cairo.Context ctx)
-		{
-		  if (_use_base_colors)
-		  {
+    private MatchListView view;
+    private MatchViewRenderer rend;
+    private Label status;
+    private Label logo;
+    
+    public new void set_state (Gtk.StateFlags state)
+    {
+      base.set_state_flags (state, false);
+      status.set_state_flags (Gtk.StateFlags.NORMAL, true);
+      logo.set_state_flags (Gtk.StateFlags.NORMAL, true);
+    }
+    
+    public override bool draw (Cairo.Context ctx)
+    {
+      if (_use_base_colors)
+      {
         Gtk.Allocation allocation, status_allocation;
         this.get_allocation (out allocation);
         status.get_allocation (out status_allocation);

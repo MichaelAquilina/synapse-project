@@ -416,28 +416,42 @@ namespace Synapse.Gui
       private Gtk.StyleContext fg_context;
       private Gtk.StyleContext bg_context;
 
-      public ColorHelper ()
+    private string current_theme;
+
+    private static ColorHelper? instance = null;
+    public static ColorHelper get_default ()
+    {
+      if (instance == null)
+        instance = new ColorHelper ();
+      return instance;
+    }
+
+      private ColorHelper ()
       {
         this.colormap = new Gee.HashMap <string, Color> ();
 
-        var path = new Gtk.WidgetPath ();
-        path.append_type (typeof (Gtk.Window));
+    //FIXME get ourselves a number of dummy widgets
+    // messing with stylecontexts directly resulted in deep frustation
+    var window = new Gtk.Window ();
+    var box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+    var label = new Gtk.Label (null);
+    window.add (box);
+    box.pack_start (label);
+    fg_context = label.get_style_context ();
+    bg_context = box.get_style_context ();
 
-        var parent_context = new Gtk.StyleContext ();
-        parent_context.set_path (path);
-
-        var fg_path = path.copy ();
-        fg_path.append_type (typeof (Gtk.Label));
-        fg_context = new Gtk.StyleContext ();
-        fg_context.set_path (fg_path);
-        fg_context.set_parent (parent_context);
-
-        var bg_path = path.copy ();
-        bg_path.append_type (typeof (Gtk.EventBox));
-        bg_context = new Gtk.StyleContext ();
-        bg_context.set_path (bg_path);
-        bg_context.set_parent (parent_context);
+    current_theme = Gtk.Settings.get_default ().gtk_theme_name;
+    Gtk.Settings.get_default ().notify["gtk-theme-name"].connect (theme_changed);
       }
+
+    private void theme_changed (Object o, ParamSpec p)
+    {
+      var new_theme = (o as Gtk.Settings).gtk_theme_name;
+      if (new_theme == current_theme)
+        return;
+      current_theme = new_theme;
+      colormap.clear ();
+    }
       
       public void get_color_colorized (ref double red, ref double green, ref double blue,
                                        StyleType t, Gtk.StateFlags st, Mod mod = Mod.NORMAL)
@@ -522,8 +536,8 @@ namespace Synapse.Gui
         public void init_from_gdk_color (Gdk.RGBA col)
         {
           this.r = col.red;
-		  this.g = col.green;
-		  this.b = col.blue;
+          this.g = col.green;
+          this.b = col.blue;
         }
         
         /*

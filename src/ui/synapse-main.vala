@@ -213,7 +213,7 @@ namespace Synapse
       current_shortcut = "<Control>space";
       Utils.Logger.log (this, "Binding activation to %s", current_shortcut);
       settings.set_keybinding (current_shortcut, false);
-	    Keybinder.bind (current_shortcut, handle_shortcut, this);
+      Keybinder.bind (current_shortcut, handle_shortcut, this);
     }
     
     static void handle_shortcut (string key, void* data)

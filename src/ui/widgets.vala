@@ -127,7 +127,7 @@ namespace Synapse.Gui
     construct
     {
       layout = this.create_pango_layout ("");
-      ch = new Utils.ColorHelper ();
+      ch = Utils.ColorHelper.get_default ();
       last_req = {0, 0};
       this.set_has_window (false);
       this.notify["size"].connect (sizes_changed);
@@ -797,7 +797,7 @@ namespace Synapse.Gui
     construct
     {
       _focus_widget = null;
-      ch = new Utils.ColorHelper ();
+      ch = Utils.ColorHelper.get_default ();
       this.notify["draw-input"].connect (this.queue_draw);
       this.notify["input-alpha"].connect (this.queue_draw);
       this.notify["border-radius"].connect (this.queue_draw);
@@ -977,7 +977,7 @@ namespace Synapse.Gui
     private Utils.ColorHelper ch;
     public MenuButton ()
     {
-      ch = new Utils.ColorHelper ();
+      ch = Utils.ColorHelper.get_default ();
       entered = false;
       menu = new Gtk.Menu ();
       Gtk.MenuItem item = null;
@@ -1175,7 +1175,7 @@ namespace Synapse.Gui
       this.add (label);
       this.set_events (Gdk.EventMask.BUTTON_PRESS_MASK |
                        Gdk.EventMask.SCROLL_MASK);
-      ch = new Utils.ColorHelper ();
+      ch = Utils.ColorHelper.get_default ();
       cached_surface = null;
       tid = 0;
       wmax = hmax = current_offset = 0;

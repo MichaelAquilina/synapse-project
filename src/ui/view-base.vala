@@ -173,7 +173,7 @@ namespace Synapse
 
       Gui.Utils.ensure_transparent_bg (this);
       
-      ch = new Gui.Utils.ColorHelper ();
+      ch = Gui.Utils.ColorHelper.get_default ();
       
       // only needed to execute the static construct of SmartLabel
       var initialize_smartlabel = new SmartLabel ();
@@ -207,8 +207,8 @@ namespace Synapse
         menu.settings_clicked.connect (()=>{ controller.show_settings_requested (); });
       }
 
-	  // gtk3 no longer calls this itself on startup
-	  style_updated ();
+       // gtk3 no longer calls this itself on startup
+       style_updated ();
     }
     
     protected virtual void build_ui ()
