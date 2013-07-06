@@ -129,7 +129,6 @@ namespace Synapse.Gui
       var categories_hbox = new HBox (false, 0);
 
       menuthrobber = new MenuThrobber ();
-      menuthrobber.set_state_flags (StateFlags.SELECTED, false);
       menu = (MenuButton) menuthrobber;
       menuthrobber.set_size_request (14, 14);
       menuthrobber.button_scale = 0.75;
@@ -161,7 +160,7 @@ namespace Synapse.Gui
       
       /* list */
       this.prepare_results_container (out results_container, out results_sources,
-                                      out results_actions, out results_targets, StateFlags.SELECTED);
+                                      out results_actions, out results_targets, StateFlags.NORMAL);
       container.pack_start (results_container, false);
       
       container.show_all ();
