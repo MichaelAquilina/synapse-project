@@ -224,6 +224,7 @@ namespace Synapse
     private void change_keyboard_shortcut (string key)
     {
       Keybinder.unbind (current_shortcut, handle_shortcut);
+      current_shortcut = key;
       Keybinder.bind (current_shortcut, handle_shortcut, this);
     }
 
