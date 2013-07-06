@@ -844,8 +844,8 @@ namespace Synapse.Gui
 		public new void set_state (Gtk.StateFlags state)
 		{
 		  base.set_state_flags (state, false);
-		  status.set_state_flags (state, false);
-		  logo.set_state_flags (state, false);
+		  status.set_state_flags (Gtk.StateFlags.NORMAL, true);
+		  logo.set_state_flags (Gtk.StateFlags.NORMAL, true);
 		}
 		
 		public override bool draw (Cairo.Context ctx)

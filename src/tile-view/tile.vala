@@ -105,6 +105,7 @@ namespace UI.Widgets
       set_text ();
 
       button_box = new HBox (false, 3);
+      button_box.margin_bottom = 5;
 
       add_remove_button = new Button ();
       // FIXME: could cause leak!
@@ -133,16 +134,21 @@ namespace UI.Widgets
       Gtk.Allocation allocation;
       this.get_allocation (out allocation);
 
+      var context = this.get_style_context ();
+
       if (this.get_state () == StateType.SELECTED)
       {
-        get_style_context ().render_background (cr, 0, 0,
-          allocation.width, allocation.height);
+        context.render_background (cr, 0, 0, allocation.width, allocation.height);
       }
 
       if (!last)
       {
-        this.get_style_context ().render_line (cr, 0, allocation.height - 1,
+        context.save ();
+        // this gives us a lighter stroke
+        context.add_class (Gtk.STYLE_CLASS_SEPARATOR);
+        context.render_line (cr, 0, allocation.height - 1,
           allocation.width, allocation.height - 1);
+        context.restore ();
       }
 
       return base.draw (cr);
@@ -168,7 +174,7 @@ namespace UI.Widgets
 
     public void set_selected (bool selected)
     {
-      this.set_state (selected ? StateType.SELECTED : StateType.NORMAL);
+      this.set_state_flags (selected ? StateFlags.SELECTED : StateFlags.NORMAL, true);
 
       if (selected)
       {
@@ -179,7 +185,13 @@ namespace UI.Widgets
         button_box.hide ();
       }
 
-      button_box.set_state (StateType.NORMAL);
+      // need to reset those to prevent multiple overlapping backgrounds
+      button_box.set_state_flags (StateFlags.NORMAL, true);
+      tile_image.set_state_flags (StateFlags.NORMAL, true);
+      description.set_state_flags (StateFlags.NORMAL, true);
+      sub_description.set_state_flags (StateFlags.NORMAL, true);
+      title.set_state_flags (StateFlags.NORMAL, true);
+
       this.update_state ();
       this.queue_resize ();
     }
