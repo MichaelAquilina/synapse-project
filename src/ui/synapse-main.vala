@@ -282,7 +282,7 @@ namespace Synapse
         Gtk.init (ref argv);
         Notify.init ("synapse");
         
-        var app = new Unique.App ("org.gnome.Synapse", null);
+        var app = new Unique.App ("org.gnome.Synapse", "");
         if (app.is_running ())
         {
           Utils.Logger.log (null, "Synapse is already running, activating...");

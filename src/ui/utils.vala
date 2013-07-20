@@ -22,6 +22,24 @@
 
 namespace Synapse.Gui
 {
+  public enum StyleType
+  {
+    BG,
+    FG,
+    BASE,
+    TEXT
+  }
+
+  public enum Mod
+  {
+    NORMAL,
+    LIGHTER,
+    LIGHTEST,
+    DARKER,
+    DARKEST,
+    INVERTED
+  }
+
   namespace Utils
   {
     private static string home_directory = null;
@@ -222,7 +240,7 @@ namespace Synapse.Gui
       var display = screen.get_display ();
       int x = 0, y = 0;
       Gdk.Screen screen_for_pointer = null;
-      display.get_pointer (out screen_for_pointer, out x, out y, null);
+      display.get_device_manager ().get_client_pointer ().get_position (out screen_for_pointer, out x, out y);
       
       Gdk.Rectangle rect = {0, 0};
       screen_for_pointer.get_monitor_geometry (screen_for_pointer.get_monitor_at_point (x, y), out rect);
@@ -395,23 +413,6 @@ namespace Synapse.Gui
     }
     public class ColorHelper 
     {
-      public enum StyleType
-      {
-        BG,
-        FG,
-        BASE,
-        TEXT
-      }
-      public enum Mod
-      {
-        NORMAL,
-        LIGHTER,
-        LIGHTEST,
-        DARKER,
-        DARKEST,
-        INVERTED
-      }
-
       private Gee.Map <string, Color> colormap;
       private Gtk.StyleContext fg_context;
       private Gtk.StyleContext bg_context;
@@ -851,28 +852,41 @@ namespace Synapse.Gui
       if (Synapse.Utils.Logger.debug_enabled ()) return;
       uint32 time = Gtk.get_current_event_time();
 
-      Gdk.pointer_ungrab (time);
-      Gdk.keyboard_ungrab (time);
+      var pointer = Gdk.Display.get_default ().get_device_manager ().get_client_pointer ();
+      var keyboard = pointer.associated_device;
+
+      pointer.ungrab (time);
+      if (keyboard != null)
+        keyboard.ungrab (time);
       Gtk.grab_remove (window);
     }
     /* Code from Gnome-Do */
     private static bool try_grab_window (Gtk.Window window)
     {
       uint time = Gtk.get_current_event_time();
-      if (Gdk.pointer_grab (window.get_window(),
+      var pointer = Gdk.Display.get_default ().get_device_manager ().get_client_pointer ();
+      var keyboard = pointer.associated_device;
+
+      if (pointer.grab (window.get_window(),
+            Gdk.GrabOwnership.NONE,
             true,
             Gdk.EventMask.BUTTON_PRESS_MASK |
             Gdk.EventMask.BUTTON_RELEASE_MASK |
             Gdk.EventMask.POINTER_MOTION_MASK,
             null,
-            null,
             time) == Gdk.GrabStatus.SUCCESS)
       {
-        if (Gdk.keyboard_grab (window.get_window(), true, time) == Gdk.GrabStatus.SUCCESS) {
+        if (keyboard != null && keyboard.grab (window.get_window(),
+              Gdk.GrabOwnership.NONE,
+              true,
+              Gdk.EventMask.KEY_PRESS_MASK |
+              Gdk.EventMask.KEY_RELEASE_MASK,
+              null,
+              time) == Gdk.GrabStatus.SUCCESS) {
           Gtk.grab_add (window);
           return true;
         } else {
-          Gdk.pointer_ungrab (time);
+          pointer.ungrab (time);
           return false;
         }
       }

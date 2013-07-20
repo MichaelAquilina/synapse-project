@@ -397,7 +397,7 @@ namespace Synapse
     
     protected virtual void paint_background (Cairo.Context ctx)
     {
-      ch.set_source_rgba (ctx, 0.9, ch.StyleType.BG, StateFlags.NORMAL);
+      ch.set_source_rgba (ctx, 0.9, StyleType.BG, StateFlags.NORMAL);
       ctx.set_operator (Cairo.Operator.SOURCE);
       ctx.paint ();
     }

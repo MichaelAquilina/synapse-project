@@ -77,7 +77,7 @@ namespace Synapse.Gui
     
     private SchemaContainer icon_container;
     
-    private VBox container;
+    private Box container;
     
     private SelectionContainer results_container;
     
@@ -89,7 +89,7 @@ namespace Synapse.Gui
     
     protected override void build_ui ()
     {
-      container = new VBox (false, 0);
+      container = new Box (Gtk.Orientation.VERTICAL, 0);
       /* Icons */
       source_icon = new NamedIcon ();
       action_icon = new NamedIcon ();
@@ -148,7 +148,7 @@ namespace Synapse.Gui
       adescription_label.size = SmartLabel.Size.SMALL;
       
       /* Categories - Throbber and menu */ //#0C71D6
-      var categories_hbox = new HBox (false, 0);
+      var categories_hbox = new Box (Gtk.Orientation.HORIZONTAL, 0);
 
       menuthrobber = new MenuThrobber ();
       menu = (MenuButton) menuthrobber;
@@ -158,7 +158,7 @@ namespace Synapse.Gui
       categories_hbox.pack_start (flag_selector);
       categories_hbox.pack_start (menuthrobber, false);
 
-      var vb = new VBox (false, 0);
+      var vb = new Box (Gtk.Orientation.VERTICAL, 0);
       vb.pack_end (description_label, false);
       var fi = new FakeInput ();
       fi.border_radius = 5;
@@ -169,9 +169,9 @@ namespace Synapse.Gui
       
       var sensitive = new SensitiveWidget (icon_container);
       this.make_draggable (sensitive);
-      var lvb = new VBox (false, 0);
+      var lvb = new Box (Gtk.Orientation.VERTICAL, 0);
       lvb.pack_start (sensitive, false);
-      var lhb = new HBox (false, 10);
+      var lhb = new Box (Gtk.Orientation.HORIZONTAL, 10);
       lhb.pack_end (adescription_label, false);
       lhb.pack_end (ldescription_label);
       lvb.pack_start (lhb, false);
@@ -180,7 +180,7 @@ namespace Synapse.Gui
       flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
       
       /* Top Container */
-      var hb = new HBox (false, 5);
+      var hb = new Box (Gtk.Orientation.HORIZONTAL, 5);
       
       hb.pack_start (lvb, false);
       hb.pack_start (vb, true);
@@ -251,7 +251,7 @@ namespace Synapse.Gui
           ctx.translate (-0.5, -0.5);
         }
         ctx.set_operator (Operator.SOURCE);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateFlags.NORMAL);
+        ch.set_source_rgba (ctx, 1.0, StyleType.BASE, Gtk.StateFlags.NORMAL);
         ctx.rectangle (spacer_allocation.x, spacer_allocation.y + BORDER_RADIUS, spacer_allocation.width, SHADOW_SIZE);
         ctx.fill ();
       }
@@ -278,17 +278,17 @@ namespace Synapse.Gui
       if (this.bg_state == Gtk.StateFlags.SELECTED)
       {
         r = g = b = 0.5;
-        ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, this.bg_state);
+        ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, this.bg_state);
         pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
         r = g = b = 0.15;
-        ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, this.bg_state);
+        ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, this.bg_state);
         pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
       }
       else
       {
-        ch.add_color_stop_rgba (pat, 0.0, 0.95, ch.StyleType.BG, this.bg_state, ch.Mod.LIGHTER);
-        ch.add_color_stop_rgba (pat, 0.2, 1.0, ch.StyleType.BG, this.bg_state, ch.Mod.NORMAL);
-        ch.add_color_stop_rgba (pat, 1.0, 1.0, ch.StyleType.BG, this.bg_state, ch.Mod.DARKER);
+        ch.add_color_stop_rgba (pat, 0.0, 0.95, StyleType.BG, this.bg_state, Mod.LIGHTER);
+        ch.add_color_stop_rgba (pat, 0.2, 1.0, StyleType.BG, this.bg_state, Mod.NORMAL);
+        ch.add_color_stop_rgba (pat, 1.0, 1.0, StyleType.BG, this.bg_state, Mod.DARKER);
       }
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
       ctx.set_source (pat);
@@ -315,21 +315,21 @@ namespace Synapse.Gui
       {
         if (controller.is_in_initial_state ())
         {
-          focus_label.set_text (controller.TYPE_TO_SEARCH);
-          description_label.set_text (controller.DOWN_TO_SEE_RECENT);
+          focus_label.set_text (IController.TYPE_TO_SEARCH);
+          description_label.set_text (IController.DOWN_TO_SEE_RECENT);
         }
         else if (controller.searched_for_recent ())
         {
           focus_label.set_text ("");
-          description_label.set_text (controller.NO_RECENT_ACTIVITIES);
+          description_label.set_text (IController.NO_RECENT_ACTIVITIES);
         }
         else
         {
           focus_label.set_text (this.model.query[model.searching_for]);
           if (this.menuthrobber.active)
-            description_label.set_text (controller.SEARCHING);
+            description_label.set_text (IController.SEARCHING);
           else
-            description_label.set_text (controller.NO_RESULTS);
+            description_label.set_text (IController.NO_RESULTS);
         }
       }
       else

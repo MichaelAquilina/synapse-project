@@ -287,14 +287,14 @@ namespace Synapse.Gui
     
     private void build_ui ()
     {
-      var main_vbox = new VBox (false, 12);
+      var main_vbox = new Box (Gtk.Orientation.VERTICAL, 12);
       main_vbox.border_width = 12;
       this.add (main_vbox);
       
       var tabs = new Gtk.Notebook ();
-      var general_tab = new VBox (false, 6);
+      var general_tab = new Box (Gtk.Orientation.VERTICAL, 6);
       general_tab.border_width = 12;
-      var plugin_tab = new VBox (false, 6);
+      var plugin_tab = new Box (Gtk.Orientation.VERTICAL, 6);
       plugin_tab.border_width = 12;
       main_vbox.pack_start (tabs);
       tabs.append_page (general_tab, new Label (_("General")));
@@ -307,14 +307,14 @@ namespace Synapse.Gui
       theme_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", _("Behavior & Look")));
       theme_frame.set_label_widget (theme_frame_label);
 
-      var behavior_vbox = new VBox (false, 6);
+      var behavior_vbox = new Box (Gtk.Orientation.VERTICAL, 6);
       var align = new Alignment (0.5f, 0.5f, 1.0f, 1.0f);
       align.set_padding (6, 12, 12, 12);
       align.add (behavior_vbox);
       theme_frame.add (align);
       
       /* Select theme combobox row */
-      var row = new HBox (false, 6);
+      var row = new Box (Gtk.Orientation.HORIZONTAL, 6);
       behavior_vbox.pack_start (row, false);
       var select_theme_label = new Label (_("Theme:"));
       row.pack_start (select_theme_label, false, false);
@@ -350,7 +350,7 @@ namespace Synapse.Gui
       var shortcut_scroll = new Gtk.ScrolledWindow (null, null);    
       shortcut_scroll.set_shadow_type (ShadowType.IN);
       shortcut_scroll.set_policy (PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
-      var tree_vbox = new VBox (false, 6);
+      var tree_vbox = new Box (Gtk.Orientation.VERTICAL, 6);
       Gtk.TreeView treeview = new Gtk.TreeView ();
       tree_vbox.pack_start (shortcut_scroll);
       shortcut_scroll.add (treeview);
@@ -416,7 +416,7 @@ namespace Synapse.Gui
       
       /* Add info */
       
-      var info_box = new HBox (false, 6);
+      var info_box = new Box (Gtk.Orientation.HORIZONTAL, 6);
       var info_image = new Image.from_stock (Gtk.Stock.INFO, IconSize.MENU);
       info_box.pack_start (info_image, false);
       var info_label = new Label (Markup.printf_escaped ("<span size=\"small\">%s</span>",

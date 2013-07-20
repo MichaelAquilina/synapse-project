@@ -65,7 +65,7 @@ namespace Synapse.Gui
     
     private SchemaContainer icon_container;
     
-    private VBox container;
+    private Box container;
     
     private SelectionContainer results_container;
     
@@ -77,7 +77,7 @@ namespace Synapse.Gui
     
     protected override void build_ui ()
     {
-      container = new VBox (false, 0);
+      container = new Box (Gtk.Orientation.VERTICAL, 0);
       /* Icons */
       source_icon = new NamedIcon ();
       action_icon = new NamedIcon ();
@@ -124,7 +124,7 @@ namespace Synapse.Gui
       focus_label.xpad = 3;
       
       /* Categories - Throbber and menu */ //#0C71D6
-      var categories_hbox = new HBox (false, 0);
+      var categories_hbox = new Box (Gtk.Orientation.HORIZONTAL, 0);
 
       menuthrobber = new MenuThrobber ();
       menu = (MenuButton) menuthrobber;
@@ -134,7 +134,7 @@ namespace Synapse.Gui
       categories_hbox.pack_start (flag_selector);
       categories_hbox.pack_start (menuthrobber, false);
 
-      var vb = new VBox (false, 0);
+      var vb = new Box (Gtk.Orientation.VERTICAL, 0);
       // vb.pack_end (description_label, false);
       var fi = new FakeInput ();
       fi.border_radius = 5;
@@ -147,7 +147,7 @@ namespace Synapse.Gui
       flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
       
       /* Top Container */
-      var hb = new HBox (false, 5);
+      var hb = new Box (Gtk.Orientation.HORIZONTAL, 5);
       var sensitive = new SensitiveWidget (icon_container);
       this.make_draggable (sensitive);
       hb.pack_start (sensitive, false);
@@ -219,7 +219,7 @@ namespace Synapse.Gui
           ctx.translate (-0.5, -0.5);
         }
         ctx.set_operator (Operator.SOURCE);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateFlags.NORMAL);
+        ch.set_source_rgba (ctx, 1.0, StyleType.BASE, Gtk.StateFlags.NORMAL);
         ctx.rectangle (spacer_allocation.x, spacer_allocation.y + BORDER_RADIUS, spacer_allocation.width, SHADOW_SIZE);
         ctx.fill ();
       }
@@ -246,16 +246,16 @@ namespace Synapse.Gui
       if (this.bg_state == Gtk.StateFlags.SELECTED)
       {
         r = g = b = 0.5;
-        ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, this.bg_state);
+        ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, this.bg_state);
         pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
         r = g = b = 0.15;
-        ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, this.bg_state);
+        ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, this.bg_state);
         pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
       }
       else
       {
-        ch.add_color_stop_rgba (pat, 0.0, 0.95, ch.StyleType.BG, this.bg_state, ch.Mod.LIGHTER);
-        ch.add_color_stop_rgba (pat, 1.0, 1.0, ch.StyleType.BG, this.bg_state, ch.Mod.NORMAL);
+        ch.add_color_stop_rgba (pat, 0.0, 0.95, StyleType.BG, this.bg_state, Mod.LIGHTER);
+        ch.add_color_stop_rgba (pat, 1.0, 1.0, StyleType.BG, this.bg_state, Mod.NORMAL);
       }
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
       ctx.set_source (pat);
@@ -282,7 +282,7 @@ namespace Synapse.Gui
       {
         if (controller.is_in_initial_state ())
         {
-          focus_label.set_text (controller.TYPE_TO_SEARCH);
+          focus_label.set_text (IController.TYPE_TO_SEARCH);
         }
         else if (controller.searched_for_recent ())
         {

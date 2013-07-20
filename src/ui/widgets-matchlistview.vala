@@ -174,19 +174,19 @@ namespace Synapse.Gui
       
       bool selected = (state == Gtk.StateFlags.SELECTED);
 
-      var styletype = ch.StyleType.FG;
-      if (use_base || selected) styletype = ch.StyleType.TEXT;
+      var styletype = StyleType.FG;
+      if (use_base || selected) styletype = StyleType.TEXT;
       
       if (selected && selected_fill_pct < 1.0)
       {
         double r = 0, g = 0, b = 0;
-        ch.get_rgb_from_mix (styletype, Gtk.StateFlags.NORMAL, ch.Mod.NORMAL,
-                             styletype, Gtk.StateFlags.SELECTED, ch.Mod.NORMAL,
+        ch.get_rgb_from_mix (styletype, Gtk.StateFlags.NORMAL, Mod.NORMAL,
+                             styletype, Gtk.StateFlags.SELECTED, Mod.NORMAL,
                selected_fill_pct, out r, out g, out b);
         ctx.set_source_rgba (r, g, b, 1.0);
       }
       else {
-      ch.set_source_rgba (ctx, 1.0, styletype, state, Utils.ColorHelper.Mod.NORMAL);
+      ch.set_source_rgba (ctx, 1.0, styletype, state, Mod.NORMAL);
     }
 
       string s = "";
@@ -633,7 +633,7 @@ namespace Synapse.Gui
       
       if (this.use_base_colors)
       {
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateFlags.NORMAL, Utils.ColorHelper.Mod.NORMAL);
+        ch.set_source_rgba (ctx, 1.0, StyleType.BASE, Gtk.StateFlags.NORMAL, Mod.NORMAL);
         ctx.paint ();
       }
       
@@ -697,7 +697,7 @@ namespace Synapse.Gui
       if (this.items == null) return true;
       inhibit_move = false;
       int k = 1;
-      if (event.direction == event.direction.UP) k = this.goto_index == 0 ? 0 : -1;
+      if (event.direction == Gdk.ScrollDirection.UP) k = this.goto_index == 0 ? 0 : -1;
 
       this.set_indexes (this.goto_index + k, this.goto_index + k);
       this.selected_index_changed (this.select_index);
@@ -728,7 +728,7 @@ namespace Synapse.Gui
       
       if (this.selection_enabled)
       {
-        if (event.type == event.type.2BUTTON_PRESS &&
+        if (event.type == Gdk.EventType.2BUTTON_PRESS &&
             this.select_index == this.dragdrop_target_item)
         {
           this.set_indexes (this.dragdrop_target_item, this.dragdrop_target_item);
@@ -798,8 +798,8 @@ namespace Synapse.Gui
     private int mwidth;
     private int nrows;
 
-    private VBox vbox;
-    private HBox status_box;
+    private Box vbox;
+    private Box status_box;
     
     private Utils.ColorHelper ch;
     
@@ -861,8 +861,8 @@ namespace Synapse.Gui
         Pattern pat = new Pattern.linear(0, 0, 0, status.get_allocated_height ());
         
         StateFlags t = this.get_state_flags ();
-        ch.add_color_stop_rgba (pat, 0.0, 0.95, ch.StyleType.BG, t);
-        ch.add_color_stop_rgba (pat, 1.0, 0.95, ch.StyleType.BG, t, ch.Mod.DARKER);
+        ch.add_color_stop_rgba (pat, 0.0, 0.95, StyleType.BG, t);
+        ch.add_color_stop_rgba (pat, 1.0, 0.95, StyleType.BG, t, Mod.DARKER);
         /* Prepare and draw top bg's rect */
         ctx.set_source (pat);
         ctx.paint ();
@@ -895,11 +895,11 @@ namespace Synapse.Gui
       view = new MatchListView (rend);
       view.min_visible_rows = this.nrows;
       
-      vbox = new VBox (false, 0);
+      vbox = new Box (Gtk.Orientation.VERTICAL, 0);
       vbox.border_width = 0;
       this.add (vbox);
       vbox.pack_start (view);
-      status_box = new HBox (false, 0);
+      status_box = new Box (Gtk.Orientation.HORIZONTAL, 0);
       status_box.set_size_request (-1, 15);
       vbox.pack_start (status_box, false);
       status = new Label (null);
@@ -987,20 +987,20 @@ namespace Synapse.Gui
         nores = new Gee.ArrayList<Match>();
         noact = new Gee.ArrayList<Match>();
         Match m = null;
-        m = new LabelMatch (controller.NO_RESULTS,
+        m = new LabelMatch (IController.NO_RESULTS,
                             "",
                             "missing-image");
         nores.add (m);
-        m = new LabelMatch (controller.NO_RECENT_ACTIVITIES,
+        m = new LabelMatch (IController.NO_RECENT_ACTIVITIES,
                             "",
                             "missing-image");
         noact.add (m);
-        m = new LabelMatch (controller.TYPE_TO_SEARCH,
-                            controller.DOWN_TO_SEE_RECENT,
+        m = new LabelMatch (IController.TYPE_TO_SEARCH,
+                            IController.DOWN_TO_SEE_RECENT,
                             "search");
         tts.add (m);
         this.controller.handle_recent_activities.connect ((b)=>{
-          m.description = controller.DOWN_TO_SEE_RECENT;
+          m.description = IController.DOWN_TO_SEE_RECENT;
           queue_draw ();
         });
       }

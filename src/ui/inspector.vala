@@ -62,7 +62,8 @@ namespace UI
     private bool check_window_at_pointer ()
     {
       int win_x, win_y;
-      Gdk.Window? window = Gdk.Window.at_pointer (out win_x, out win_y);
+      Gdk.Window? window = Gdk.Display.get_default ().get_device_manager ().
+        get_client_pointer ().get_window_at_position (out win_x, out win_y);
       if (window != null)
       {
         void* pointer;

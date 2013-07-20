@@ -167,7 +167,7 @@ namespace Synapse.Gui
       description_label.xalign = 0.5f;
       
       /* Categories - Throbber and menu */ //#0C71D6
-      var categories_hbox = new HBox (false, 0);
+      var categories_hbox = new Box (Gtk.Orientation.HORIZONTAL, 0);
 
       menuthrobber = new MenuThrobber ();
       menuthrobber.set_state_flags (StateFlags.SELECTED, false);
@@ -182,14 +182,14 @@ namespace Synapse.Gui
       flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
       flag_selector.set_state_flags (StateFlags.SELECTED, false);
 
-      var hbox_panes = new HBox (false, 0);
+      var hbox_panes = new Box (Gtk.Orientation.HORIZONTAL, 0);
 
       /* PANES */
       sp1 = new Label (null);
       sp2 = new Label (null);
 
       /* Source Pane */
-      spane = new HBox (false, 0);
+      spane = new Box (Gtk.Orientation.HORIZONTAL, 0);
       spane.border_width = 5;
       var sensitive = new SensitiveWidget (source_icon);
       this.make_draggable (sensitive);
@@ -197,7 +197,7 @@ namespace Synapse.Gui
       spane.pack_start (source_label, true, true, 3);
       
       /* Action Pane */
-      apane = new HBox (false, 0);
+      apane = new Box (Gtk.Orientation.HORIZONTAL, 0);
       apane.border_width = 5;
       apane.pack_start (action_icon, false);
       apane.pack_start (action_label, false, false, 3);
@@ -207,15 +207,15 @@ namespace Synapse.Gui
       hbox_panes.pack_start (apane, false);
 
       /* Target Pane */
-      tpane = new HBox (false, 0);
+      tpane = new Box (Gtk.Orientation.HORIZONTAL, 0);
       tpane.border_width = 5;
       sensitive = new SensitiveWidget (target_icon);
       this.make_draggable (sensitive);
       tpane.pack_start (sensitive, false);
       tpane.pack_start (target_label, true, true, 3);
       
-      target_container = new VBox (false, 0);
-      var hb = new HBox (false, 0);
+      target_container = new Box (Gtk.Orientation.VERTICAL, 0);
+      var hb = new Box (Gtk.Orientation.HORIZONTAL, 0);
       hb.pack_start (sp2, false);
       hb.pack_start (tpane);
       target_container.pack_start (new CloneWidget (categories_hbox), false);
@@ -226,14 +226,14 @@ namespace Synapse.Gui
       this.prepare_results_container (out results_container, out results_sources,
                                       out results_actions, out results_targets, StateFlags.SELECTED);
 
-      container = new VBox (false, 0);
+      container = new Box (Gtk.Orientation.VERTICAL, 0);
       container.pack_start (categories_hbox, false);
       container.pack_start (hbox_panes, false, true, 5);
       container.pack_start (description_label, false);
       container.pack_start (spacer, false);
       container.pack_start (results_container, false);
       
-      var main_container = new HBox (false, 0);
+      var main_container = new Box (Gtk.Orientation.HORIZONTAL, 0);
       main_container.pack_start (container, false);
       main_container.pack_start (target_container, false);
       
@@ -302,7 +302,7 @@ namespace Synapse.Gui
           ctx.translate (-0.5, -0.5);
         }
         ctx.set_operator (Operator.SOURCE);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateFlags.NORMAL);
+        ch.set_source_rgba (ctx, 1.0, StyleType.BASE, Gtk.StateFlags.NORMAL);
         ctx.rectangle (spacer_allocation.x, spacer_allocation.y + BORDER_RADIUS, spacer_allocation.width, SHADOW_SIZE);
         ctx.fill ();
       }
@@ -313,10 +313,10 @@ namespace Synapse.Gui
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
       r = g = b = 0.12;
-      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateFlags.SELECTED);
+      ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, StateFlags.SELECTED);
       pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
       r = g = b = 0.4;
-      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateFlags.SELECTED);
+      ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, StateFlags.SELECTED);
       pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
       
       r = g = b = 0.0;
@@ -350,7 +350,7 @@ namespace Synapse.Gui
                                          tpane_allocation.height + tpane.border_width * 2,
                                          15);
           ch.set_source_rgba (ctx, 0.3,
-                              ch.StyleType.FG, StateFlags.SELECTED);
+                              StyleType.FG, StateFlags.SELECTED);
           ctx.clip ();
           ctx.paint ();
         }
@@ -403,7 +403,7 @@ namespace Synapse.Gui
                                      spane_allocation.height + spane.border_width * 2,
                                      15);
       ch.set_source_rgba (ctx, model.searching_for == SearchingFor.SOURCES ? 0.3 : 0.08,
-                          ch.StyleType.FG, StateFlags.SELECTED);
+                          StyleType.FG, StateFlags.SELECTED);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();
@@ -415,7 +415,7 @@ namespace Synapse.Gui
                                      apane_allocation.height + apane.border_width * 2,
                                      15);
       ch.set_source_rgba (ctx, model.searching_for == SearchingFor.ACTIONS ? 0.3 : 0.08,
-                          ch.StyleType.FG, StateFlags.SELECTED);
+                          StyleType.FG, StateFlags.SELECTED);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();
@@ -428,19 +428,19 @@ namespace Synapse.Gui
       {
         if (controller.is_in_initial_state ())
         {
-          source_label.set_text (controller.TYPE_TO_SEARCH);
-          description_label.set_text (controller.DOWN_TO_SEE_RECENT);
+          source_label.set_text (IController.TYPE_TO_SEARCH);
+          description_label.set_text (IController.DOWN_TO_SEE_RECENT);
         }
         else if (controller.searched_for_recent ())
         {
-          description_label.set_text (controller.NO_RECENT_ACTIVITIES);
+          description_label.set_text (IController.NO_RECENT_ACTIVITIES);
         }
         else
         {
           if (this.menuthrobber.active)
-            description_label.set_text (controller.SEARCHING);
+            description_label.set_text (IController.SEARCHING);
           else
-            description_label.set_text (controller.NO_RESULTS);
+            description_label.set_text (IController.NO_RESULTS);
         }
       }
       else
