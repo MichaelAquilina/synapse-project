@@ -57,7 +57,7 @@ namespace Synapse.Gui
 
   public class SmartLabel : Gtk.Misc
   {
-    public static string[] size_to_string = {
+    public static const string[] size_to_string = {
       "xx-small",
       "x-small",
       "small",
@@ -77,7 +77,7 @@ namespace Synapse.Gui
       return s;
     }
     
-    protected static double[] size_to_scale = {
+    protected static const double[] size_to_scale = {
       Pango.Scale.XX_SMALL,
       Pango.Scale.X_SMALL,
       Pango.Scale.SMALL,
@@ -264,8 +264,8 @@ namespace Synapse.Gui
     
     public override bool draw (Cairo.Context ctx)
     {
-      int h = this.get_allocated_height () - this.ypad * 2;
       int w = this.get_allocated_width () - this.xpad * 2;
+      int h = this.get_allocated_height () - this.ypad * 2;
       ctx.translate (this.xpad, this.ypad);
       ctx.rectangle (0, 0, w, h);
       ctx.clip ();
@@ -810,6 +810,7 @@ namespace Synapse.Gui
     {
       if (draw_input)
       {
+        ctx.save ();
         ctx.translate (1.5, 1.5);
         ctx.set_operator (Cairo.Operator.OVER);
         ctx.set_line_width (1.25);
@@ -883,6 +884,7 @@ namespace Synapse.Gui
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
         ch.set_source_rgba (ctx, 0.6 * input_alpha, StyleType.FG, StateFlags.NORMAL);
         ctx.stroke ();
+        ctx.restore ();
       }
       return base.draw (ctx);
     }
