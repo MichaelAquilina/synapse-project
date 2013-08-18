@@ -19,7 +19,7 @@ Build-Depends: debhelper (>= 7.0.50~),
  libnotify-dev,
  librest-dev,
  libsoup-gnome2.4-dev,
- libappindicator-dev (>= 0.0.7)
+ libappindicator3-dev (>= 0.0.7)
 Vcs-Bzr: http://bazaar.launchpad.net/~synapse-core/synapse-project/trunk/
 Vcs-Browser: http://bazaar.launchpad.net/~synapse-core/synapse-project/trunk/files
 Homepage: https://launchpad.net/synapse-project
