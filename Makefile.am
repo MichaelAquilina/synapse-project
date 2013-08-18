@@ -15,4 +15,4 @@ EXTRA_DIST = \
 
 # make sure we have translations in the tarball
 dist-hook:
-	@test -n "$(wildcard $(top_srcdir)/po/*.po)" || (echo "Translations are missing!" && exit 1)
+	@test -n "$(wildcard $(top_srcdir)/po/*.po)" || (echo "Translations are missing! Please merge lp:~mhr3/synapse-project/synapse-i18n" && exit 1)
