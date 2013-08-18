@@ -78,13 +78,13 @@ namespace Synapse.Gui
       ctx.set_operator (Cairo.Operator.OVER);
       //rtl = Gtk.TextDirection.RTL; // <-- uncomment to test RTL
       bool has_action = false;
-      Gtk.StateType state = Gtk.StateType.NORMAL;
+      Gtk.StateFlags state = Gtk.StateFlags.NORMAL;
       if (selected_pct > 1.0)
       {
-        state = Gtk.StateType.SELECTED;
+        state = Gtk.StateFlags.SELECTED;
         selected_pct = selected_pct - 1.0;
       }
-      if (state == Gtk.StateType.SELECTED && action != null) has_action = true;
+      if (state == Gtk.StateFlags.SELECTED && action != null) has_action = true;
 
       int x = 0, y = 0;
       int text_width = width - cell_hpadding * 4 - icon_size;
@@ -165,27 +165,29 @@ namespace Synapse.Gui
       ctx.restore ();
     }
 
-    private void draw_text (Cairo.Context ctx, Match m, int x, int y, int width, Gtk.StateType state, bool use_base, double selected_fill_pct)
+    private void draw_text (Cairo.Context ctx, Match m, int x, int y, int width, Gtk.StateFlags state, bool use_base, double selected_fill_pct)
     {
       ctx.save ();
       ctx.translate (x, y);
       ctx.rectangle (0, 0, width, text_height);
       ctx.clip ();
       
-      bool selected = (state == Gtk.StateType.SELECTED);
+      bool selected = (state == Gtk.StateFlags.SELECTED);
 
-      var styletype = ch.StyleType.FG;
-      if (use_base || selected) styletype = ch.StyleType.TEXT;
+      var styletype = StyleType.FG;
+      if (use_base || selected) styletype = StyleType.TEXT;
       
       if (selected && selected_fill_pct < 1.0)
       {
         double r = 0, g = 0, b = 0;
-        ch.get_rgb_from_mix (styletype, Gtk.StateType.NORMAL, ch.Mod.NORMAL,
-                             styletype, Gtk.StateType.SELECTED, ch.Mod.NORMAL,
-                             selected_fill_pct, out r, out g, out b);
+        ch.get_rgb_from_mix (styletype, Gtk.StateFlags.NORMAL, Mod.NORMAL,
+                             styletype, Gtk.StateFlags.SELECTED, Mod.NORMAL,
+               selected_fill_pct, out r, out g, out b);
         ctx.set_source_rgba (r, g, b, 1.0);
       }
-      else ch.set_source_rgba (ctx, 1.0, styletype, state);
+      else {
+      ch.set_source_rgba (ctx, 1.0, styletype, state, Mod.NORMAL);
+    }
 
       string s = "";
       /* ----------------------- draw title --------------------- */
@@ -197,7 +199,9 @@ namespace Synapse.Gui
       {
         s = Markup.printf_escaped (title_markup, m.title);
       }
+      var layout = this.get_layout ();
       layout.set_markup (s, -1);
+      layout.set_ellipsize (Pango.EllipsizeMode.END);
       layout.set_width (Pango.SCALE * width);
       Pango.cairo_show_layout (ctx, layout);
 
@@ -380,7 +384,7 @@ namespace Synapse.Gui
       construct
       {
         rtl = Gtk.TextDirection.LTR;
-        ch = new Utils.ColorHelper (this);
+        ch = Utils.ColorHelper.get_default ();
       }
 
       private int row_height_cached = 36;
@@ -389,10 +393,10 @@ namespace Synapse.Gui
         return this.row_height_cached;
       }
 
-      public override void style_set (Style? previous_style)
+      public override void style_updated ()
       {
         // calculate here the new row height
-        base.style_set (previous_style);
+        base.style_updated ();
         this.rtl = this.get_direction ();
         Utils.update_layout_rtl (this.get_layout (), rtl);
         this.get_layout ().set_ellipsize (Pango.EllipsizeMode.END);
@@ -400,7 +404,8 @@ namespace Synapse.Gui
         this.queue_resize (); // queue_resize, so MatchListView will query for new row_height_request
       }
 
-      public override bool expose_event (Gdk.EventExpose event) {
+      public override bool draw (Cairo.Context ctx)
+      {
         //Transparent.
         return true;
       }
@@ -417,7 +422,7 @@ namespace Synapse.Gui
     
     public MatchListView (MatchViewRendererBase mr)
     {
-      ch = new Utils.ColorHelper (this);
+      ch = Utils.ColorHelper.get_default ();
       inhibit_move = false;
       renderer = mr;
       // Add the renderer to screen as a child, this way it will receive all events.
@@ -462,14 +467,14 @@ namespace Synapse.Gui
       if (b) callback (this.renderer);
     }
     
-    public override void size_allocate (Gdk.Rectangle allocation)
+    public override void size_allocate (Gtk.Allocation allocation)
     {
       base.size_allocate (allocation);
       renderer.size_allocate ({ 0, 0, 0, 0 });
     }
-    public override void size_request (out Requisition requisition)
+    public override void get_preferred_height (out int min_height, out int nat_height)
     {
-      base.size_request (out requisition);
+      base.get_preferred_height (out min_height, out nat_height);
       int tmp = this.renderer.get_row_height_request ();
       if (tmp != this.row_height)
       {
@@ -477,8 +482,12 @@ namespace Synapse.Gui
         this.update_target_offsets ();
         this.queue_draw ();
       }
-      requisition.width = 1;
-      requisition.height = this.row_height * this.min_visible_rows;
+      min_height = nat_height = this.row_height * this.min_visible_rows;
+    }
+    public override void get_preferred_width (out int min_width, out int nat_width)
+    {
+      base.get_preferred_width (out min_width, out nat_width);
+      min_width = nat_width = 1;
     }
 
     private bool _select (int i)
@@ -503,7 +512,7 @@ namespace Synapse.Gui
     
     private bool update_current_offsets ()
     {
-      if (! (animation_enabled && this.is_realized ()) )
+      if (! (animation_enabled && this.get_realized ()) )
       {
         this.tid = 0;
         this.offset = this.toffset;
@@ -562,7 +571,7 @@ namespace Synapse.Gui
     
     private void update_target_offsets ()
     {
-      int visible_items = this.allocation.height / this.row_height;
+      int visible_items = this.get_allocated_height () / this.row_height;
       
       switch (this.behavior)
       {
@@ -578,11 +587,11 @@ namespace Synapse.Gui
           }
           else if (this.goto_index >= ( this.items.size - 1 - (visible_items / 2) ))
           {
-            this.toffset = this.row_height * this.items.size - this.allocation.height;
+            this.toffset = this.row_height * this.items.size - this.get_allocated_height ();
           }
           else
           {
-            this.toffset = this.row_height * this.goto_index - this.allocation.height / 2 + this.row_height / 2;
+            this.toffset = this.row_height * this.goto_index - this.get_allocated_height () / 2 + this.row_height / 2;
           }
           break;
       }
@@ -615,18 +624,16 @@ namespace Synapse.Gui
       return this.items == null ? 0 : this.items.size;
     }
     
-    public override bool expose_event (Gdk.EventExpose event)
+    public override bool draw (Cairo.Context ctx)
     {
       /* Clip */
-      Cairo.Context ctx = Gdk.cairo_create (this.window);
-      ctx.translate (this.allocation.x, this.allocation.y);
-      ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
+      ctx.rectangle (0, 0, this.get_allocated_width (), this.get_allocated_height ());
       ctx.clip ();
       ctx.set_operator (Cairo.Operator.OVER);
       
       if (this.use_base_colors)
       {
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
+        ch.set_source_rgba (ctx, 1.0, StyleType.BASE, Gtk.StateFlags.NORMAL, Mod.NORMAL);
         ctx.paint ();
       }
       
@@ -634,7 +641,7 @@ namespace Synapse.Gui
 
       ctx.set_font_options (this.get_screen().get_font_options());
 
-      int visible_items = this.allocation.height / this.row_height + 2;
+      int visible_items = this.get_allocated_height () / this.row_height + 2;
       int i = get_item_at_pos (0);
       visible_items += i;
       
@@ -642,29 +649,28 @@ namespace Synapse.Gui
 
       if (this.select_index >= 0 && this.selection_enabled)
       {
-        if (this.soffset > (-this.row_height) && this.soffset < this.allocation.height)
+        if (this.soffset > (-this.row_height) && this.soffset < this.get_allocated_height ())
         {
-          bool had_focus = Gtk.WidgetFlags.HAS_FOCUS in this.get_flags ();
-          // fool theme engine to use proper bg color
-          if (!had_focus) this.set_flags (Gtk.WidgetFlags.HAS_FOCUS);
-          ypos = int.max (this.soffset, 0) + this.allocation.y;
-          event.area.x = this.allocation.x;
-          event.area.width = this.allocation.width;
-          Gtk.paint_flat_box (this.style, event.window, StateType.SELECTED,
-                              ShadowType.NONE, event.area, this, "cell_odd",
-                              this.allocation.x, ypos,
-                              this.allocation.width, this.row_height);
-          if (!had_focus) this.unset_flags (Gtk.WidgetFlags.HAS_FOCUS);
+          Gtk.Allocation allocation;
+          this.get_allocation (out allocation);
+
+          ypos = int.max (this.soffset, 0);
+      var context = get_style_context ();
+      context.save ();
+      context.set_state (Gtk.StateFlags.SELECTED);
+          context.render_background (ctx, 0, ypos,
+            this.get_allocated_width (), this.row_height);
+      context.restore ();
         }
       }
       double pct = 1.0;
       for (; i < visible_items && i < this.items.size; ++i)
       {
         ypos = i * this.row_height - this.offset;
-        if (ypos > this.allocation.height) break;
+        if (ypos > this.get_allocated_height ()) break;
         ctx.save ();
         ctx.translate (0, ypos);
-        ctx.rectangle (0, 0, this.allocation.width, this.row_height);
+        ctx.rectangle (0, 0, this.get_allocated_width (), this.row_height);
         ctx.clip ();
         pct = 1.0;
         if (this.selection_enabled && i == select_index)
@@ -674,7 +680,7 @@ namespace Synapse.Gui
           if (pct == 0.0) pct = (Math.fabs (this.tsoffset - this.soffset) / this.row_height);
           pct = 2.0 - double.min (1.0 , pct);
         }
-        renderer.render_match (ctx, this.items.get (i), this.allocation.width, this.row_height, this.use_base_colors, pct);
+        renderer.render_match (ctx, this.items.get (i), this.get_allocated_width (), this.row_height, this.use_base_colors, pct);
         ctx.restore ();
       }
       
@@ -691,7 +697,7 @@ namespace Synapse.Gui
       if (this.items == null) return true;
       inhibit_move = false;
       int k = 1;
-      if (event.direction == event.direction.UP) k = this.goto_index == 0 ? 0 : -1;
+      if (event.direction == Gdk.ScrollDirection.UP) k = this.goto_index == 0 ? 0 : -1;
 
       this.set_indexes (this.goto_index + k, this.goto_index + k);
       this.selected_index_changed (this.select_index);
@@ -722,7 +728,7 @@ namespace Synapse.Gui
       
       if (this.selection_enabled)
       {
-        if (event.type == event.type.2BUTTON_PRESS &&
+        if (event.type == Gdk.EventType.2BUTTON_PRESS &&
             this.select_index == this.dragdrop_target_item)
         {
           this.set_indexes (this.dragdrop_target_item, this.dragdrop_target_item);
@@ -792,8 +798,8 @@ namespace Synapse.Gui
     private int mwidth;
     private int nrows;
 
-    private VBox vbox;
-    private HBox status_box;
+    private Box vbox;
+    private Box status_box;
     
     private Utils.ColorHelper ch;
     
@@ -814,55 +820,55 @@ namespace Synapse.Gui
       this.set_has_window (false);
       this.above_child = false;
       this.visible_window = false;
-      ch = new Utils.ColorHelper (this);
+      ch = Utils.ColorHelper.get_default ();
       build_ui();
       this.notify["use-base-colors"].connect (()=>{
         view.use_base_colors = use_base_colors;
         if (use_base_colors)
         {
-          set_state (Gtk.StateType.SELECTED);
+          set_state (Gtk.StateFlags.SELECTED);
         }
         else
         {
-          set_state (Gtk.StateType.NORMAL);
+          set_state (Gtk.StateFlags.NORMAL);
         }
         this.queue_draw ();
       });
     }
 
-		private MatchListView view;
-		private MatchViewRenderer rend;
-		private Label status;
-		private Label logo;
-		
-		public new void set_state (Gtk.StateType state)
-		{
-		  base.set_state (state);
-		  status.set_state (state);
-		  logo.set_state (state);
-		}
-		
-		public override bool expose_event (Gdk.EventExpose event)
-		{
-		  if (_use_base_colors)
-		  {
-        var ctx = Gdk.cairo_create (this.get_window ());
+    private MatchListView view;
+    private MatchViewRenderer rend;
+    private Label status;
+    private Label logo;
+    
+    public new void set_state (Gtk.StateFlags state)
+    {
+      base.set_state_flags (state, false);
+      status.set_state_flags (Gtk.StateFlags.NORMAL, true);
+      logo.set_state_flags (Gtk.StateFlags.NORMAL, true);
+    }
+    
+    public override bool draw (Cairo.Context ctx)
+    {
+      if (_use_base_colors)
+      {
+        Gtk.Allocation allocation, status_allocation;
+        this.get_allocation (out allocation);
+        status.get_allocation (out status_allocation);
+
         ctx.set_operator (Cairo.Operator.OVER);
-        ctx.translate (this.allocation.x, status.allocation.y);
-        ctx.rectangle (0, 0, this.allocation.width, status.allocation.height);
-        ctx.clip ();
-        /* Prepare bg's colors using GtkStyle */
-        Pattern pat = new Pattern.linear(0, 0, 0, status.allocation.height);
+        /* Prepare bg's colors using GtkStyleContext */
+        Pattern pat = new Pattern.linear(0, 0, 0, status.get_allocated_height ());
         
-        StateType t = this.get_state ();
-        ch.add_color_stop_rgba (pat, 0.0, 0.95, ch.StyleType.BG, t);
-        ch.add_color_stop_rgba (pat, 1.0, 0.95, ch.StyleType.BG, t, ch.Mod.DARKER);
+        StateFlags t = this.get_state_flags ();
+        ch.add_color_stop_rgba (pat, 0.0, 0.95, StyleType.BG, t);
+        ch.add_color_stop_rgba (pat, 1.0, 0.95, StyleType.BG, t, Mod.DARKER);
         /* Prepare and draw top bg's rect */
         ctx.set_source (pat);
         ctx.paint ();
       }
-      /* Propagate Expose */               
-      this.propagate_expose (this.get_child(), event);
+      /* Propagate Draw */               
+      this.propagate_draw (this.get_child (), ctx);
       
       return true;
     }
@@ -872,10 +878,15 @@ namespace Synapse.Gui
       return this.view;
     }
 
-    public override void size_request (out Requisition requisition)
+    public override void get_preferred_width (out int min_width, out int nat_width)
     {
-      vbox.size_request (out requisition);
-      requisition.width = int.max (requisition.width, this.mwidth);
+      vbox.get_preferred_width (out min_width, out nat_width);
+      min_width = nat_width = int.max (min_width, this.mwidth);
+    }
+
+    public override void get_preferred_height (out int min_height, out int nat_height)
+    {
+      vbox.get_preferred_height (out min_height, out nat_height);
     }
 
     private void build_ui()
@@ -884,11 +895,11 @@ namespace Synapse.Gui
       view = new MatchListView (rend);
       view.min_visible_rows = this.nrows;
       
-      vbox = new VBox (false, 0);
+      vbox = new Box (Gtk.Orientation.VERTICAL, 0);
       vbox.border_width = 0;
       this.add (vbox);
       vbox.pack_start (view);
-      status_box = new HBox (false, 0);
+      status_box = new Box (Gtk.Orientation.HORIZONTAL, 0);
       status_box.set_size_request (-1, 15);
       vbox.pack_start (status_box, false);
       status = new Label (null);
@@ -976,20 +987,20 @@ namespace Synapse.Gui
         nores = new Gee.ArrayList<Match>();
         noact = new Gee.ArrayList<Match>();
         Match m = null;
-        m = new LabelMatch (controller.NO_RESULTS,
+        m = new LabelMatch (IController.NO_RESULTS,
                             "",
                             "missing-image");
         nores.add (m);
-        m = new LabelMatch (controller.NO_RECENT_ACTIVITIES,
+        m = new LabelMatch (IController.NO_RECENT_ACTIVITIES,
                             "",
                             "missing-image");
         noact.add (m);
-        m = new LabelMatch (controller.TYPE_TO_SEARCH,
-                            controller.DOWN_TO_SEE_RECENT,
+        m = new LabelMatch (IController.TYPE_TO_SEARCH,
+                            IController.DOWN_TO_SEE_RECENT,
                             "search");
         tts.add (m);
         this.controller.handle_recent_activities.connect ((b)=>{
-          m.description = controller.DOWN_TO_SEE_RECENT;
+          m.description = IController.DOWN_TO_SEE_RECENT;
           queue_draw ();
         });
       }

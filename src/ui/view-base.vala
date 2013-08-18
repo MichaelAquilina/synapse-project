@@ -23,20 +23,16 @@ using Gtk;
 
 namespace Synapse
 {
-  /* Gtk+-2.0 base class */
+  /* Gtk+-3.0 base class */
   public class Gui.View : Gtk.Window, Synapse.Gui.IView
   {
-    /* --- base class for gtk+-2.0 --- */
-    /* In ~/.config/synapse/gtkrc  use:
-       widget_class "*SynapseGui*" style : highest "synapse" 
-       and set your custom colors
-    */
-    
+    /* --- base class for gtk+-3.0 --- */
+
     protected bool is_kwin = false;
     
     private void update_wm ()
     {
-      string wmname = Gdk.x11_screen_get_window_manager_name (Gdk.Screen.get_default ()).down ();
+      string wmname = Gdk.X11Screen.get_window_manager_name (Gdk.Screen.get_default ()).down ();
       this.is_kwin = wmname == "kwin";
     }
     
@@ -51,7 +47,7 @@ namespace Synapse
 
     protected int BORDER_RADIUS;
     protected int SHADOW_SIZE;
-    protected Gtk.StateType bg_state;
+    protected Gtk.StateFlags bg_state;
     
     protected bool cache_enabled;
     protected Gee.Map<string, Cairo.Surface> bg_cache;
@@ -149,13 +145,13 @@ namespace Synapse
       
       cache_enabled = true;
       bg_cache = new Gee.HashMap<string, Cairo.Surface> ();
-      bg_state = Gtk.StateType.SELECTED;
+      bg_state = Gtk.StateFlags.SELECTED;
       
       req_target = {0, 0};
       req_current = {0, 0};
       
-      this.style.get (typeof(Synapse.Gui.View), "border-radius", out BORDER_RADIUS);
-      this.style.get (typeof(Synapse.Gui.View), "shadow-size", out SHADOW_SIZE);
+      style_get ("border-radius", out BORDER_RADIUS,
+        "shadow-size", out SHADOW_SIZE);
       
       this.set_app_paintable (true);
       this.skip_taskbar_hint = true;
@@ -177,7 +173,7 @@ namespace Synapse
 
       Gui.Utils.ensure_transparent_bg (this);
       
-      ch = new Gui.Utils.ColorHelper (this);
+      ch = Gui.Utils.ColorHelper.get_default ();
       
       // only needed to execute the static construct of SmartLabel
       var initialize_smartlabel = new SmartLabel ();
@@ -210,6 +206,9 @@ namespace Synapse
         menu.get_menu ().show.connect (this.force_grab);
         menu.settings_clicked.connect (()=>{ controller.show_settings_requested (); });
       }
+
+       // gtk3 no longer calls this itself on startup
+       style_updated ();
     }
     
     protected virtual void build_ui ()
@@ -217,18 +216,22 @@ namespace Synapse
       
     }
     
-    public override void size_allocate (Gdk.Rectangle alloc)
+    public override void size_allocate (Gtk.Allocation alloc)
     {
       base.size_allocate (alloc);
+
+      Gtk.Allocation allocation;
+      this.get_allocation (out allocation);
+
       if (this.is_kwin && 
-          (old_alloc.width != this.allocation.width || 
-           old_alloc.height != this.allocation.height)
+          (old_alloc.width != allocation.width || 
+           old_alloc.height != allocation.height)
          )
       {
-        this.add_kde_compatibility (this, this.allocation.width, this.allocation.height);
+        this.add_kde_compatibility (this, allocation.width, allocation.height);
         this.old_alloc = {
-          this.allocation.width,
-          this.allocation.height
+          allocation.width,
+          allocation.height
         };
       }
     }
@@ -237,14 +240,14 @@ namespace Synapse
     {
       Gdk.Screen screen = this.get_screen ();
       bool comp = screen.is_composited ();
-      Gdk.Colormap? cm = screen.get_rgba_colormap();
-      if (cm == null)
+      Gdk.Visual? visual = screen.get_rgba_visual();
+      if (visual == null)
       {
         comp = false;
-        cm = screen.get_rgb_colormap();
+        visual = screen.get_system_visual();
       }
       Synapse.Utils.Logger.log (this, "Screen is%s composited.", comp ? "": " NOT");
-      this.set_colormap (cm);
+      this.set_visual (visual);
 
       update_wm ();
       update_border_and_shadow ();
@@ -254,24 +257,20 @@ namespace Synapse
     {
       /* Fix to the horrible shadow glitches in KDE 4 */
       /* If shape mask is set, KWin will not add that horrible shadow */
-      var bitmap = new Gdk.Pixmap (null, w, h, 1);
-      var ctx = Gdk.cairo_create (bitmap);
-      ctx.set_source_rgba (0, 0, 0, 1);
-      ctx.set_operator (Cairo.Operator.SOURCE);
-      ctx.paint ();
-      window.shape_combine_mask (null, 0, 0);
-      window.shape_combine_mask ((Gdk.Bitmap*)bitmap, 0, 0);
+      var region = new Cairo.Region.rectangle ({0, 0, w, h});
+      var gdkwin = window.get_window ();
+      gdkwin.shape_combine_region (null, 0, 0);
+      gdkwin.shape_combine_region (region, 0, 0);
     }
     
-    public override void style_set (Gtk.Style? old)
+    public override void style_updated ()
     {
-      base.style_set (old);
+      base.style_updated ();
       string dmax, dmin;
       bool bgselected;
-      this.style.get (typeof(Synapse.Gui.View), "use-selected-color", out bgselected);
-      this.style.get (typeof(Synapse.Gui.View), "selected-category-size", out dmax);
-      this.style.get (typeof(Synapse.Gui.View), "unselected-category-size", out dmin);
-      this.bg_state = bgselected ? StateType.SELECTED : StateType.NORMAL;
+      style_get ("use-selected-color", out bgselected, "selected-category-size", out dmax,
+        "unselected-category-size", out dmin);
+      this.bg_state = bgselected ? StateFlags.SELECTED : StateFlags.NORMAL;
       flag_selector.selected_markup = "<span size=\"%s\"><b>%s</b></span>".printf (
                                                       SmartLabel.size_to_string[SmartLabel.string_to_size (dmax)], "%s");
       flag_selector.unselected_markup = "<span size=\"%s\">%s</span>".printf (
@@ -284,9 +283,7 @@ namespace Synapse
     {
       if (this.is_composited ())
       {
-        this.style.get (typeof(Synapse.Gui.View), "border-radius", out BORDER_RADIUS);
-        this.style.get (typeof(Synapse.Gui.View), "shadow-size", out SHADOW_SIZE);
-        
+        style_get ("border-radius", out BORDER_RADIUS, "shadow-size", out SHADOW_SIZE);
       }
       else
       {
@@ -318,33 +315,19 @@ namespace Synapse
       this.controller.key_press_event (event);
       return false;
     }
-    
-    public override void size_request (out Requisition requisition)
+
+    public override bool draw (Cairo.Context ctx)
     {
-      base.size_request (out requisition);
-      /* if the size requested is different => redraw () */
-      if (this.is_realized () && (
-            this.allocation.height != requisition.height ||
-            this.allocation.width != requisition.width
-          ))
-      {
-        this.queue_draw ();
-      }
-    }
-    
-    public override bool expose_event (Gdk.EventExpose event)
-    {
-      Cairo.Context ctx = Gdk.cairo_create (this.window);
       ctx.set_operator (Cairo.Operator.CLEAR);
       ctx.paint ();
 
-      /* Propagate Expose */
-      this.propagate_expose (this.get_child(), event);
+      /* Propagate Draw */
+      this.propagate_draw (this.get_child(), ctx);
       
-      ctx.rectangle (0, 0, this.allocation.width, this.allocation.height);
+      ctx.rectangle (0, 0, this.get_allocated_width (), this.get_allocated_height ());
       ctx.clip ();
       
-      string key = "%dx%dx%d".printf (this.allocation.width, this.allocation.height, model.searching_for);
+      string key = "%dx%dx%d".printf (this.get_allocated_width (), this.get_allocated_height (), model.searching_for);
       
       if (cache_enabled)
       {
@@ -356,8 +339,8 @@ namespace Synapse
         {
           Cairo.Surface surf = new Cairo.Surface.similar (ctx.get_target (),
                                                           Cairo.Content.COLOR_ALPHA,
-                                                          this.allocation.width,
-                                                          this.allocation.height);
+                                                          this.get_allocated_width (),
+                                                          this.get_allocated_height ());
           Cairo.Context cr = new Cairo.Context (surf);
           paint_background (cr);
           bg_cache[key] = surf;
@@ -381,7 +364,7 @@ namespace Synapse
                                                       out ResultBox results_sources,
                                                       out ResultBox results_actions,
                                                       out ResultBox results_targets,
-                                                      Gtk.StateType state_type = Gtk.StateType.NORMAL,
+                                                      Gtk.StateFlags state_type = Gtk.StateFlags.NORMAL,
                                                       bool add_to_container = true)
     {
       results_sources = new ResultBox (100);
@@ -414,7 +397,7 @@ namespace Synapse
     
     protected virtual void paint_background (Cairo.Context ctx)
     {
-      ch.set_source_rgba (ctx, 0.9, ch.StyleType.BG, StateType.NORMAL);
+      ch.set_source_rgba (ctx, 0.9, StyleType.BG, StateFlags.NORMAL);
       ctx.set_operator (Cairo.Operator.SOURCE);
       ctx.paint ();
     }
@@ -430,7 +413,7 @@ namespace Synapse
       Gui.Utils.move_window_to_center (this);
       this.set_list_visible (false);
       this.show ();
-      if (this.is_kwin) this.add_kde_compatibility (this, this.allocation.width, this.allocation.height);
+      if (this.is_kwin) this.add_kde_compatibility (this, this.get_allocated_width (), this.get_allocated_height ());
       Gui.Utils.present_window (this);
       this.queue_draw ();
       this.summoned ();

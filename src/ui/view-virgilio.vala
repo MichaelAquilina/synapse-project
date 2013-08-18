@@ -55,16 +55,14 @@ namespace Synapse.Gui
       install_style_property (descr_max);
     }
     
-    public override void style_set (Gtk.Style? old)
+    public override void style_updated ()
     {
-      base.style_set (old);
+      base.style_updated ();
 
       int width, icon_size;
       string tmax, dmax;
-      this.style.get (typeof(Synapse.Gui.View), "ui-width", out width);
-      this.style.get (typeof(Synapse.Gui.ViewVirgilio), "icon-size", out icon_size);
-      this.style.get (typeof(Synapse.Gui.ViewVirgilio), "title-size", out tmax);
-      this.style.get (typeof(Synapse.Gui.ViewVirgilio), "description-size", out dmax);
+      style_get ("ui-width", out width, "icon-size", out icon_size,
+        "title-size", out tmax, "description-size", out dmax);
 
       container.set_size_request (width, -1);
       fix_listview_size (results_sources.get_match_renderer (), icon_size, tmax, dmax);
@@ -88,7 +86,7 @@ namespace Synapse.Gui
     
     protected override void build_ui ()
     {
-      container = new VBox (false, 0);
+      container = new Box (Gtk.Orientation.VERTICAL, 0);
       
       status = new SmartLabel ();
       logo = new SmartLabel ();
@@ -98,13 +96,14 @@ namespace Synapse.Gui
       logo.xalign = 1.0f;
       status.xalign = 0.0f;
       logo.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
-      var hb_status = new HBox (true, 0);
+      var hb_status = new Box (Gtk.Orientation.HORIZONTAL, 0);
+      hb_status.homogeneous = true;
       hb_status.pack_start (status);
       hb_status.pack_start (search);
       hb_status.pack_start (logo);
       
       /* Categories - Throbber and menu */
-      var categories_hbox = new HBox (false, 0);
+      var categories_hbox = new Box (Gtk.Orientation.HORIZONTAL, 0);
 
       menuthrobber = new MenuThrobber ();
       menu = (MenuButton) menuthrobber;
@@ -115,7 +114,7 @@ namespace Synapse.Gui
       categories_hbox.pack_start (menuthrobber, false);
       
       container.pack_start (categories_hbox, false, false, 2);
-      container.pack_start (new HSeparator(), false);
+      container.pack_start (create_separator (), false);
       
       /* Sources */
       results_sources = new SpecificMatchList (controller, model, SearchingFor.SOURCES);
@@ -129,16 +128,16 @@ namespace Synapse.Gui
       fix_listview_size (results_targets.get_match_renderer ());
 
       container.pack_start (results_sources);
-      container.pack_start (new HSeparator(), false, false, 0);
+      container.pack_start (create_separator (), false);
       
-      action_box = new VBox (false, 0);
+      action_box = new Box (Gtk.Orientation.VERTICAL, 0);
       action_box.pack_start (results_actions, false);
-      action_box.pack_start (new HSeparator(), false, false, 0);
+      action_box.pack_start (create_separator (), false);
       container.pack_start (action_box, false);
       
-      target_box = new VBox (false, 0);
+      target_box = new Box (Gtk.Orientation.VERTICAL, 0);
       target_box.pack_start (results_targets, false);
-      target_box.pack_start (new HSeparator(), false, false, 0);
+      target_box.pack_start (create_separator (), false);
       container.pack_start (target_box, false);
       
       container.pack_start (hb_status, false, false, 2);
@@ -147,6 +146,24 @@ namespace Synapse.Gui
 
       container.set_size_request (500, -1);
       this.add (container);
+    }
+
+    //FIXME GtkSeparators won't show up. Here we have a workaround
+    private Gtk.Widget create_separator ()
+    {
+      var separator = new Gtk.EventBox ();
+      separator.height_request = 2;
+      separator.width_request = 120;
+      separator.get_style_context ().add_class (Gtk.STYLE_CLASS_SEPARATOR);
+      separator.get_style_context ().add_class (Gtk.STYLE_CLASS_HORIZONTAL);
+      separator.draw.connect (draw_separator);
+      return separator;
+    }
+
+    private bool draw_separator (Gtk.Widget separator, Cairo.Context ctx)
+    {
+      separator.get_style_context ().render_frame (ctx, 0, 0, separator.get_allocated_width (), 2);
+      return false;
     }
     
     private void fix_listview_size (MatchViewRenderer rend, int iconsize = 48, string title = "large", string desc = "medium")
@@ -201,9 +218,12 @@ namespace Synapse.Gui
     
     protected override void paint_background (Cairo.Context ctx)
     {
-      int width = container.allocation.width + BORDER_RADIUS * 2;
-      int height = container.allocation.height + BORDER_RADIUS * 2;
-      ctx.translate (container.allocation.x - BORDER_RADIUS, container.allocation.y - BORDER_RADIUS);
+      Gtk.Allocation container_allocation;
+      container.get_allocation (out container_allocation);
+      
+      int width = container_allocation.width + BORDER_RADIUS * 2;
+      int height = container_allocation.height + BORDER_RADIUS * 2;
+      ctx.translate (container_allocation.x - BORDER_RADIUS, container_allocation.y - BORDER_RADIUS);
       if (this.is_composited ())
       {
         ctx.translate (0.5, 0.5);
@@ -215,9 +235,9 @@ namespace Synapse.Gui
       ctx.save ();
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
-      ch.add_color_stop_rgba (pat, 0.0, 0.95, ch.StyleType.BG, StateType.NORMAL, ch.Mod.LIGHTER);
-      ch.add_color_stop_rgba (pat, 0.2, 1.0, ch.StyleType.BG, StateType.NORMAL, ch.Mod.NORMAL);
-      ch.add_color_stop_rgba (pat, 1.0, 1.0, ch.StyleType.BG, StateType.NORMAL, ch.Mod.DARKER);
+      ch.add_color_stop_rgba (pat, 0.0, 0.95, StyleType.BG, StateFlags.NORMAL, Mod.LIGHTER);
+      ch.add_color_stop_rgba (pat, 0.2, 1.0, StyleType.BG, StateFlags.NORMAL, Mod.NORMAL);
+      ch.add_color_stop_rgba (pat, 1.0, 1.0, StyleType.BG, StateFlags.NORMAL, Mod.DARKER);
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
       ctx.set_source (pat);
       ctx.set_operator (Operator.SOURCE);
