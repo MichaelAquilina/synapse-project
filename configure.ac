@@ -1,4 +1,4 @@
-AC_INIT([synapse], [0.2.11])
+AC_INIT([synapse], [0.2.99])
 AC_DEFINE(RELEASE_NAME, "Cholecystokinin", "Codename of this release")
 
 AC_CONFIG_MACRO_DIR([m4])
