@@ -676,6 +676,7 @@ namespace Synapse.Gui
       return true;
     }
   }
+
   public class NamedIcon: Gtk.Image
   {
     public string not_found_name {get; set; default = "unknown";}
@@ -886,26 +887,37 @@ namespace Synapse.Gui
       return base.draw (ctx);
     }
   }
-  
+
   public class MenuThrobber: MenuButton
   {
-    private Gtk.Spinner throbber;
-    public bool active {get; set; default = false;}
+    public bool active { get; set; default = false; }
+    private float progress = 0.0f;
+    private uint timer_src_id = 0;
+
     construct
     {
-      throbber = new Gtk.Spinner ();
-      throbber.active = false;
-      this.notify["active"].connect ( ()=>{
-        throbber.active = active;
-		if (active) {
-			throbber.start ();
-		} else {
-			throbber.stop ();
-		}
-        queue_draw ();
-      } );
-      
-      this.add (throbber);
+      this.notify["active"].connect (this.active_toggled);
+    }
+
+    private void active_toggled ()
+    {
+      if (active && timer_src_id == 0)
+      {
+        timer_src_id = Timeout.add (1000 / 30, () =>
+        {
+          progress += 1.0f / 30;
+          if (progress > 1.0f) progress = 0.0f;
+          queue_draw ();
+          return true;
+        });
+      }
+      else if (!active && timer_src_id != 0)
+      {
+        Source.remove (timer_src_id);
+        timer_src_id = 0;
+        progress = 0.0f;
+      }
+      queue_draw ();
     }
 
     public override void get_preferred_width (out int min_width, out int nat_width)
@@ -922,25 +934,29 @@ namespace Synapse.Gui
     {
       Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
       set_allocation (alloc);
-      int min = int.min (allocation.width, allocation.height);
-      allocation.x = allocation.x + allocation.width - min;
-      allocation.height = allocation.width = min;
-      throbber.size_allocate (allocation);
     }
     
     public override bool draw (Cairo.Context ctx)
     {
-      if (this.active)
-      {
-        /* Propagate Draw */               
-        Bin c = (this is Bin) ? (Bin) this : null;
-        if (c != null)
-          c.propagate_draw (this.get_child(), ctx);
-      }
-      else
-      {
-        base.draw (ctx);
-      }
+      base.draw (ctx);
+
+      if (!active) return true;
+
+      double r = 0.0, g = 0.0, b = 0.0;
+      double SIZE = 0.5;
+      double size = button_scale * int.min (this.get_allocated_width (), this.get_allocated_height ()) - SIZE * 2;
+      size *= 0.5;
+      double xc = this.get_allocated_width () - SIZE * 2 - size;
+      double yc = size;
+      double arc_start = Math.PI * 2 * progress;
+      double arc_end = arc_start + Math.PI / 2.0;
+
+      ch.get_rgb (out r, out g, out b, StyleType.FG, StateFlags.NORMAL, Mod.LIGHTER);
+      ctx.set_source_rgb (r, g, b);
+      ctx.arc_negative (xc, yc, size * 0.5, arc_end, arc_start);
+      ctx.arc (xc, yc, size, arc_start, arc_end);
+      ctx.fill ();
+
       return true;
     }
   }
@@ -976,10 +992,10 @@ namespace Synapse.Gui
 
   public class MenuButton: FakeButton
   {
-    private Gtk.Menu menu;
+    public double button_scale { get; set; default = 1.0; }
     private bool entered;
-    public double button_scale {get; set; default = 0.5;}
-    private Utils.ColorHelper ch;
+    protected Utils.ColorHelper ch;
+    private Gtk.Menu menu;
     public MenuButton ()
     {
       ch = Utils.ColorHelper.get_default ();
@@ -1081,12 +1097,12 @@ namespace Synapse.Gui
                               double.min(r + 0.15, 1),
                               double.min(g + 0.15, 1),
                               double.min(b + 0.15, 1));
-      
+
       size *= 0.5;
+      double xc = this.get_allocated_width () - SIZE * 2 - size;
+      double yc = size;
       ctx.set_source (pat);
-      ctx.arc (this.get_allocated_width () - SIZE * 2 - size,
-               size,
-               size, 0, Math.PI * 2);
+      ctx.arc (xc, yc, size, 0.0, Math.PI * 2);
       ctx.fill ();
 
       if (entered)
@@ -1099,11 +1115,9 @@ namespace Synapse.Gui
       }
       
       ctx.set_source_rgb (r, g, b);
-      ctx.arc (this.get_allocated_width () - SIZE * 2 - size,
-               size,
-               size * 0.5, 0, Math.PI * 2);
+      ctx.arc (xc, yc, size * 0.5, 0.0, Math.PI * 2);
       ctx.fill ();
-      
+
       return true;
     }
   }
@@ -1112,12 +1126,14 @@ namespace Synapse.Gui
   {
     public SynapseAboutDialog ()
     {
-      string[] devs = {"Michal Hruby <michal.mhr@gmail.com>", "Alberto Aldegheri <albyrock87+dev@gmail.com>"};
+      string[] devs = {"Michal Hruby <michal.mhr@gmail.com>",
+                       "Alberto Aldegheri <albyrock87+dev@gmail.com>",
+                       "Tom Beckmann <tom@elementaryos.org>"};
       string[] artists = devs;
       artists += "Ian Cylkowski <designbyizo@gmail.com>";
       GLib.Object (artists : artists,
                    authors : devs,
-                   copyright : "Copyright (C) 2010-2011 Michal Hruby <michal.mhr@gmail.com>\nAlberto Aldegheri <albyrock87+dev@gmail.com>",
+                   copyright : "Copyright (C) 2010-2013 " + string.joinv ("\n", devs),
                    program_name: "Synapse",
                    logo_icon_name : "synapse",
                    version: Config.VERSION,
@@ -1248,9 +1264,7 @@ namespace Synapse.Gui
       });
       _global_update ();
     }
-    
-    
-    
+
     public void remove_text (int i)
     {
       return_if_fail (i > 0 && i < texts.size);

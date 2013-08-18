@@ -129,7 +129,6 @@ namespace Synapse.Gui
       menuthrobber = new MenuThrobber ();
       menu = (MenuButton) menuthrobber;
       menuthrobber.set_size_request (14, 14);
-      menuthrobber.button_scale = 0.75;
 
       categories_hbox.pack_start (flag_selector);
       categories_hbox.pack_start (menuthrobber, false);
