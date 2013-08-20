@@ -65,7 +65,7 @@ namespace Synapse
       activatable_names = new Gee.HashSet<string> ();
       system_activatable_names = new Gee.HashSet<string> ();
 
-      initialize ();
+      initialize.begin ();
     }
     
     ~DBusService ()

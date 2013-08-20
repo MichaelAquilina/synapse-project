@@ -220,7 +220,7 @@ namespace Synapse
       relevancy_service = RelevancyService.get_default ();
       volume_service = VolumeService.get_default ();
 
-      initialize_caches ();
+      initialize_caches.begin ();
       register_static_plugin (typeof (CommonActions));
     }
 

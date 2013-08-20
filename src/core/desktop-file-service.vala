@@ -223,7 +223,7 @@ namespace Synapse
       non_hidden_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
       mimetype_parent_map = new Gee.HashMultiMap<string, string> ();
 
-      initialize ();
+      initialize.begin ();
     }
     
     ~DesktopFileService ()
@@ -438,7 +438,7 @@ namespace Synapse
       timer_id = Timeout.add (5000, () =>
       {
         timer_id = 0;
-        reload_desktop_files ();
+        reload_desktop_files.begin ();
         return false;
       });
     }
