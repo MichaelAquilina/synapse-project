@@ -210,7 +210,7 @@ namespace Synapse.Gui
           var widget = plugin.create_config_widget ();
           var dialog = new Gtk.Dialog.with_buttons (_("Configure plugin"),
                                                     this,
-                                                    Gtk.DialogFlags.MODAL | Gtk.DialogFlags.NO_SEPARATOR,
+                                                    Gtk.DialogFlags.MODAL,
                                                     Gtk.Stock.CLOSE, null);
           dialog.set_default_size (300, 200);
           (dialog.get_content_area () as Gtk.Container).add (widget);
@@ -287,14 +287,14 @@ namespace Synapse.Gui
     
     private void build_ui ()
     {
-      var main_vbox = new VBox (false, 12);
+      var main_vbox = new Box (Gtk.Orientation.VERTICAL, 12);
       main_vbox.border_width = 12;
       this.add (main_vbox);
       
       var tabs = new Gtk.Notebook ();
-      var general_tab = new VBox (false, 6);
+      var general_tab = new Box (Gtk.Orientation.VERTICAL, 6);
       general_tab.border_width = 12;
-      var plugin_tab = new VBox (false, 6);
+      var plugin_tab = new Box (Gtk.Orientation.VERTICAL, 6);
       plugin_tab.border_width = 12;
       main_vbox.pack_start (tabs);
       tabs.append_page (general_tab, new Label (_("General")));
@@ -307,14 +307,14 @@ namespace Synapse.Gui
       theme_frame_label.set_markup (Markup.printf_escaped ("<b>%s</b>", _("Behavior & Look")));
       theme_frame.set_label_widget (theme_frame_label);
 
-      var behavior_vbox = new VBox (false, 6);
+      var behavior_vbox = new Box (Gtk.Orientation.VERTICAL, 6);
       var align = new Alignment (0.5f, 0.5f, 1.0f, 1.0f);
       align.set_padding (6, 12, 12, 12);
       align.add (behavior_vbox);
       theme_frame.add (align);
       
       /* Select theme combobox row */
-      var row = new HBox (false, 6);
+      var row = new Box (Gtk.Orientation.HORIZONTAL, 6);
       behavior_vbox.pack_start (row, false);
       var select_theme_label = new Label (_("Theme:"));
       row.pack_start (select_theme_label, false, false);
@@ -350,7 +350,7 @@ namespace Synapse.Gui
       var shortcut_scroll = new Gtk.ScrolledWindow (null, null);    
       shortcut_scroll.set_shadow_type (ShadowType.IN);
       shortcut_scroll.set_policy (PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
-      var tree_vbox = new VBox (false, 6);
+      var tree_vbox = new Box (Gtk.Orientation.VERTICAL, 6);
       Gtk.TreeView treeview = new Gtk.TreeView ();
       tree_vbox.pack_start (shortcut_scroll);
       shortcut_scroll.add (treeview);
@@ -416,7 +416,7 @@ namespace Synapse.Gui
       
       /* Add info */
       
-      var info_box = new HBox (false, 6);
+      var info_box = new Box (Gtk.Orientation.HORIZONTAL, 6);
       var info_image = new Image.from_stock (Gtk.Stock.INFO, IconSize.MENU);
       info_box.pack_start (info_image, false);
       var info_label = new Label (Markup.printf_escaped ("<span size=\"small\">%s</span>",
@@ -470,31 +470,18 @@ namespace Synapse.Gui
 
     private ComboBox build_theme_combo ()
     {
-      var cb_themes = new ComboBox.text ();
-      /* Set the model */                  /* key */      /* Label */
-      var theme_list = new ListStore (2, typeof(string), typeof(string));
-      cb_themes.clear ();
-      cb_themes.set_model (theme_list);
-      /* Set the renderer only for the Label */
-      var ctxt = new CellRendererText();
-      cb_themes.pack_start (ctxt, true);
-      cb_themes.set_attributes (ctxt, "text", 1);
+      var cb_themes = new ComboBoxText ();
       /* Pack data into the model and select current theme */
       if (!themes.has_key (selected_theme)) selected_theme = "default";
-      TreeIter iter;
       foreach (Gee.Map.Entry<string,Theme?> e in themes.entries)
       {
-        theme_list.append (out iter);
-        theme_list.set (iter, 0, e.key, 1, e.value.name);
+        cb_themes.append (e.key, e.value.name);
         if (e.key == selected_theme)
-          cb_themes.set_active_iter (iter);
+          cb_themes.active_id = e.key;
       }
       /* Listen on value changed */
       cb_themes.changed.connect (() => {
-        TreeIter active_iter;
-        cb_themes.get_active_iter (out active_iter);
-        theme_list.get (active_iter, 0, out selected_theme);
-        config.ui_type = selected_theme;
+        selected_theme = config.ui_type = cb_themes.active_id;
         theme_selected (get_current_theme ());
       });
       

@@ -40,6 +40,8 @@ namespace UI.Widgets
       this.key_press_event.connect (this.on_key_press);
       box.show ();
       this.add (box);
+
+      style_updated ();
     }
 
     public virtual void append_tile (AbstractTileObject tile_obj)
@@ -131,15 +133,15 @@ namespace UI.Widgets
 
     private bool changing_style = false;
 
-    protected override void style_set (Gtk.Style? prev_style)
+    protected override void style_updated ()
     {
-      if (changing_style) return;
+      /*if (changing_style) return;
 
       changing_style = true;
-      base.style_set (prev_style);
+      base.style_updated ();
       unowned Widget p = this.get_parent ();
       p.modify_bg (StateType.NORMAL, style.@base[StateType.NORMAL]);
-      changing_style = false;
+      changing_style = false;*/
     }
 
     public virtual void on_tile_active_changed (Tile tile)
@@ -152,7 +154,7 @@ namespace UI.Widgets
       }
     }
 
-    public virtual void on_tile_size_allocated (Gtk.Widget w, Gdk.Rectangle alloc)
+    public virtual void on_tile_size_allocated (Gtk.Widget w, Gtk.Allocation alloc)
     {
       Tile tile = w as Tile;
       ScrolledWindow? scroll = null;
@@ -173,11 +175,10 @@ namespace UI.Widgets
       va.x = 0;
       va.y = (int) scroll.get_vadjustment ().get_value ();
       va.width = alloc.width;
-      va.height = this.get_parent ().allocation.height;
+      va.height = this.get_parent ().get_allocated_height ();
 
-      var va_region = Gdk.Region.rectangle (va);
-
-      if (va_region.rect_in (alloc) != Gdk.OverlapType.IN)
+      var va_region = new Cairo.Region.rectangle (va);
+      if (va_region.contains_rectangle ((Cairo.RectangleInt)alloc) != Cairo.RegionOverlap.IN)
       {
         double delta = 0.0;
         if (alloc.y + alloc.height > va.y + va.height)
@@ -204,16 +205,17 @@ namespace UI.Widgets
       for (int i=0; i<tiles.length (); i++)
       {
         unowned Tile t = tiles.nth_data (i);
-        Gdk.Rectangle *rect_ptr = (Gdk.Rectangle*) (&t.allocation);
-        var region = Gdk.Region.rectangle (*rect_ptr);
-        if (region.point_in ((int) event.x, (int) event.y))
+        Gtk.Allocation alloc;
+        t.get_allocation (out alloc);
+        var region = new Cairo.Region.rectangle ((Cairo.RectangleInt)alloc);
+        if (region.contains_point ((int)event.x, (int)event.y))
         {
           this.select (i);
           break;
         }
       }
 
-      this.queue_draw ();
+       this.queue_draw ();
 
       return false;
     }
@@ -224,12 +226,14 @@ namespace UI.Widgets
 
       switch (event.keyval)
       {
-        case 0xff52: // GDK_Up
-        case 0x8fc: // GDK_uparrow
+        case Gdk.Key.Up:
+        case Gdk.Key.KP_Up:
+        case Gdk.Key.uparrow:
           index--;
           break;
-        case 0xff54: // GDK_Down
-        case 0x8fe: // GDK_downarrow
+        case Gdk.Key.Down:
+        case Gdk.Key.KP_Down:
+        case Gdk.Key.downarrow:
           index++;
           break;
       }
@@ -258,7 +262,7 @@ namespace UI.Widgets
         clear_selection ();
       }
 
-      if (this.get_parent () != null && this.get_parent ().is_realized ())
+      if (this.get_parent () != null && this.get_parent ().get_realized ())
       {
         this.get_parent ().queue_draw ();
       }

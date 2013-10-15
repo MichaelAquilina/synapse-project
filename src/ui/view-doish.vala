@@ -66,18 +66,15 @@ namespace Synapse.Gui
       install_style_property (descr_min);
     }
     
-    public override void style_set (Gtk.Style? old)
+    public override void style_updated ()
     {
-      base.style_set (old);
+      base.style_updated ();
 
       int spacing, icon_size;
       string tmax, tmin, dmax, dmin;
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "pane-spacing", out spacing);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "icon-size", out icon_size);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "title-size", out tmax);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "title-min-size", out tmin);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "description-size", out dmax);
-      this.style.get (typeof(Synapse.Gui.ViewDoish), "description-min-size", out dmin);
+	  style_get ("pane-spacing", out spacing, "icon-size", out icon_size,
+        "title-size", out tmax, "title-min-size", out tmin, "description-size", out dmax,
+        "description-min-size", out dmin);
       
       sp1.set_size_request (spacing, -1);
       sp2.set_size_request (spacing, -1);
@@ -145,50 +142,49 @@ namespace Synapse.Gui
       source_label.set_ellipsize (Pango.EllipsizeMode.END);
       source_label.size = SmartLabel.Size.MEDIUM;
       source_label.min_size = SmartLabel.Size.SMALL;
-      source_label.set_state (StateType.SELECTED);
+      source_label.set_state_flags (StateFlags.SELECTED, false);
       source_label.xalign = 0.5f;
       action_label = new SmartLabel ();
       action_label.set_ellipsize (Pango.EllipsizeMode.END);
       action_label.size = SmartLabel.Size.MEDIUM;
       action_label.min_size = SmartLabel.Size.SMALL;
-      action_label.set_state (StateType.SELECTED);
+      action_label.set_state_flags (StateFlags.SELECTED, false);
       action_label.xalign = 0.5f;
       target_label = new SmartLabel ();
       target_label.set_ellipsize (Pango.EllipsizeMode.END);
       target_label.size = SmartLabel.Size.MEDIUM;
       target_label.min_size = SmartLabel.Size.SMALL;
-      target_label.set_state (StateType.SELECTED);
+      target_label.set_state_flags (StateFlags.SELECTED, false);
       target_label.xalign = 0.5f;
       description_label = new SmartLabel ();
       description_label.size = SmartLabel.Size.SMALL;
       description_label.set_animation_enabled (true);
-      description_label.set_state (StateType.SELECTED);
+      description_label.set_state_flags (StateFlags.SELECTED, false);
       description_label.xalign = 0.5f;
       
       /* Categories - Throbber and menu */ //#0C71D6
-      var categories_hbox = new HBox (false, 0);
+      var categories_hbox = new Box (Gtk.Orientation.HORIZONTAL, 0);
 
       menuthrobber = new MenuThrobber ();
-      menuthrobber.set_state (StateType.SELECTED);
+      menuthrobber.set_state_flags (StateFlags.SELECTED, false);
       menu = (MenuButton) menuthrobber;
       menuthrobber.set_size_request (14, 14);
-      menuthrobber.button_scale = 0.75;
 
       categories_hbox.pack_start (flag_selector);
       categories_hbox.pack_start (menuthrobber, false);
 
       flag_selector.selected_markup = "<span size=\"small\"><b>%s</b></span>";
       flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
-      flag_selector.set_state (StateType.SELECTED);
+      flag_selector.set_state_flags (StateFlags.SELECTED, false);
 
-      var hbox_panes = new HBox (false, 0);
+      var hbox_panes = new Box (Gtk.Orientation.HORIZONTAL, 0);
 
       /* PANES */
       sp1 = new Label (null);
       sp2 = new Label (null);
 
       /* Source Pane */
-      spane = new VBox (false, 0);
+      spane = new Box (Gtk.Orientation.VERTICAL, 0);
       spane.border_width = 5;
       var sensitive = new SensitiveWidget (source_icon);
       this.make_draggable (sensitive);
@@ -196,7 +192,7 @@ namespace Synapse.Gui
       spane.pack_start (source_label, false);
       
       /* Action Pane */
-      apane = new VBox (false, 0);
+      apane = new Box (Gtk.Orientation.VERTICAL, 0);
       apane.border_width = 5;
       apane.pack_start (action_icon, false);
       apane.pack_start (action_label, false);
@@ -206,15 +202,15 @@ namespace Synapse.Gui
       hbox_panes.pack_start (apane, true);
 
       /* Target Pane */
-      tpane = new VBox (false, 0);
+      tpane = new Box (Gtk.Orientation.VERTICAL, 0);
       tpane.border_width = 5;
       sensitive = new SensitiveWidget (target_icon);
       this.make_draggable (sensitive);
       tpane.pack_start (sensitive, false);
       tpane.pack_start (target_label, false);
       
-      target_container = new VBox (false, 0);
-      var hb = new HBox (false, 0);
+      target_container = new Box (Gtk.Orientation.VERTICAL, 0);
+      var hb = new Box (Gtk.Orientation.HORIZONTAL, 0);
       hb.pack_start (sp2, false);
       hb.pack_start (tpane, false, false);
       target_container.pack_start (new CloneWidget (categories_hbox), false);
@@ -223,16 +219,16 @@ namespace Synapse.Gui
 
       /* list */
       this.prepare_results_container (out results_container, out results_sources,
-                                      out results_actions, out results_targets, StateType.SELECTED);
+                                      out results_actions, out results_targets, StateFlags.SELECTED);
 
-      container = new VBox (false, 0);
+      container = new Box (Gtk.Orientation.VERTICAL, 0);
       container.pack_start (categories_hbox, false);
       container.pack_start (hbox_panes, false, true, 5);
       container.pack_start (description_label, false);
       container.pack_start (spacer, false);
       container.pack_start (results_container, false);
       
-      var main_container = new HBox (false, 0);
+      var main_container = new Box (Gtk.Orientation.HORIZONTAL, 0);
       main_container.pack_start (container, false);
       main_container.pack_start (target_container, false);
       
@@ -274,55 +270,68 @@ namespace Synapse.Gui
       bool comp = this.is_composited ();
       double r = 0, b = 0, g = 0;
 
+      Gtk.Allocation spacer_allocation, flag_selector_allocation,
+        spane_allocation, apane_allocation;
+      spacer.get_allocation (out spacer_allocation);
+      flag_selector.get_allocation (out flag_selector_allocation);
+      spane.get_allocation (out spane_allocation);
+      apane.get_allocation (out apane_allocation);
+
       if (is_list_visible () || (!comp))
       {
         if (comp && is_list_visible ())
         {
+          Gtk.Allocation results_container_allocation;
+          results_container.get_allocation (out results_container_allocation);
           ctx.translate (0.5, 0.5);
           ctx.set_operator (Operator.OVER);
-          Utils.cairo_make_shadow_for_rect (ctx, results_container.allocation.x,
-                                                 results_container.allocation.y,
-                                                 results_container.allocation.width - 1,
-                                                 results_container.allocation.height - 1,
+          Utils.cairo_make_shadow_for_rect (ctx, results_container_allocation.x,
+                                                 results_container_allocation.y,
+                                                 results_container_allocation.width - 1,
+                                                 results_container_allocation.height - 1,
                                                  0, r, g, b, SHADOW_SIZE);
           ctx.translate (-0.5, -0.5);
         }
         ctx.set_operator (Operator.SOURCE);
-        ch.set_source_rgba (ctx, 1.0, ch.StyleType.BASE, Gtk.StateType.NORMAL);
-        ctx.rectangle (spacer.allocation.x, spacer.allocation.y + BORDER_RADIUS, spacer.allocation.width, SHADOW_SIZE);
+        ch.set_source_rgba (ctx, 1.0, StyleType.BASE, Gtk.StateFlags.NORMAL);
+        ctx.rectangle (spacer_allocation.x, spacer_allocation.y + BORDER_RADIUS, spacer_allocation.width, SHADOW_SIZE);
         ctx.fill ();
       }
 
-      int width = this.allocation.width;
-      int height = spacer.allocation.y + BORDER_RADIUS + SHADOW_SIZE;
+      int width = this.get_allocated_width ();
+      int height = spacer_allocation.y + BORDER_RADIUS + SHADOW_SIZE;
       
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
       r = g = b = 0.12;
-      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
+      ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, StateFlags.SELECTED);
       pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
       r = g = b = 0.4;
-      ch.get_color_colorized (ref r, ref g, ref b, ch.StyleType.BG, StateType.SELECTED);
+      ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, StateFlags.SELECTED);
       pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
       
       r = g = b = 0.0;
 
       if (target_container.visible)
       {
-        width -= target_container.allocation.width;
+        Gtk.Allocation target_container_allocation, tpane_allocation;
+        target_container.get_allocation (out target_container_allocation);
+        tpane.get_allocation (out tpane_allocation);
+
+        width -= target_container_allocation.width;
         // draw background
         ctx.save ();
         ctx.translate (0.5, 0.5);
         ctx.set_operator (Operator.OVER);
-        Utils.cairo_make_shadow_for_rect (ctx, target_container.allocation.x - BORDER_RADIUS, 
-                                               tpane.allocation.y,
-                                               target_container.allocation.width - 1 + BORDER_RADIUS,
-                                               tpane.allocation.height - 1, 15, r, g, b, SHADOW_SIZE);
+        Utils.cairo_make_shadow_for_rect (ctx, target_container_allocation.x - BORDER_RADIUS, 
+                                               tpane_allocation.y,
+                                               target_container_allocation.width - 1 + BORDER_RADIUS,
+                                               tpane_allocation.height - 1, 15, r, g, b, SHADOW_SIZE);
         ctx.translate (-0.5, -0.5);
-        Utils.cairo_rounded_rect (ctx, target_container.allocation.x - BORDER_RADIUS, 
-                                       tpane.allocation.y,
-                                       target_container.allocation.width + BORDER_RADIUS,
-                                       tpane.allocation.height, 15);
+        Utils.cairo_rounded_rect (ctx, target_container_allocation.x - BORDER_RADIUS, 
+                                       tpane_allocation.y,
+                                       target_container_allocation.width + BORDER_RADIUS,
+                                       tpane_allocation.height, 15);
         ctx.set_operator (Operator.SOURCE);
         ctx.set_source (pat);
         ctx.clip ();
@@ -330,20 +339,20 @@ namespace Synapse.Gui
         if (model.searching_for == SearchingFor.TARGETS)
         {
           ctx.set_operator (Cairo.Operator.OVER);
-          Utils.cairo_rounded_rect (ctx, tpane.allocation.x,
-                                         tpane.allocation.y,
-                                         tpane.allocation.width,
-                                         tpane.allocation.height,
+          Utils.cairo_rounded_rect (ctx, tpane_allocation.x,
+                                         tpane_allocation.y,
+                                         tpane_allocation.width,
+                                         tpane_allocation.height,
                                          15);
           ch.set_source_rgba (ctx, 0.3,
-                              ch.StyleType.FG, StateType.SELECTED);
+                              StyleType.FG, StateFlags.SELECTED);
           ctx.clip ();
           ctx.paint ();
         }
         ctx.restore ();
       }
 
-      int delta = flag_selector.allocation.y - BORDER_RADIUS;
+      int delta = flag_selector_allocation.y - BORDER_RADIUS;
       if (!comp) delta = 0;
       
       ctx.save ();
@@ -383,25 +392,25 @@ namespace Synapse.Gui
       // icon bgs
       ctx.set_operator (Operator.OVER);
       ctx.save ();
-      Utils.cairo_rounded_rect (ctx, spane.allocation.x,
-                                     spane.allocation.y,
-                                     spane.allocation.width,
-                                     spane.allocation.height,
+      Utils.cairo_rounded_rect (ctx, spane_allocation.x,
+                                     spane_allocation.y,
+                                     spane_allocation.width,
+                                     spane_allocation.height,
                                      15);
       ch.set_source_rgba (ctx, model.searching_for == SearchingFor.SOURCES ? 0.3 : 0.08,
-                          ch.StyleType.FG, StateType.SELECTED);
+                          StyleType.FG, StateFlags.SELECTED);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();
       
       ctx.save ();
-      Utils.cairo_rounded_rect (ctx, apane.allocation.x,
-                                     apane.allocation.y,
-                                     apane.allocation.width,
-                                     apane.allocation.height,
+      Utils.cairo_rounded_rect (ctx, apane_allocation.x,
+                                     apane_allocation.y,
+                                     apane_allocation.width,
+                                     apane_allocation.height,
                                      15);
       ch.set_source_rgba (ctx, model.searching_for == SearchingFor.ACTIONS ? 0.3 : 0.08,
-                          ch.StyleType.FG, StateType.SELECTED);
+                          StyleType.FG, StateFlags.SELECTED);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();
@@ -414,19 +423,19 @@ namespace Synapse.Gui
       {
         if (controller.is_in_initial_state ())
         {
-          source_label.set_text (controller.TYPE_TO_SEARCH);
-          description_label.set_text (controller.DOWN_TO_SEE_RECENT);
+          source_label.set_text (IController.TYPE_TO_SEARCH);
+          description_label.set_text (IController.DOWN_TO_SEE_RECENT);
         }
         else if (controller.searched_for_recent ())
         {
-          description_label.set_text (controller.NO_RECENT_ACTIVITIES);
+          description_label.set_text (IController.NO_RECENT_ACTIVITIES);
         }
         else
         {
           if (this.menuthrobber.active)
-            description_label.set_text (controller.SEARCHING);
+            description_label.set_text (IController.SEARCHING);
           else
-            description_label.set_text (controller.NO_RESULTS);
+            description_label.set_text (IController.NO_RESULTS);
         }
       }
       else

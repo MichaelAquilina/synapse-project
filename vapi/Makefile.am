@@ -1,8 +1,7 @@
 VAPIS = \
-	appindicator-0.1.vapi \
 	config.vapi \
-	gtkhotkey-1.0.vapi \
-	keysyms.vapi \
+	keybinder-3.0.vapi \
+	unique-3.0.vapi \
 	rest-fix.vapi \
 	$(NULL)
 

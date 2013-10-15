@@ -7,7 +7,7 @@ noinst_LTLIBRARIES = libplugins.la
 VAPIDIR = $(top_srcdir)/vapi
 
 libplugins_la_VALAFLAGS = \
-	--pkg gtk+-2.0 \
+	--pkg gtk+-3.0 \
 	--pkg gee-1.0 \
 	--pkg json-glib-1.0 \
 	--pkg dbus-glib-1 \

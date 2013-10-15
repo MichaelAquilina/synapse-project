@@ -89,7 +89,7 @@ namespace Synapse.Gui
       KeyComboConfig.Commands command = 
         this.key_combo_config.get_command_from_eventkey (event);
       
-      if (command != command.INVALID_COMMAND)
+      if (command != KeyComboConfig.Commands.INVALID_COMMAND)
       {
         im_context.reset ();
         this.fetch_command (command);
@@ -286,7 +286,7 @@ namespace Synapse.Gui
     
     protected virtual bool fetch_command (KeyComboConfig.Commands command)
     {
-      if (command != command.INVALID_COMMAND)
+      if (command != KeyComboConfig.Commands.INVALID_COMMAND)
       {
         switch (command)
         {
@@ -340,7 +340,7 @@ namespace Synapse.Gui
               view.set_list_visible (false);
               break;
             }
-            selected_index_changed_event (this.model.focus[this.model.searching_for].key - this.RESULTS_PER_PAGE);
+            selected_index_changed_event (this.model.focus[this.model.searching_for].key - RESULTS_PER_PAGE);
             break;
           case KeyComboConfig.Commands.NEXT_RESULT:
             if (this.is_in_initial_state () && handle_empty)
@@ -363,7 +363,7 @@ namespace Synapse.Gui
               view.set_list_visible (true);
               break;
             }
-            selected_index_changed_event (this.model.focus[this.model.searching_for].key + this.RESULTS_PER_PAGE);
+            selected_index_changed_event (this.model.focus[this.model.searching_for].key + RESULTS_PER_PAGE);
             break;
           case KeyComboConfig.Commands.NEXT_PANE:
             switch (this.model.searching_for)
@@ -609,8 +609,8 @@ namespace Synapse.Gui
       
       searching[what] = true;
       
-      search_provider.search (model.query[what],
-                              what == what.SOURCES ? qf : model.focus[SearchingFor.ACTIONS].value.target_flags (),
+      search_provider.search.begin (model.query[what],
+                              what == SearchingFor.SOURCES ? qf : model.focus[SearchingFor.ACTIONS].value.target_flags (),
                               last_result_set,
                               current_cancellable[what],
                               (obj, res)=>{
@@ -642,7 +642,7 @@ namespace Synapse.Gui
         {
           if (matcher.key.match (model.focus[what].value.title))
           {
-            if (what == what.SOURCES)
+            if (what == SearchingFor.SOURCES)
               view.update_focused_source (model.focus[what]);
             else
               view.update_focused_target (model.focus[what]);
@@ -662,7 +662,7 @@ namespace Synapse.Gui
         model.focus[what].value = null;
       }
       
-      if (what == what.SOURCES)
+      if (what == SearchingFor.SOURCES)
       {
         /* It's important to search for actions before show the match */
         model.clear_searching_for (SearchingFor.ACTIONS);
@@ -733,7 +733,7 @@ namespace Synapse.Gui
         model.results[what] = null;
       }
 
-      if (what == what.SOURCES)
+      if (what == SearchingFor.SOURCES)
       {
         /* It's important to search for actions before show the match */
         model.clear_searching_for (SearchingFor.ACTIONS);

@@ -43,7 +43,7 @@ namespace Synapse
     private DataSink data_sink;
     private Gui.KeyComboConfig key_combo_config;
     private Gui.CategoryConfig category_config;
-    private GtkHotkey.Info? hotkey;
+    private string current_shortcut;
     private ConfigService config;
 #if HAVE_INDICATOR
     private AppIndicator.Indicator indicator;
@@ -63,6 +63,7 @@ namespace Synapse
       settings = new SettingsWindow (data_sink, key_combo_config);
       settings.keybinding_changed.connect (this.change_keyboard_shortcut);
       
+      Keybinder.init ();
       bind_keyboard_shortcut ();
       
       controller = GLib.Object.new (typeof (Gui.Controller), 
@@ -122,15 +123,15 @@ namespace Synapse
       // Why Category.OTHER? See >
       // https://bugs.launchpad.net/synapse-project/+bug/685634/comments/13
       indicator = new AppIndicator.Indicator ("synapse", "synapse",
-                                              AppIndicator.Category.OTHER);
+                                              AppIndicator.IndicatorCategory.OTHER);
 
       indicator.set_menu (indicator_menu);
-      if (settings.indicator_active) indicator.set_status (AppIndicator.Status.ACTIVE);
+      if (settings.indicator_active) indicator.set_status (AppIndicator.IndicatorStatus.ACTIVE);
 
       settings.notify["indicator-active"].connect (() =>
       {
         indicator.set_status (settings.indicator_active ?
-          AppIndicator.Status.ACTIVE : AppIndicator.Status.PASSIVE);
+          AppIndicator.IndicatorStatus.ACTIVE : AppIndicator.IndicatorStatus.PASSIVE);
       });
 #else
       status_icon = new StatusIcon.from_icon_name ("synapse");
@@ -207,75 +208,25 @@ namespace Synapse
       if (this.controller == null) return;
       this.controller.summon_or_vanish ();
     }
-    
+
     private void bind_keyboard_shortcut ()
     {
-      var registry = GtkHotkey.Registry.get_default ();
-      try
-      {
-        if (registry.has_hotkey ("synapse", "activate"))
-        {
-          hotkey = registry.get_hotkey ("synapse", "activate");
-        }
-        else
-        {
-          hotkey = new GtkHotkey.Info ("synapse", "activate",
-                                       "<Control>space", null);
-          registry.store_hotkey (hotkey);
-        }
-        Utils.Logger.log (this, "Binding activation to %s", hotkey.signature);
-        settings.set_keybinding (hotkey.signature, false);
-        hotkey.bind ();
-        hotkey.activated.connect ((event_time) => { this.show_ui (event_time); });
-      }
-      catch (Error err)
-      {
-        warning ("%s", err.message);
-        var d = new MessageDialog (settings.visible ? settings : null, 0, MessageType.ERROR, 
-                                     ButtonsType.CLOSE,
-                                     "%s", err.message);
-        d.run ();
-        d.destroy ();
-      }/* */
+      current_shortcut = "<Control>space";
+      Utils.Logger.log (this, "Binding activation to %s", current_shortcut);
+      settings.set_keybinding (current_shortcut, false);
+      Keybinder.bind (current_shortcut, handle_shortcut, this);
     }
     
+    static void handle_shortcut (string key, void* data)
+    {
+      ((UILauncher)data).show_ui (Keybinder.get_current_event_time ());
+    }
+
     private void change_keyboard_shortcut (string key)
     {
-      var registry = GtkHotkey.Registry.get_default ();
-      try
-      {
-        if (hotkey.is_bound ()) hotkey.unbind ();
-      }
-      catch (Error err)
-      {
-        warning ("%s", err.message);
-      }
-      
-      try
-      {
-        if (registry.has_hotkey ("synapse", "activate"))
-        {
-          registry.delete_hotkey ("synapse", "activate");
-        }
-        
-        if (key != "")
-        {
-          hotkey = new GtkHotkey.Info ("synapse", "activate",
-                                       key, null);
-          registry.store_hotkey (hotkey);
-          hotkey.bind ();
-          hotkey.activated.connect ((event_time) => { this.show_ui (event_time); });
-        }
-      }
-      catch (Error err)
-      {
-        Gtk.MessageDialog dialog = new Gtk.MessageDialog (this.settings, 0,
-          Gtk.MessageType.WARNING, Gtk.ButtonsType.OK,
-          "%s", err.message
-        );
-        dialog.run ();
-        dialog.destroy ();
-      }
+      Keybinder.unbind (current_shortcut, handle_shortcut);
+      current_shortcut = key;
+      Keybinder.bind (current_shortcut, handle_shortcut, this);
     }
 
     public void run ()
@@ -332,8 +283,8 @@ namespace Synapse
         Gtk.init (ref argv);
         Notify.init ("synapse");
         
-        var app = new Unique.App ("org.gnome.Synapse", null);
-        if (app.is_running)
+        var app = new Unique.App ("org.gnome.Synapse", "");
+        if (app.is_running ())
         {
           Utils.Logger.log (null, "Synapse is already running, activating...");
           app.send_message (Unique.Command.ACTIVATE, null);
