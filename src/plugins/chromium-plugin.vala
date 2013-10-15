@@ -94,7 +94,8 @@ namespace Synapse
     
     construct
     {
-      bookmarks = parse_bookmarks ();
+      bookmarks = new Gee.ArrayList<BookmarkMatch> ();
+      parse_bookmarks.begin ();
     }
     
     private void full_search (Query q, ResultSet results,
@@ -168,13 +169,11 @@ namespace Synapse
                                         .split (":", 1)[0]);
     }
     
-    private Gee.List<BookmarkMatch>? parse_bookmarks ()
+    private async void parse_bookmarks ()
     {
       var parser = new Json.Parser ();
       string fpath = GLib.Path.build_filename (Environment.get_user_config_dir (),
                                         "chromium", "Default", "Bookmarks");
-      
-      bookmarks = new Gee.ArrayList<BookmarkMatch> ();
       
       string CONTAINER = "folder";
       Gee.HashSet<string> UNWANTED_SCHEME = new Gee.HashSet<string> ();
@@ -215,8 +214,6 @@ namespace Synapse
       {
         warning ("%s", err.message);
       }
-      
-      return bookmarks;
     }
   }
 }
