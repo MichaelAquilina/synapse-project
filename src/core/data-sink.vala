@@ -233,7 +233,7 @@ namespace Synapse
       int NUM_COMPONENTS = 2;
 
       dbus_name_cache = DBusService.get_default ();
-      ulong sid1 = dbus_name_cache.initialization_done.connect (() =>
+      dbus_name_cache.initialize.begin (() =>
       {
         initialized_components++;
         if (initialized_components >= NUM_COMPONENTS)
@@ -244,7 +244,7 @@ namespace Synapse
 
       desktop_file_service = DesktopFileService.get_default ();
       desktop_file_service.reload_done.connect (this.check_plugins);
-      ulong sid2 = desktop_file_service.initialization_done.connect (() =>
+      desktop_file_service.initialize.begin (() =>
       {
         initialized_components++;
         if (initialized_components >= NUM_COMPONENTS)
@@ -254,8 +254,6 @@ namespace Synapse
       });
 
       yield;
-      SignalHandler.disconnect (dbus_name_cache, sid1);
-      SignalHandler.disconnect (desktop_file_service, sid2);
 
       Idle.add (() => { this.load_plugins (); return false; });
     }

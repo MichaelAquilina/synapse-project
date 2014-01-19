@@ -194,7 +194,7 @@ namespace Synapse
   public class DesktopFileService : Object
   {
     private static unowned DesktopFileService? instance;
-    public bool initialized { get; private set; default = false; }
+    private Utils.AsyncOnce<bool> init_once;
 
     // singleton that can be easily destroyed
     public static DesktopFileService get_default ()
@@ -222,6 +222,7 @@ namespace Synapse
       all_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
       non_hidden_desktop_files = new Gee.ArrayList<DesktopFileInfo> ();
       mimetype_parent_map = new Gee.HashMultiMap<string, string> ();
+      init_once = new Utils.AsyncOnce<bool> ();
 
       initialize.begin ();
     }
@@ -230,11 +231,13 @@ namespace Synapse
     {
       instance = null;
     }
-   
-    public signal void initialization_done ();
-    
-    private async void initialize ()
+
+    public async void initialize ()
     {
+      if (init_once.is_initialized ()) return;
+      var is_locked = yield init_once.enter ();
+      if (!is_locked) return;
+
       get_environment_type ();
       DesktopAppInfo.set_desktop_env (session_type_str);
 
@@ -243,8 +246,7 @@ namespace Synapse
 
       yield load_all_desktop_files ();
 
-      initialized = true;
-      initialization_done ();
+      init_once.leave (true);
     }
     
     private DesktopFileInfo.EnvironmentType session_type =

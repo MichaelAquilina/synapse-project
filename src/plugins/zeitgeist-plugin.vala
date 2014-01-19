@@ -179,7 +179,7 @@ namespace Synapse
         }
         else
         {
-          extended_info = "long time ago";
+          extended_info = _ ("long time ago");
         }
       }
     }

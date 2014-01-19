@@ -205,6 +205,125 @@ namespace Synapse
       }
     }
 
+    [Compact]
+    private class DelegateWrapper
+    {
+      public SourceFunc callback;
+
+      public DelegateWrapper (owned SourceFunc cb)
+      {
+        callback = (owned) cb;
+      }
+    }
+    /*
+     * Asynchronous Once.
+     *
+     * Usage:
+     * private AsyncOnce<string> once = new AsyncOnce<string> ();
+     * public async void foo ()
+     * {
+     *   if (!once.is_initialized ()) // not stricly necessary but improves perf
+     *   {
+     *     if (yield once.enter ())
+     *     {
+     *       // this block will be executed only once, but the method
+     *       // is reentrant; it's also recommended to wrap this block
+     *       // in try { } and call once.leave() in finally { }
+     *       // if any of the operations can throw an error
+     *       var s = yield get_the_string ();
+     *       once.leave (s);
+     *     }
+     *   }
+     *   // if control reaches this point the once was initialized
+     *   yield do_something_for_string (once.get_data ());
+     * }
+     */
+    public class AsyncOnce<G>
+    {
+      private enum OperationState
+      {
+        NOT_STARTED,
+        IN_PROGRESS,
+        DONE
+      }
+
+      private G inner;
+
+      private OperationState state;
+      private DelegateWrapper[] callbacks = {};
+
+      public AsyncOnce ()
+      {
+        state = OperationState.NOT_STARTED;
+      }
+
+      public unowned G get_data ()
+      {
+        return inner;
+      }
+
+      public bool is_initialized ()
+      {
+        return state == OperationState.DONE;
+      }
+
+      public async bool enter ()
+      {
+        if (state == OperationState.NOT_STARTED)
+        {
+          state = OperationState.IN_PROGRESS;
+          return true;
+        }
+        else if (state == OperationState.IN_PROGRESS)
+        {
+          yield wait_async ();
+        }
+
+        return false;
+      }
+
+      public void leave (G result)
+      {
+        if (state != OperationState.IN_PROGRESS)
+        {
+          warning ("Incorrect usage of AsyncOnce");
+          return;
+        }
+        state = OperationState.DONE;
+        inner = result;
+        notify_all ();
+      }
+
+      /* Once probably shouldn't have this, but it's useful */
+      public void reset ()
+      {
+        if (state == OperationState.IN_PROGRESS)
+        {
+          warning ("AsyncOnce.reset() cannot be called in the middle of initialization.");
+        }
+        else
+        {
+          state = OperationState.NOT_STARTED;
+          inner = null;
+        }
+      }
+
+      private void notify_all ()
+      {
+        foreach (unowned DelegateWrapper wrapper in callbacks)
+        {
+          wrapper.callback ();
+        }
+        callbacks = {};
+      }
+
+      private async void wait_async ()
+      {
+        callbacks += new DelegateWrapper (wait_async.callback);
+        yield;
+      }
+    }
+
     public class FileInfo
     {
       private static string interesting_attributes;

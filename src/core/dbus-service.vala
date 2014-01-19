@@ -45,7 +45,7 @@ namespace Synapse
     private Gee.Set<string> activatable_names;
     private Gee.Set<string> system_activatable_names;
     
-    public bool initialized { get; private set; default = false; }
+    private Utils.AsyncOnce<bool> init_once;
 
     // singleton that can be easily destroyed
     public static DBusService get_default ()
@@ -64,6 +64,7 @@ namespace Synapse
       owned_names = new Gee.HashSet<string> ();
       activatable_names = new Gee.HashSet<string> ();
       system_activatable_names = new Gee.HashSet<string> ();
+      init_once = new Utils.AsyncOnce<bool> ();
 
       initialize.begin ();
     }
@@ -109,10 +110,12 @@ namespace Synapse
       return name in system_activatable_names;
     }
 
-    public signal void initialization_done ();
-    
-    private async void initialize ()
+    public async void initialize ()
     {
+      if (init_once.is_initialized ()) return;
+      var is_locked = yield init_once.enter ();
+      if (!is_locked) return;
+
       string[] names;
       try
       {
@@ -156,9 +159,7 @@ namespace Synapse
       {
         warning ("%s", sys_err.message);
       }
-      
-      initialized = true;
-      initialization_done ();
+      init_once.leave (true);
     }
   }
 }
