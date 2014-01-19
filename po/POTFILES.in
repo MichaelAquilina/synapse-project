@@ -20,6 +20,7 @@ src/core/common-actions.vala
 src/plugins/banshee-plugin.vala
 src/plugins/calculator-plugin.vala
 src/plugins/chat-actions-plugin.vala
+src/plugins/chromium-plugin.vala
 src/plugins/command-plugin.vala
 src/plugins/desktop-file-plugin.vala
 src/plugins/devhelp-search.vala

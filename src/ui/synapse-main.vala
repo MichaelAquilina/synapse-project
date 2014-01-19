@@ -177,6 +177,7 @@ namespace Synapse
         typeof (SelectionPlugin),
         typeof (SshPlugin),
         typeof (XnoiseActions),
+        typeof (ChromiumPlugin),
         // typeof (FileOpPlugin),
         // typeof (PidginPlugin),
         // typeof (ChatActions),
