@@ -411,49 +411,50 @@ namespace Synapse.Gui
       
       ctx.restore ();
     }
+
     public class ColorHelper 
     {
       private Gee.Map <string, Color> colormap;
       private Gtk.StyleContext fg_context;
       private Gtk.StyleContext bg_context;
 
-    private string current_theme;
+      private string current_theme;
 
-    private static ColorHelper? instance = null;
-    public static ColorHelper get_default ()
-    {
-      if (instance == null)
-        instance = new ColorHelper ();
-      return instance;
-    }
+      private static ColorHelper? instance = null;
+      public static ColorHelper get_default ()
+      {
+        if (instance == null)
+          instance = new ColorHelper ();
+        return instance;
+      }
 
       private ColorHelper ()
       {
         this.colormap = new Gee.HashMap <string, Color> ();
 
-    //FIXME get ourselves a number of dummy widgets
-    // messing with stylecontexts directly resulted in deep frustation
-    var window = new Gtk.Window ();
-    var box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-    var label = new Gtk.Label (null);
-    window.add (box);
-    box.pack_start (label);
-    fg_context = label.get_style_context ();
-    bg_context = box.get_style_context ();
+        //FIXME get ourselves a number of dummy widgets
+        // messing with stylecontexts directly resulted in deep frustation
+        var window = new Gtk.Window ();
+        var box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+        var label = new Gtk.Label (null);
+        window.add (box);
+        box.pack_start (label);
+        fg_context = label.get_style_context ();
+        bg_context = window.get_style_context ();
 
-    current_theme = Gtk.Settings.get_default ().gtk_theme_name;
-    Gtk.Settings.get_default ().notify["gtk-theme-name"].connect (theme_changed);
+        current_theme = Gtk.Settings.get_default ().gtk_theme_name;
+        Gtk.Settings.get_default ().notify["gtk-theme-name"].connect (theme_changed);
       }
 
-    private void theme_changed (Object o, ParamSpec p)
-    {
-      var new_theme = (o as Gtk.Settings).gtk_theme_name;
-      if (new_theme == current_theme)
-        return;
-      current_theme = new_theme;
-      colormap.clear ();
-    }
-      
+      private void theme_changed (Object o, ParamSpec p)
+      {
+        var new_theme = (o as Gtk.Settings).gtk_theme_name;
+        if (new_theme == current_theme)
+          return;
+        current_theme = new_theme;
+        colormap.clear ();
+      }
+
       public void get_color_colorized (ref double red, ref double green, ref double blue,
                                        StyleType t, Gtk.StateFlags st, Mod mod = Mod.NORMAL)
       {
@@ -491,16 +492,19 @@ namespace Synapse.Gui
         }
         return col;
       }
+
       public void set_source_rgba (Cairo.Context ctx, double alpha, StyleType t, Gtk.StateFlags st, Mod mod = Mod.NORMAL)
       {
         Color col = get_color_from_map (t, st, mod);
         ctx.set_source_rgba (col.r, col.g, col.b, alpha);
       }
+
       public void add_color_stop_rgba (Cairo.Pattern pat, double val, double alpha, StyleType t, Gtk.StateFlags st, Mod mod = Mod.NORMAL)
       {
         Color col = get_color_from_map (t, st, mod);
         pat.add_color_stop_rgba (val, col.r, col.g, col.b, alpha);
       }
+
       public void get_rgb_from_mix (StyleType t, Gtk.StateFlags st, Mod mod,
                                     StyleType t2, Gtk.StateFlags st2, Mod mod2,
                                     double mix_pct,
@@ -510,6 +514,7 @@ namespace Synapse.Gui
         Color col2 = get_color_from_map (t2, st2, mod2);
         col.mix (col2, mix_pct, out r, out g, out b);
       }
+
       public void get_rgb (out double r, out double g, out double b, StyleType t, Gtk.StateFlags st, Mod mod = Mod.NORMAL)
       {
         Color col = get_color_from_map (t, st, mod);
@@ -517,6 +522,7 @@ namespace Synapse.Gui
         g = col.g;
         b = col.b;
       }
+
       public bool is_dark_color (StyleType t, Gtk.StateFlags st, Mod mod = Mod.NORMAL)
       {
         Color col = get_color_from_map (t, st, mod);

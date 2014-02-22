@@ -389,7 +389,11 @@ namespace Synapse
         results_container.add (results_actions);
         results_container.add (results_targets);
       }
-      
+      else
+      {
+        results_container = null;
+      }
+
       results_sources.set_state (state_type);
       results_actions.set_state (state_type);
       results_targets.set_state (state_type);

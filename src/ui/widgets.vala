@@ -319,7 +319,11 @@ namespace Synapse.Gui
       layout.get_extents (null, out logical_rect);
       
       req.width += logical_rect.width / Pango.SCALE;
-      if (return_only_width) return;
+      if (return_only_width)
+      {
+        char_width = 0;
+        return;
+      }
       
       Pango.Context ctx = layout.get_context ();
       Pango.FontDescription fdesc = new Pango.FontDescription ();

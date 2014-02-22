@@ -54,13 +54,12 @@ namespace Synapse.Gui
     //the markup of the extended info **extend info is already inserted into description markup**
     public string extended_info_markup {get; set; default = "%s";}
     
-    private int text_height;
+    private int text_height = 1;
     
     construct
     {
-      this.text_height = 1;
       this.get_layout ().set_ellipsize (Pango.EllipsizeMode.END);
-      
+
       this.notify["icon-size"].connect (size_changed);
       this.notify["cell-vpadding"].connect (size_changed);
       this.notify["cell-hpadding"].connect (size_changed);
@@ -120,7 +119,7 @@ namespace Synapse.Gui
         x = x - cell_hpadding * 2 - text_width;
         y = (height - text_height) / 2;
         draw_text (ctx, m, x, y, text_width, state, use_base, selected_pct);
-        
+
         /* Action Icon */
         if (has_action)
         {
@@ -171,7 +170,7 @@ namespace Synapse.Gui
       ctx.translate (x, y);
       ctx.rectangle (0, 0, width, text_height);
       ctx.clip ();
-      
+
       bool selected = (state == Gtk.StateFlags.SELECTED);
 
       var styletype = StyleType.FG;
@@ -182,12 +181,13 @@ namespace Synapse.Gui
         double r = 0, g = 0, b = 0;
         ch.get_rgb_from_mix (styletype, Gtk.StateFlags.NORMAL, Mod.NORMAL,
                              styletype, Gtk.StateFlags.SELECTED, Mod.NORMAL,
-               selected_fill_pct, out r, out g, out b);
+        selected_fill_pct, out r, out g, out b);
         ctx.set_source_rgba (r, g, b, 1.0);
       }
-      else {
-      ch.set_source_rgba (ctx, 1.0, styletype, state, Mod.NORMAL);
-    }
+      else
+      {
+        ch.set_source_rgba (ctx, 1.0, styletype, state, Mod.NORMAL);
+      }
 
       string s = "";
       /* ----------------------- draw title --------------------- */
@@ -385,6 +385,9 @@ namespace Synapse.Gui
       {
         rtl = Gtk.TextDirection.LTR;
         ch = Utils.ColorHelper.get_default ();
+
+        style_updated.connect (this.on_style_updated);
+        on_style_updated ();
       }
 
       private int row_height_cached = 36;
@@ -393,10 +396,9 @@ namespace Synapse.Gui
         return this.row_height_cached;
       }
 
-      public override void style_updated ()
+      public void on_style_updated ()
       {
         // calculate here the new row height
-        base.style_updated ();
         this.rtl = this.get_direction ();
         Utils.update_layout_rtl (this.get_layout (), rtl);
         this.get_layout ().set_ellipsize (Pango.EllipsizeMode.END);
@@ -655,12 +657,12 @@ namespace Synapse.Gui
           this.get_allocation (out allocation);
 
           ypos = int.max (this.soffset, 0);
-      var context = get_style_context ();
-      context.save ();
-      context.set_state (Gtk.StateFlags.SELECTED);
+          var context = get_style_context ();
+          context.save ();
+          context.set_state (Gtk.StateFlags.SELECTED);
           context.render_background (ctx, 0, ypos,
-            this.get_allocated_width (), this.row_height);
-      context.restore ();
+                                     this.get_allocated_width (), this.row_height);
+          context.restore ();
         }
       }
       double pct = 1.0;
