@@ -212,7 +212,7 @@ namespace Synapse
         call.run_async ((call_obj, error, obj) =>
         {
           err = error;
-          auth_step1.callback ();
+          auth_step3.callback ();
         }, this);
         yield;
 
