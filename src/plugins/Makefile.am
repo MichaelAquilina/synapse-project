@@ -65,7 +65,7 @@ endif
 
 if HAVE_LIBREST
 libplugins_la_VALASOURCES += imgur-plugin.vala
-libplugins_la_VALAFLAGS += --pkg rest-fix -D HAVE_LIBREST
+libplugins_la_VALAFLAGS += --pkg rest-0.7 -D HAVE_LIBREST
 libplugins_la_CFLAGS += $(REST_CFLAGS)
 libplugins_la_LIBADD += $(REST_LIBS)
 endif
