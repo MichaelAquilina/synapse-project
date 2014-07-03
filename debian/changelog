@@ -1,33 +1,122 @@
-synapse (0.2.0+bzr-2) UNRELEASED; urgency=low
+synapse (0.2.99-1) UNRELEASED; urgency=medium
 
-  * debian/control:
-   - Set zeitgeist and zeitgeist-fts-extension as Recommends.
-   - Bump libgtk2.0-dev, libglib2.0-dev and intltool requierement.
-   - Update Vcs-*.
-   - Build-depends on pkg-config.
-   - Build-depends on libappindicator-dev.
-   - Add a debug binary.
-  * debian/docs:
-   - Add upstream documentation.
-  * debian/watch
-   - Add a watch file.
-  * debian/copyright
-   - Update copyright holders and licenses.
-  * debian/rules:
-   - Pass --enable-indicator=auto to configure.
-   - Pass --fail-missing to dh_install.
-   - Call dh_strip for the dbg package.
-  * debian/synapse.install:
-   - Install all files in synapse binary.
-  * debian/synapse.1
-   - Add manpages.
+  [ Julien Lavergne ]
   * debian/synapse.manpages:
    - Install the manpage.
 
- -- Julien Lavergne <gilir@ubuntu.com>  Tue, 30 Nov 2010 21:55:53 +0100
+  [ Rico Tzschichholz ]
+  * Update build-deps according to the transitions to gtk+-3.0, gee-0.8
+    and zeitgeist-2.0
+  * Bump compat level to 9
+  * Bump standards version to 3.9.5
+  * Use dh-autoreconf
 
-synapse (0.2.0+bzr-1) experimental; urgency=low
+ -- Rico Tzschichholz <ricotz@ubuntu.com>  Thu, 03 Jul 2014 13:55:07 +0200
 
-  * Initial release.
+synapse (0.2.10-2ubuntu3) saucy; urgency=low
 
- -- Michal Hruby <michal.mhr@gmail.com>  Fri, 10 Sep 2010 14:31:29 +0200
+  * Add dependency on consolekit and upower, since we use their D-Bus APIs. 
+
+ -- Iain Lane <iain@orangesquash.org.uk>  Wed, 01 May 2013 00:58:45 +0100
+
+synapse (0.2.10-2ubuntu2) raring; urgency=low
+
+  * Added missing lib to link, fixing FTBFS.
+
+ -- Daniel T Chen <crimsun@ubuntu.com>  Tue, 23 Apr 2013 12:31:31 -0400
+
+synapse (0.2.10-2ubuntu1) quantal; urgency=low
+
+  * Merge from Debian unstable (LP: #965564).
+  * Ubuntu remaining changes:
+  * debian/control:
+   - Build-depends on libappindicator-dev.
+
+ -- Julien Lavergne <gilir@ubuntu.com>  Fri, 25 May 2012 23:16:49 +0200
+
+synapse (0.2.10-2) unstable; urgency=low
+
+  * debian/patches:
+   - 91_check_null_exec.patch: From upstream, don't crash on empty Exec field
+     (Closes: #668972)
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Wed, 02 May 2012 13:19:11 +0200
+
+synapse (0.2.10-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/patches:
+   - 90_check_xdg_current_desktop.patch: From upstream, detect XFCE system
+     applications (Closes: #659316)
+  * debian/control:
+   - Update build-depends on vala 0.14 (Closes: #663322)
+   - Update to Standards-Version 3.9.3 (no change needed).
+  * debian/watch:
+   - Update launchpad link.
+  * debian/copyright:
+   - Update to copyright-format 1.0.
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Sun, 25 Mar 2012 13:56:07 +0200
+
+synapse (0.2.8.2-1ubuntu1) precise; urgency=low
+
+  * Merge from Debian unstable. Ubuntu remaining changes:
+  * debian/control:
+   - Build-depends on libappindicator-dev.
+
+ -- Julien Lavergne <gilir@ubuntu.com>  Tue, 08 Nov 2011 20:22:33 +0100
+
+synapse (0.2.8.2-1) unstable; urgency=low
+
+  * New upstream release.
+   - Include the transltions (Closes: #644716)
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Mon, 07 Nov 2011 11:40:22 +0100
+
+synapse (0.2.8.1-1) unstable; urgency=low
+
+  * New upstream release.
+   - Include Czech translation (Closes: #638544).
+  * debian/control:
+   - Bump build-depends on vala >= 0.12.0
+   - Add DM-Upload-Allowed: yes.
+  * debian/synapse.manpages, debian/synapse.1
+   - Remove, install upstream manpage instead.
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Sun, 25 Sep 2011 20:33:15 +0200
+
+synapse (0.2.6-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+   - Bump build-depends on vala >= 0.11.5
+   - Add build-depends on libvala-0.12-dev
+   - Bump Standards-Version to 3.9.2.0 (no change needed).
+  * debian/copyright:
+   - Update with new files.
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Fri, 15 Apr 2011 23:19:38 +0200
+
+synapse (0.2.6-0ubuntu3) oneiric; urgency=low
+
+  * debian/patches:
+   - 90_init_libnotify.patch: From upstream, init libnotify, otherwise it
+     crashes in latest versions.
+  * debian/rules:
+   - Use --with autoreconf, needed by 90_init_libnotify.patch.
+  * debian/control:
+   - Build-depends on dh-autoreconf.
+
+ -- Julien Lavergne <gilir@ubuntu.com>  Sun, 25 Sep 2011 20:32:38 +0200
+
+synapse (0.2.6-0ubuntu2) oneiric; urgency=low
+
+  * No change upload to build against libnotify4
+
+ -- Laurent Bigonville <bigon@ubuntu.com>  Fri, 19 Aug 2011 15:55:32 +0200
+
+synapse (0.2.4.1-1) unstable; urgency=low
+
+  * Initial upload to Debian. (Closes: #605629)
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Wed, 16 Mar 2011 23:58:12 +0100

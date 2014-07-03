@@ -1,7 +1,7 @@
 Source: synapse
 Section: utils
 Priority: optional
-Maintainer: Michal Hruby <michal.mhr@gmail.com>
+Maintainer: Julien Lavergne <gilir@ubuntu.com>
 Build-Depends: debhelper (>= 9),
  dh-autoreconf,
  gnome-common,
@@ -26,7 +26,10 @@ Package: synapse
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-Recommends: zeitgeist (>= 0.9.14) | zeitgeist-core (>= 0.9.14)
+Recommends: zeitgeist (>= 0.9.14) | zeitgeist-core (>= 0.9.14),
+ consolekit,
+ pastebinit,
+ upower
 Description: semantic file launcher
  Synapse is a graphical launcher enabling you to start applications and also
  to quickly find and access relevant documents and files (by making use of the

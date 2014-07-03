@@ -1,6 +1,6 @@
-Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=59
-Name: Synapse
-Maintainer: Michal Hruby <michal.mhr@gmail.com>
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Synapse
+Upstream-Contact: Michal Hruby <michal.mhr@gmail.com>
 Source: https://code.launchpad.net/synapse-project
 
 Files: *
@@ -18,10 +18,16 @@ License: LGPL-2.1+
 Files: src/plugins/*
        src/tile-view/*
 Copyright:
- 2010, Michal Hruby <michal.mhr@gmail.com>,
+ 2010-2011, Michal Hruby <michal.mhr@gmail.com>,
  2010, Igor S. Mandrigin <i@mandrigin.ru>,
- 2010 Alberto Aldegheri <albyrock87+dev@gmail.com>
+ 2010, Alberto Aldegheri <albyrock87+dev@gmail.com>
+ 2012, Jörn Magens <shuerhaaken@googlemail.com>
 License: GPL-2+
+
+Files: src/plugins/ssh-plugin.vala
+Copyright:
+ 2011, Antono Vasiljev <self@antono.info>
+License: GPL-3+
 
 Files: debian/*
 Copyright:
@@ -34,15 +40,15 @@ License: GPL-3+
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-
+  .
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-
+  .
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-X-Comment: On Debian systems, the complete text of the GNU General
+Comment: On Debian systems, the complete text of the GNU General
  Public License can be found in `/usr/share/common-licenses/GPL-3’.
 
 License: LGPL-2.1+
@@ -50,15 +56,15 @@ License: LGPL-2.1+
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
-
+  .
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
-
+  .
   You should have received a copy of the GNU Lesser General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-X-Comment: On Debian systems, the complete text of the GNU Lesser General
+Comment: On Debian systems, the complete text of the GNU Lesser General
  Public License can be found in `/usr/share/common-licenses/LGPL-2.1’.
 
 License: GPL-2+
@@ -66,14 +72,14 @@ License: GPL-2+
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
   (at your option) any later version.
-
+  .
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-
+  .
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
-X-Comment: On Debian systems, the complete text of the GNU General
+Comment: On Debian systems, the complete text of the GNU General
  Public License can be found in `/usr/share/common-licenses/GPL-2’.

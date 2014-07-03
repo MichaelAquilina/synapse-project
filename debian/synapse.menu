@@ -1,0 +1,5 @@
+?package(synapse):needs="X11"\
+                  section="Applications/File Management"\
+                  title="Synapse"\
+                  command="synapse" \
+                  hints="GNOME,Utility"
