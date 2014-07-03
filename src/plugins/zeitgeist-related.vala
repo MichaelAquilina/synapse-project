@@ -134,8 +134,8 @@ namespace Synapse
       if (!(m is UriMatch) && !(m is ApplicationMatch)) return null;
 
       GenericArray<Event> templates = new GenericArray<Event> ();
-      PtrArray event_templates = new PtrArray ();
-      PtrArray result_templates = new PtrArray ();
+      GenericArray<Event> event_templates = new GenericArray<Event> ();
+      GenericArray<Event> result_templates = new GenericArray<Event> ();
 
       if (m is UriMatch)
       {
@@ -143,7 +143,7 @@ namespace Synapse
         Utils.Logger.debug (this, "searching for items related to %s", um.uri);
 
         s = new Subject ();
-        s.set_uri (um.uri);
+        s.uri = um.uri;
         e = new Event ();
         e.add_subject (s);
       }
@@ -175,7 +175,7 @@ namespace Synapse
         Utils.Logger.debug (this, "searching for items related to %s", app_id);
 
         e = new Event ();
-        e.set_actor (app_id);
+        e.actor = app_id;
       }
       else return null;
 
@@ -185,11 +185,11 @@ namespace Synapse
       try
       {
         string[] uris;
-        int64 end = Zeitgeist.Timestamp.now ();
+        int64 end = new DateTime.now_local ().to_unix () * 1000;
         int64 start = end - Zeitgeist.Timestamp.WEEK * 8;
         uris = yield zg_log.find_related_uris (new TimeRange (start, end),
-            (owned) event_templates, (owned) result_templates,
-            StorageState.ANY, q.max_results, ResultType.MOST_RECENT_EVENTS,
+            event_templates, result_templates,
+            StorageState.ANY, q.max_results, RelevantResultType.RECENT,
             q.cancellable);
 
         if (uris == null || uris.length == 0)
@@ -199,12 +199,12 @@ namespace Synapse
         }
 
         templates = new GenericArray<Event> ();
-        event_templates = new PtrArray ();
+        event_templates = new GLib.GenericArray<Event> ();
 
         foreach (unowned string uri in uris)
         {
           s = new Subject ();
-          s.set_uri (uri);
+          s.uri = uri;
           e = new Event ();
           e.add_subject (s);
 
@@ -213,7 +213,7 @@ namespace Synapse
         }
 
         var rs = yield zg_log.find_events (new TimeRange.anytime (),
-                                           (owned) event_templates,
+                                           event_templates,
                                            StorageState.ANY,
                                            q.max_results,
                                            ResultType.MOST_RECENT_SUBJECTS,

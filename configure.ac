@@ -48,7 +48,7 @@ dnl ==============================================
 dnl Check that we meet the dependencies
 dnl ==============================================
 MIN_GLIB_VERSION=2.26.0
-MIN_ZEITGEIST_VERSION=0.3.14
+MIN_ZEITGEIST_VERSION=0.9.14
 MIN_GEE_VERSION=0.5.2
 MIN_JSON_VERSION=0.10.0
 
@@ -85,9 +85,9 @@ dnl Check that we meet the optional dependencies
 dnl ==============================================
 
 if test "x$enable_zeitgeist" = "xyes" ; then
-	PKG_CHECK_EXISTS([zeitgeist-1.0 >= $MIN_ZEITGEIST_VERSION],,
-	                 AC_MSG_ERROR([zeitgeist-1.0 is not installed]))
-	PKG_CHECK_MODULES(ZEITGEIST, zeitgeist-1.0 >= $MIN_ZEITGEIST_VERSION)
+	PKG_CHECK_EXISTS([zeitgeist-2.0 >= $MIN_ZEITGEIST_VERSION],,
+	                 AC_MSG_ERROR([zeitgeist-2.0 is not installed]))
+	PKG_CHECK_MODULES(ZEITGEIST, zeitgeist-2.0 >= $MIN_ZEITGEIST_VERSION)
 	AC_DEFINE(HAVE_ZEITGEIST, 1, [Have Zeitgeist])
 fi
 AM_CONDITIONAL(HAVE_ZEITGEIST, test "x$enable_zeitgeist" = "xyes")

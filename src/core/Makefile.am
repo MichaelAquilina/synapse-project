@@ -34,7 +34,7 @@ libsynapsecore_la_VALASOURCES = \
 
 if HAVE_ZEITGEIST
 libsynapsecore_la_VALASOURCES += relevancy-backend-zg.vala
-libsynapsecore_la_VALAFLAGS += --pkg zeitgeist-1.0 -D HAVE_ZEITGEIST
+libsynapsecore_la_VALAFLAGS += --pkg zeitgeist-2.0 -D HAVE_ZEITGEIST
 libsynapsecore_la_CFLAGS += $(ZEITGEIST_CFLAGS)
 libsynapsecore_la_LIBADD += $(ZEITGEIST_LIBS)
 endif

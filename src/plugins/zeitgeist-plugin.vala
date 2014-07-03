@@ -84,12 +84,12 @@ namespace Synapse
       private void init_from_event (Zeitgeist.Event event,
                                     bool use_origin = false)
       {
-        var subject = event.get_subject (0);
-        this.uri = use_origin ? subject.get_origin () : subject.get_current_uri ();
+        var subject = event.subjects[0];
+        this.uri = use_origin ? subject.origin : subject.current_uri;
         var f = File.new_for_uri (this.uri);
         this.description = f.get_parse_name ();
 
-        unowned string text = subject.get_text ();
+        unowned string text = subject.text;
         if (use_origin)
         {
           this.title = Path.get_basename (f.get_parse_name ());
@@ -103,26 +103,26 @@ namespace Synapse
           this.title = text;
         }
         
-        this.mime_type = subject.get_mimetype ();
+        this.mime_type = subject.mimetype;
 
-        unowned string interpretation = subject.get_interpretation ();
-        if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_AUDIO))
+        unowned string interpretation = subject.interpretation;
+        if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO.AUDIO))
         {
           this.file_type = QueryFlags.AUDIO;
         }
-        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_VIDEO))
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO.VIDEO))
         {
           this.file_type = QueryFlags.VIDEO;
         }
-        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_IMAGE))
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO.IMAGE))
         {
           this.file_type = QueryFlags.IMAGES;
         }
-        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_DOCUMENT))
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO.DOCUMENT))
         {
           this.file_type = QueryFlags.DOCUMENTS;
         }
-        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO_WEBSITE))
+        else if (Zeitgeist.Symbol.is_a (interpretation, Zeitgeist.NFO.WEBSITE))
         {
           this.file_type = QueryFlags.INTERNET;
         }
@@ -136,8 +136,8 @@ namespace Synapse
       {
         this.file_type = QueryFlags.UNCATEGORIZED;
         this.match_type = MatchType.APPLICATION;
-        var subject = event.get_subject (0);
-        this.uri = subject.get_uri ();
+        var subject = event.subjects[0];
+        this.uri = subject.uri;
 
         var dfs = DesktopFileService.get_default ();
         var dfi = dfs.get_desktop_file_for_id (uri.substring (14));
@@ -151,8 +151,8 @@ namespace Synapse
       
       public void init_extended_info_from_event (Zeitgeist.Event event)
       {
-        var now = Zeitgeist.Timestamp.now ();
-        var delta = now - event.get_timestamp ();
+        var now = new DateTime.now_local ().to_unix () * 1000;
+        var delta = now - event.timestamp;
         if (delta < Zeitgeist.Timestamp.MINUTE * 2)
         {
           extended_info = _("few moments ago");
@@ -252,9 +252,9 @@ namespace Synapse
       foreach (var event in events)
       {
         if (event.num_subjects () <= 0) continue;
-        var subject = event.get_subject (0);
+        var subject = event.subjects[0];
         unowned string uri = places_search ?
-          subject.get_origin () : subject.get_current_uri ();
+          subject.origin : subject.current_uri;
         if (uri == null || uri == "") continue;
         // make sure we don't add the same uri twice
         if (!(uri in uris))
@@ -320,7 +320,7 @@ namespace Synapse
           else // non native (mostly remote uris)
           {
             relevancy_penalty += Match.Score.INCREMENT_SMALL;
-            unowned string mimetype = subject.get_mimetype ();
+            unowned string mimetype = subject.mimetype;
             if (mimetype != null && mimetype != "")
             {
               icon = ContentType.get_icon (mimetype).to_string ();
@@ -398,7 +398,7 @@ namespace Synapse
         if (event.num_subjects () <= 0) continue;
         var subject = event.get_subject (0);
         unowned string uri = places_search ?
-          subject.get_origin () : subject.get_current_uri ();
+          subject.origin : subject.current_uri;
         if (uri == null || uri == "") continue;
 
         if (!(uri in uris))
@@ -450,7 +450,7 @@ namespace Synapse
           else
           {
             relevancy_penalty += Match.Score.INCREMENT_SMALL;
-            unowned string mimetype = subject.get_mimetype ();
+            unowned string mimetype = subject.mimetype;
             if (mimetype != null && mimetype != "")
             {
               icon = ContentType.get_icon (mimetype).to_string ();
@@ -478,7 +478,7 @@ namespace Synapse
     {
       var templates = new GenericArray<Zeitgeist.Event> ();
       var manifestation = QueryFlags.INCLUDE_REMOTE in flags ?
-        "" : "!" + Zeitgeist.NFO_REMOTE_DATA_OBJECT;
+        "" : "!" + Zeitgeist.NFO.REMOTE_DATA_OBJECT;
 
       Zeitgeist.Event event;
       Zeitgeist.Subject subject;
@@ -492,18 +492,18 @@ namespace Synapse
       if (flags_intersect == almost_all) // "All" category
       {
         subject = new Zeitgeist.Subject ();
-        subject.set_manifestation (manifestation);
+        subject.manifestation = manifestation;
         event = new Zeitgeist.Event ();
         event.add_subject (subject);
         /* ignore some results */
         // bzr plugin logs these, and we probably don't want to search
         //   in commit messages
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation ("!" + Zeitgeist.NFO_FOLDER);
+        subject.interpretation = "!" + Zeitgeist.NFO.FOLDER;
         event.add_subject (subject);
         // according to seif,these results arent wanted (because of App plugin?)
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation ("!" + Zeitgeist.NFO_SOFTWARE);
+        subject.interpretation = "!" + Zeitgeist.NFO.SOFTWARE;
         event.add_subject (subject);
 
         templates.add (event);
@@ -514,7 +514,7 @@ namespace Synapse
       if (QueryFlags.APPLICATIONS in flags)
       {
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation (Zeitgeist.NFO_SOFTWARE);
+        subject.interpretation = Zeitgeist.NFO.SOFTWARE;
         event = new Zeitgeist.Event ();
         event.add_subject (subject);
 
@@ -524,8 +524,8 @@ namespace Synapse
       if (QueryFlags.AUDIO in flags)
       {
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation (Zeitgeist.NFO_AUDIO);
-        subject.set_manifestation (manifestation);
+        subject.interpretation = Zeitgeist.NFO.AUDIO;
+        subject.manifestation = manifestation;
         event = new Zeitgeist.Event ();
         event.add_subject (subject);
 
@@ -535,8 +535,8 @@ namespace Synapse
       if (QueryFlags.VIDEO in flags)
       {
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation (Zeitgeist.NFO_VIDEO);
-        subject.set_manifestation (manifestation);
+        subject.interpretation = Zeitgeist.NFO.VIDEO;
+        subject.manifestation = manifestation;
         event = new Zeitgeist.Event ();
         event.add_subject (subject);
 
@@ -546,8 +546,8 @@ namespace Synapse
       if (QueryFlags.IMAGES in flags)
       {
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation (Zeitgeist.NFO_IMAGE);
-        subject.set_manifestation (manifestation);
+        subject.interpretation = Zeitgeist.NFO.IMAGE;
+        subject.manifestation = manifestation;
         event = new Zeitgeist.Event ();
         event.add_subject (subject);
 
@@ -557,8 +557,8 @@ namespace Synapse
       if (QueryFlags.DOCUMENTS in flags)
       {
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation (Zeitgeist.NFO_DOCUMENT);
-        subject.set_manifestation (manifestation);
+        subject.interpretation = Zeitgeist.NFO.DOCUMENT;
+        subject.manifestation = manifestation;
         event = new Zeitgeist.Event ();
         event.add_subject (subject);
 
@@ -568,8 +568,8 @@ namespace Synapse
       if (QueryFlags.INTERNET in flags)
       {
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation (Zeitgeist.NFO_WEBSITE);
-        subject.set_manifestation (manifestation);
+        subject.interpretation = Zeitgeist.NFO.WEBSITE;
+        subject.manifestation = manifestation;
         event = new Zeitgeist.Event ();
         event.add_subject (subject);
 
@@ -580,29 +580,29 @@ namespace Synapse
       {
         event = new Zeitgeist.Event ();
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation ("!" + Zeitgeist.NFO_SOFTWARE);
+        subject.interpretation = "!" + Zeitgeist.NFO.SOFTWARE;
         event.add_subject (subject);
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation ("!" + Zeitgeist.NFO_AUDIO);
+        subject.interpretation = "!" + Zeitgeist.NFO.AUDIO;
         event.add_subject (subject);
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation ("!" + Zeitgeist.NFO_VIDEO);
+        subject.interpretation = "!" + Zeitgeist.NFO.VIDEO;
         event.add_subject (subject);
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation ("!" + Zeitgeist.NFO_IMAGE);
+        subject.interpretation = "!" + Zeitgeist.NFO.IMAGE;
         event.add_subject (subject);
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation ("!" + Zeitgeist.NFO_DOCUMENT);
+        subject.interpretation = "!" + Zeitgeist.NFO.DOCUMENT;
         event.add_subject (subject);
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation ("!" + Zeitgeist.NFO_WEBSITE);
+        subject.interpretation = "!" + Zeitgeist.NFO.WEBSITE;
         event.add_subject (subject);
 
         // and one more subject to say that we might not want remote stuff
         if (!(QueryFlags.INCLUDE_REMOTE in flags))
         {
           subject = new Zeitgeist.Subject ();
-          subject.set_manifestation (manifestation);
+          subject.manifestation = manifestation;
           event.add_subject (subject);
         }
 
@@ -613,7 +613,7 @@ namespace Synapse
       {
         event = new Zeitgeist.Event ();
         subject = new Zeitgeist.Subject ();
-        subject.set_interpretation ("!" + Zeitgeist.NFO_WEBSITE);
+        subject.interpretation = "!" + Zeitgeist.NFO.WEBSITE;
         event.add_subject (subject);
 
         templates.add (event);
@@ -638,7 +638,7 @@ namespace Synapse
 
       var timer = new Timer ();
 
-      var templates = new PtrArray ();
+      var templates = new GLib.GenericArray<Zeitgeist.Event> ();
       var event_templates = create_templates (q.query_type);
       if (event_templates.length == 0) return null; // nothing to search for
       for (int i=0; i<event_templates.length; i++)
@@ -696,9 +696,9 @@ namespace Synapse
         // special case empty searches
         if (empty_query)
         {
-          int64 start_ts = Zeitgeist.Timestamp.now () - Zeitgeist.Timestamp.WEEK * 24;
+          int64 start_ts = new DateTime.now_local ().to_unix () * 1000 - Zeitgeist.Timestamp.WEEK * 24;
           rs = yield zg_log.find_events (new Zeitgeist.TimeRange (start_ts, int64.MAX),
-                                         (owned) templates,
+                                         templates,
                                          Zeitgeist.StorageState.ANY,
                                          q.max_results,
                                          rt,
@@ -716,7 +716,7 @@ namespace Synapse
           search_query = "(%s*)".printf (string.joinv ("* ", words));
           rs = yield zg_index.search (search_query,
                                       new Zeitgeist.TimeRange (int64.MIN, int64.MAX),
-                                      (owned) templates,
+                                      templates,
                                       0,
                                       q.max_results,
                                       rt,
