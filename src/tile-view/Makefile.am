@@ -9,6 +9,7 @@ libtileview_la_VALAFLAGS = \
 	--pkg gtk+-3.0 \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
+	-g \
 	$(NULL)
 
 libtileview_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h

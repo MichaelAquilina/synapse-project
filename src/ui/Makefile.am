@@ -24,6 +24,7 @@ synapse_VALAFLAGS = \
 	--pkg tile-view \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
+	-g \
 	$(NULL)
 
 synapse_CFLAGS = \

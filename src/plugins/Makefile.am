@@ -17,6 +17,7 @@ libplugins_la_VALAFLAGS = \
 	--pkg synapse-core \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
+	-g \
 	$(NULL)
 
 libplugins_la_CFLAGS = \

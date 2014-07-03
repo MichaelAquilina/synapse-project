@@ -13,6 +13,7 @@ libsynapsecore_la_VALAFLAGS = \
 	--pkg gio-unix-2.0 \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
+	-g \
 	$(NULL)
 
 libsynapsecore_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h -w $(LIBM)
