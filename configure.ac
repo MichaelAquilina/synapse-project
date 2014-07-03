@@ -2,10 +2,11 @@ AC_INIT([synapse], [0.2.99])
 AC_DEFINE(RELEASE_NAME, "Cholecystokinin", "Codename of this release")
 
 AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS([config.h])
 
-AM_INIT_AUTOMAKE([1.11 -Wno-portability])
+AM_INIT_AUTOMAKE([1.11 tar-ustar dist-xz no-dist-gzip -Wno-portability subdir-objects])
 
 dnl -- Populate top_srcdir variable
 top_srcdir=$(readlink -f $0 | sed -e s/configure$//)
@@ -22,17 +23,15 @@ ALL_LINGUAS=`ls ${top_srcdir}/po/*.po | sed 's/.po$//' | sed 's/.*\///' | tr '\n
 IT_PROG_INTLTOOL([0.35])
 AM_GLIB_GNU_GETTEXT
 
-dnl pkg-config
-AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
-if test "x$PKG_CONFIG" = "xno"; then
-        AC_MSG_ERROR([You need to install pkg-config])
-fi
+PKG_PROG_PKG_CONFIG([0.21])
 
 AC_PROG_INSTALL
 AC_PROG_CC
 AM_PROG_CC_C_O
-AC_PROG_LIBTOOL
+LT_INIT
 AC_STDC_HEADERS
+
+LT_LIB_M
 
 dnl ==============================================
 dnl Check for Vala
@@ -120,15 +119,6 @@ if test "x$enable_librest" = "xyes" ; then
 	AC_DEFINE(HAVE_LIBREST, 1, [Have librest])
 fi
 AM_CONDITIONAL(HAVE_LIBREST, test "x$enable_librest" = "xyes")
-
-dnl Expansions
-AS_AC_EXPAND([PKGDATADIR], [$datadir/$PACKAGE_NAME])
-AS_AC_EXPAND([DATADIR], [$datadir])
-dnl AS_AC_EXPAND([LIBDIR], [$libdir])
-dnl AS_AC_EXPAND([LIBEXECDIR], [$libexecdir])
-
-AC_DEFINE_UNQUOTED(PKGDATADIR, "$PKGDATADIR", [Package base directory])
-AC_DEFINE_UNQUOTED(DATADIR, "$DATADIR", [Data directory])
 
 AC_CONFIG_FILES([
 Makefile

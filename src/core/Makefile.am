@@ -15,7 +15,7 @@ libsynapsecore_la_VALAFLAGS = \
 	$(VAPIDIR)/config.vapi \
 	$(NULL)
 
-libsynapsecore_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h -w -lm
+libsynapsecore_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h -w $(LIBM)
 libsynapsecore_la_LIBADD = $(SYNAPSE_MODULES_LIBS)
 libsynapsecore_la_VALASOURCES = \
 	common-actions.vala \

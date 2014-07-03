@@ -39,7 +39,7 @@ synapse_LDADD = \
 	$(top_builddir)/src/core/libsynapsecore.la \
 	$(top_builddir)/src/plugins/libplugins.la \
 	$(top_builddir)/src/tile-view/libtileview.la \
-	-lm
+	$(LIBM) \
 	$(NULL)
 
 if HAVE_INDICATOR
