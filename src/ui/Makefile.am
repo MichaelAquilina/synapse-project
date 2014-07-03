@@ -55,7 +55,7 @@ synapse_LDADD += $(REST_LIBS)
 endif
 
 if HAVE_ZEITGEIST
-synapse_VALAFLAGS += --pkg zeitgeist-1.0 -D HAVE_ZEITGEIST
+synapse_VALAFLAGS += --pkg zeitgeist-2.0 -D HAVE_ZEITGEIST
 synapse_CFLAGS += $(ZEITGEIST_CFLAGS)
 synapse_LDADD += $(ZEITGEIST_LIBS)
 endif
