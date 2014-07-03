@@ -207,7 +207,7 @@ namespace Synapse
           // wait 2 seconds
           Timeout.add (2000, do_hibernate.callback);
           yield;
-          dbus_interface.hibernate ();
+          dbus_interface.hibernate.begin ();
         }
         catch (IOError err)
         {

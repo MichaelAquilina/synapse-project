@@ -100,7 +100,7 @@ namespace Synapse
       directory_hits = new Gee.HashMap<string, int> ();
       directory_contents = new Gee.HashMap<string, Utils.FileInfo?> ();
 
-      analyze_recent_documents ();
+      analyze_recent_documents.begin ();
     }
     
     private bool initialization_done = false;

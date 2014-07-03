@@ -228,10 +228,14 @@ namespace Synapse
     {
       p = null;
 
-      PurpleInterface p = Bus.get_proxy_sync (BusType.SESSION,
-                                   PurpleInterface.UNIQUE_NAME,
-                                   PurpleInterface.OBJECT_PATH);
-      
+      try {
+        PurpleInterface p = Bus.get_proxy_sync (BusType.SESSION,
+                                     PurpleInterface.UNIQUE_NAME,
+                                     PurpleInterface.OBJECT_PATH);
+      }
+      catch {
+      }
+
       if (p != null)
       {
         init_contacts.begin (
@@ -280,7 +284,7 @@ namespace Synapse
       else if (addremove >= 0)
       {
         if (addremove == 1)
-          get_contact (buddy);
+          get_contact.begin (buddy);
         else
           contacts.unset (buddy);
       }

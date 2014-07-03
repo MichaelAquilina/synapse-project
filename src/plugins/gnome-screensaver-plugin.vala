@@ -69,11 +69,15 @@ namespace Synapse
     
     public static void lock_screen ()
     {
-      GnomeScreenSaver dbus_interface = Bus.get_proxy_sync (BusType.SESSION,
-                                               GnomeScreenSaver.UNIQUE_NAME,
-                                               GnomeScreenSaver.OBJECT_PATH);
-      // we need the async variant cause Screensaver doesn't send the reply
-      dbus_interface.lock.begin ();
+      try {
+        GnomeScreenSaver dbus_interface = Bus.get_proxy_sync (BusType.SESSION,
+                                                 GnomeScreenSaver.UNIQUE_NAME,
+                                                 GnomeScreenSaver.OBJECT_PATH);
+        // we need the async variant cause Screensaver doesn't send the reply
+        dbus_interface.lock.begin ();
+      } catch (IOError err) {
+        warning ("%s", err.message);
+      }
     }
 
     static void register_plugin ()

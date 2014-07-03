@@ -112,10 +112,10 @@ namespace Synapse
       dfs.reload_done.connect (() => {
         mimetype_map.clear ();
         desktop_files.clear ();
-        load_all_desktop_files ();
+        load_all_desktop_files.begin ();
       });
 
-      load_all_desktop_files ();
+      load_all_desktop_files.begin ();
     }
 
     public signal void load_complete ();
