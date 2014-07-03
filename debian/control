@@ -8,10 +8,10 @@ Build-Depends: debhelper (>= 7.0.50~),
  libtool,
  pkg-config,
  valac (>= 0.16.0),
- libzeitgeist-dev (>= 0.2.14),
+ libzeitgeist-2.0-dev (>= 0.9.14),
  libdbus-glib-1-dev,
- libgtk-3-dev (>= 2.20.0),
- libglib2.0-dev (>= 2.22.0),
+ libgtk-3-dev (>= 3.0.0),
+ libglib2.0-dev (>= 2.26.0),
  libgee-dev (>= 0.5.2),
  libjson-glib-dev (>= 0.10.0),
  libunique-3.0-dev,
@@ -29,12 +29,7 @@ Package: synapse
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-#Hard-code version for Lucid, ${shlibs:Depends} doesn't work for libs in the PPA
-         libjson-glib-1.0-0 (>= 0.10.0),
-         libgee2 (>= 0.6.0),
-         libzeitgeist-1.0-0 (>= 0.2.14) | libzeitgeist-1.0-1 (>= 0.3.2)
-Recommends: zeitgeist (>= 0.6.0~) | zeitgeist-core (>= 0.6.0~),
-            zeitgeist-fts-extension | zeitgeist-extension-fts
+Recommends: zeitgeist (>= 0.9.14) | zeitgeist-core (>= 0.9.14)
 Description: semantic file launcher
  Synapse is a graphical launcher enabling you to start applications and also
  to quickly find and access relevant documents and files (by making use of the
