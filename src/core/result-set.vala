@@ -20,7 +20,7 @@
 
 namespace Synapse
 {
-  public class ResultSet : Object, Gee.Iterable <Gee.Map.Entry <Match, int>>
+  public class ResultSet : Object, Gee.Traversable<Match>, Gee.Iterable <Gee.Map.Entry <Match, int>>
   {
     protected Gee.Map<Match, int> matches;
     protected Gee.Set<unowned string> uris;
@@ -86,6 +86,11 @@ namespace Synapse
     public bool contains_uri (string uri)
     {
       return uri in uris;
+    }
+
+    public bool foreach (Gee.ForallFunc<Match> func)
+    {
+      return matches.keys.foreach (func);
     }
 
     public Gee.List<Match> get_sorted_list ()

@@ -82,9 +82,9 @@ namespace Synapse.Gui
           this.cmd = cmd;
           this.mods = mods;
         }
-        public static int compare (void* a, void* b)
+        public static int compare (ModCmd a, ModCmd b)
         {
-          return (int)(((ModCmd)a).mods) - (int)(((ModCmd)b).mods);
+          return (int)(a.mods) - (int)(b.mods);
         }
       }
  

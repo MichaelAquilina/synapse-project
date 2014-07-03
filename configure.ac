@@ -56,7 +56,7 @@ PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   glib-2.0 >= $MIN_GLIB_VERSION \
   gtk+-3.0 \
   gobject-2.0 \
-  gee-1.0 >= $MIN_GEE_VERSION \
+  gee-0.8 >= $MIN_GEE_VERSION \
   gio-unix-2.0 \
   unique-3.0 \
   keybinder-3.0 \
