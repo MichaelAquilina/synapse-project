@@ -1,6 +1,8 @@
 AC_INIT([synapse], [0.2.99])
 AC_DEFINE(RELEASE_NAME, "Cholecystokinin", "Codename of this release")
 
+AC_PREREQ([2.65])
+
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([.])
@@ -8,8 +10,7 @@ AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([1.11 tar-ustar dist-xz no-dist-gzip -Wno-portability subdir-objects])
 
-dnl -- Populate top_srcdir variable
-top_srcdir=$(readlink -f $0 | sed -e s/configure$//)
+AM_MAINTAINER_MODE
 
 dnl ==============================================
 dnl Translation support
@@ -20,14 +21,12 @@ AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, ["$GETTEXT_PACKAGE"], [Define the gettext package to be used])
 IT_PROG_INTLTOOL([0.35.0])
 
-
 PKG_PROG_PKG_CONFIG([0.21])
 
 AC_PROG_INSTALL
 AC_PROG_CC
 AM_PROG_CC_C_O
 LT_INIT
-AC_STDC_HEADERS
 
 LT_LIB_M
 
