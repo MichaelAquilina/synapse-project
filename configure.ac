@@ -43,14 +43,15 @@ AM_SILENT_RULES([yes])
 dnl ==============================================
 dnl Check that we meet the dependencies
 dnl ==============================================
-MIN_GLIB_VERSION=2.26.0
+MIN_GLIB_VERSION=2.28.0
+MIN_GTK_VERSION=3.0.0
 MIN_ZEITGEIST_VERSION=0.9.14
 MIN_GEE_VERSION=0.5.2
 MIN_JSON_VERSION=0.10.0
 
 PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   glib-2.0 >= $MIN_GLIB_VERSION \
-  gtk+-3.0 \
+  gtk+-3.0 >= $MIN_GTK_VERSION \
   gobject-2.0 \
   gee-0.8 >= $MIN_GEE_VERSION \
   gio-unix-2.0 \
