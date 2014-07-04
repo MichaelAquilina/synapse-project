@@ -54,7 +54,7 @@ namespace Synapse
           AppInfo ai = AppInfo.create_from_commandline (
             "devhelp -s \"%s\"".printf (match.title),
             "devhelp", 0);
-          ai.launch (null, new Gdk.AppLaunchContext ());
+          ai.launch (null, null);
         }
         catch (Error err)
         {

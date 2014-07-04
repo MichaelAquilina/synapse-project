@@ -277,7 +277,7 @@ namespace Synapse
           var app_info = new DesktopAppInfo.from_filename (desktop_info.filename);
           List<File> files = new List<File> ();
           files.prepend (f);
-          app_info.launch (files, new Gdk.AppLaunchContext ());
+          app_info.launch (files, null);
         }
         catch (Error err)
         {

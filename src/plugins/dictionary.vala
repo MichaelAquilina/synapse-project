@@ -54,7 +54,7 @@ namespace Synapse
           AppInfo ai = AppInfo.create_from_commandline (
             "gnome-dictionary \"%s\"".printf (match.title),
             "gnome-dictionary", 0);
-          ai.launch (null, new Gdk.AppLaunchContext ());
+          ai.launch (null, null);
         }
         catch (Error err)
         {

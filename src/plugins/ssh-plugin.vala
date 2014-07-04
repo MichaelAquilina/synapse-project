@@ -181,7 +181,7 @@ namespace Synapse
           AppInfo ai = AppInfo.create_from_commandline (
             "ssh %s".printf (this.title),
             "ssh", AppInfoCreateFlags.NEEDS_TERMINAL);
-          ai.launch (null, new Gdk.AppLaunchContext ());
+          ai.launch (null, null);
         }
         catch (Error err)
         {

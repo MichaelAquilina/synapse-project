@@ -623,8 +623,6 @@ namespace Synapse
       {
         processing_query = false;
       }
-
-      return null;
     }
   }
 }
