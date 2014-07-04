@@ -229,7 +229,7 @@ namespace Synapse
       p = null;
 
       try {
-        PurpleInterface p = Bus.get_proxy_sync (BusType.SESSION,
+        p = Bus.get_proxy_sync (BusType.SESSION,
                                      PurpleInterface.UNIQUE_NAME,
                                      PurpleInterface.OBJECT_PATH);
       }
