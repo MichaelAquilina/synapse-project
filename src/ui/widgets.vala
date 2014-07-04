@@ -1139,7 +1139,7 @@ namespace Synapse.Gui
       artists += "Ian Cylkowski <designbyizo@gmail.com>";
       GLib.Object (artists : artists,
                    authors : devs,
-                   copyright : "Copyright (C) 2010-2013 " + string.joinv ("\n", devs),
+                   copyright : "Copyright (C) 2010-2014 " + string.joinv ("\n", devs),
                    program_name: "Synapse",
                    logo_icon_name : "synapse",
                    version: Config.VERSION,
