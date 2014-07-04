@@ -211,7 +211,7 @@ namespace Synapse
 
     private void bind_keyboard_shortcut ()
     {
-      current_shortcut = "<Control>space";
+      current_shortcut = key_combo_config.activate;
       Utils.Logger.log (this, "Binding activation to %s", current_shortcut);
       settings.set_keybinding (current_shortcut, false);
       Keybinder.bind (current_shortcut, handle_shortcut, this);
