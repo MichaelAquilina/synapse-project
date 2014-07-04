@@ -54,7 +54,6 @@ PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   gobject-2.0 \
   gee-0.8 >= $MIN_GEE_VERSION \
   gio-unix-2.0 \
-  unique-3.0 \
   keybinder-3.0 \
   json-glib-1.0 >= $MIN_JSON_VERSION \
   libnotify

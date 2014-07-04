@@ -107,7 +107,7 @@ namespace Synapse
       activate_item.set_image (new Gtk.Image.from_stock (Gtk.Stock.EXECUTE, Gtk.IconSize.MENU));
       activate_item.activate.connect (() =>
       {
-        show_ui (Gtk.get_current_event_time ());
+        show_ui ();
       });
       indicator_menu.append (activate_item);
       var settings_item = new ImageMenuItem.from_stock (Gtk.Stock.PREFERENCES, null);
@@ -201,10 +201,8 @@ namespace Synapse
       }
     }
     
-    protected void show_ui (uint32 event_time)
+    protected void show_ui ()
     {
-      //if (this.ui == null) return;
-      //this.ui.show_hide_with_time (event_time);
       if (this.controller == null) return;
       this.controller.summon_or_vanish ();
     }
@@ -219,7 +217,7 @@ namespace Synapse
     
     static void handle_shortcut (string key, void* data)
     {
-      ((UILauncher)data).show_ui (Keybinder.get_current_event_time ());
+      ((UILauncher)data).show_ui ();
     }
 
     private void change_keyboard_shortcut (string key)
@@ -283,26 +281,19 @@ namespace Synapse
         Gtk.init (ref argv);
         Notify.init ("synapse");
         
-        var app = new Unique.App ("org.gnome.Synapse", "");
-        if (app.is_running ())
-        {
+        var app = new GLib.Application ("org.gnome.Synapse", ApplicationFlags.FLAGS_NONE);
+        if (!app.register () || app.get_is_remote ()) {
           Utils.Logger.log (null, "Synapse is already running, activating...");
-          app.send_message (Unique.Command.ACTIVATE, null);
+          app.activate ();
         }
         else
         {
           var launcher = new UILauncher ();
-          app.message_received.connect ((cmd, data, event_time) =>
+          app.activate.connect (() =>
           {
-            if (cmd == Unique.Command.ACTIVATE)
-            {
-              launcher.show_ui (event_time);
-
-              return Unique.Response.OK;
-            }
-
-            return Unique.Response.PASSTHROUGH;
+            launcher.show_ui ();
           });
+
           launcher.run ();
         }
       }
