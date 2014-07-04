@@ -15,6 +15,7 @@ dnl ==============================================
 dnl Translation support
 dnl ==============================================
 
+GETTEXT_PACKAGE=AC_PACKAGE_NAME
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, ["$GETTEXT_PACKAGE"], [Define the gettext package to be used])
 IT_PROG_INTLTOOL([0.35.0])
