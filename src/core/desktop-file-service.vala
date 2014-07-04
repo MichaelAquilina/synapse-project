@@ -41,9 +41,12 @@ namespace Synapse
       TDE   = 1 << 6,
       UNITY = 1 << 7,
       XFCE  = 1 << 8,
-      OLD   = 1 << 9,
+      EDE   = 1 << 9,
+      CINNAMON = 1 << 10,
+      PANTHEON = 1 << 11,
 
-      ALL   = 0x3FF
+      OLD   = 1 << 12,
+      ALL   = 0xFFF
     }
    
     public string desktop_id { get; construct set; } 
@@ -97,7 +100,12 @@ namespace Synapse
           case "TDE": result |= EnvironmentType.TDE; break;
           case "UNITY": result |= EnvironmentType.UNITY; break;
           case "XFCE": result |= EnvironmentType.XFCE; break;
+          case "EDE": result |= EnvironmentType.EDE; break;
+          case "CINNAMON": result |= EnvironmentType.CINNAMON; break;
           case "OLD": result |= EnvironmentType.OLD; break;
+
+          case "PANTHEON": result |= EnvironmentType.PANTHEON; break;
+
           default: warning ("%s is not understood", env); break;
         }
       }
@@ -315,6 +323,21 @@ namespace Synapse
       {
         session_type = DesktopFileInfo.EnvironmentType.ROX;
         session_type_str = "ROX";
+      }
+      else if (session.has_prefix ("ede"))
+      {
+        session_type = DesktopFileInfo.EnvironmentType.ROX;
+        session_type_str = "EDE";
+      }
+      else if (session.has_prefix ("cinnamon"))
+      {
+        session_type = DesktopFileInfo.EnvironmentType.ROX;
+        session_type_str = "Cinnamon";
+      }
+      else if (session.has_prefix ("pantheon"))
+      {
+        session_type = DesktopFileInfo.EnvironmentType.ROX;
+        session_type_str = "Pantheon";
       }
       else
       {
