@@ -142,7 +142,7 @@ namespace Synapse
       });
       status_icon.activate.connect (() =>
       {
-        show_ui (Gtk.get_current_event_time ());
+        show_ui ();
       });
       status_icon.set_visible (settings.indicator_active);
       
