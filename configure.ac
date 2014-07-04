@@ -15,13 +15,10 @@ dnl ==============================================
 dnl Translation support
 dnl ==============================================
 
-GETTEXT_PACKAGE=synapse
 AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Gettext package])
-ALL_LINGUAS=`ls ${top_srcdir}/po/*.po | sed 's/.po$//' | sed 's/.*\///' | tr '\n' ' '`
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, ["$GETTEXT_PACKAGE"], [Define the gettext package to be used])
+IT_PROG_INTLTOOL([0.35.0])
 
-IT_PROG_INTLTOOL([0.35])
-AM_GLIB_GNU_GETTEXT
 
 PKG_PROG_PKG_CONFIG([0.21])
 
