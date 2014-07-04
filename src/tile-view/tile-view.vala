@@ -26,7 +26,7 @@ namespace UI.Widgets
   public class TileView: EventBox
   {
     private List<Tile> tiles = new List<Tile> ();
-    private VBox box = new VBox (false, 0);
+    private Box box = new Box (Gtk.Orientation.VERTICAL, 0);
 
     public int icon_size { get; construct set; default = 48; }
 
@@ -38,6 +38,7 @@ namespace UI.Widgets
 
       this.button_press_event.connect (this.on_button_press);
       this.key_press_event.connect (this.on_key_press);
+      box.homogeneous = false;
       box.show ();
       this.add (box);
 

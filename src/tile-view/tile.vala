@@ -104,7 +104,8 @@ namespace UI.Widgets
 
       set_text ();
 
-      button_box = new HBox (false, 3);
+      button_box = new Box (Gtk.Orientation.HORIZONTAL, 3);
+      button_box.homogeneous = false;
       button_box.margin_bottom = 5;
 
       add_remove_button = new Button ();
