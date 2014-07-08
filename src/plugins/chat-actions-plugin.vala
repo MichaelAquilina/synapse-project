@@ -46,9 +46,9 @@ namespace Synapse
                 default_relevancy: Match.Score.EXCELLENT);
       }
       
-      public override void do_execute (Match? match, Match? target = null)
+      public override void do_execute (Match match, Match? target = null)
       {
-        ContactMatch? cm = match as ContactMatch;
+        unowned ContactMatch? cm = match as ContactMatch;
         if ( match == null ) return;
         cm.open_chat ();
       }
@@ -70,9 +70,9 @@ namespace Synapse
                 default_relevancy: Match.Score.VERY_GOOD);
       }
       
-      public override void do_execute (Match? match, Match? target = null)
+      public override void do_execute (Match match, Match? target = null)
       {
-        ContactMatch? cm = match as ContactMatch;
+        unowned ContactMatch? cm = match as ContactMatch;
         if ( match == null || target == null ) return;
         cm.send_message (target.title, false);
       }
@@ -104,11 +104,11 @@ namespace Synapse
                 default_relevancy: Match.Score.VERY_GOOD);
       }
       
-      public override void do_execute (Match? match, Match? target = null)
+      public override void do_execute (Match match, Match? target = null)
       {
         if ( match == null || target == null ) return;
-        ContactMatch? cm = target as ContactMatch;
-        TextMatch? text = match as TextMatch;
+        unowned ContactMatch? cm = target as ContactMatch;
+        unowned TextMatch? text = match as TextMatch;
         if ( cm == null || text == null ) return;
         cm.send_message (text.get_text (), false);
       }

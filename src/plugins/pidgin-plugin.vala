@@ -98,11 +98,12 @@ namespace Synapse
                   default_relevancy: Match.Score.AVERAGE);
       }
       
-      public override void do_execute (Match? match, Match? target = null)
+      public override void do_execute (Match match, Match? target = null)
       {
-        Contact? c = target as Contact;
-        UriMatch? u = match as UriMatch;
-        if (c == null) return;
+        unowned Contact? c = target as Contact;
+        return_if_fail (c != null);
+        unowned UriMatch? u = match as UriMatch;
+        return_if_fail (u != null);
         
         c.send_file (u.uri);
       }
@@ -112,7 +113,8 @@ namespace Synapse
         switch (match.match_type)
         {
           case MatchType.GENERIC_URI:
-            UriMatch um = match as UriMatch;
+            unowned UriMatch? um = match as UriMatch;
+            return_val_if_fail (um != null, false);
             return (um.file_type & QueryFlags.FILES) != 0;
           default:
             return false;

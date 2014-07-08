@@ -174,11 +174,12 @@ namespace Synapse
         }
       }
       
-      public override void do_execute (Match? match, Match? target = null)
+      public override void do_execute (Match match, Match? target = null)
       {
         if (match.match_type == MatchType.GENERIC_URI && match is UriMatch)
         {
-          var uri_match = match as UriMatch;
+          unowned UriMatch? uri_match = match as UriMatch;
+          return_if_fail (uri_match != null);
           var f = File.new_for_uri (uri_match.uri);
           string path = f.get_path ();
           if (path == null)
@@ -194,7 +195,8 @@ namespace Synapse
         }
         else if (match.match_type == MatchType.TEXT)
         {
-          TextMatch? text_match = match as TextMatch;
+          unowned TextMatch? text_match = match as TextMatch;
+          return_if_fail (text_match != null);
           string content = text_match != null ? text_match.get_text () : match.title;
           pastebin_text.begin (content, (obj, res) =>
           {

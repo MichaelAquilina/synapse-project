@@ -54,7 +54,7 @@ namespace Synapse
         return default_relevancy;
       }
       
-      public virtual void execute_with_target (Match? source, Match? target = null)
+      public virtual void execute_with_target (Match source, Match? target = null)
       {
         if (target == null) execute (source);
         else Utils.Logger.error (this, "execute () is not implemented");
@@ -81,11 +81,11 @@ namespace Synapse
                 default_relevancy: Match.Score.AVERAGE);
       }
       
-      public override void execute_with_target (Match? source, Match? target = null)
+      public override void execute_with_target (Match source, Match? target = null)
       {
         if (target == null) return; // not possible
         
-        UriMatch uri_match = source as UriMatch;
+        unowned UriMatch? uri_match = source as UriMatch;
         if (uri_match == null) return; // not possible
         
         File f;
@@ -122,7 +122,8 @@ namespace Synapse
         switch (match.match_type)
         {
           case MatchType.GENERIC_URI:
-            UriMatch um = match as UriMatch;
+            unowned UriMatch? um = match as UriMatch;
+            return_val_if_fail (um != null, false);
             return (um.file_type & QueryFlags.FILES) != 0;
           default:
             return false;

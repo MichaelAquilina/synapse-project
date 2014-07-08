@@ -66,7 +66,7 @@ namespace Synapse
     {
       matches.set (match, relevancy);
 
-      unowned UriMatch? uri_match = match as UriMatch
+      unowned UriMatch? uri_match = match as UriMatch;
       if (uri_match != null)
       {
         unowned string uri = uri_match.uri;
