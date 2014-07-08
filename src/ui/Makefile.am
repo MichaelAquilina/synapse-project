@@ -88,7 +88,7 @@ synapse_SOURCES = $(synapse_VALASOURCES:.vala=.c)
 # flags (ie --disable-indicator won't rebuild the Vala sources)
 
 #synapse_vala.stamp: $(addprefix $(srcdir)/,$(synapse_VALASOURCES)) Makefile
-synapse_vala.stamp: $(synapse_VALASOURCES) Makefile
+synapse_vala.stamp: $(synapse_VALASOURCES) $(top_builddir)/src/core/synapse-core.vapi $(top_builddir)/src/plugins/plugins.vapi $(top_builddir)/src/tile-view/tile-view.vapi Makefile
 	$(AM_V_VALA)$(VALAC) $(synapse_VALAFLAGS) $(VALAFLAGS) -C $(filter %.vala %.c,$^)
 	$(AM_V_at)touch $@
 

@@ -76,7 +76,7 @@ libplugins_la_SOURCES = \
 	$(libplugins_la_VALASOURCES:.vala=.c) \
 	$(NULL)
 
-plugins.vapi plugins.vala.stamp: $(libplugins_la_VALASOURCES) Makefile
+plugins.vapi plugins.vala.stamp: $(libplugins_la_VALASOURCES) $(top_builddir)/src/core/synapse-core.vapi Makefile
 	$(AM_V_VALA)$(VALAC) $(libplugins_la_VALAFLAGS) -C -H plugins.h --library plugins $(filter %.vala %.c,$^)
 	touch $@
 
