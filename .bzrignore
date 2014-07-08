@@ -1,6 +1,7 @@
 COPYING
 INSTALL
 aclocal.m4
+ChangeLog
 compile
 config.guess
 config.h
