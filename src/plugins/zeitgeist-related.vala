@@ -139,7 +139,7 @@ namespace Synapse
 
       if (m is UriMatch)
       {
-        var um = m as UriMatch;
+        unowned UriMatch um = (UriMatch) m;
         Utils.Logger.debug (this, "searching for items related to %s", um.uri);
 
         s = new Subject ();
@@ -149,20 +149,21 @@ namespace Synapse
       }
       else if (m is ApplicationMatch)
       {
+        unowned ApplicationMatch am = (ApplicationMatch) m;
         string app_id;
-        var app_info = (m as ApplicationMatch).app_info;
+        var app_info = am.app_info;
         if (app_info != null)
         {
           app_id = app_info.get_id () ?? "";
           if (app_id == "" && app_info is DesktopAppInfo)
           {
-            app_id = (app_info as DesktopAppInfo).get_filename () ?? "";
+            app_id = ((DesktopAppInfo) app_info).get_filename () ?? "";
             app_id = Path.get_basename (app_id);
           }
         }
         else
         {
-          app_id = Path.get_basename ((m as ApplicationMatch).filename);
+          app_id = Path.get_basename (am.filename);
         }
 
         if (app_id == null || app_id == "")

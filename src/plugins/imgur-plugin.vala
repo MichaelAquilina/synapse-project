@@ -190,7 +190,7 @@ namespace Synapse
       {
         if (match.match_type == MatchType.GENERIC_URI && match is UriMatch)
         {
-          unowned UriMatch uri_match = match as UriMatch;
+          unowned UriMatch? uri_match = match as UriMatch;
           return_if_fail (uri_match != null);
           upload_file.begin (uri_match.uri, (obj, res) =>
           {
@@ -215,7 +215,8 @@ namespace Synapse
         switch (match.match_type)
         {
           case MatchType.GENERIC_URI:
-            var um = match as UriMatch;
+            unowned UriMatch? um = match as UriMatch;
+            return_val_if_fail (um != null, false);
             // FIXME: maybe we shouldn't care about the real path?
             var f = File.new_for_uri (um.uri);
             if (f.get_path () == null) return false;
@@ -239,7 +240,7 @@ namespace Synapse
       
       protected override void process_result (string? url, Match? target = null)
       {
-        ContactMatch? contact = target as ContactMatch;
+        unowned ContactMatch? contact = target as ContactMatch;
         if (contact == null || url == null)
         {
           base.process_result (url, null);

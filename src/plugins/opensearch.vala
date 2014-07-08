@@ -181,7 +181,7 @@ namespace Synapse
         try
         {
           string what = (match is TextMatch) ?
-            (match as TextMatch).get_text () : match.title;
+            ((TextMatch) match).get_text () : match.title;
           AppInfo.launch_default_for_uri (get_query_url (what), null);
         }
         catch (Error err)

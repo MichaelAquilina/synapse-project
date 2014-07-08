@@ -540,7 +540,7 @@ namespace Synapse
         // let's mine directories ZG is aware of
         foreach (var match in rs)
         {
-          unowned UriMatch uri_match = match.key as UriMatch;
+          unowned UriMatch? uri_match = match.key as UriMatch;
           if (uri_match == null) continue;
           uris.add (uri_match.uri);
         }

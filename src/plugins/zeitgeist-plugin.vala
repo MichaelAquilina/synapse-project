@@ -364,7 +364,7 @@ namespace Synapse
       
       foreach (var entry in results.entries)
       {
-        var mo = entry.key as MatchObject;
+        unowned MatchObject mo = (MatchObject) entry.key;
         if (mo.uri != null && mo.uri.has_prefix ("http") && minimum != maximum)
         {
           long len = mo.uri.length;

@@ -185,7 +185,7 @@ namespace Synapse
       
       foreach (var match in rs)
       {
-        unowned UriMatch uri_match = match.key as UriMatch;
+        unowned UriMatch? uri_match = match.key as UriMatch;
         if (uri_match == null) continue;
         var f = File.new_for_uri (uri_match.uri);
         if (!f.is_native () || !f.has_parent (null)) continue;

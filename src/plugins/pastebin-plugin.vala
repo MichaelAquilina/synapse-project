@@ -213,7 +213,8 @@ namespace Synapse
           case MatchType.TEXT:
             return true;
           case MatchType.GENERIC_URI:
-            var um = match as UriMatch;
+            unowned UriMatch um = match as UriMatch;
+            return_val_if_fail (um != null, false);
             var f = File.new_for_uri (um.uri);
             if (f.get_path () == null) return false;
             return ContentType.is_a (um.mime_type, "text/*");
@@ -236,7 +237,7 @@ namespace Synapse
       
       protected override void process_pastebin_result (string? url, Match? target = null)
       {
-        ContactMatch? contact = target as ContactMatch;
+        unowned ContactMatch? contact = target as ContactMatch;
         if (contact == null || url == null)
         {
           base.process_pastebin_result (url, null);

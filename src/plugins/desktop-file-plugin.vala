@@ -268,7 +268,7 @@ namespace Synapse
       
       protected void execute (Match? match)
       {
-        UriMatch uri_match = match as UriMatch;
+        unowned UriMatch? uri_match = match as UriMatch;
         return_if_fail (uri_match != null);
         
         var f = File.new_for_uri (uri_match.uri);
@@ -292,7 +292,7 @@ namespace Synapse
     {
       if (match.match_type != MatchType.GENERIC_URI) return null;
 
-      var uri_match = match as UriMatch;
+      unowned UriMatch? uri_match = match as UriMatch;
       return_val_if_fail (uri_match != null, null);
       
       if (uri_match.mime_type == null) return null;

@@ -275,7 +275,8 @@ namespace Synapse
       public override void execute_internal (Match? match)
       {
         return_if_fail (match.match_type == MatchType.GENERIC_URI);
-        UriMatch uri = match as UriMatch;
+        unowned UriMatch? uri = match as UriMatch;
+        return_if_fail (uri != null);
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
         try {
           RhythmboxShell shell = Bus.get_proxy_sync (BusType.SESSION,
@@ -299,7 +300,8 @@ namespace Synapse
         switch (match.match_type)
         {
           case MatchType.GENERIC_URI:
-            UriMatch uri = match as UriMatch;
+            unowned UriMatch? uri = match as UriMatch;
+            return_val_if_fail (uri != null, false);
             if ((uri.file_type & QueryFlags.AUDIO) != 0)
               return true;
             else
@@ -323,7 +325,8 @@ namespace Synapse
       public override void execute_internal (Match? match)
       {
         return_if_fail (match.match_type == MatchType.GENERIC_URI);
-        UriMatch uri = match as UriMatch;
+        unowned UriMatch? uri = match as UriMatch;
+        return_if_fail (uri != null);
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
         try {
           RhythmboxShell shell = Bus.get_proxy_sync (BusType.SESSION,
@@ -346,7 +349,8 @@ namespace Synapse
         switch (match.match_type)
         {
           case MatchType.GENERIC_URI:
-            UriMatch uri = match as UriMatch;
+            unowned UriMatch? uri = match as UriMatch;
+            return_val_if_fail (uri != null, false);
             if ((uri.file_type & QueryFlags.AUDIO) != 0)
               return true;
             else
