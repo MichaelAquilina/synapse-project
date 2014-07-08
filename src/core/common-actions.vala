@@ -280,7 +280,7 @@ namespace Synapse
       public override bool valid_for_match (Match match)
       {
         unowned UriMatch? uri_match = match as UriMatch;
-        return_val_if_fail (uri_match != null, false);
+        if (uri_match == null) return false;
 
         var f = File.new_for_uri (uri_match.uri);
         var parent = f.get_parent ();
