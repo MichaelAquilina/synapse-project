@@ -248,7 +248,8 @@ namespace Synapse
         }
       }
       
-      public override bool needs_target () {
+      public override bool needs_target ()
+      {
         return true;
       }
       

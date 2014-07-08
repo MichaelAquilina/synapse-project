@@ -32,21 +32,8 @@ namespace Synapse
       
     }
     
-    private class BookmarkMatch : Object, Match, UriMatch
+    private class BookmarkMatch : UriMatch
     {
-      // from Match interface
-      public string title { get; construct set; }
-      public string description { get; set; default = ""; }
-      public string icon_name { get; construct set; }
-      public bool has_thumbnail { get; construct set; default = false; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-      
-      // from UriMatch interface
-      public string uri { get; set; }
-      public QueryFlags file_type { get; set; }
-      public string mime_type { get; set; }
-      
       private string? title_folded = null;
       private string? uri_folded = null;
       

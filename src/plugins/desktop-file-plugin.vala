@@ -35,21 +35,8 @@ namespace Synapse
       
     }
 
-    private class DesktopFileMatch: Object, Match, ApplicationMatch
+    private class DesktopFileMatch: ApplicationMatch
     {
-      // for Match interface
-      public string title { get; construct set; }
-      public string description { get; set; default = ""; }
-      public string icon_name { get; construct set; default = ""; }
-      public bool has_thumbnail { get; construct set; default = false; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
-      // for ApplicationMatch
-      public AppInfo? app_info { get; set; default = null; }
-      public bool needs_terminal { get; set; default = false; }
-      public string? filename { get; construct set; }
-
       private string? title_folded = null;
       public unowned string get_title_folded ()
       {
@@ -239,16 +226,8 @@ namespace Synapse
       return result;
     }
     
-    private class OpenWithAction: Object, Match
+    private class OpenWithAction: Match
     {
-       // for Match interface
-      public string title { get; construct set; }
-      public string description { get; set; default = ""; }
-      public string icon_name { get; construct set; default = ""; }
-      public bool has_thumbnail { get; construct set; default = false; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-      
       public DesktopFileInfo desktop_info { get; private set; }
       
       public OpenWithAction (DesktopFileInfo info)
@@ -266,7 +245,7 @@ namespace Synapse
         this.desktop_info = info;
       }
       
-      protected void execute (Match? match)
+      public override void execute (Match? match)
       {
         unowned UriMatch? uri_match = match as UriMatch;
         return_if_fail (uri_match != null);

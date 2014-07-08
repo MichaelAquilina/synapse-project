@@ -31,7 +31,7 @@ namespace Synapse
     CONTACT
   }
 
-  public interface Match: Object
+  public abstract class Match: Object
   {
     public enum Score
     {
@@ -52,13 +52,15 @@ namespace Synapse
       HIGHEST = 100000
     }
     
+    public signal void executed ();
+    
     // properties
-    public abstract string title { get; construct set; }
-    public abstract string description { get; set; }
-    public abstract string icon_name { get; construct set; }
-    public abstract bool has_thumbnail { get; construct set; }
-    public abstract string thumbnail_path { get; construct set; }
-    public abstract MatchType match_type { get; construct set; }
+    public string title { get; construct set; }
+    public string description { get; construct set; }
+    public string icon_name { get; construct set; }
+    public bool has_thumbnail { get; construct set; }
+    public string thumbnail_path { get; construct set; }
+    public MatchType match_type { get; construct set; }
 
     public virtual void execute (Match? match)
     {
@@ -67,11 +69,14 @@ namespace Synapse
     
     public virtual void execute_with_target (Match source, Match? target = null)
     {
-      if (target == null) execute (source);
-      else Utils.Logger.error (this, "execute () is not implemented");
+      if (target == null)
+        execute (source);
+      else
+        Utils.Logger.error (this, "execute_with_target () is not implemented");
     }
     
-    public virtual bool needs_target () {
+    public virtual bool needs_target ()
+    {
       return false;
     }
     
@@ -79,31 +84,29 @@ namespace Synapse
     {
       return QueryFlags.ALL;
     }
-    
-    public signal void executed ();
   }
   
-  public interface ApplicationMatch: Match
+  public abstract class ApplicationMatch: Match
   {
-    public abstract AppInfo? app_info { get; set; }
-    public abstract bool needs_terminal { get; set; }
-    public abstract string? filename { get; construct set; }
+    public AppInfo? app_info { get; set; }
+    public bool needs_terminal { get; set; }
+    public string? filename { get; construct set; }
   }
 
-  public interface UriMatch: Match
+  public abstract class UriMatch: Match
   {
-    public abstract string uri { get; set; }
-    public abstract QueryFlags file_type { get; set; }
-    public abstract string mime_type { get; set; }
+    public string uri { get; set; }
+    public QueryFlags file_type { get; set; }
+    public string mime_type { get; set; }
   }
   
-  public interface ContactMatch: Match
+  public abstract class ContactMatch: Match
   {
     public abstract void send_message (string message, bool present);
     public abstract void open_chat ();
   }
 
-  public interface ExtendedInfo: Match
+  public interface ExtendedInfo
   {
     public abstract string? extended_info { get; set; }
   }
@@ -114,26 +117,22 @@ namespace Synapse
     CLIPBOARD
   }
   
-  public interface TextMatch: Match
+  public abstract class TextMatch: Match
   {
-    public abstract TextOrigin text_origin { get; set; }
+    public TextOrigin text_origin { get; set; }
+
     public abstract string get_text ();
   }
   
-  public interface SearchMatch: Match, SearchProvider
+  public abstract class SearchMatch: Match, SearchProvider
   {
-    public abstract Match search_source { get; set; }
+    public Match search_source { get; set; }
+
+    public abstract async Gee.List<Synapse.Match> search (string query, Synapse.QueryFlags flags, Synapse.ResultSet? dest_result_set, GLib.Cancellable? cancellable = null) throws Synapse.SearchError;
   }
 
-  public class DefaultMatch: Object, Match
+  public class DefaultMatch: Match
   {
-    public string title { get; construct set; }
-    public string description { get; set; }
-    public string icon_name { get; construct set; }
-    public bool has_thumbnail { get; construct set; }
-    public string thumbnail_path { get; construct set; }
-    public MatchType match_type { get; construct set; }
-    
     public DefaultMatch (string query_string)
     {
       Object (title: query_string, description: "", has_thumbnail: false,

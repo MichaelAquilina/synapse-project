@@ -163,20 +163,12 @@ namespace Synapse
       }
     }
     
-    private class SearchAction: Object, Match
+    private class SearchAction: Match
     {
-      // from Match interface
-      public string title { get; construct set; }
-      public string description { get; set; }
-      public string icon_name { get; construct set; }
-      public bool has_thumbnail { get; construct set; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-      
       public int default_relevancy { get; set; default = Match.Score.INCREMENT_MINOR; }
       public string query_template { get; construct set; }
 
-      public void execute (Match? match)
+      public override void execute (Match? match)
       {
         try
         {

@@ -35,22 +35,10 @@ namespace Synapse
       
     }
 
-    private class CommandObject: Object, Match, ApplicationMatch
+    private class CommandObject: ApplicationMatch
     {
-      // for Match interface
-      public string title { get; construct set; }
-      public string description { get; set; default = ""; }
-      public string icon_name { get; construct set; default = ""; }
-      public bool has_thumbnail { get; construct set; default = false; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
-      // for ApplicationMatch
-      public AppInfo? app_info { get; set; default = null; }
-      public bool needs_terminal { get; set; default = false; }
-      public string? filename { get; construct set; default = null; }
       public string command { get; construct set; }
-      
+
       public CommandObject (string cmd)
       {
         Object (title: cmd, description: _ ("Run command"), command: cmd,

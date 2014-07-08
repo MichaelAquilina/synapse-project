@@ -41,21 +41,8 @@ namespace Synapse
       
     }
 
-    private class MatchObject: Object, Match, UriMatch
+    private class MatchObject: UriMatch
     {
-      // for Match interface
-      public string title { get; construct set; }
-      public string description { get; set; default = ""; }
-      public string icon_name { get; construct set; default = ""; }
-      public bool has_thumbnail { get; construct set; default = false; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
-      // for FileMatch
-      public string uri { get; set; }
-      public QueryFlags file_type { get; set; }
-      public string mime_type { get; set; }
-
       public MatchObject (string? thumbnail_path, string? icon)
       {
         Object (match_type: MatchType.GENERIC_URI,

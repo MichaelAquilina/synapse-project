@@ -98,16 +98,8 @@ namespace Synapse
     }
 
     // define our Match object
-    private class WorldMatch : Object, Match
+    private class WorldMatch : Match
     {
-      // from Match interface
-      public string title { get; construct set; }
-      public string description { get; set; }
-      public string icon_name { get; construct set; }
-      public bool has_thumbnail { get; construct set; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
       public WorldMatch ()
       {
         Object (match_type: MatchType.UNKNOWN,

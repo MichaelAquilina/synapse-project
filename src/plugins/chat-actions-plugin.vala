@@ -83,7 +83,8 @@ namespace Synapse
       }
       
             
-      public override bool needs_target () {
+      public override bool needs_target ()
+      {
         return true;
       }
       
@@ -118,8 +119,8 @@ namespace Synapse
         return match.match_type == MatchType.TEXT;
       }
       
-            
-      public override bool needs_target () {
+      public override bool needs_target ()
+      {
         return true;
       }
       

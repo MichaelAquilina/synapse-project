@@ -47,16 +47,8 @@ namespace Synapse
       
     }
 
-    private class ShutDownAction: Object, Match
+    private class ShutDownAction: Match
     {
-      // for Match interface
-      public string title { get; construct set; }
-      public string description { get; set; default = ""; }
-      public string icon_name { get; construct set; default = ""; }
-      public bool has_thumbnail { get; construct set; default = false; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
       public ShutDownAction ()
       {
         Object (match_type: MatchType.ACTION, title: _ ("Shut Down"),
@@ -64,7 +56,7 @@ namespace Synapse
                 icon_name: "system-shutdown", has_thumbnail: false);
       }
       
-      public void execute (Match? match)
+      public override void execute (Match? match)
       {
         try
         {
@@ -81,16 +73,8 @@ namespace Synapse
       }
     }
 
-    private class RebootAction: Object, Match
+    private class RebootAction: Match
     {
-      // for Match interface
-      public string title { get; construct set; }
-      public string description { get; set; default = ""; }
-      public string icon_name { get; construct set; default = ""; }
-      public bool has_thumbnail { get; construct set; default = false; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
       public RebootAction ()
       {
         Object (match_type: MatchType.ACTION, title: _ ("Restart"),
@@ -98,7 +82,7 @@ namespace Synapse
                 icon_name: "gnome-session-reboot", has_thumbnail: false);
       }
       
-      public void execute (Match? match)
+      public override void execute (Match? match)
       {
         try
         {
@@ -115,16 +99,8 @@ namespace Synapse
       }
     }
 
-    private class LogOutAction: Object, Match
+    private class LogOutAction: Match
     {
-      // for Match interface
-      public string title { get; construct set; }
-      public string description { get; set; default = ""; }
-      public string icon_name { get; construct set; default = ""; }
-      public bool has_thumbnail { get; construct set; default = false; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
       public LogOutAction ()
       {
         Object (match_type: MatchType.ACTION, title: _ ("Log Out"),
@@ -132,7 +108,7 @@ namespace Synapse
                 icon_name: "gnome-session-logout", has_thumbnail: false);
       }
       
-      public void execute (Match? match)
+      public override void execute (Match? match)
       {
         try
         {

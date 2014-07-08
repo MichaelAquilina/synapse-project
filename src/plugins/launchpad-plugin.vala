@@ -228,21 +228,8 @@ namespace Synapse
 */
     }
 
-    private class LaunchpadObject: Object, Match, UriMatch
+    private class LaunchpadObject: UriMatch
     {
-      // for Match interface
-      public string title { get; construct set; }
-      public string description { get; set; default = ""; }
-      public string icon_name { get; construct set; default = ""; }
-      public bool has_thumbnail { get; construct set; default = false; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
-      // for UriMatch
-      public string uri { get; set; }
-      public QueryFlags file_type { get; set; }
-      public string mime_type { get; set; }
-      
       public LaunchpadObject (string title, string desc, string uri)
       {
         Object (title: title, description: desc,

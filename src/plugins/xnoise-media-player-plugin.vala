@@ -69,21 +69,14 @@ namespace Synapse
       register_plugin ();
     }
     
-    private abstract class XnoiseAction: Object, Match
+    private abstract class XnoiseAction: Match
     {
-      // from Match interface
-      public string title          { get; construct set; }
-      public string description    { get; set; }
-      public string icon_name      { get; construct set; }
-      public bool has_thumbnail    { get; construct set; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type  { get; construct set; }
       public int default_relevancy { get; set; }
-      
+
       public abstract bool valid_for_match (Match match);
       public abstract void execute_internal (Match? match);
       
-      public void execute (Match? match)
+      public override void execute (Match? match)
       {
         execute_internal (match);
       }
@@ -96,17 +89,9 @@ namespace Synapse
       }
     }
     
-    private abstract class XnoiseControlMatch: Object, Match
+    private abstract class XnoiseControlMatch: Match
     {
-      // for Match interface
-      public string title           { get; construct set; }
-      public string description     { get; set; default = ""; }
-      public string icon_name       { get; construct set; default = ""; }
-      public bool has_thumbnail     { get; construct set; default = false; }
-      public string thumbnail_path  { get; construct set; }
-      public MatchType match_type   { get; construct set; }
-      
-      public void execute (Match? match)
+      public override void execute (Match? match)
       {
         this.do_action ();
       }

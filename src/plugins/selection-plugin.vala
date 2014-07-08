@@ -65,17 +65,8 @@ namespace Synapse
       register_plugin ();
     }
     
-    private class SelectedTextItem : Object, Match, TextMatch
+    private class SelectedTextItem : TextMatch
     {
-      public string title { get; construct set; }
-      public string description { get; set; }
-      public string icon_name { get; construct set; }
-      public bool has_thumbnail { get; construct set; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-      
-      public TextOrigin text_origin { get; set; }
-      
       public SelectedTextItem ()
       {
         Object (title: _("Selected text"),
@@ -86,7 +77,7 @@ namespace Synapse
                 text_origin: TextOrigin.CLIPBOARD);
       }
 
-      protected string get_text ()
+      public override string get_text ()
       {
         return content;
       }

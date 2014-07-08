@@ -39,46 +39,51 @@ namespace Synapse
     public unowned DataSink data_sink { get; set; }
 
     private const string UNIQUE_NAME = "org.gnome.zeitgeist.Engine";
-    private class MatchObject: Object, 
-      Match, UriMatch, ApplicationMatch, ExtendedInfo
+
+    private class ZeitgeistApplicationMatch : ApplicationMatch, ExtendedInfo
     {
-      // for Match interface
-      public string title { get; construct set; }
-      public string description { get; set; default = ""; }
-      public string icon_name { get; construct set; default = ""; }
-      public bool has_thumbnail { get; construct set; default = false; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
-      // for ApplicationMatch
-      public AppInfo? app_info { get; set; }
-      public bool needs_terminal { get; set; }
-      public string? filename { get; construct set; }
-
-      // for UriMatch
-      public string uri { get; set; }
-      public QueryFlags file_type { get; set; }
-      public string mime_type { get; set; }
-      
       // for ExtendedInfo
       public string? extended_info { get; set; default = null; }
 
-      public MatchObject (Zeitgeist.Event event,
-                          string? thumbnail_path,
-                          string? icon,
-                          QueryFlags obj_type = QueryFlags.FILES)
+      public ZeitgeistApplicationMatch (Zeitgeist.Event event,
+                                        string? thumbnail_path,
+                                        string? icon)
+      {
+        Object (match_type: MatchType.APPLICATION,
+                has_thumbnail: thumbnail_path != null,
+                icon_name: icon ?? "",
+                thumbnail_path: thumbnail_path ?? "");
+
+        var subject = event.subjects[0];
+        var uri = subject.uri;
+
+        var dfs = DesktopFileService.get_default ();
+        var dfi = dfs.get_desktop_file_for_id (uri.substring (14));
+
+        title = dfi.name;
+        icon_name = dfi.icon_name;
+        description = dfi.comment;
+        needs_terminal = dfi.needs_terminal;
+        filename = dfi.filename;
+      }
+    }
+
+    private class ZeitgeistUriMatch : UriMatch, ExtendedInfo
+    {
+      // for ExtendedInfo
+      public string? extended_info { get; set; default = null; }
+
+      public ZeitgeistUriMatch (Zeitgeist.Event event,
+                                string? thumbnail_path,
+                                string? icon,
+                                bool use_origin = false)
       {
         Object (match_type: MatchType.GENERIC_URI,
                 has_thumbnail: thumbnail_path != null,
                 icon_name: icon ?? "",
                 thumbnail_path: thumbnail_path ?? "");
 
-        if (QueryFlags.FILES in obj_type)
-          init_from_event (event);
-        else if (QueryFlags.APPLICATIONS in obj_type)
-          init_from_app_event (event);
-        else if (QueryFlags.PLACES in obj_type)
-          init_from_event (event, true);
+        init_from_event (event, use_origin);
       }
 
       private void init_from_event (Zeitgeist.Event event,
@@ -131,55 +136,56 @@ namespace Synapse
           this.file_type = QueryFlags.UNCATEGORIZED;
         }
       }
+    }
 
-      private void init_from_app_event (Zeitgeist.Event event)
+    private class ZeitgeistMatchFactory
+    {
+      public static Match get_match_for_event (Zeitgeist.Event event,
+                                        string? thumbnail_path,
+                                        string? icon,
+                                        QueryFlags obj_type = QueryFlags.FILES)
       {
-        this.file_type = QueryFlags.UNCATEGORIZED;
-        this.match_type = MatchType.APPLICATION;
-        var subject = event.subjects[0];
-        this.uri = subject.uri;
-
-        var dfs = DesktopFileService.get_default ();
-        var dfi = dfs.get_desktop_file_for_id (uri.substring (14));
-
-        this.title = dfi.name;
-        this.icon_name = dfi.icon_name;
-        this.description = dfi.comment;
-        this.needs_terminal = dfi.needs_terminal;
-        this.filename = dfi.filename;
+        if (QueryFlags.FILES in obj_type)
+          return new ZeitgeistUriMatch (event, thumbnail_path, icon);
+        else if (QueryFlags.APPLICATIONS in obj_type)
+          return new ZeitgeistApplicationMatch (event, thumbnail_path, icon);
+        else if (QueryFlags.PLACES in obj_type)
+          return new ZeitgeistUriMatch (event, thumbnail_path, icon, true);
+        
+        assert_not_reached ();
       }
-      
-      public void init_extended_info_from_event (Zeitgeist.Event event)
+
+      public static void init_extended_info_from_event (ExtendedInfo match, Zeitgeist.Event event)
       {
         var now = new DateTime.now_local ().to_unix () * 1000;
         var delta = now - event.timestamp;
         if (delta < Zeitgeist.Timestamp.MINUTE * 2)
         {
-          extended_info = _("few moments ago");
+          match.extended_info = _("few moments ago");
         }
         else if (delta < Zeitgeist.Timestamp.HOUR)
         {
           int mins = (int) (delta / Zeitgeist.Timestamp.MINUTE);
-          extended_info = ngettext ("%d minute ago", "%d minutes ago", mins).printf (mins);
+          match.extended_info = ngettext ("%d minute ago", "%d minutes ago", mins).printf (mins);
         }
         else if (delta < Zeitgeist.Timestamp.DAY * 2)
         {
           int hours = (int) (delta / Zeitgeist.Timestamp.HOUR);
-          extended_info = ngettext ("%d hour ago", "%d hours ago", hours).printf (hours);
+          match.extended_info = ngettext ("%d hour ago", "%d hours ago", hours).printf (hours);
         }
         else if (delta < Zeitgeist.Timestamp.WEEK * 2)
         {
           int days = (int) (delta / Zeitgeist.Timestamp.DAY);
-          extended_info = ngettext ("%d day ago", "%d days ago", days).printf (days);
+          match.extended_info = ngettext ("%d day ago", "%d days ago", days).printf (days);
         }
         else if (delta < Zeitgeist.Timestamp.YEAR)
         {
           int weeks = (int) (delta / Zeitgeist.Timestamp.WEEK);
-          extended_info = ngettext ("%d week ago", "%d weeks ago", weeks).printf (weeks);
+          match.extended_info = ngettext ("%d week ago", "%d weeks ago", weeks).printf (weeks);
         }
         else
         {
-          extended_info = _ ("long time ago");
+          match.extended_info = _ ("long time ago");
         }
       }
     }
@@ -332,14 +338,14 @@ namespace Synapse
             }
           }
 
-          QueryFlags match_type = (is_application ?
+          QueryFlags query_type = (is_application ?
             QueryFlags.APPLICATIONS : (places_search ?
               QueryFlags.PLACES : QueryFlags.FILES));
 
-          var match_obj = new MatchObject (event,
+          var match_obj = ZeitgeistMatchFactory.get_match_for_event (event,
                                            thumbnail_path,
                                            icon,
-                                           match_type);
+                                           query_type);
           bool match_found = false;
           foreach (var matcher in matchers)
           {
@@ -364,7 +370,7 @@ namespace Synapse
       
       foreach (var entry in results.entries)
       {
-        unowned MatchObject mo = (MatchObject) entry.key;
+        unowned ZeitgeistUriMatch? mo = entry.key as ZeitgeistUriMatch;
         if (mo.uri != null && mo.uri.has_prefix ("http") && minimum != maximum)
         {
           long len = mo.uri.length;
@@ -457,14 +463,14 @@ namespace Synapse
             }
           }
 
-          QueryFlags match_type = (is_application ?
+          QueryFlags query_type = (is_application ?
             QueryFlags.APPLICATIONS : (places_search ?
               QueryFlags.PLACES : QueryFlags.FILES));
-          var match_obj = new MatchObject (event,
+          var match_obj = ZeitgeistMatchFactory.get_match_for_event (event,
                                            thumbnail_path,
                                            icon,
-                                           match_type);
-          match_obj.init_extended_info_from_event (event);
+                                           query_type);
+          ZeitgeistMatchFactory.init_extended_info_from_event ((ExtendedInfo) match_obj, event);
 
           int relevancy = (int) ((events_size - event_index) / 
             (float) events_size * Match.Score.HIGHEST);
@@ -627,7 +633,7 @@ namespace Synapse
       return true;
     }
 
-    public bool search_in_progress { get; private set; default = false; }
+    bool search_in_progress = false;
 
     public async ResultSet? search (Query q) throws SearchError
     {

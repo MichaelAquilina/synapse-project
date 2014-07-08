@@ -44,16 +44,8 @@ namespace Synapse
       
     }
 
-    private class LockScreenAction: Object, Match
+    private class LockScreenAction: Match
     {
-      // for Match interface
-      public string title { get; construct set; }
-      public string description { get; set; default = ""; }
-      public string icon_name { get; construct set; default = ""; }
-      public bool has_thumbnail { get; construct set; default = false; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
       public LockScreenAction ()
       {
         Object (match_type: MatchType.ACTION, title: _ ("Lock Screen"),
@@ -61,7 +53,7 @@ namespace Synapse
                 icon_name: "system-lock-screen", has_thumbnail: false);
       }
       
-      public void execute (Match? match)
+      public override void execute (Match? match)
       {
         GnomeScreenSaverPlugin.lock_screen ();
       }

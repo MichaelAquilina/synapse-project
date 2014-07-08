@@ -164,17 +164,11 @@ namespace Synapse
       return results;
     }
 
-    private class SshHost : Object, Match
+    private class SshHost : Match
     {
-      public string title           { get; construct set; }
-      public string description     { get; set; }
-      public string icon_name       { get; construct set; }
-      public bool   has_thumbnail   { get; construct set; }
-      public string thumbnail_path  { get; construct set; }
-      public string host_query      { get; construct set; }
-      public MatchType match_type   { get; construct set; }
+      public string host_query { get; construct set; }
 
-      public void execute (Match? match)
+      public override void execute (Match? match)
       {
         try
         {

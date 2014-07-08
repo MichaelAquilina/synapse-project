@@ -35,38 +35,22 @@ namespace Synapse
       
     }
 
-    private abstract class FileAction: Object, Match
+    private abstract class FileAction: Match
     {
-      // from Match interface
-      public string title { get; construct set; }
-      public string description { get; set; }
-      public string icon_name { get; construct set; }
-      public bool has_thumbnail { get; construct set; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
       public int default_relevancy { get; set; }
       public bool notify_match { get; set; default = true; }
 
       public abstract bool valid_for_match (Match match);
+
       public virtual int get_relevancy_for_match (Match match)
       {
         return default_relevancy;
       }
       
-      public virtual void execute_with_target (Match source, Match? target = null)
+      public override void execute_with_target (Match source, Match? target = null)
       {
         if (target == null) execute (source);
         else Utils.Logger.error (this, "execute () is not implemented");
-      }
-      
-      public virtual bool needs_target () {
-        return false;
-      }
-      
-      public virtual QueryFlags target_flags ()
-      {
-        return QueryFlags.ALL;
       }
     }
     

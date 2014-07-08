@@ -121,7 +121,8 @@ namespace Synapse
         }
       }
       
-      public override bool needs_target () {
+      public override bool needs_target ()
+      {
         return true;
       }
       
@@ -131,15 +132,8 @@ namespace Synapse
       }
     }
     
-    private class Contact: Object, Match, ContactMatch
+    private class Contact: ContactMatch
     {
-      // from Match interface
-      public string title { get; construct set; }
-      public string description { get; set; }
-      public string icon_name { get; construct set; }
-      public bool has_thumbnail { get; construct set; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
       public PidginPlugin plugin { get; construct set; }
       
       public int account_id { get; construct set; }
@@ -162,12 +156,12 @@ namespace Synapse
                 contact_id: contact_id);
       }
 
-      public virtual void send_message (string message, bool present)
+      public override void send_message (string message, bool present)
       {
         plugin.send_message (this, message, present);
       }
       
-      public virtual void open_chat ()
+      public override void open_chat ()
       {
         plugin.open_chat (this);
       }
@@ -438,7 +432,5 @@ namespace Synapse
 
       return result;
     }
-
-    
   }
 }

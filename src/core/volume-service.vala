@@ -114,20 +114,8 @@ namespace Synapse
       return null;
     }
 
-    public class VolumeObject: Object, Match, UriMatch
+    public class VolumeObject: UriMatch
     {
-      public string title { get; construct set; }
-      public string description { get; set; }
-      public string icon_name { get; construct set; }
-      public bool has_thumbnail { get; construct set; }
-      public string thumbnail_path { get; construct set; }
-      public MatchType match_type { get; construct set; }
-
-      // UriMatch
-      public string uri { get; set; }
-      public QueryFlags file_type { get; set; }
-      public string mime_type { get; set; }
-
       private ulong changed_signal_id;
 
       private GLib.Volume _volume;
