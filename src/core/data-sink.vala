@@ -283,13 +283,13 @@ namespace Synapse
     {
       if (plugin is ActionProvider)
       {
-        ActionProvider action_plugin = plugin as ActionProvider;
+        unowned ActionProvider action_plugin = (ActionProvider) plugin;
         action_plugins.add (action_plugin);
         has_unknown_handlers |= action_plugin.handles_unknown ();
       }
-      if (plugin is ItemProvider)
+      else if (plugin is ItemProvider)
       {
-        ItemProvider item_plugin = plugin as ItemProvider;
+        unowned ItemProvider item_plugin = (ItemProvider) plugin;
         item_plugins.add (item_plugin);
         has_empty_handlers |= item_plugin.handles_empty_query ();
       }
@@ -350,7 +350,7 @@ namespace Synapse
         {
           var plugin = create_plugin (t);
           register_plugin (plugin);
-          (plugin as Activatable).activate ();
+          ((Activatable) plugin).activate ();
         }
       }
 
@@ -431,7 +431,7 @@ namespace Synapse
       {
         var new_instance = create_plugin (plugin_type);
         register_plugin (new_instance);
-        (new_instance as Activatable).activate ();
+        ((Activatable) new_instance).activate ();
       }
     }
 
@@ -482,7 +482,9 @@ namespace Synapse
         // magic comes here
         data_plugin.search.begin (q, (src_obj, res) =>
         {
-          var plugin = src_obj as ItemProvider;
+          unowned ItemProvider? plugin = src_obj as ItemProvider;
+          return_if_fail (plugin != null);
+			
           try
           {
             var results = plugin.search.end (res);
