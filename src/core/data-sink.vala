@@ -287,7 +287,7 @@ namespace Synapse
         action_plugins.add (action_plugin);
         has_unknown_handlers |= action_plugin.handles_unknown ();
       }
-      else if (plugin is ItemProvider)
+      if (plugin is ItemProvider)
       {
         unowned ItemProvider item_plugin = (ItemProvider) plugin;
         item_plugins.add (item_plugin);
