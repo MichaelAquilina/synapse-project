@@ -49,19 +49,19 @@ namespace Synapse
     {
       instance = this;
       this.add_weak_pointer (&instance);
-      
+
       initialize_relevancy_backend ();
     }
-    
+
     private RelevancyBackend backend;
-    
+
     private void initialize_relevancy_backend ()
     {
 #if HAVE_ZEITGEIST
       backend = new ZeitgeistRelevancyBackend ();
 #endif
     }
-    
+
     public float get_application_popularity (string desktop_id)
     {
       if (backend == null) return 0.0f;
@@ -73,7 +73,7 @@ namespace Synapse
       if (backend == null) return 0.0f;
       return backend.get_uri_popularity (uri);
     }
-    
+
     public void application_launched (AppInfo app_info)
     {
       Utils.Logger.debug (this, "application launched");

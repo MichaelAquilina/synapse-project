@@ -30,13 +30,13 @@ namespace Synapse.Gui
     ICON_NOT_FOUND,
     UNKNOWN
   }
-  
+
   public class UIWidgetsConfig : ConfigObject
   {
     public bool animation_enabled { get; set; default = true; }
     public bool extended_info_enabled { get; set; default = true; }
   }
-  
+
   public class CloneWidget : Gtk.Widget
   {
     private Widget clone;
@@ -66,7 +66,7 @@ namespace Synapse.Gui
       "x-large",
       "xx-large"
     };
-    
+
     public static Size string_to_size (string sizename)
     {
       Size s = Size.MEDIUM;
@@ -76,7 +76,7 @@ namespace Synapse.Gui
       }
       return s;
     }
-    
+
     protected static const double[] size_to_scale = {
       Pango.Scale.XX_SMALL,
       Pango.Scale.X_SMALL,
@@ -97,11 +97,11 @@ namespace Synapse.Gui
       X_LARGE,
       XX_LARGE
     }
-    
+
     public bool natural_requisition {
       get; set; default = false;
     }
-    
+
     public Size size {
       get; set; default = Size.MEDIUM;
     }
@@ -109,15 +109,15 @@ namespace Synapse.Gui
     public Size min_size {
       get; set; default = Size.MEDIUM;
     }
-    
+
     private string text = "";
-    
+
     private Size real_size = Size.MEDIUM;
     private Requisition last_req;
     private Pango.Layout layout;
     private Utils.ColorHelper ch;
     private Pango.EllipsizeMode ellipsize = Pango.EllipsizeMode.NONE;
-    
+
     private uint tid = 0;
     private static const int INITIAL_TIMEOUT = 1750;
     private static const int SPACING = 50;
@@ -145,7 +145,7 @@ namespace Synapse.Gui
       this.real_size = size;
       queue_resize ();
     }
-    
+
     public void set_animation_enabled (bool b)
     {
       this.animate = b;
@@ -161,7 +161,7 @@ namespace Synapse.Gui
         sizes_changed ();
       }
     }
-    
+
     public void set_text (string s)
     {
       string m = Markup.escape_text (s);
@@ -169,21 +169,21 @@ namespace Synapse.Gui
       text = m;
       text_updated ();
     }
-    
+
     public void set_markup (string m)
     {
       if (m == text) return;
       text = m;
       text_updated ();
     }
-    
+
     private void stop_animation ()
     {
       Source.remove (tid);
       tid = 0;
       offset = 0;
     }
-    
+
     int _anim_width = 0;
     private void start_animation ()
     {
@@ -195,20 +195,20 @@ namespace Synapse.Gui
         return true;
       });
     }
-    
+
     public void set_ellipsize (Pango.EllipsizeMode mode)
     {
       if (animate) this.ellipsize = Pango.EllipsizeMode.NONE;
       else this.ellipsize = mode;
     }
-    
+
     private void text_updated ()
     {
       real_size = _size;
       queue_resize ();
       if (tid != 0) stop_animation ();
     }
-    
+
     public override void size_allocate (Gtk.Allocation allocation)
     {
       base.size_allocate (allocation);
@@ -261,7 +261,7 @@ namespace Synapse.Gui
         if (tid != 0) stop_animation ();
       }
     }
-    
+
     public override bool draw (Cairo.Context ctx)
     {
       int w = this.get_allocated_width () - this.xpad * 2;
@@ -269,11 +269,11 @@ namespace Synapse.Gui
       ctx.translate (this.xpad, this.ypad);
       ctx.rectangle (0, 0, w, h);
       ctx.clip ();
-      
+
       bool rtl = this.get_direction () == Gtk.TextDirection.RTL;
 
       int x, y, width, height;
-      
+
       if (animate && tid != 0)
       {
         ctx.translate (offset, 0);
@@ -286,16 +286,16 @@ namespace Synapse.Gui
           layout.set_ellipsize (ellipsize);
         }
       }
-      
+
       Gui.Utils.get_draw_position (out x, out y, out width, out height, layout, rtl,
                                    w, h, this.xalign, this.yalign);
       ctx.translate (x, y);
-      
+
       ctx.set_operator (Cairo.Operator.OVER);
       ch.set_source_rgba (ctx, 1.0, StyleType.FG, this.get_state_flags ());
-      
+
       Pango.cairo_show_layout (ctx, layout);
-      
+
       width += SPACING;
       _anim_width = width;
       int rotate = (offset + width);
@@ -317,14 +317,14 @@ namespace Synapse.Gui
       layout.set_width (-1);
       layout.set_ellipsize (Pango.EllipsizeMode.NONE);
       layout.get_extents (null, out logical_rect);
-      
+
       req.width += logical_rect.width / Pango.SCALE;
       if (return_only_width)
       {
         char_width = 0;
         return;
       }
-      
+
       Pango.Context ctx = layout.get_context ();
       Pango.FontDescription fdesc = new Pango.FontDescription ();
       fdesc.merge_static (this.style.font_desc, true);
@@ -335,7 +335,7 @@ namespace Synapse.Gui
       req.height += (metrics.get_ascent () + metrics.get_descent ()) / Pango.SCALE;
       char_width = int.max (metrics.get_approximate_char_width (), metrics.get_approximate_digit_width ()) / Pango.SCALE;
     }
-    
+
     public void size_request (out Requisition req)
     {
       layout.set_markup ("<span size=\"%s\">%s</span>".printf (size_to_string[_size], this.text), -1);
@@ -361,7 +361,7 @@ namespace Synapse.Gui
       min_height = nat_height = req.height;
     }
   }
-  
+
   public class SchemaContainer: Gtk.Container
   {
     public class Schema : GLib.Object
@@ -382,27 +382,27 @@ namespace Synapse.Gui
         this._positions += alloc;
       }
     }
-    
+
     protected Gee.List<Schema> schemas;
     protected Gee.List<Widget> children;
     private int active_schema = 0;
     private int[] render_order = null;
-    
+
     public int xpad { get; set; default = 0; }
     public int ypad { get; set; default = 0; }
-    
+
     public int scale_size {
       get; set; default = 128;
     }
-    
+
     public bool fixed_height {
       get; set; default = false;
     }
-    
+
     public bool fixed_width {
       get; set; default = false;
     }
-    
+
     public SchemaContainer (int scale_size)
     {
       this.scale_size = scale_size;
@@ -416,7 +416,7 @@ namespace Synapse.Gui
       this.notify["xpad"].connect (this.queue_resize);
       this.notify["ypad"].connect (this.queue_resize);
     }
-    
+
     public void set_render_order (int[]? order)
     {
       this.render_order = order;
@@ -427,16 +427,16 @@ namespace Synapse.Gui
     {
       if (width <= 0) width = 1;
       if (height <= 0) height = 1;
-      
+
       base.set_size_request (width, height);
     }
-    
+
     public void add_schema (Schema s)
     {
       schemas.add (s);
       if (schemas.size == 1) select_schema (0);
     }
-    
+
     public void select_schema (int i)
     {
       if (i < 0) return;
@@ -451,9 +451,9 @@ namespace Synapse.Gui
       });
       queue_resize ();
     }
-    
-    
-    
+
+
+
     public override void forall_internal (bool b, Gtk.Callback callback)
     {
       if (render_order == null)
@@ -469,18 +469,18 @@ namespace Synapse.Gui
           callback (children.get (render_order[i]));
       }
     }
-    
+
     public override void add (Widget widget)
     {
       this.children.add (widget);
       widget.set_parent (this);
     }
-    
+
     public override void remove (Widget widget)
     {
       // cannot remove for now :P TODO
     }
-    
+
     public void size_request (out Gtk.Requisition req)
     {
       req = {0, 0};
@@ -506,7 +506,7 @@ namespace Synapse.Gui
       req.width += _xpad * 2;
       req.height += _ypad * 2;
     }
-    
+
     public override void get_preferred_width (out int min_width, out int nat_width)
     {
       Requisition req;
@@ -524,7 +524,7 @@ namespace Synapse.Gui
     public override void size_allocate (Gtk.Allocation allocation)
     {
       base.size_allocate (allocation);
-      
+
       if (schemas.size <= 0)
       {
         foreach (Widget child in children)
@@ -532,7 +532,7 @@ namespace Synapse.Gui
         return;
       }
       Allocation[] alloc = schemas.get (active_schema).positions;
-      
+
       int i = 0;
       int x = allocation.x + _xpad;
       int y = allocation.y + _ypad;
@@ -561,19 +561,19 @@ namespace Synapse.Gui
       }
     }
   }
-  
+
   public class SelectionContainer: Gtk.Container
   {
     protected Gee.List<Widget> children;
     private int active_child = 0;
-    
+
     public SelectionContainer ()
     {
       children = new Gee.ArrayList<Widget> ();
       set_has_window (false);
       set_redraw_on_allocate (false);
     }
-    
+
     public void select_child (int i)
     {
       if (i < 0) return;
@@ -590,38 +590,38 @@ namespace Synapse.Gui
         {
           if (child.visible) child.hide ();
         }
-        
+
         i++;
       }
       if (!this.get_realized ()) return;
       queue_resize ();
     }
-    
+
     public override void forall_internal (bool b, Gtk.Callback callback)
     {
       foreach (var child in children)
         callback (child);
     }
-    
+
     public override void add (Widget widget)
     {
       this.children.add (widget);
       widget.set_parent (this);
     }
-    
+
     public override void remove (Widget widget)
     {
       this.children.remove (widget);
       widget.unparent ();
     }
-    
+
     public override void size_allocate (Gtk.Allocation allocation)
     {
       base.size_allocate (allocation);
       if (active_child >= children.size) return;
       children.get (active_child).size_allocate (allocation);
     }
-    
+
     public override void get_preferred_width (out int min_width, out int nat_width)
     {
       if (active_child >= children.size) {
@@ -657,7 +657,7 @@ namespace Synapse.Gui
       return true;
     }
   }
-  
+
   public class SensitiveWidget: Gtk.EventBox
   {
     private Widget _widget;
@@ -668,12 +668,12 @@ namespace Synapse.Gui
       this.above_child = false;
       this.visible_window = false;
       this.set_has_window (false);
-      
+
       this._widget = widget;
       this.add (this._widget);
       this._widget.show ();
     }
-    
+
     public override bool draw (Cairo.Context ctx)
     {
       this.propagate_draw (this.get_child (), ctx);
@@ -686,13 +686,13 @@ namespace Synapse.Gui
     public string not_found_name {get; set; default = "unknown";}
     private string current;
     private IconSize current_size;
-    
+
     construct
     {
       current = "";
       current_size = IconSize.DIALOG;
     }
-    
+
     public void size_request (out Requisition req)
     {
       req = {
@@ -744,8 +744,8 @@ namespace Synapse.Gui
 
       if (icon_pixbuf == null) return true;
 
-      Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf, 
-          (w - icon_pixbuf.get_width ()) / 2, 
+      Gdk.cairo_set_source_pixbuf (ctx, icon_pixbuf,
+          (w - icon_pixbuf.get_width ()) / 2,
           (h - icon_pixbuf.get_height ()) / 2);
       ctx.paint ();
 
@@ -782,9 +782,9 @@ namespace Synapse.Gui
     public double border_radius {get; set; default = 3.0;}
     public double shadow_height {get; set; default = 3;}
     public double focus_height {get; set; default = 3;}
-    
+
     private Utils.ColorHelper ch;
-    public Widget? focus_widget 
+    public Widget? focus_widget
     {
       get {return _focus_widget;}
       set {
@@ -941,7 +941,7 @@ namespace Synapse.Gui
       Allocation alloc = {allocation.x, allocation.y, allocation.width, allocation.height};
       set_allocation (alloc);
     }
-    
+
     public override bool draw (Cairo.Context ctx)
     {
       base.draw (ctx);
@@ -966,17 +966,17 @@ namespace Synapse.Gui
       return true;
     }
   }
-  
+
   public class FakeButton: EventBox
   {
     construct
     {
       this.set_events (Gdk.EventMask.BUTTON_RELEASE_MASK |
-                       Gdk.EventMask.ENTER_NOTIFY_MASK | 
+                       Gdk.EventMask.ENTER_NOTIFY_MASK |
                        Gdk.EventMask.LEAVE_NOTIFY_MASK);
       this.visible_window = false;
     }
-    public override bool enter_notify_event (Gdk.EventCrossing event) 
+    public override bool enter_notify_event (Gdk.EventCrossing event)
     {
       enter ();
       return true;
@@ -1008,35 +1008,35 @@ namespace Synapse.Gui
       entered = false;
       menu = new Gtk.Menu ();
       Gtk.MenuItem item = null;
-      
+
       item = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.PREFERENCES, null);
       item.activate.connect (()=> {settings_clicked ();});
       menu.append (item);
-      
+
       item = new ImageMenuItem.from_stock (Gtk.Stock.ABOUT, null);
-      item.activate.connect (()=> 
+      item.activate.connect (()=>
       {
         var about = new SynapseAboutDialog ();
         about.run ();
         about.destroy ();
       });
       menu.append (item);
-      
+
       item = new Gtk.SeparatorMenuItem ();
       menu.append (item);
-      
+
       item = new ImageMenuItem.from_stock (Gtk.Stock.QUIT, null);
       item.activate.connect (Gtk.main_quit);
       menu.append (item);
-      
+
       menu.show_all ();
     }
-    
+
     public Gtk.Menu get_menu ()
     {
       return menu;
     }
-    
+
     public override void enter ()
     {
       entered = true;
@@ -1071,16 +1071,16 @@ namespace Synapse.Gui
     {
       min_height = nat_height = 11;
     }
-    
+
     public override bool draw (Cairo.Context ctx)
     {
       double SIZE = 0.5;
       ctx.translate (SIZE, SIZE);
       ctx.set_operator (Cairo.Operator.OVER);
-      
+
       double r = 0.0, g = 0.0, b = 0.0;
       double size = button_scale * int.min (this.get_allocated_width (), this.get_allocated_height ()) - SIZE * 2;
-      
+
       Pattern pat;
       pat = new Pattern.linear (0, 0, 0, this.get_allocated_height ());
       if (entered || this.get_state_flags () == StateFlags.SELECTED)
@@ -1119,7 +1119,7 @@ namespace Synapse.Gui
       {
         ch.get_rgb (out r, out g, out b, StyleType.BG, StateFlags.NORMAL);
       }
-      
+
       ctx.set_source_rgb (r, g, b);
       ctx.arc (xc, yc, size * 0.5, 0.0, Math.PI * 2);
       ctx.fill ();
@@ -1146,7 +1146,7 @@ namespace Synapse.Gui
                    website: "http://launchpad.net/synapse-project");
     }
   }
-  
+
   public class HTextSelector : EventBox
   {
     private const int ARROW_SIZE = 7;
@@ -1191,7 +1191,7 @@ namespace Synapse.Gui
     private int current_offset;
     private Utils.ColorHelper ch;
     private Label label;
-    
+
     public HTextSelector ()
     {
       this.above_child = false;
@@ -1227,7 +1227,7 @@ namespace Synapse.Gui
       this.notify["selected-markup"].connect (_global_update);
       this.notify["unselected-markup"].connect (_global_update);
       _selected = 0;
-      
+
       var config = (UIWidgetsConfig) ConfigService.get_default ().get_config ("ui", "widgets", typeof (UIWidgetsConfig));
       animation_enabled = config.animation_enabled;
     }
@@ -1247,7 +1247,7 @@ namespace Synapse.Gui
       selection_changed ();
       return false;
     }
-    
+
     public override bool scroll_event (Gdk.EventScroll event)
     {
       if (event.direction == Gdk.ScrollDirection.UP)
@@ -1257,9 +1257,9 @@ namespace Synapse.Gui
       selection_changed ();
       return true;
     }
-    
+
     public signal void selection_changed ();
-    
+
     public void add_text (string txt)
     {
       texts.add (new PangoReadyText(){
@@ -1415,7 +1415,7 @@ namespace Synapse.Gui
         return true;
       double w = this.get_allocated_width ();
       double h = this.get_allocated_height ();
-      
+
       ctx.set_operator (Cairo.Operator.OVER);
       double x, y;
       x = current_offset;

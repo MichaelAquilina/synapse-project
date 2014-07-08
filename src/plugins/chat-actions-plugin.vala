@@ -27,14 +27,14 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
-    
+
     private class OpenChat: BaseAction
     {
       public OpenChat ()
@@ -45,20 +45,20 @@ namespace Synapse
                 match_type: MatchType.ACTION,
                 default_relevancy: Match.Score.EXCELLENT);
       }
-      
+
       public override void do_execute (Match match, Match? target = null)
       {
         unowned ContactMatch? cm = match as ContactMatch;
         if ( match == null ) return;
         cm.open_chat ();
       }
-      
+
       public override bool valid_for_match (Match match)
       {
         return match.match_type == MatchType.CONTACT;
       }
     }
-    
+
     private class SendMessage: BaseAction
     {
       public SendMessage ()
@@ -69,31 +69,31 @@ namespace Synapse
                 match_type: MatchType.ACTION,
                 default_relevancy: Match.Score.VERY_GOOD);
       }
-      
+
       public override void do_execute (Match match, Match? target = null)
       {
         unowned ContactMatch? cm = match as ContactMatch;
         if ( match == null || target == null ) return;
         cm.send_message (target.title, false);
       }
-      
+
       public override bool valid_for_match (Match match)
       {
         return match.match_type == MatchType.CONTACT;
       }
-      
-            
+
+
       public override bool needs_target ()
       {
         return true;
       }
-      
+
       public override QueryFlags target_flags ()
       {
         return QueryFlags.TEXT;
       }
     }
-    
+
     private class SendMessageTo: BaseAction
     {
       public SendMessageTo ()
@@ -104,7 +104,7 @@ namespace Synapse
                 match_type: MatchType.ACTION,
                 default_relevancy: Match.Score.VERY_GOOD);
       }
-      
+
       public override void do_execute (Match match, Match? target = null)
       {
         if ( match == null || target == null ) return;
@@ -113,23 +113,23 @@ namespace Synapse
         if ( cm == null || text == null ) return;
         cm.send_message (text.get_text (), false);
       }
-      
+
       public override bool valid_for_match (Match match)
       {
         return match.match_type == MatchType.TEXT;
       }
-      
+
       public override bool needs_target ()
       {
         return true;
       }
-      
+
       public override QueryFlags target_flags ()
       {
         return QueryFlags.CONTACTS;
       }
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -140,7 +140,7 @@ namespace Synapse
         register_plugin
       );
     }
-    
+
     static construct
     {
       register_plugin ();
@@ -161,7 +161,7 @@ namespace Synapse
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
-      
+
       if (query_empty)
       {
         foreach (var action in actions)

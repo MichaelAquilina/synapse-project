@@ -44,7 +44,7 @@ namespace Synapse.Gui
   {
     private static string home_directory = null;
     private static long home_directory_length = 0;
-    
+
     public static string markup_string_with_search (string text,
       string pattern, string size = "xx-large", bool show_not_found = false)
     {
@@ -105,23 +105,23 @@ namespace Synapse.Gui
            return markup.printf (Markup.escape_text(text));
       }
     }
-    
+
     public static string get_printable_description (Match match)
     {
       UriMatch? m = match as UriMatch;
-      
+
       if (m == null || m.match_type != MatchType.GENERIC_URI)
       {
         return match.description; // not an UriMatch
       }
-      
+
       if (!m.uri.has_prefix("file://")) return m.uri; //fix only local files
-      
+
       //unowned string? desc = m.get_data<string> ("printable-description");
       //if (desc != null) return desc; // already fixed
 
       string desc_fixed = m.description;
-      
+
       if (home_directory == null)
       {
         home_directory = Environment.get_home_dir ();
@@ -146,7 +146,7 @@ namespace Synapse.Gui
           desc_fixed = _("Root") + desc_fixed;
         }
       }
-      
+
       // convert "/" to " > "
       string[] parts = Regex.split_simple ("/", desc_fixed);
       desc_fixed = string.joinv (" > ", parts);
@@ -155,7 +155,7 @@ namespace Synapse.Gui
 
       return desc_fixed;
     }
-    
+
     public static void update_layout_rtl (Pango.Layout layout, Gtk.TextDirection rtl)
     {
       /* set_auto_dir (false) to handle mixed rtl/ltr text */
@@ -172,7 +172,7 @@ namespace Synapse.Gui
       }
       layout.context_changed ();
     }
-    
+
     public static void get_draw_position (out int x, out int y,
                                           out int width, out int height,
                                           Pango.Layout layout, bool rtl,
@@ -183,68 +183,68 @@ namespace Synapse.Gui
 
       Pango.Rectangle logical_rect;
       layout.get_pixel_extents (null, out logical_rect);
-      
+
       layout.get_pixel_size (out width, out height);
-      
+
       y = (int) (yalign * (area_height - height));
       x = (int) (xalign * (area_width - width));
-      
+
       if (rtl)
         x = int.min (x, area_width);
       else
         x = int.max (x, 0);
       x -= logical_rect.x;
     }
-    
+
     public static void make_transparent_bg (Gtk.Widget widget)
     {
       var window = widget.get_window ();
       if (window == null) return;
-      
+
       if (widget.is_composited ())
       {
         window.set_background_rgba ({0, 0, 0, 0});
       }
     }
-     
+
     private static void on_style_updated (Gtk.Widget widget)
     {
-      if (widget.get_realized ()) 
+      if (widget.get_realized ())
       {
         make_transparent_bg (widget);
         widget.queue_draw ();
       }
     }
-    
+
     private static void on_composited_change (Gtk.Widget widget)
     {
       if (widget.is_composited ()) make_transparent_bg (widget);
       else widget.override_background_color (Gtk.StateFlags.NORMAL, null);
     }
-    
+
     public static void ensure_transparent_bg (Gtk.Widget widget)
     {
       if (widget.get_realized ()) make_transparent_bg (widget);
-      
+
       widget.realize.disconnect (make_transparent_bg);
       widget.style_updated.disconnect (on_style_updated);
       widget.composited_changed.disconnect (on_composited_change);
-      
+
       widget.realize.connect (make_transparent_bg);
       widget.style_updated.connect (on_style_updated);
       widget.composited_changed.connect (on_composited_change);
     }
-    
-    private static Gdk.Rectangle get_current_monitor_geometry (Gdk.Screen screen) 
+
+    private static Gdk.Rectangle get_current_monitor_geometry (Gdk.Screen screen)
     {
       var display = screen.get_display ();
       int x = 0, y = 0;
       Gdk.Screen screen_for_pointer = null;
       display.get_device_manager ().get_client_pointer ().get_position (out screen_for_pointer, out x, out y);
-      
+
       Gdk.Rectangle rect = {0, 0};
       screen_for_pointer.get_monitor_geometry (screen_for_pointer.get_monitor_at_point (x, y), out rect);
-      
+
       return rect;
     }
     public static void move_window_to_center (Gtk.Window win)
@@ -267,7 +267,7 @@ namespace Synapse.Gui
       if (g >= 0.5) g /= 4; else g = 1 - g / 4;
       if (b >= 0.5) b /= 4; else b = 1 - b / 4;
     }
-    
+
     public static void cairo_arrow (Cairo.Context ctx, bool rtl, double x, double y, double w, double h)
     {
       double xh = x + w / 2;
@@ -287,7 +287,7 @@ namespace Synapse.Gui
       }
       ctx.close_path ();
     }
-    
+
     public static void cairo_rounded_rect (Cairo.Context ctx, double x, double y, double w, double h, double r)
     {
       double y2 = y+h, x2 = x+w;
@@ -297,7 +297,7 @@ namespace Synapse.Gui
       ctx.arc (x2-r, y2-r, r, 0, Math.PI * 0.5);
       ctx.arc (x+r, y2-r, r, Math.PI * 0.5, Math.PI);
     }
-    
+
     private static void add_shadow_stops (Cairo.Pattern pat, double r, double g, double b, double size, double alpha)
     {
       /* Let's make a nice shadow */
@@ -332,9 +332,9 @@ namespace Synapse.Gui
          |                       |
          |                       | 3
           \_____________________/  4
-          
+
       x->1 2                    3 4
-      */ 
+      */
       Cairo.Pattern pat;
       /* Top left corner */
       ctx.save ();
@@ -408,11 +408,11 @@ namespace Synapse.Gui
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();
-      
+
       ctx.restore ();
     }
 
-    public class ColorHelper 
+    public class ColorHelper
     {
       private Gee.Map <string, Color> colormap;
       private Gtk.StyleContext fg_context;
@@ -465,7 +465,7 @@ namespace Synapse.Gui
         green = g;
         blue = b;
       }
-      
+
       private Color get_color_from_map (StyleType t, Gtk.StateFlags st, Mod mod)
       {
         Color col;
@@ -528,7 +528,7 @@ namespace Synapse.Gui
         Color col = get_color_from_map (t, st, mod);
         return col.is_dark_color ();
       }
-      
+
       private class Color
       {
         public double r;
@@ -546,7 +546,7 @@ namespace Synapse.Gui
           this.g = col.green;
           this.b = col.blue;
         }
-        
+
         /*
         public void clone (Color col)
         {
@@ -554,7 +554,7 @@ namespace Synapse.Gui
           this.g = col.g;
           this.b = col.b;
         }
-        
+
         public void init_from_rgb (double r, double g, double b)
         {
           this.r = r;
@@ -596,7 +596,7 @@ namespace Synapse.Gui
               break;
           }
         }
-        
+
         public bool is_dark_color ()
         {
           double h;
@@ -606,24 +606,24 @@ namespace Synapse.Gui
           h = r;
           l = g;
           s = b;
-          
+
           murrine_rgb_to_hls (&h, &l, &s);
           return l < 0.40;
         }
-        
+
         public static void colorize (double *r, double *g, double *b,
                                      double cr, double cg, double cb)
         {
           if (!(*r == *g && *g == *b)) return; //nothing to do
           murrine_rgb_to_hls (r, g, b);
           murrine_rgb_to_hls (&cr, &cg, &cb);
-          
+
           *r = cr;
           *b = *b * 0.25 + cb * 0.85;
           *g = *g * 0.4 + cg * 0.6;
-          
+
           murrine_hls_to_rgb (r, g, b);
-        }        
+        }
         /* RGB / HLS utils - from Murrine gtk-engine:
          * Copyright (C) 2006-2007-2008-2009 Andrea Cimitan
          */
@@ -791,7 +791,7 @@ namespace Synapse.Gui
           blue  = b;
 
           murrine_rgb_to_hls (&red, &green, &blue);
-          
+
           k -= 1.0;
 
           green += k;
@@ -814,12 +814,12 @@ namespace Synapse.Gui
         }
       }
     }
-    
+
     public static bool is_point_in_mask (Gtk.Widget w, int x, int y)
     {
       if (x < 0 || y < 0 || x >= w.get_allocated_width () || y >= w.get_allocated_height ()) return false;
       if (!w.is_composited ()) return true;
-      
+
       // create an image surface to hold the rendered window
       Cairo.ImageSurface mask = new Cairo.ImageSurface (Cairo.Format.ARGB32, w.get_allocated_width (), w.get_allocated_height ());
       Cairo.Context cr = new Cairo.Context (mask);

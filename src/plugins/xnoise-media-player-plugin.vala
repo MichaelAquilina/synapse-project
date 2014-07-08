@@ -26,10 +26,10 @@ namespace Synapse
   {
     public const string UNIQUE_NAME = "org.gtk.xnoise.PlayerEngine";
     public const string OBJECT_PATH = "/PlayerEngine";
-    
+
     public abstract void quit ()              throws IOError;
     public abstract void raise ()             throws IOError;
-    
+
     public abstract void next ()              throws IOError;
     public abstract void previous ()          throws IOError;
     public abstract void pause ()             throws IOError;
@@ -38,19 +38,19 @@ namespace Synapse
     public abstract void play ()              throws IOError;
     public abstract void open_uri (string uri) throws IOError;
   }
-  
+
   public class XnoiseActions: Object, Activatable, ItemProvider, ActionProvider
   {
     public bool enabled { get; set; default = true; }
-    
+
     public void activate ()
     {
     }
-    
+
     public void deactivate ()
     {
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -63,24 +63,24 @@ namespace Synapse
         _ ("Xnoise is not installed!")
       );
     }
-    
+
     static construct
     {
       register_plugin ();
     }
-    
+
     private abstract class XnoiseAction: Match
     {
       public int default_relevancy { get; set; }
 
       public abstract bool valid_for_match (Match match);
       public abstract void execute_internal (Match? match);
-      
+
       public override void execute (Match? match)
       {
         execute_internal (match);
       }
-      
+
       public virtual int get_relevancy ()
       {
         bool xnoise_running = DBusService.get_default ().name_has_owner (
@@ -88,16 +88,16 @@ namespace Synapse
         return xnoise_running ? default_relevancy + Match.Score.INCREMENT_LARGE : default_relevancy;
       }
     }
-    
+
     private abstract class XnoiseControlMatch: Match
     {
       public override void execute (Match? match)
       {
         this.do_action ();
       }
-      
+
       public abstract void do_action ();
-      
+
       public virtual bool action_available ()
       {
         return DBusService.get_default ().name_has_owner (
@@ -105,7 +105,7 @@ namespace Synapse
         );
       }
     }
-    
+
     /* MATCHES of Type.ACTION */
     private class Quit : XnoiseControlMatch
     {
@@ -118,7 +118,7 @@ namespace Synapse
                 match_type:    MatchType.ACTION
                 );
       }
-      
+
       public override void do_action ()
       {
         try {
@@ -143,7 +143,7 @@ namespace Synapse
                 match_type:    MatchType.ACTION
                 );
       }
-      
+
       public override void do_action ()
       {
         try {
@@ -163,12 +163,12 @@ namespace Synapse
       {
         Object (title:         _ ("Play"),
                 description:   _ ("Start playback in Xnoise"),
-                icon_name:     "media-playback-start", 
+                icon_name:     "media-playback-start",
                 has_thumbnail: false,
                 match_type:    MatchType.ACTION
                 );
       }
-      
+
       public override void do_action ()
       {
         try {
@@ -188,12 +188,12 @@ namespace Synapse
       {
         Object (title:         _ ("TogglePlaying"),
                 description:   _ ("Start/Pause playback in Xnoise"),
-                icon_name:     "media-playback-pause", 
+                icon_name:     "media-playback-pause",
                 has_thumbnail: false,
                 match_type:    MatchType.ACTION
                 );
       }
-      
+
       public override void do_action ()
       {
         try {
@@ -211,7 +211,7 @@ namespace Synapse
         return true;
       }
     }
-    
+
     private class Pause : XnoiseControlMatch
     {
       public Pause ()
@@ -223,7 +223,7 @@ namespace Synapse
                 match_type:    MatchType.ACTION
                 );
       }
-      
+
       public override void do_action ()
       {
         try {
@@ -236,7 +236,7 @@ namespace Synapse
         }
       }
     }
-    
+
     private class Next : XnoiseControlMatch
     {
       public Next ()
@@ -248,21 +248,21 @@ namespace Synapse
                 match_type:    MatchType.ACTION
                 );
       }
-      
+
       public override void do_action ()
       {
         try {
           XnoisePlayerEngine player = Bus.get_proxy_sync (BusType.SESSION,
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
-          
+
           player.next ();
         } catch (IOError e) {
           Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
         }
       }
     }
-    
+
     private class Previous : XnoiseControlMatch
     {
       public Previous ()
@@ -274,7 +274,7 @@ namespace Synapse
                 match_type:    MatchType.ACTION
                 );
       }
-      
+
       public override void do_action ()
       {
         try {
@@ -287,7 +287,7 @@ namespace Synapse
         }
       }
     }
-    
+
     private class Stop : XnoiseControlMatch
     {
       public Stop ()
@@ -299,7 +299,7 @@ namespace Synapse
                 match_type:    MatchType.ACTION
                 );
       }
-      
+
       public override void do_action ()
       {
         try {
@@ -312,7 +312,7 @@ namespace Synapse
         }
       }
     }
-    
+
     /* ACTIONS FOR MP3s */
     private class OpenUri: XnoiseAction
     {
@@ -326,7 +326,7 @@ namespace Synapse
                 default_relevancy: Match.Score.ABOVE_AVERAGE
                 );
       }
-      
+
       public override void execute_internal (Match? match)
       {
         return_if_fail (match.match_type == MatchType.GENERIC_URI);
@@ -344,7 +344,7 @@ namespace Synapse
           Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
         }
       }
-      
+
       public override bool valid_for_match (Match match)
       {
         switch (match.match_type)
@@ -362,20 +362,20 @@ namespace Synapse
         }
       }
     }
-    
+
     private Gee.List<XnoiseAction> actions;
     private Gee.List<XnoiseControlMatch> matches;
-    
+
     construct
     {
       actions = new Gee.ArrayList<XnoiseAction> ();
       matches = new Gee.ArrayList<XnoiseControlMatch> ();
-      
+
       actions.add (new OpenUri());
-      
+
       matches.add (new Raise ());
       matches.add (new Quit ());
-      
+
       matches.add (new Play ());
       matches.add (new TogglePlaying ());
       matches.add (new Pause ());
@@ -383,17 +383,17 @@ namespace Synapse
       matches.add (new Previous ());
       matches.add (new Next ());
     }
-    
+
     public async ResultSet? search (Query q) throws SearchError
     {
       // we only search for actions
       if (!(QueryFlags.ACTIONS in q.query_type)) return null;
-      
+
       var result = new ResultSet ();
-      
+
       var matchers = Query.get_matchers_for_query (q.query_string, 0,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
-      
+
       foreach (var action in matches)
       {
         if (!action.action_available ()) continue;
@@ -414,7 +414,7 @@ namespace Synapse
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
-      
+
       if (query_empty)
       {
         foreach (var action in actions)

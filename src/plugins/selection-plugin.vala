@@ -39,9 +39,9 @@ namespace Synapse
     {
       clipboard.owner_change.disconnect (this.cb_owner_change);
     }
-    
+
     bool cb_changed = true;
-    
+
     private void cb_owner_change ()
     {
       cb_changed = true;
@@ -64,7 +64,7 @@ namespace Synapse
       // register the plugin when the class is constructed
       register_plugin ();
     }
-    
+
     private class SelectedTextItem : TextMatch
     {
       public SelectedTextItem ()
@@ -81,7 +81,7 @@ namespace Synapse
       {
         return content;
       }
-      
+
       private string? content = null;
 
       public void update_content (owned string content)
@@ -113,10 +113,10 @@ namespace Synapse
           break;
         }
       }
-      
+
       if (relevancy == 0) return null;
       string? cb_text = null;
-      
+
       if (cb_changed)
       {
         clipboard.request_text ((cb, text) =>

@@ -37,14 +37,14 @@ namespace Synapse
                                                uint32 flags) throws IOError;
     public abstract async string get_name_owner (string name) throws IOError;
   }
-  
+
   public class DBusService : Object
   {
     private FreeDesktopDBus proxy;
     private Gee.Set<string> owned_names;
     private Gee.Set<string> activatable_names;
     private Gee.Set<string> system_activatable_names;
-    
+
     private Utils.AsyncOnce<bool> init_once;
 
     // singleton that can be easily destroyed
@@ -56,7 +56,7 @@ namespace Synapse
     private DBusService ()
     {
     }
-    
+
     private static unowned DBusService? instance;
     construct
     {
@@ -68,12 +68,12 @@ namespace Synapse
 
       initialize.begin ();
     }
-    
+
     ~DBusService ()
     {
       instance = null;
     }
-    
+
     private void name_owner_changed (FreeDesktopDBus sender,
                                      string name,
                                      string old_owner,
@@ -92,19 +92,19 @@ namespace Synapse
         owner_changed (name, false);
       }
     }
-    
+
     public signal void owner_changed (string name, bool is_owned);
-    
+
     public bool name_has_owner (string name)
     {
       return name in owned_names;
     }
-    
+
     public bool name_is_activatable (string name)
     {
       return name in activatable_names;
     }
-    
+
     public bool service_is_available (string name)
     {
       return name in system_activatable_names;
@@ -130,7 +130,7 @@ namespace Synapse
           if (name.has_prefix (":")) continue;
           owned_names.add (name);
         }
-        
+
         names = yield proxy.list_activatable_names ();
         foreach (unowned string session_act in names)
         {

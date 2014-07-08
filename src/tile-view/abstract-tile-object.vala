@@ -56,7 +56,7 @@ namespace UI.Widgets
     private Gdk.Pixbuf? _force_pixbuf;
     public Gdk.Pixbuf force_pixbuf
     {
-      get 
+      get
       {
         return _force_pixbuf;
       }

@@ -27,18 +27,18 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class Define: Match
     {
       public int default_relevancy { get; set; default = 0; }
-      
+
       public override void execute (Match? match)
       {
         try
@@ -53,7 +53,7 @@ namespace Synapse
           warning ("%s", err.message);
         }
       }
-      
+
       public Define ()
       {
         Object (title: _ ("Define"),
@@ -61,7 +61,7 @@ namespace Synapse
                 has_thumbnail: false, icon_name: "accessories-dictionary");
       }
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -89,7 +89,7 @@ namespace Synapse
       has_dictionary =
         Environment.find_program_in_path ("gnome-dictionary") != null;
     }
-    
+
     public bool handles_unknown ()
     {
       return has_dictionary;

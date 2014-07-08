@@ -45,7 +45,7 @@ namespace Synapse
 
       return result;
     }
-    
+
     public static string? remove_last_unichar (string input)
     {
       long char_count = input.char_count ();
@@ -53,7 +53,7 @@ namespace Synapse
       int len = input.index_of_nth_char (char_count - 1);
       return input.substring (0, len);
     }
-    
+
     public static async bool query_exists_async (GLib.File f)
     {
       bool exists;
@@ -69,15 +69,15 @@ namespace Synapse
 
       return exists;
     }
-    
+
     public static string extract_type_name (Type obj_type)
     {
       string obj_class = obj_type.name ();
       if (obj_class.has_prefix ("Synapse")) return obj_class.substring (7);
-      
+
       return obj_class;
     }
-    
+
     public class Logger
     {
       protected const string RED = "\x1b[31m";
@@ -102,14 +102,14 @@ namespace Synapse
         }
         logv ("Synapse", level, desc + format, args);
       }
-      
+
       private static void initialize ()
       {
         var levels = LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.LEVEL_INFO |
             LogLevelFlags.LEVEL_WARNING | LogLevelFlags.LEVEL_CRITICAL |
             LogLevelFlags.LEVEL_ERROR;
 
-        string[] domains = 
+        string[] domains =
         {
           "Synapse",
           "Gtk",
@@ -130,13 +130,13 @@ namespace Synapse
         show_debug = Environment.get_variable ("SYNAPSE_DEBUG") != null;
         initialized = true;
       }
-      
+
       public static bool debug_enabled ()
       {
         if (!initialized) initialize ();
         return show_debug;
       }
-      
+
       public static void log (Object? obj, string format, ...)
       {
         var args = va_list ();
@@ -161,7 +161,7 @@ namespace Synapse
         var args = va_list ();
         log_internal (obj, LogLevelFlags.LEVEL_ERROR, format, args);
       }
-      
+
       protected static void handler (string? domain, LogLevelFlags level, string msg)
       {
         string header;
@@ -359,12 +359,12 @@ namespace Synapse
         var f = File.new_for_uri (uri);
         this.parse_name = f.get_parse_name ();
       }
-      
+
       public bool is_initialized ()
       {
         return this.initialized;
       }
-      
+
       public async void initialize ()
       {
         initialized = true;
@@ -386,10 +386,10 @@ namespace Synapse
               "match-type", MatchType.GENERIC_URI,
               null
             );
-            
+
             // let's determine the file type if unavailable the generic "unknown" type is set.
 			// On UNIX this is the "application/octet-stream" mimetype
-            unowned string mime_type = 
+            unowned string mime_type =
               fi.get_attribute_string (FileAttribute.STANDARD_FAST_CONTENT_TYPE) ?? "application/octet-stream";
             if (ContentType.is_unknown (mime_type))
             {
@@ -426,12 +426,12 @@ namespace Synapse
           warning ("%s", err.message);
         }
       }
-      
+
       public async bool exists ()
       {
         var f = File.new_for_uri (uri);
         bool result = yield query_exists_async (f);
-        
+
         return result;
       }
     }

@@ -27,12 +27,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class DesktopFileMatch: ApplicationMatch
@@ -43,7 +43,7 @@ namespace Synapse
         if (title_folded == null) title_folded = title.casefold ();
         return title_folded;
       }
-      
+
       public string? title_unaccented { get; set; default = null; }
       public string? desktop_id { get; set; default = null; }
 
@@ -79,12 +79,12 @@ namespace Synapse
         register_plugin
       );
     }
-    
+
     static construct
     {
       register_plugin ();
     }
-    
+
     private Gee.List<DesktopFileMatch> desktop_files;
 
     construct
@@ -124,7 +124,7 @@ namespace Synapse
       loading_in_progress = false;
       load_complete ();
     }
-    
+
     private int compute_relevancy (DesktopFileMatch dfm, int base_relevancy)
     {
       var rs = RelevancyService.get_default ();
@@ -132,7 +132,7 @@ namespace Synapse
 
       int r = RelevancyService.compute_relevancy (base_relevancy, popularity);
       Utils.Logger.debug (this, "relevancy for %s: %d", dfm.desktop_id, r);
-      
+
       return r;
     }
 
@@ -225,15 +225,15 @@ namespace Synapse
 
       return result;
     }
-    
+
     private class OpenWithAction: Match
     {
       public DesktopFileInfo desktop_info { get; private set; }
-      
+
       public OpenWithAction (DesktopFileInfo info)
       {
         Object ();
-        
+
         init_with_info (info);
       }
 
@@ -244,12 +244,12 @@ namespace Synapse
         this.description = _ ("Opens current selection using %s").printf (info.name);
         this.desktop_info = info;
       }
-      
+
       public override void execute (Match? match)
       {
         unowned UriMatch? uri_match = match as UriMatch;
         return_if_fail (uri_match != null);
-        
+
         var f = File.new_for_uri (uri_match.uri);
         try
         {
@@ -264,7 +264,7 @@ namespace Synapse
         }
       }
     }
-    
+
     private Gee.Map<string, Gee.List<OpenWithAction> > mimetype_map;
 
     public ResultSet? find_for_match (ref Query query, Match match)
@@ -273,7 +273,7 @@ namespace Synapse
 
       unowned UriMatch? uri_match = match as UriMatch;
       return_val_if_fail (uri_match != null, null);
-      
+
       if (uri_match.mime_type == null) return null;
 
       Gee.List<OpenWithAction> ow_list = mimetype_map[uri_match.mime_type];
@@ -298,7 +298,7 @@ namespace Synapse
       else if (ow_list.size == 0) return null;
 
       var rs = new ResultSet ();
-      
+
       if (query.query_string == "")
       {
         foreach (var action in ow_list)

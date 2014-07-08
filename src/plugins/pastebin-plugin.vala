@@ -27,12 +27,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class PastebinAction: BaseAction
@@ -45,7 +45,7 @@ namespace Synapse
                 icon_name: "document-send", has_thumbnail: false,
                 default_relevancy: Match.Score.AVERAGE);
       }
-      
+
       protected async string? pastebin_file (string path)
       {
         string[] argv = {"pastebinit", "-i", path};
@@ -72,7 +72,7 @@ namespace Synapse
               complete_output += line;
             }
           } while (line != null);
-          
+
           Regex url = new Regex ("^http(s)?://.*$"); // url
           if (url.match (complete_output))
           {
@@ -87,14 +87,14 @@ namespace Synapse
         {
           Utils.Logger.warning (this, "%s", err.message);
         }
-        
+
         return null;
       }
 
       protected async string? pastebin_text (string content)
       {
         string[] argv = {"pastebinit"};
-        
+
         try
         {
           Pid pid;
@@ -122,7 +122,7 @@ namespace Synapse
               complete_output += line;
             }
           } while (line != null);
-          
+
           Regex url = new Regex ("^http(s)?://.*$"); // url
           if (url.match (complete_output))
           {
@@ -137,10 +137,10 @@ namespace Synapse
         {
           Utils.Logger.warning (this, "%s", err.message);
         }
-        
+
         return null;
       }
-      
+
       protected virtual void process_pastebin_result (string? url, Match? target = null)
       {
         string msg;
@@ -173,7 +173,7 @@ namespace Synapse
           Utils.Logger.warning (this, "%s", err.message);
         }
       }
-      
+
       public override void do_execute (Match match, Match? target = null)
       {
         if (match.match_type == MatchType.GENERIC_URI && match is UriMatch)
@@ -205,7 +205,7 @@ namespace Synapse
           });
         }
       }
-      
+
       public override bool valid_for_match (Match match)
       {
         switch (match.match_type)
@@ -223,7 +223,7 @@ namespace Synapse
         }
       }
     }
-    
+
     private class PastebinToContactAction : PastebinAction
     {
       public PastebinToContactAction ()
@@ -234,7 +234,7 @@ namespace Synapse
                 icon_name: "document-send", has_thumbnail: false,
                 default_relevancy: Match.Score.AVERAGE);
       }
-      
+
       protected override void process_pastebin_result (string? url, Match? target = null)
       {
         unowned ContactMatch? contact = target as ContactMatch;
@@ -247,12 +247,12 @@ namespace Synapse
           contact.send_message (url, true);
         }
       }
-      
+
       public override bool needs_target ()
       {
         return true;
       }
-      
+
       public override QueryFlags target_flags ()
       {
         return QueryFlags.CONTACTS;

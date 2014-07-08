@@ -99,7 +99,7 @@ namespace Synapse
       var l = new Gee.ArrayList<Gee.Map.Entry<Match, int>> ();
       l.add_all (matches.entries);
 
-      l.sort ((a, b) => 
+      l.sort ((a, b) =>
       {
         unowned Gee.Map.Entry<Match, int> e1 = (Gee.Map.Entry<Match, int>) a;
         unowned Gee.Map.Entry<Match, int> e2 = (Gee.Map.Entry<Match, int>) b;

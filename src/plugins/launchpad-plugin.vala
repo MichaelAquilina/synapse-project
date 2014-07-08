@@ -36,7 +36,7 @@ namespace Synapse
     {
       auth_object = null;
     }
-    
+
     public Gtk.Widget create_config_widget ()
     {
       var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
@@ -45,7 +45,7 @@ namespace Synapse
       var authorize_button = new Gtk.Button.with_label (_("Authorize with Launchpad"));
       authorize_button.show ();
       box.pack_start (authorize_button, true, false);
-      
+
       var spinner = new Gtk.Spinner ();
       box.pack_start (spinner);
 
@@ -105,7 +105,7 @@ namespace Synapse
           {
             label.set_text (_ ("Authentication failed") + " (%s)".printf (e.message));
           }
-          
+
           label.show ();
         });
       });
@@ -133,7 +133,7 @@ namespace Synapse
 
         return ht;
       }
-      
+
       private class Credentials: ConfigObject
       {
         public string token { get; set; default = ""; }
@@ -147,23 +147,23 @@ namespace Synapse
         // make sure we keep a ref to this, otherwise it'll crash when the call
         // finishes
         proxy = new Rest.Proxy ("https://launchpad.net/", false);
-        
+
         creds = ConfigService.get_default ().bind_config (
           "plugins", "launchpad-plugin", typeof (Credentials)
         ) as Credentials;
       }
-      
+
       public bool is_authenticated ()
       {
         return creds.token != "" && creds.token_secret != "";
       }
-      
+
       public void get_tokens (out string token, out string token_secret)
       {
         token = creds.token;
         token_secret = creds.token_secret;
       }
-      
+
       public async HashTable<string, string> auth_step1 () throws Error
       {
         Error? err = null;
@@ -189,13 +189,13 @@ namespace Synapse
         var result = parse_form_reply (call.get_payload ());
         return result;
       }
-      
+
       public void auth_step2 (string oauth_token)
       {
         // https://launchpad.net/+authorize-token?oauth_token={oauth_token}
         CommonActions.open_uri ("https://launchpad.net/+authorize-token?oauth_token=" + oauth_token);
       }
-      
+
       public async HashTable<string, string> auth_step3 (string oauth_token,
                                                          string token_secret) throws Error
       {
@@ -239,7 +239,7 @@ namespace Synapse
                 file_type: QueryFlags.INTERNET);
       }
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -250,7 +250,7 @@ namespace Synapse
         register_plugin
       );
     }
-    
+
     static construct
     {
       register_plugin ();
@@ -271,7 +271,7 @@ namespace Synapse
         Utils.Logger.warning (this, "Unable to construct regex: %s", err.message);
       }
     }
-    
+
     public bool handles_query (Query q)
     {
       return (QueryFlags.INTERNET in q.query_type || QueryFlags.ACTIONS in q.query_type);
@@ -323,7 +323,7 @@ namespace Synapse
       else if (bug_regex.match (stripped, 0, out mi))
       {
         string bug_num = mi.fetch (1);
-        
+
         uri = "https://bugs.launchpad.net/bugs/" + bug_num;
         title = _ ("Launchpad: Bug #%s").printf (bug_num);
         description = uri;
@@ -334,7 +334,7 @@ namespace Synapse
       q.check_cancellable ();
       return result;
     }
-    
+
     public ResultSet? find_for_match (ref Query query, Match match)
     {
       return null;

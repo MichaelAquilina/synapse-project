@@ -38,7 +38,7 @@ namespace Synapse
         null
       }
     };
-    
+
     private SettingsWindow settings;
     private DataSink data_sink;
     private Gui.KeyComboConfig key_combo_config;
@@ -51,7 +51,7 @@ namespace Synapse
     private StatusIcon status_icon;
 #endif
     private Gui.IController controller;
-    
+
     public UILauncher ()
     {
       config = ConfigService.get_default ();
@@ -62,11 +62,11 @@ namespace Synapse
       register_plugins ();
       settings = new SettingsWindow (data_sink, key_combo_config);
       settings.keybinding_changed.connect (this.change_keyboard_shortcut);
-      
+
       Keybinder.init ();
       bind_keyboard_shortcut ();
-      
-      controller = GLib.Object.new (typeof (Gui.Controller), 
+
+      controller = GLib.Object.new (typeof (Gui.Controller),
                                     "data-sink", data_sink,
                                     "key-combo-config", key_combo_config,
                                     "category-config", category_config) as Gui.IController;
@@ -85,21 +85,21 @@ namespace Synapse
       init_ui (settings.get_current_theme ());
 
       if (!is_startup) controller.summon_or_vanish ();
-      
+
       settings.theme_selected.connect (init_ui);
       init_indicator ();
     }
-    
+
     private void init_ui (Type t)
     {
       controller.set_view (t);
     }
-    
+
     ~UILauncher ()
     {
       config.save ();
     }
-    
+
     private void init_indicator ()
     {
       var indicator_menu = new Gtk.Menu ();
@@ -145,14 +145,14 @@ namespace Synapse
         show_ui ();
       });
       status_icon.set_visible (settings.indicator_active);
-      
+
       settings.notify["indicator-active"].connect (() =>
       {
         status_icon.set_visible (settings.indicator_active);
       });
 #endif
     }
-    
+
     private void register_plugins ()
     {
       // while we don't install proper plugin .so files, we'll do it this way
@@ -200,7 +200,7 @@ namespace Synapse
         data_sink.register_static_plugin (t);
       }
     }
-    
+
     protected void show_ui ()
     {
       if (this.controller == null) return;
@@ -214,7 +214,7 @@ namespace Synapse
       settings.set_keybinding (current_shortcut, false);
       Keybinder.bind (current_shortcut, handle_shortcut, this);
     }
-    
+
     static void handle_shortcut (string key, void* data)
     {
       ((UILauncher)data).show_ui ();
@@ -236,7 +236,7 @@ namespace Synapse
 
     private static void load_custom_style ()
     {
-      string custom_gtkrc = 
+      string custom_gtkrc =
         Path.build_filename (Environment.get_user_config_dir (),
                              "synapse",
                              "gtkrc");
@@ -280,7 +280,7 @@ namespace Synapse
         load_custom_style ();
         Gtk.init (ref argv);
         Notify.init ("synapse");
-        
+
         var app = new GLib.Application ("org.gnome.Synapse", ApplicationFlags.FLAGS_NONE);
         if (!app.register () || app.get_is_remote ()) {
           Utils.Logger.log (null, "Synapse is already running, activating...");

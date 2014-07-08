@@ -25,7 +25,7 @@ namespace Synapse
     SEARCH_CANCELLED,
     UNKNOWN_ERROR
   }
-  
+
   public interface SearchProvider : Object
   {
     public abstract async Gee.List<Match> search (string query,
@@ -37,7 +37,7 @@ namespace Synapse
   // don't move into a class, gir doesn't like it
   [CCode (has_target = false)]
   public delegate void PluginRegisterFunc ();
-  
+
   public class DataSink : Object, SearchProvider
   {
     public class PluginRegistry : Object
@@ -68,23 +68,23 @@ namespace Synapse
       public static unowned PluginRegistry instance = null;
 
       private Gee.List<PluginInfo> plugins;
-      
+
       construct
       {
         instance = this;
         plugins = new Gee.ArrayList<PluginInfo> ();
       }
-      
+
       ~PluginRegistry ()
       {
         instance = null;
       }
-      
+
       public static PluginRegistry get_default ()
       {
         return instance ?? new PluginRegistry ();
       }
-      
+
       public void register_plugin (Type plugin_type,
                                    string title,
                                    string description,
@@ -104,28 +104,28 @@ namespace Synapse
           }
         }
         if (index >= 0) plugins.remove_at (index);
-        
+
         var p = new PluginInfo (plugin_type, title, description, icon_name,
                                 reg_func, runnable, runnable_error);
         plugins.add (p);
       }
-      
+
       public Gee.List<PluginInfo> get_plugins ()
       {
         return plugins.read_only_view;
       }
-      
+
       public PluginInfo? get_plugin_info_for_type (Type plugin_type)
       {
         foreach (PluginInfo pi in plugins)
         {
           if (pi.plugin_type == plugin_type) return pi;
         }
-        
+
         return null;
       }
     }
-    
+
     private class DataSinkConfiguration : ConfigObject
     {
       // vala keeps array lengths, and therefore doesn't support setting arrays
@@ -142,13 +142,13 @@ namespace Synapse
           _disabled_plugins = value;
         }
       }
-      
+
       public void set_plugin_enabled (Type t, bool enabled)
       {
         if (enabled) enable_plugin (t.name ());
         else disable_plugin (t.name ());
       }
-      
+
       public bool is_plugin_enabled (Type t)
       {
         if (_disabled_plugins == null) return true;
@@ -159,12 +159,12 @@ namespace Synapse
         }
         return true;
       }
-      
+
       private void enable_plugin (string name)
       {
         if (_disabled_plugins == null) return;
         if (!(name in _disabled_plugins)) return;
-        
+
         string[] cpy = {};
         foreach (string s in _disabled_plugins)
         {
@@ -172,7 +172,7 @@ namespace Synapse
         }
         _disabled_plugins = (owned) cpy;
       }
-      
+
       private void disable_plugin (string name)
       {
         if (_disabled_plugins == null || !(name in _disabled_plugins))
@@ -181,7 +181,7 @@ namespace Synapse
         }
       }
     }
-    
+
     public DataSink ()
     {
     }
@@ -257,7 +257,7 @@ namespace Synapse
 
       Idle.add (() => { this.load_plugins (); return false; });
     }
-    
+
     private void check_plugins ()
     {
       PluginRegisterFunc[] reg_funcs = {};
@@ -296,7 +296,7 @@ namespace Synapse
 
       plugin_registered (plugin);
     }
-    
+
     private void update_has_unknown_handlers ()
     {
       bool tmp = false;
@@ -356,7 +356,7 @@ namespace Synapse
 
       plugins_loaded = true;
     }
-    
+
     /* This needs to be called right after instantiation,
      * if plugins_loaded == true, it won't have any effect. */
     public void register_static_plugin (Type plugin_type)
@@ -364,7 +364,7 @@ namespace Synapse
       if (plugin_type in plugin_types) return;
       plugin_types += plugin_type;
     }
-    
+
     public unowned Object? get_plugin (string name)
     {
       unowned Object? result = null;
@@ -380,22 +380,22 @@ namespace Synapse
 
       return result;
     }
-    
+
     public bool is_plugin_enabled (Type plugin_type)
     {
       foreach (var plugin in item_plugins)
       {
         if (plugin.get_type () == plugin_type) return plugin.enabled;
       }
-      
+
       foreach (var action in action_plugins)
       {
         if (action.get_type () == plugin_type) return action.enabled;
       }
-      
+
       return false;
     }
-    
+
     public void set_plugin_enabled (Type plugin_type, bool enabled)
     {
       // save it into our config object
@@ -484,7 +484,7 @@ namespace Synapse
         {
           unowned ItemProvider? plugin = src_obj as ItemProvider;
           return_if_fail (plugin != null);
-			
+
           try
           {
             var results = plugin.search.end (res);
@@ -504,7 +504,7 @@ namespace Synapse
         });
       }
       cancellables.reverse ();
-      
+
       if (cancellable != null)
       {
         cancellable.connect (() =>
@@ -542,7 +542,7 @@ namespace Synapse
 
       return current_result_set.get_sorted_list ();
     }
-    
+
     protected Gee.List<Match> find_actions_for_unknown_match (Match match,
                                                               QueryFlags flags)
     {
@@ -568,7 +568,7 @@ namespace Synapse
         if (!action_plugin.enabled) continue;
         rs.add_all (action_plugin.find_for_match (ref q, match));
       }
-      
+
       return rs.get_sorted_list ();
     }
   }

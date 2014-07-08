@@ -19,9 +19,9 @@
  *
  */
 
-/* 
+/*
  * This plugin keeps a cache of file names for directories that are commonly
- * used. 
+ * used.
  */
 
 namespace Synapse
@@ -33,12 +33,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class MatchObject: UriMatch
@@ -64,7 +64,7 @@ namespace Synapse
         this.path = path;
       }
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -89,7 +89,7 @@ namespace Synapse
 
       analyze_recent_documents.begin ();
     }
-    
+
     private bool initialization_done = false;
 
     protected override void constructed ()
@@ -162,7 +162,7 @@ namespace Synapse
           {
             unowned Gee.Map.Entry<string, int> e1 =
               (Gee.Map.Entry<string, int>) a;
-            unowned Gee.Map.Entry<string, int> e2 = 
+            unowned Gee.Map.Entry<string, int> e2 =
               (Gee.Map.Entry<string, int>) b;
             return e2.value - e1.value;
           });
@@ -202,7 +202,7 @@ namespace Synapse
     }
 
     public signal void zeitgeist_search_complete (ResultSet? rs, uint query_id);
-    
+
     private void zg_plugin_search_done (ResultSet? rs, uint query_id)
     {
       zeitgeist_search_complete (rs, query_id);
@@ -438,7 +438,7 @@ namespace Synapse
                     base_relevancy = matcher.value - Match.Score.URI_PENALTY;
                   }
                   float pop = rel_srv.get_uri_popularity (fi.uri);
-                  results.add (fi.match_obj, 
+                  results.add (fi.match_obj,
                     RelevancyService.compute_relevancy (base_relevancy, pop));
                   num_results++;
                 }
@@ -513,7 +513,7 @@ namespace Synapse
         current_level_uris = 0;
         directory_hits.clear ();
       }
-      
+
       uint query_id = q.query_id;
       current_query = q.query_string;
       int last_level_uris = current_level_uris;

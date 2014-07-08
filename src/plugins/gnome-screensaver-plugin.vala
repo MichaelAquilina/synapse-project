@@ -26,7 +26,7 @@ namespace Synapse
   {
     public const string UNIQUE_NAME = "org.gnome.ScreenSaver";
     public const string OBJECT_PATH = "/org/gnome/ScreenSaver";
-    
+
     public abstract async void lock () throws IOError;
   }
 
@@ -36,12 +36,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class LockScreenAction: Match
@@ -52,13 +52,13 @@ namespace Synapse
                 description: _ ("Locks screen and starts screensaver."),
                 icon_name: "system-lock-screen", has_thumbnail: false);
       }
-      
+
       public override void execute (Match? match)
       {
         GnomeScreenSaverPlugin.lock_screen ();
       }
     }
-    
+
     public static void lock_screen ()
     {
       try {
@@ -97,7 +97,7 @@ namespace Synapse
       actions = new Gee.LinkedList<Match> ();
       actions.add (new LockScreenAction ());
     }
-    
+
     public async ResultSet? search (Query q) throws SearchError
     {
       // we only search for actions

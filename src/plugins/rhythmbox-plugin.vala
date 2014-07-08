@@ -26,7 +26,7 @@ namespace Synapse
   interface RhythmboxShell : Object {
       public const string UNIQUE_NAME = "org.gnome.Rhythmbox";
       public const string OBJECT_PATH = "/org/gnome/Rhythmbox/Shell";
-      
+
       [DBus (name = "addToQueue")]
       public abstract void add_to_queue (string uri) throws IOError;
       /*
@@ -35,14 +35,14 @@ namespace Synapse
       */
       [DBus (name = "loadURI")]
       public abstract void load_uri (string uri, bool b) throws IOError;
-      
+
   }
 
   [DBus (name = "org.gnome.Rhythmbox.Player")]
   interface RhythmboxPlayer : Object {
       public const string UNIQUE_NAME = "org.gnome.Rhythmbox";
       public const string OBJECT_PATH = "/org/gnome/Rhythmbox/Player";
-      
+
       [DBus (name = "getPlaying")]
       public abstract bool get_playing () throws IOError;
       [DBus (name = "next")]
@@ -52,7 +52,7 @@ namespace Synapse
       [DBus (name = "playPause")]
       public abstract void play_pause (bool b) throws IOError;
   }
-  
+
   public class RhythmboxActions: Object, Activatable, ItemProvider, ActionProvider
   {
     public bool enabled { get; set; default = true; }
@@ -61,10 +61,10 @@ namespace Synapse
     {
       actions = new Gee.ArrayList<RhythmboxAction> ();
       matches = new Gee.ArrayList<RhythmboxControlMatch> ();
-      
+
       actions.add (new PlayNow());
       actions.add (new AddToPlaylist());
-      
+
       matches.add (new Play ());
       matches.add (new Pause ());
       matches.add (new Previous ());
@@ -73,7 +73,7 @@ namespace Synapse
 
     public void deactivate ()
     {
-      
+
     }
 
     static void register_plugin ()
@@ -88,7 +88,7 @@ namespace Synapse
         _ ("Rhythmbox is not installed")
       );
     }
-    
+
     static construct
     {
       register_plugin ();
@@ -97,7 +97,7 @@ namespace Synapse
     private abstract class RhythmboxAction: Match
     {
       public int default_relevancy { get; set; }
-      
+
       public abstract bool valid_for_match (Match match);
       // stupid Vala...
       public abstract void execute_internal (Match? match);
@@ -114,7 +114,7 @@ namespace Synapse
         return rb_running ? default_relevancy + Match.Score.INCREMENT_LARGE : default_relevancy;
       }
     }
-    
+
     private abstract class RhythmboxControlMatch: Match
     {
       public override void execute (Match? match)
@@ -123,7 +123,7 @@ namespace Synapse
       }
 
       public abstract void do_action ();
-      
+
       public virtual bool action_available ()
       {
         return DBusService.get_default ().name_has_owner (
@@ -352,14 +352,14 @@ namespace Synapse
     construct
     {
     }
-    
+
     public async ResultSet? search (Query q) throws SearchError
     {
       // we only search for actions
       if (!(QueryFlags.ACTIONS in q.query_type)) return null;
 
       var result = new ResultSet ();
-      
+
       var matchers = Query.get_matchers_for_query (q.query_string, 0,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
 
@@ -385,7 +385,7 @@ namespace Synapse
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
-      
+
       if (query_empty)
       {
         foreach (var action in actions)

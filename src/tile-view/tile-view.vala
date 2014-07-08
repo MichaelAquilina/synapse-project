@@ -160,7 +160,7 @@ namespace UI.Widgets
       Tile tile = w as Tile;
       ScrolledWindow? scroll = null;
 
-      scroll = this.get_parent () == null ? 
+      scroll = this.get_parent () == null ?
         null : this.get_parent ().get_parent () as ScrolledWindow;
       if (scroll == null)
       {

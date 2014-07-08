@@ -19,9 +19,9 @@
  *
  */
 
-/* 
+/*
  * This plugin keeps a cache of file names for directories that are commonly
- * used. 
+ * used.
  */
 
 namespace Synapse
@@ -33,12 +33,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class MatchObject: UriMatch
@@ -52,7 +52,7 @@ namespace Synapse
                 mime_type: "inode/directory");
       }
     }
-    
+
     private class DirectoryInfo
     {
       public MatchObject match_obj;
@@ -67,7 +67,7 @@ namespace Synapse
       }
 
       private bool initialized = false;
-      
+
       private const string ATTRIBUTE_CUSTOM_ICON = "metadata::custom-icon";
 
       public async void initialize ()
@@ -94,16 +94,16 @@ namespace Synapse
         {
           warning ("%s", err.message);
         }
-        
+
         initialized = true;
       }
     }
-    
+
     private class Config: ConfigObject
     {
       public bool home_dir_children_only { get; set; default = true; }
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -119,7 +119,7 @@ namespace Synapse
     {
       register_plugin ();
     }
-    
+
     private Gee.Map<unowned string, DirectoryInfo> directory_info_map;
     private Config config;
 
@@ -129,18 +129,18 @@ namespace Synapse
       var cs = ConfigService.get_default ();
       config = (Config) cs.get_config ("plugins", "directory-plugin", typeof (Config));
     }
-    
+
     protected override void constructed ()
     {
       data_sink.search_done["SynapseZeitgeistPlugin"].connect (this.zg_plugin_search_done);
     }
-    
+
     private bool xdg_indexed = false;
 
     private async void index_xdg_directories ()
     {
       if (xdg_indexed) return;
-      
+
       for (UserDirectory dir = UserDirectory.DESKTOP;
            dir <= UserDirectory.VIDEOS; //dir < UserDirectory.N_DIRECTORIES;
            dir = dir + 1)
@@ -155,21 +155,21 @@ namespace Synapse
         yield info.initialize ();
         directory_info_map[info.match_obj.uri] = info;
       }
-      
+
       xdg_indexed = true;
     }
 
     public signal void zeitgeist_search_complete (ResultSet? rs, uint query_id);
-    
+
     private void zg_plugin_search_done (ResultSet? rs, uint query_id)
     {
       zeitgeist_search_complete (rs, query_id);
     }
-    
+
     private Gee.Collection<string> extract_directories (ResultSet rs)
     {
       Gee.Set<string> directories = new Gee.HashSet<string> ();
-      
+
       foreach (var match in rs)
       {
         unowned UriMatch? uri_match = match.key as UriMatch;
@@ -185,9 +185,9 @@ namespace Synapse
 
       return directories;
     }
-    
+
     private string? home_dir_uri = null;
-    
+
     private string[] get_dir_parents (string dir_uri, bool include_self)
     {
       string[] dirs = {};
@@ -205,7 +205,7 @@ namespace Synapse
 
       return dirs;
     }
-    
+
     private async void process_directories (Gee.Collection<string>? dirs)
     {
       if (home_dir_uri == null)
@@ -313,7 +313,7 @@ namespace Synapse
           rs.add (entry.match_obj, relevancy2);
         }
       }
-      
+
       return rs;
     }
   }

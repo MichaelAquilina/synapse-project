@@ -27,18 +27,18 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class Search: Match
     {
       public int default_relevancy { get; set; default = 0; }
-      
+
       public override void execute (Match? match)
       {
         try
@@ -53,7 +53,7 @@ namespace Synapse
           warning ("%s", err.message);
         }
       }
-      
+
       public Search ()
       {
         Object (title: _ ("Search in Devhelp"),
@@ -61,7 +61,7 @@ namespace Synapse
                 has_thumbnail: false, icon_name: "devhelp");
       }
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -90,7 +90,7 @@ namespace Synapse
         Environment.find_program_in_path ("devhelp") != null;
 
       try
-      {        
+      {
         symbol_re = new Regex ("^([a-z]+_)|([A-Z]+[a-z]+[A-Z])",
                                RegexCompileFlags.OPTIMIZE);
       }
@@ -99,12 +99,12 @@ namespace Synapse
         warning ("%s", err.message);
       }
     }
-    
+
     public bool handles_unknown ()
     {
       return has_devhelp;
     }
-    
+
     private Regex symbol_re;
 
     public ResultSet? find_for_match (ref Query query, Match match)

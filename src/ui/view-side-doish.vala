@@ -28,9 +28,9 @@ namespace Synapse.Gui
   public class ViewSideDoish : Synapse.Gui.View
   {
     construct {
-      
+
     }
-    
+
     static construct
     {
       /* Override here style properties */
@@ -65,7 +65,7 @@ namespace Synapse.Gui
       install_style_property (width);
       install_style_property (spacing);
     }
-    
+
     public override void style_updated ()
     {
       base.style_updated ();
@@ -75,10 +75,10 @@ namespace Synapse.Gui
       style_get ("ui-width", out width, "pane-spacing", out spacing, "icon-size", out icon_size,
           "title-size", out tmax, "title-min-size", out tmin, "description-size", out dmax,
           "description-min-size", out dmin);
-      
+
       sp1.set_size_request (spacing, -1);
       sp2.set_size_request (spacing, -1);
-      
+
       container.set_size_request (width, -1);
       action_label.set_size_request ((width - spacing) / 2 - icon_size - 10, -1);
       target_container.set_size_request (width / 2, -1);
@@ -96,34 +96,34 @@ namespace Synapse.Gui
       description_label.size = SmartLabel.string_to_size (dmax);
       description_label.min_size = SmartLabel.string_to_size (dmin);
     }
-    
+
     private NamedIcon source_icon;
     private NamedIcon action_icon;
     private NamedIcon target_icon;
-    
+
     private SmartLabel source_label;
     private SmartLabel action_label;
     private SmartLabel target_label;
     private SmartLabel description_label;
 
     private SelectionContainer results_container;
-    
+
     private ResultBox results_sources;
     private ResultBox results_actions;
     private ResultBox results_targets;
-    
+
     private MenuThrobber menuthrobber;
-    
+
     private Box target_container;
     private Box container;
-    
+
     private Box spane; //source and action panes
     private Box apane;
     private Box tpane;
-    
+
     private Label sp1;
     private Label sp2;
-    
+
     protected override void build_ui ()
     {
       /* Icons */
@@ -133,11 +133,11 @@ namespace Synapse.Gui
       source_icon.set_icon_name ("search", IconSize.DND);
       action_icon.clear ();
       target_icon.set_icon_name ("");
-      
+
       source_icon.set_pixel_size (48);
       action_icon.set_pixel_size (48);
       target_icon.set_pixel_size (48);
-      
+
       /* Labels */
       source_label = new SmartLabel ();
       source_label.set_ellipsize (Pango.EllipsizeMode.END);
@@ -165,7 +165,7 @@ namespace Synapse.Gui
       description_label.set_animation_enabled (true);
       description_label.set_state_flags (StateFlags.SELECTED, false);
       description_label.xalign = 0.5f;
-      
+
       /* Categories - Throbber and menu */ //#0C71D6
       var categories_hbox = new Box (Gtk.Orientation.HORIZONTAL, 0);
 
@@ -194,13 +194,13 @@ namespace Synapse.Gui
       this.make_draggable (sensitive);
       spane.pack_start (sensitive, false);
       spane.pack_start (source_label, true, true, 3);
-      
+
       /* Action Pane */
       apane = new Box (Gtk.Orientation.HORIZONTAL, 0);
       apane.border_width = 5;
       apane.pack_start (action_icon, false);
       apane.pack_start (action_label, false, false, 3);
-      
+
       hbox_panes.pack_start (spane, true);
       hbox_panes.pack_start (sp1, false);
       hbox_panes.pack_start (apane, false);
@@ -212,7 +212,7 @@ namespace Synapse.Gui
       this.make_draggable (sensitive);
       tpane.pack_start (sensitive, false);
       tpane.pack_start (target_label, true, true, 3);
-      
+
       target_container = new Box (Gtk.Orientation.VERTICAL, 0);
       var hb = new Box (Gtk.Orientation.HORIZONTAL, 0);
       hb.pack_start (sp2, false);
@@ -231,32 +231,32 @@ namespace Synapse.Gui
       container.pack_start (description_label, false);
       container.pack_start (spacer, false);
       container.pack_start (results_container, false);
-      
+
       var main_container = new Box (Gtk.Orientation.HORIZONTAL, 0);
       main_container.pack_start (container, false);
       main_container.pack_start (target_container, false);
-      
+
       main_container.show_all ();
       results_container.hide ();
-      
+
       this.add (main_container);
     }
-    
+
     public override bool is_list_visible ()
     {
       return results_container.visible;
     }
-    
+
     public override void set_list_visible (bool visible)
     {
       results_container.visible = visible;
     }
-    
+
     public override void set_throbber_visible (bool visible)
     {
       menuthrobber.active = visible;
     }
-    
+
     public override void update_searching_for ()
     {
       update_labels ();
@@ -264,12 +264,12 @@ namespace Synapse.Gui
       action_label.visible = model.searching_for > SearchingFor.SOURCES;
       queue_draw ();
     }
-    
+
     public override void update_selected_category ()
     {
       flag_selector.selected = model.selected_category;
     }
-    
+
     protected override void paint_background (Cairo.Context ctx)
     {
       bool comp = this.is_composited ();
@@ -308,7 +308,7 @@ namespace Synapse.Gui
 
       int width = this.get_allocated_width ();
       int height = spacer_allocation.y + BORDER_RADIUS + SHADOW_SIZE;
-      
+
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
       r = g = b = 0.12;
@@ -317,7 +317,7 @@ namespace Synapse.Gui
       r = g = b = 0.4;
       ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, StateFlags.SELECTED);
       pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
-      
+
       r = g = b = 0.0;
 
       if (target_container.visible)
@@ -327,12 +327,12 @@ namespace Synapse.Gui
         ctx.save ();
         ctx.translate (0.5, 0.5);
         ctx.set_operator (Operator.OVER);
-        Utils.cairo_make_shadow_for_rect (ctx, target_container_allocation.x - BORDER_RADIUS, 
+        Utils.cairo_make_shadow_for_rect (ctx, target_container_allocation.x - BORDER_RADIUS,
                                                tpane_allocation.y,
                                                target_container_allocation.width - 1 + BORDER_RADIUS,
                                                tpane_allocation.height - 1, 15, r, g, b, SHADOW_SIZE);
         ctx.translate (-0.5, -0.5);
-        Utils.cairo_rounded_rect (ctx, target_container_allocation.x - BORDER_RADIUS, 
+        Utils.cairo_rounded_rect (ctx, target_container_allocation.x - BORDER_RADIUS,
                                        tpane_allocation.y,
                                        target_container_allocation.width + BORDER_RADIUS,
                                        tpane_allocation.height, 15);
@@ -358,7 +358,7 @@ namespace Synapse.Gui
 
       int delta = flag_selector_allocation.y - BORDER_RADIUS;
       if (!comp) delta = 0;
-      
+
       ctx.save ();
       ctx.translate (SHADOW_SIZE, delta);
       width -= SHADOW_SIZE * 2;
@@ -368,13 +368,13 @@ namespace Synapse.Gui
       ctx.set_operator (Operator.OVER);
       Utils.cairo_make_shadow_for_rect (ctx, 0, 0, width - 1, height - 1, BORDER_RADIUS, r, g, b, SHADOW_SIZE);
       ctx.translate (-0.5, -0.5);
-      
+
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
       ctx.set_source (pat);
       ctx.set_operator (Operator.SOURCE);
       ctx.clip ();
       ctx.paint ();
-      
+
       // reflection
       ctx.set_operator (Operator.OVER);
       ctx.new_path ();
@@ -392,7 +392,7 @@ namespace Synapse.Gui
       ctx.paint ();
 
       ctx.restore ();
-      
+
       // icon bgs
       ctx.set_operator (Operator.OVER);
       ctx.save ();
@@ -406,7 +406,7 @@ namespace Synapse.Gui
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();
-      
+
       ctx.save ();
       Utils.cairo_rounded_rect (ctx, apane_allocation.x - apane.border_width,
                                      apane_allocation.y - apane.border_width,
@@ -419,7 +419,7 @@ namespace Synapse.Gui
       ctx.paint ();
       ctx.restore ();
     }
-    
+
     private void update_labels ()
     {
       var focus = model.get_actual_focus ();
@@ -456,7 +456,7 @@ namespace Synapse.Gui
       }
       target_container.visible = model.needs_target ();
     }
-    
+
     public override void update_focused_source (Entry<int, Match> m)
     {
       if (controller.is_in_initial_state ()) source_icon.set_icon_name ("search");
@@ -472,7 +472,7 @@ namespace Synapse.Gui
       source_label.set_markup (Utils.markup_string_with_search (m.value == null ? "" : m.value.title, this.model.query[SearchingFor.SOURCES], ""));
       if (model.searching_for == SearchingFor.SOURCES) update_labels ();
     }
-    
+
     public override void update_focused_action (Entry<int, Match> m)
     {
       if (controller.is_in_initial_state () ||
@@ -492,7 +492,7 @@ namespace Synapse.Gui
       action_label.set_markup (Utils.markup_string_with_search (m.value == null ? "" : m.value.title, this.model.query[SearchingFor.ACTIONS], ""));
       if (model.searching_for == SearchingFor.ACTIONS) update_labels ();
     }
-    
+
     public override void update_focused_target (Entry<int, Match> m)
     {
       if (m.value == null) target_icon.set_icon_name ("");
@@ -512,7 +512,7 @@ namespace Synapse.Gui
       target_label.set_markup (Utils.markup_string_with_search (m.value == null ? "" : m.value.title, this.model.query[SearchingFor.TARGETS], ""));
       if (model.searching_for == SearchingFor.TARGETS) update_labels ();
     }
-    
+
     public override void update_sources (Gee.List<Match>? list = null)
     {
       results_sources.update_matches (list);

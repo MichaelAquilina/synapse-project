@@ -53,7 +53,7 @@ namespace Synapse
     {
       vm = VolumeMonitor.get ();
 
-      vm.volume_added.connect ((volume) => 
+      vm.volume_added.connect ((volume) =>
       {
         volumes[volume] = new VolumeObject (volume);
       });
@@ -61,7 +61,7 @@ namespace Synapse
       {
         volumes.unset (volume);
       });
-      vm.mount_added.connect ((mount) => 
+      vm.mount_added.connect ((mount) =>
       {
         var volume = mount.get_volume ();
         if (volume == null) return;

@@ -30,12 +30,12 @@ namespace UI
     {
       timer_id = Timeout.add (500, this.check_window_at_pointer);
     }
-  
+
     ~Inspector ()
     {
       Source.remove (timer_id);
     }
-    
+
     private unowned Widget? find_child (Container container, int widget_x, int widget_y)
     {
       foreach (unowned Widget child in container.get_children ())
@@ -52,13 +52,13 @@ namespace UI
           return child;
         }
       }
-      
+
       return container;
     }
-    
+
     private unowned Widget last_drawn = null;
     private unowned Widget last_drawn_container = null;
-  
+
     private bool check_window_at_pointer ()
     {
       int win_x, win_y;
@@ -94,7 +94,7 @@ namespace UI
       }
       return true;
     }
-    
+
     private bool paint_border (Widget widget, Cairo.Context cr)
     {
       Gtk.Allocation allocation;
@@ -116,7 +116,7 @@ namespace UI
       cr.rectangle (allocation.x, allocation.y,
                     allocation.width-1, allocation.height-1);
       cr.stroke ();
-      
+
       Cairo.TextExtents ext;
       unowned string widget_name = widget.get_type ().name ();
       cr.text_extents (widget_name, out ext);

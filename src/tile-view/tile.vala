@@ -50,7 +50,7 @@ namespace UI.Widgets
       IconSize isz = IconSize.SMALL_TOOLBAR;
       add_image = new Image.from_stock (obj.add_button_stock, isz);
       remove_image = new Image.from_stock (obj.remove_button_stock, isz);
-      
+
       owned_object = obj;
       owned_object.icon_updated.connect (this.set_image);
       owned_object.text_updated.connect (this.set_text);
@@ -122,7 +122,7 @@ namespace UI.Widgets
       this.show ();
       update_state ();
     }
-    
+
     protected override void realize ()
     {
       this.set_has_window (false);
@@ -203,7 +203,7 @@ namespace UI.Widgets
       if (owned_object.force_pixbuf != null)
       {
         pixbuf = owned_object.force_pixbuf;
-        if (pixbuf.get_width () != icon_size 
+        if (pixbuf.get_width () != icon_size
           || pixbuf.get_height () != icon_size)
         {
           pixbuf = pixbuf.scale_simple (icon_size, icon_size,

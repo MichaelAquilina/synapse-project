@@ -39,12 +39,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class ShutDownAction: Match
@@ -55,7 +55,7 @@ namespace Synapse
                 description: _ ("Turn your computer off"),
                 icon_name: "system-shutdown", has_thumbnail: false);
       }
-      
+
       public override void execute (Match? match)
       {
         try
@@ -81,7 +81,7 @@ namespace Synapse
                 description: _ ("Restart your computer"),
                 icon_name: "gnome-session-reboot", has_thumbnail: false);
       }
-      
+
       public override void execute (Match? match)
       {
         try
@@ -107,7 +107,7 @@ namespace Synapse
                 description: _ ("Close your session and return to the login screen"),
                 icon_name: "gnome-session-logout", has_thumbnail: false);
       }
-      
+
       public override void execute (Match? match)
       {
         try
@@ -129,7 +129,7 @@ namespace Synapse
         }
       }
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -157,14 +157,14 @@ namespace Synapse
       session_manager_available = cache.name_has_owner (GnomeSessionManager.UNIQUE_NAME);
       Utils.Logger.log (this, "%s %s available", GnomeSessionManager.UNIQUE_NAME,
         session_manager_available ? "is" : "isn't");
-      
+
       actions = new Gee.LinkedList<Match> ();
       actions.add (new LogOutAction ());
       // TODO: add a config option to enable these actions (for example when ConsoleKit is not available)
       //actions.add (new RebootAction ());
       //actions.add (new ShutDownAction ());
     }
-    
+
     public async ResultSet? search (Query q) throws SearchError
     {
       if (!session_manager_available) return null;

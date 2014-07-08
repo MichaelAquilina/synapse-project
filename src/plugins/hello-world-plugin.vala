@@ -70,7 +70,7 @@ namespace Synapse
       register_plugin ();
     }
 
-    // an optional method to improve the speed of searches, 
+    // an optional method to improve the speed of searches,
     // if you return false here, the search method won't be called
     // for this query
     public bool handles_query (Query query)

@@ -53,9 +53,9 @@ namespace Synapse.Gui
     public string description_markup {get; set; default = "<span size=\"small\">%s</span>";}
     //the markup of the extended info **extend info is already inserted into description markup**
     public string extended_info_markup {get; set; default = "%s";}
-    
+
     private int text_height = 1;
-    
+
     construct
     {
       this.get_layout ().set_ellipsize (Pango.EllipsizeMode.END);
@@ -66,7 +66,7 @@ namespace Synapse.Gui
       this.notify["title-markup"].connect (size_changed);
       this.notify["description-markup"].connect (size_changed);
     }
-    
+
     public override void render_match (Cairo.Context ctx, Match m, int width, int height, bool use_base = false, double selected_pct = 1.0)
     {
       /* _____   ____________________________   _____
@@ -140,13 +140,13 @@ namespace Synapse.Gui
       height = int.max (this.icon_size, height) + cell_vpadding * 2;
       return height;
     }
-    
+
     private void size_changed ()
     {
       calculate_row_height ();
       this.queue_resize ();
     }
-    
+
     private void draw_icon (Cairo.Context ctx, Match m, int x, int y)
     {
       ctx.save ();
@@ -175,7 +175,7 @@ namespace Synapse.Gui
 
       var styletype = StyleType.FG;
       if (use_base || selected) styletype = StyleType.TEXT;
-      
+
       if (selected && selected_fill_pct < 1.0)
       {
         double r = 0, g = 0, b = 0;
@@ -208,7 +208,7 @@ namespace Synapse.Gui
       bool has_extended_info = show_extended_info && (m is ExtendedInfo);
       if (hide_extended_on_selected && selected) has_extended_info = false;
       int width_for_description = width - cell_hpadding;
-      
+
       /* ----------------- draw extended info ------------------- */
       if (has_extended_info)
       {
@@ -220,17 +220,17 @@ namespace Synapse.Gui
         int w = 0, h = 0;
         layout.get_pixel_size (out w, out h);
         w += _cell_hpadding * 2;
-        
+
         width_for_description -= w;
-        
-        if (rtl == Gtk.TextDirection.RTL) 
+
+        if (rtl == Gtk.TextDirection.RTL)
           ctx.translate (- width + w, text_height - h);
         else
           ctx.translate (width - w, text_height - h);
         Pango.cairo_show_layout (ctx, layout);
         ctx.restore ();
       }
-      
+
       /* ------------------ draw description --------------------- */
       s = Markup.printf_escaped (description_markup, Utils.get_printable_description (m));
 
@@ -238,8 +238,8 @@ namespace Synapse.Gui
       layout.set_width (Pango.SCALE * width_for_description);
       int w = 0, h = 0;
       layout.get_pixel_size (out w, out h);
-      
-      if (rtl == Gtk.TextDirection.RTL) 
+
+      if (rtl == Gtk.TextDirection.RTL)
         ctx.translate (width - width_for_description, text_height - h);
       else
         ctx.translate (0, text_height - h);
@@ -264,10 +264,10 @@ namespace Synapse.Gui
 
     private int soffset; //current selection offset
     private int tsoffset; //target selection offset
-    
+
     private int astep; // animation step for offset
     private int sstep; // animation step for selection
-    
+
     private int row_height; //fixed row height (usually icon_size + 4)
 
     /* _________________      -> 0 coord for offset
@@ -282,11 +282,11 @@ namespace Synapse.Gui
        |                |
        |________________|
     */
-    
+
     private Gee.List<Match> items;
     private int goto_index;
     private int select_index;
-    
+
     public void set_indexes (int targetted, int selected)
     {
       bool b = _select(selected);
@@ -299,30 +299,30 @@ namespace Synapse.Gui
         return this.select_index;
       }
     }
-    
+
     public int targetted_index {
       get {
         return this.goto_index;
       }
     }
-    
+
     public bool selection_enabled
     {
       get; set; default = true;
     }
-    
+
     public bool use_base_colors
     {
       get; set; default = true;
     }
-    
+
     public int min_visible_rows
     {
       get; set; default = 5;
     }
-    
+
     private bool inhibit_move;
-    
+
     public enum Behavior
     {
       TOP,
@@ -338,14 +338,14 @@ namespace Synapse.Gui
       set;
       default = Behavior.CENTER;
     }
-    
+
     public class MatchViewRendererBase : Gtk.Label
     {
       /* Methods to override here */
-      
+
       /* render_match:
          use_base : if true use gtk.BASE/TEXT, else use gtk.BG/FG
-         selected_pct : [1.0 - 2.0] -> 
+         selected_pct : [1.0 - 2.0] ->
           if > 1.0 then
             selected = true
             pct = selected_pct - 1.0 : how much is the selected row near the target position
@@ -360,11 +360,11 @@ namespace Synapse.Gui
         return 36;
       }
       /* End Methods to override - do not edit below */
-      
+
       protected Utils.ColorHelper ch;
-      
+
       protected Gtk.TextDirection rtl;
-            
+
       protected void draw_icon_in_position (Cairo.Context ctx, string? name, int pixel_size, double with_alpha = 1.0)
       {
         ctx.rectangle (0, 0, pixel_size, pixel_size);
@@ -380,7 +380,7 @@ namespace Synapse.Gui
         else
           ctx.paint_with_alpha (with_alpha);
       }
-      
+
       construct
       {
         rtl = Gtk.TextDirection.LTR;
@@ -411,17 +411,17 @@ namespace Synapse.Gui
         //Transparent.
         return true;
       }
-      
+
     }
-    
+
     protected MatchViewRendererBase renderer;
     private Utils.ColorHelper ch;
-    
+
     public MatchViewRendererBase get_renderer ()
     {
       return renderer;
     }
-    
+
     public MatchListView (MatchViewRendererBase mr)
     {
       ch = Utils.ColorHelper.get_default ();
@@ -436,12 +436,12 @@ namespace Synapse.Gui
       this.set_has_window (false);
       this.set_events (Gdk.EventMask.BUTTON_PRESS_MASK |
                        Gdk.EventMask.SCROLL_MASK);
-      
+
       // D&D
-      Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, {}, 
-                               Gdk.DragAction.ASK | 
-                               Gdk.DragAction.COPY | 
-                               Gdk.DragAction.MOVE | 
+      Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, {},
+                               Gdk.DragAction.ASK |
+                               Gdk.DragAction.COPY |
+                               Gdk.DragAction.MOVE |
                                Gdk.DragAction.LINK);
 
       //this.above_child = true;
@@ -455,7 +455,7 @@ namespace Synapse.Gui
       this.tid = 0;
 
       this.items = null;
-      
+
       this.size_allocate.connect (this.update_target_offsets);
       this.notify["behavior"].connect (this.update_target_offsets);
       this.notify["min-visible-rows"].connect (this.queue_resize);
@@ -463,12 +463,12 @@ namespace Synapse.Gui
         this.update_current_offsets ();
       });
     }
-    
+
     public override void forall_internal (bool b, Gtk.Callback callback)
     {
       if (b) callback (this.renderer);
     }
-    
+
     public override void size_allocate (Gtk.Allocation allocation)
     {
       base.size_allocate (allocation);
@@ -501,7 +501,7 @@ namespace Synapse.Gui
       this.select_index = i;
       return true;
     }
-    
+
     private bool _goto (int i)
     {
       if (i == this.goto_index ||
@@ -511,7 +511,7 @@ namespace Synapse.Gui
       this.goto_index = i;
       return true;
     }
-    
+
     private bool update_current_offsets ()
     {
       if (! (animation_enabled && this.get_realized ()) )
@@ -570,11 +570,11 @@ namespace Synapse.Gui
       tid = 0;
       return false;
     }
-    
+
     private void update_target_offsets ()
     {
       int visible_items = this.get_allocated_height () / this.row_height;
-      
+
       switch (this.behavior)
       {
         case Behavior.TOP_FORCED:
@@ -605,10 +605,10 @@ namespace Synapse.Gui
       else // use special animation if the diff is too much
         this.astep = -1;
       this.sstep = int.max (1, (int) (Math.fabs (this.tsoffset - this.soffset) / ANIM_STEPS ));
-      
+
       update_current_offsets ();
     }
-    
+
     public virtual void set_list (Gee.List<Match>? list, int targetted_index = 0, int selected_index = -1)
     {
       this.items = list;
@@ -620,25 +620,25 @@ namespace Synapse.Gui
       this.update_target_offsets ();
       this.queue_draw ();
     }
-    
+
     public int get_list_size ()
     {
       return this.items == null ? 0 : this.items.size;
     }
-    
+
     public override bool draw (Cairo.Context ctx)
     {
       /* Clip */
       ctx.rectangle (0, 0, this.get_allocated_width (), this.get_allocated_height ());
       ctx.clip ();
       ctx.set_operator (Cairo.Operator.OVER);
-      
+
       if (this.use_base_colors)
       {
         ch.set_source_rgba (ctx, 1.0, StyleType.BASE, Gtk.StateFlags.NORMAL, Mod.NORMAL);
         ctx.paint ();
       }
-      
+
       if (this.items == null || this.items.size == 0) return true;
 
       ctx.set_font_options (this.get_screen().get_font_options());
@@ -646,7 +646,7 @@ namespace Synapse.Gui
       int visible_items = this.get_allocated_height () / this.row_height + 2;
       int i = get_item_at_pos (0);
       visible_items += i;
-      
+
       int ypos = 0;
 
       if (this.select_index >= 0 && this.selection_enabled)
@@ -685,7 +685,7 @@ namespace Synapse.Gui
         renderer.render_match (ctx, this.items.get (i), this.get_allocated_width (), this.row_height, this.use_base_colors, pct);
         ctx.restore ();
       }
-      
+
       return true;
     }
 
@@ -693,7 +693,7 @@ namespace Synapse.Gui
     {
       return (this.offset + y) / this.row_height;
     }
-    
+
     public override bool scroll_event (Gdk.EventScroll event)
     {
       if (this.items == null) return true;
@@ -705,11 +705,11 @@ namespace Synapse.Gui
       this.selected_index_changed (this.select_index);
       return true;
     }
-    
+
     // Fired when user changes selection interacting with the list
     public signal void selected_index_changed (int new_index);
     public signal void fire_item ();
-    
+
     private int dragdrop_target_item = 0;
     private string dragdrop_name = "";
     private string dragdrop_uri = "";
@@ -718,7 +718,7 @@ namespace Synapse.Gui
       if (this.tid != 0) return true;
       this.dragdrop_target_item = get_item_at_pos ((int)event.y);
       var tl = new TargetList ({});
-      
+
       if (this.items == null || this.items.size <= this.dragdrop_target_item)
       {
         dragdrop_name = "";
@@ -727,7 +727,7 @@ namespace Synapse.Gui
         Gtk.drag_source_set_icon_stock (this, Gtk.Stock.MISSING_IMAGE);
         return true;
       }
-      
+
       if (this.selection_enabled)
       {
         if (event.type == Gdk.EventType.2BUTTON_PRESS &&
@@ -735,7 +735,7 @@ namespace Synapse.Gui
         {
           this.set_indexes (this.dragdrop_target_item, this.dragdrop_target_item);
           this.fire_item ();
-          return true; //Fire item! So we don't need to drag things! 
+          return true; //Fire item! So we don't need to drag things!
         }
         else
         {
@@ -768,7 +768,7 @@ namespace Synapse.Gui
       dragdrop_name = um.title;
       dragdrop_uri = um.uri;
       Gtk.drag_source_set_target_list (this, tl);
-      
+
       try {
         var icon = GLib.Icon.new_for_string (um.icon_name);
         if (icon == null) return true;
@@ -778,13 +778,13 @@ namespace Synapse.Gui
 
         Gdk.Pixbuf icon_pixbuf = iconinfo.load_icon ();
         if (icon_pixbuf == null) return true;
-        
+
         Gtk.drag_source_set_icon_pixbuf (this, icon_pixbuf);
       }
       catch (GLib.Error err) {}
       return true;
     }
-    
+
     public override void drag_data_get (Gdk.DragContext context, SelectionData selection_data, uint info, uint time_)
     {
       /* Called at drop time */
@@ -792,7 +792,7 @@ namespace Synapse.Gui
       selection_data.set_uris ({dragdrop_uri});
     }
   }
-  
+
   public class ResultBox: EventBox
   {
     private const int VISIBLE_RESULTS = 5;
@@ -802,19 +802,19 @@ namespace Synapse.Gui
 
     private Box vbox;
     private Box status_box;
-    
+
     private Utils.ColorHelper ch;
-    
+
     public bool use_base_colors
     {
       get; set; default = true;
     }
-    
+
     public bool show_no_results
     {
       get; set; default = true;
     }
-    
+
     public ResultBox (int width, int nrows = 5)
     {
       this.mwidth = width;
@@ -842,14 +842,14 @@ namespace Synapse.Gui
     private MatchViewRenderer rend;
     private Label status;
     private Label logo;
-    
+
     public new void set_state (Gtk.StateFlags state)
     {
       base.set_state_flags (state, false);
       status.set_state_flags (Gtk.StateFlags.NORMAL, true);
       logo.set_state_flags (Gtk.StateFlags.NORMAL, true);
     }
-    
+
     public override bool draw (Cairo.Context ctx)
     {
       if (_use_base_colors)
@@ -861,7 +861,7 @@ namespace Synapse.Gui
         ctx.set_operator (Cairo.Operator.OVER);
         /* Prepare bg's colors using GtkStyleContext */
         Pattern pat = new Pattern.linear(0, 0, 0, status.get_allocated_height ());
-        
+
         StateFlags t = this.get_state_flags ();
         ch.add_color_stop_rgba (pat, 0.0, 0.95, StyleType.BG, t);
         ch.add_color_stop_rgba (pat, 1.0, 0.95, StyleType.BG, t, Mod.DARKER);
@@ -869,12 +869,12 @@ namespace Synapse.Gui
         ctx.set_source (pat);
         ctx.paint ();
       }
-      /* Propagate Draw */               
+      /* Propagate Draw */
       this.propagate_draw (this.get_child (), ctx);
-      
+
       return true;
     }
-    
+
     public MatchListView get_match_list_view ()
     {
       return this.view;
@@ -896,7 +896,7 @@ namespace Synapse.Gui
       rend = new MatchViewRenderer ();
       view = new MatchListView (rend);
       view.min_visible_rows = this.nrows;
-      
+
       vbox = new Box (Gtk.Orientation.VERTICAL, 0);
       vbox.border_width = 0;
       this.add (vbox);
@@ -929,20 +929,20 @@ namespace Synapse.Gui
         status.visible = true;
       }
     }
-    
+
     public void move_selection_to_index (int i)
     {
       view.set_indexes (i, i);
       status.set_markup (Markup.printf_escaped (_("<b>%d of %d</b>"), i + 1, view.get_list_size ()));
     }
   }
-  
+
   public class SpecificMatchList: MatchListView
   {
     protected IController controller;
     protected Model model;
     protected SearchingFor sf;
-    
+
     private class LabelMatch : Match
     {
       public LabelMatch (string title, string description, string icon_name)
@@ -954,7 +954,7 @@ namespace Synapse.Gui
                      has_thumbnail: false);
       }
     }
-    
+
     private static bool lists_initialized = false;
     private static Gee.List<Match>? tts = null;
     private static Gee.List<Match>? nores = null;
@@ -964,7 +964,7 @@ namespace Synapse.Gui
     private bool has_results = false;
     private MatchViewRenderer rend;
     public MatchViewRenderer get_match_renderer () {return rend;}
-    
+
     public SpecificMatchList (IController controller, Model model, SearchingFor sf)
     {
       base (new MatchViewRenderer ());
@@ -976,7 +976,7 @@ namespace Synapse.Gui
       if (!lists_initialized)
       {
         lists_initialized = true;
-        
+
         tts = new Gee.ArrayList<Match>();
         nores = new Gee.ArrayList<Match>();
         noact = new Gee.ArrayList<Match>();
@@ -999,7 +999,7 @@ namespace Synapse.Gui
         });
       }
     }
-    
+
     public void update_searching_for ()
     {
       if (controller.is_in_initial_state ())

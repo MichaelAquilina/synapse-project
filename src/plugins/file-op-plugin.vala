@@ -27,12 +27,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private abstract class FileAction: Match
@@ -46,14 +46,14 @@ namespace Synapse
       {
         return default_relevancy;
       }
-      
+
       public override void execute_with_target (Match source, Match? target = null)
       {
         if (target == null) execute (source);
         else Utils.Logger.error (this, "execute () is not implemented");
       }
     }
-    
+
     private class RenameTo: FileAction
     {
       public RenameTo ()
@@ -64,14 +64,14 @@ namespace Synapse
                 match_type: MatchType.ACTION,
                 default_relevancy: Match.Score.AVERAGE);
       }
-      
+
       public override void execute_with_target (Match source, Match? target = null)
       {
         if (target == null) return; // not possible
-        
+
         unowned UriMatch? uri_match = source as UriMatch;
         if (uri_match == null) return; // not possible
-        
+
         File f;
         f = File.new_for_uri (uri_match.uri);
         if (!f.query_exists ())
@@ -91,16 +91,16 @@ namespace Synapse
           Utils.Logger.warning (this, _("Cannot move \"%s\" to \"%s\""), f.get_path (), newpath);
         }
       }
-      
+
       public override bool needs_target () {
         return true;
       }
-      
+
       public override QueryFlags target_flags ()
       {
         return QueryFlags.TEXT;
       }
-      
+
       public override bool valid_for_match (Match match)
       {
         switch (match.match_type)
@@ -114,7 +114,7 @@ namespace Synapse
         }
       }
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -125,7 +125,7 @@ namespace Synapse
         register_plugin
       );
     }
-    
+
     static construct
     {
       register_plugin ();
@@ -144,7 +144,7 @@ namespace Synapse
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
-      
+
       if (query_empty)
       {
         foreach (var action in actions)

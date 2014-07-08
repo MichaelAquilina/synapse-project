@@ -26,17 +26,17 @@ namespace Synapse.Gui
   public class IconCacheService : GLib.Object
   {
     private static IconCacheService instance = null;
-    
+
     public static IconCacheService get_default ()
     {
       return instance ?? new IconCacheService ();
     }
-    
+
     private IconCacheService ()
     {
-      
+
     }
-    
+
     private class PixbufInfo : GLib.Object
     {
       private Gdk.Pixbuf _pixbuf;
@@ -54,7 +54,7 @@ namespace Synapse.Gui
         //this.last_time_used = time_t ();
       }
     }
-    
+
     private Gee.Map<string, PixbufInfo> map;
     private Gtk.IconTheme theme;
     construct
@@ -64,13 +64,13 @@ namespace Synapse.Gui
       this.theme.changed.connect (this.clear_cache);
       map = new Gee.HashMap<string, PixbufInfo> ();
     }
-    
+
     public void clear_cache ()
     {
       map.clear ();
       Synapse.Utils.Logger.debug (this, "Icon Cache cleared.");
     }
-    
+
     public void reduce_cache ()
     {
       Gee.List<string> keys = new Gee.ArrayList<string> ();
@@ -88,7 +88,7 @@ namespace Synapse.Gui
       keys.clear ();
       Synapse.Utils.Logger.debug (this, "Cache freed/size: %d/%d", i, map.size);
     }
-    
+
     public Gdk.Pixbuf? get_icon (string name, int pixel_size)
     {
       if (name == "") return null;
@@ -104,7 +104,7 @@ namespace Synapse.Gui
       }
       return info.pixbuf;
     }
-    
+
     private Gdk.Pixbuf? get_pixbuf (string name, int pixel_size)
     {
       try {

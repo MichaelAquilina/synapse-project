@@ -29,7 +29,7 @@ namespace Synapse.Gui
     class PluginTileObject: UI.Widgets.AbstractTileObject
     {
       public DataSink.PluginRegistry.PluginInfo pi { get; construct set; }
-      
+
       public signal void configure ();
 
       public PluginTileObject (DataSink.PluginRegistry.PluginInfo info)
@@ -62,7 +62,7 @@ namespace Synapse.Gui
           Synapse.CommonActions.open_uri (address);
         });
         add_user_button (help_button);
-        
+
         if (pi.plugin_type.is_a (typeof (Synapse.Configurable)))
         {
           var config_button = new Gtk.Button ();
@@ -74,7 +74,7 @@ namespace Synapse.Gui
           {
             this.configure ();
           });
-          
+
           add_user_button (config_button);
         }
       }
@@ -92,13 +92,13 @@ namespace Synapse.Gui
           sub_description_text = _("Enabled");
         }
       }
-      
+
       public void refresh ()
       {
         DataSink.PluginRegistry.PluginInfo info;
         var registry = DataSink.PluginRegistry.get_default ();
         info = registry.get_plugin_info_for_type (pi.plugin_type);
-        
+
         if (pi.runnable != info.runnable)
         {
           pi.runnable = info.runnable;
@@ -110,7 +110,7 @@ namespace Synapse.Gui
         }
       }
     }
-    
+
     class UIConfig: ConfigObject
     {
       public string ui_type { get; set; default = "default"; }
@@ -122,7 +122,7 @@ namespace Synapse.Gui
       string name;
       string description;
       Type tclass;
-      
+
       Theme (string name, string desc, Type obj_type)
       {
         this.name = name;
@@ -138,7 +138,7 @@ namespace Synapse.Gui
     private unowned KeyComboConfig key_combo_config;
     private Gtk.ListStore model;
     private UIConfig config;
-    
+
     public bool indicator_active { get { return config.show_indicator; } }
 
     public SettingsWindow (DataSink data_sink, KeyComboConfig key_combo_config)
@@ -156,7 +156,7 @@ namespace Synapse.Gui
 
       init_settings ();
       build_ui ();
-      
+
       this.tile_view.map.connect (this.init_plugin_tiles);
       this.tile_view.visibility_notify_event.connect (() => { this.refresh_tiles (); return false; });
     }
@@ -173,13 +173,13 @@ namespace Synapse.Gui
 
       selected_theme = config.ui_type;
     }
-    
+
     private void init_plugin_tiles ()
     {
       tile_view.clear ();
       var arr = new Gee.ArrayList<DataSink.PluginRegistry.PluginInfo> ();
       arr.add_all (DataSink.PluginRegistry.get_default ().get_plugins ());
-      arr.sort ((a, b) => 
+      arr.sort ((a, b) =>
       {
         unowned DataSink.PluginRegistry.PluginInfo p1 =
           (DataSink.PluginRegistry.PluginInfo) a;
@@ -187,20 +187,20 @@ namespace Synapse.Gui
           (DataSink.PluginRegistry.PluginInfo) b;
         return strcmp (p1.title, p2.title);
       });
-      
+
       foreach (var pi in arr)
       {
         var tile = new PluginTileObject (pi);
         tile_view.append_tile (tile);
         tile.update_state (data_sink.is_plugin_enabled (pi.plugin_type));
-        
+
         tile.active_changed.connect ((tile_obj) =>
         {
           PluginTileObject pto = tile_obj as PluginTileObject;
           pto.update_state (!tile_obj.enabled);
           data_sink.set_plugin_enabled (pto.pi.plugin_type, tile_obj.enabled);
         });
-        
+
         tile.configure.connect ((tile_obj) =>
         {
           PluginTileObject pto = tile_obj as PluginTileObject;
@@ -219,7 +219,7 @@ namespace Synapse.Gui
         });
       }
     }
-    
+
     private void refresh_tiles ()
     {
       GLib.List<unowned UI.Widgets.AbstractTileObject> tiles = tile_view.get_tiles ();
@@ -228,7 +228,7 @@ namespace Synapse.Gui
         (pti as PluginTileObject).refresh ();
       }
     }
-    
+
     private void init_general_options ()
     {
       autostart = false;
@@ -239,7 +239,7 @@ namespace Synapse.Gui
       init_themes ();
       init_general_options ();
     }
-    
+
     private string [,] key_combos = { //activate has to stay in first position!
         {"activate", _("Activate")},
         {"execute", _("Execute")},
@@ -261,7 +261,7 @@ namespace Synapse.Gui
       };
 
     private UI.Widgets.TileView tile_view;
-    
+
     private int check_keybinding_in_use (int for_index, string keyname)
     {
       string combo;
@@ -274,7 +274,7 @@ namespace Synapse.Gui
           string cannot_bind = _("Shortcut already in use");
           cannot_bind = "%s: \"%s\"".printf (cannot_bind, keyname);
           Synapse.Utils.Logger.warning (this, cannot_bind);
-          var d = new Gtk.MessageDialog (this, 0, MessageType.ERROR, 
+          var d = new Gtk.MessageDialog (this, 0, MessageType.ERROR,
                                          ButtonsType.CLOSE,
                                          "%s", cannot_bind);
           d.run ();
@@ -284,13 +284,13 @@ namespace Synapse.Gui
       }
       return -1;
     }
-    
+
     private void build_ui ()
     {
       var main_vbox = new Box (Gtk.Orientation.VERTICAL, 12);
       main_vbox.border_width = 12;
       this.add (main_vbox);
-      
+
       var tabs = new Gtk.Notebook ();
       var general_tab = new Box (Gtk.Orientation.VERTICAL, 6);
       general_tab.border_width = 12;
@@ -299,7 +299,7 @@ namespace Synapse.Gui
       main_vbox.pack_start (tabs);
       tabs.append_page (general_tab, new Label (_("General")));
       tabs.append_page (plugin_tab, new Label (_("Plugins")));
-      
+
       /* General Tab */
       var theme_frame = new Frame (null);
       theme_frame.set_shadow_type (Gtk.ShadowType.NONE);
@@ -312,7 +312,7 @@ namespace Synapse.Gui
       align.set_padding (6, 12, 12, 12);
       align.add (behavior_vbox);
       theme_frame.add (align);
-      
+
       /* Select theme combobox row */
       var row = new Box (Gtk.Orientation.HORIZONTAL, 6);
       behavior_vbox.pack_start (row, false);
@@ -325,7 +325,7 @@ namespace Synapse.Gui
       autostart.active = autostart_exists ();
       autostart.toggled.connect (this.autostart_toggled);
       behavior_vbox.pack_start (autostart, false);
-      
+
       /* Notification icon */
       var notification = new CheckButton.with_label (_("Show notification icon"));
       notification.active = config.show_indicator;
@@ -347,7 +347,7 @@ namespace Synapse.Gui
       align = new Alignment (0.5f, 0.5f, 1.0f, 1.0f);
       align.set_padding (6, 12, 12, 12);
 
-      var shortcut_scroll = new Gtk.ScrolledWindow (null, null);    
+      var shortcut_scroll = new Gtk.ScrolledWindow (null, null);
       shortcut_scroll.set_shadow_type (ShadowType.IN);
       shortcut_scroll.set_policy (PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
       var tree_vbox = new Box (Gtk.Orientation.VERTICAL, 6);
@@ -357,7 +357,7 @@ namespace Synapse.Gui
       align.add (tree_vbox);
       shortcut_frame.add (align);
       general_tab.pack_start (shortcut_frame, true, true);
-      
+
       model = new Gtk.ListStore (2, typeof (string), typeof (string));
       treeview.set_model (model);
 
@@ -413,9 +413,9 @@ namespace Synapse.Gui
         key_combo_config.get (key_combos[j, 0], out combo);
         model.set (iter, 0, key_combos[j, 1], 1, combo);
       }
-      
+
       /* Add info */
-      
+
       var info_box = new Box (Gtk.Orientation.HORIZONTAL, 6);
       var info_image = new Image.from_stock (Gtk.Stock.INFO, IconSize.MENU);
       info_box.pack_start (info_image, false);
@@ -447,14 +447,14 @@ namespace Synapse.Gui
       var close_button = new Gtk.Button.from_stock (Gtk.Stock.CLOSE);
       close_button.clicked.connect (() => { this.hide (); });
       bbox.pack_start (close_button);
-      
+
       main_vbox.pack_start (bbox, false);
-      
+
       main_vbox.show_all ();
     }
-    
+
     public signal void keybinding_changed (string keybinding);
-    
+
     public void set_keybinding (string key, bool emit = true)
     {
       if (model != null)
@@ -484,7 +484,7 @@ namespace Synapse.Gui
         selected_theme = config.ui_type = cb_themes.active_id;
         theme_selected (get_current_theme ());
       });
-      
+
       return cb_themes;
     }
     public Type get_current_theme ()
@@ -497,7 +497,7 @@ namespace Synapse.Gui
 
     public signal void theme_selected (Type theme);
 
-    private string autostart_file = 
+    private string autostart_file =
       Path.build_filename (Environment.get_user_config_dir (), "autostart",
                            "synapse.desktop", null);
 
@@ -517,7 +517,7 @@ namespace Synapse.Gui
       }
       else if (active && !autostart_exists ())
       {
-        string autostart_entry = 
+        string autostart_entry =
           "[Desktop Entry]\n" +
           "Name=Synapse\n" +
           "Exec=synapse --startup\n" +
@@ -527,7 +527,7 @@ namespace Synapse.Gui
           "Icon=synapse\n";
 
         // create the autostart file
-        string autostart_dir = 
+        string autostart_dir =
           Path.build_filename (Environment.get_user_config_dir (),
                                "autostart", null);
         if (!FileUtils.test (autostart_dir, FileTest.EXISTS | FileTest.IS_DIR))
@@ -540,7 +540,7 @@ namespace Synapse.Gui
         }
         catch (Error err)
         {
-          var d = new MessageDialog (this, 0, MessageType.ERROR, 
+          var d = new MessageDialog (this, 0, MessageType.ERROR,
                                      ButtonsType.CLOSE,
                                      "%s", err.message);
           d.run ();

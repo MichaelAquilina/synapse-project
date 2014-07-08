@@ -42,8 +42,8 @@ namespace Synapse
      *    SUPER = OR ([categories, ...]);
      *
      *
-     * Remember: 
-     *   if you add or remove a category, 
+     * Remember:
+     *   if you add or remove a category,
      *   change labels in UIInterface.CategoryConfig.init_labels
      *
      */
@@ -51,29 +51,29 @@ namespace Synapse
     UNCATEGORIZED   = 1 << 1,
 
     APPLICATIONS    = 1 << 2,
-    
+
     ACTIONS         = 1 << 3,
-    
+
       AUDIO           = 1 << 4,
       VIDEO           = 1 << 5,
       DOCUMENTS       = 1 << 6,
       IMAGES          = 1 << 7,
     FILES           = AUDIO | VIDEO | DOCUMENTS | IMAGES,
-    
+
     PLACES          = 1 << 8,
 
     // FIXME: shouldn't this be FILES | INCLUDE_REMOTE?
     INTERNET        = 1 << 9,
-    
+
     // FIXME: Text Query flag? kinda weird, why do we have this here?
     TEXT            = 1 << 10,
-    
+
     CONTACTS        = 1 << 11,
 
     ALL           = 0xFFFFFFFF,
     LOCAL_CONTENT = ALL ^ QueryFlags.INCLUDE_REMOTE
   }
-  
+
   [Flags]
   public enum MatcherFlags
   {
@@ -226,7 +226,7 @@ namespace Synapse
           }
         }
       }
-      
+
       if (!(MatcherFlags.NO_SUBSTRING in match_flags))
       {
         try

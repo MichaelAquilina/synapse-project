@@ -48,8 +48,8 @@ namespace Synapse
       OLD   = 1 << 12,
       ALL   = 0xFFF
     }
-   
-    public string desktop_id { get; construct set; } 
+
+    public string desktop_id { get; construct set; }
     public string name { get; construct set; }
     public string comment { get; set; default = ""; }
     public string icon_name { get; construct set; default = ""; }
@@ -63,14 +63,14 @@ namespace Synapse
     public bool is_valid { get; private set; default = true; }
 
     public string[] mime_types = null;
-    
+
     private string? name_folded = null;
     public unowned string get_name_folded ()
     {
       if (name_folded == null) name_folded = name.casefold ();
       return name_folded;
     }
-    
+
     public EnvironmentType show_in { get; set; default = EnvironmentType.ALL; }
 
     private static const string GROUP = "Desktop Entry";
@@ -120,7 +120,7 @@ namespace Synapse
         {
           throw new DesktopFileError.UNINTERESTING_ENTRY ("Not Application-type desktop entry");
         }
-        
+
         if (keyfile.has_key (GROUP, "Categories"))
         {
           string[] categories = keyfile.get_string_list (GROUP, "Categories");
@@ -173,7 +173,7 @@ namespace Synapse
         }
         if (keyfile.has_key (GROUP, "OnlyShowIn"))
         {
-          show_in = parse_environments (keyfile.get_string_list (GROUP, 
+          show_in = parse_environments (keyfile.get_string_list (GROUP,
                                                                  "OnlyShowIn"));
         }
         else if (keyfile.has_key (GROUP, "NotShowIn"))
@@ -182,7 +182,7 @@ namespace Synapse
                                                                   "NotShowIn"));
           show_in = EnvironmentType.ALL ^ not_show;
         }
-        
+
         // special case these, people are using them quite often and wonder
         // why they don't appear
         if (filename.has_suffix ("gconf-editor.desktop") ||
@@ -221,7 +221,7 @@ namespace Synapse
     private Gee.Map<string, Gee.List<DesktopFileInfo> > exec_map;
     private Gee.Map<string, DesktopFileInfo> desktop_id_map;
     private Gee.MultiMap<string, string> mimetype_parent_map;
-    
+
     construct
     {
       instance = this;
@@ -234,7 +234,7 @@ namespace Synapse
 
       initialize.begin ();
     }
-    
+
     ~DesktopFileService ()
     {
       instance = null;
@@ -256,16 +256,16 @@ namespace Synapse
 
       init_once.leave (true);
     }
-    
+
     private DesktopFileInfo.EnvironmentType session_type =
       DesktopFileInfo.EnvironmentType.GNOME;
     private string session_type_str = "GNOME";
-    
+
     public DesktopFileInfo.EnvironmentType get_environment ()
     {
       return this.session_type;
     }
-    
+
     private void get_environment_type ()
     {
       unowned string? session_var;
@@ -351,14 +351,14 @@ namespace Synapse
       string? locale = Intl.setlocale (LocaleCategory.MESSAGES, null);
       if (locale == null) return null;
 
-      // even though this is what the patch in gnome-menus does, the name 
+      // even though this is what the patch in gnome-menus does, the name
       // of the file is different here (utf is uppercase)
       string filename = "desktop.%s.cache".printf (
         locale.replace (".UTF-8", ".utf8"));
 
       return Path.build_filename (dir_name, filename, null);
     }
-    
+
     private async void process_directory (File directory,
                                           string id_prefix,
                                           Gee.Set<File> monitored_dirs)
@@ -428,7 +428,7 @@ namespace Synapse
         dir_path = Path.build_filename (data_dir, "mime", "subclasses");
         yield load_mime_parents_from_file (dir_path);
       }
-      
+
       create_indices ();
 
       directory_monitors = new Gee.ArrayList<FileMonitor> ();
@@ -446,7 +446,7 @@ namespace Synapse
         }
       }
     }
-    
+
     private uint timer_id = 0;
 
     public signal void reload_started ();
@@ -459,7 +459,7 @@ namespace Synapse
       {
         Source.remove (timer_id);
       }
-      
+
       timer_id = Timeout.add (5000, () =>
       {
         timer_id = 0;
@@ -467,7 +467,7 @@ namespace Synapse
         return false;
       });
     }
-    
+
     private async void reload_desktop_files ()
     {
       debug ("Reloading desktop files...");
@@ -510,7 +510,7 @@ namespace Synapse
         warning ("%s", err.message);
       }
     }
-    
+
     private void create_indices ()
     {
       // create mimetype maps
@@ -561,7 +561,7 @@ namespace Synapse
 
         // update mimetype map
         if (dfi.is_hidden || dfi.mime_types == null) continue;
-        
+
         foreach (unowned string mime_type in dfi.mime_types)
         {
           Gee.List<DesktopFileInfo>? list = mimetype_map[mime_type];
@@ -602,7 +602,7 @@ namespace Synapse
         } while (true);
       } catch (GLib.Error err) { /* can't read file */ }
     }
-    
+
     private void add_dfi_for_mime (string mime, Gee.Set<DesktopFileInfo> ret)
     {
       var dfis = mimetype_map[mime];
@@ -619,14 +619,14 @@ namespace Synapse
     {
       return non_hidden_desktop_files.read_only_view;
     }
-    
+
     // returns all desktop files available on the system (even the ones which
     // are hidden by default)
     public Gee.List<DesktopFileInfo> get_all_desktop_files ()
     {
       return all_desktop_files.read_only_view;
     }
-    
+
     public Gee.List<DesktopFileInfo> get_desktop_files_for_type (string mime_type)
     {
       var dfi_set = new Gee.HashSet<DesktopFileInfo> ();
@@ -640,7 +640,7 @@ namespace Synapse
     {
       return exec_map[exec] ?? new Gee.ArrayList<DesktopFileInfo> ();
     }
-    
+
     public DesktopFileInfo? get_desktop_file_for_id (string desktop_id)
     {
       return desktop_id_map[desktop_id];

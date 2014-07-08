@@ -27,7 +27,7 @@ namespace Synapse
   {
     public  bool      enabled { get; set; default = true; }
     private HashMap<string, SshHost> hosts;
-    
+
     protected File config_file;
     protected FileMonitor monitor;
 
@@ -35,7 +35,7 @@ namespace Synapse
     {
       register_plugin ();
     }
-    
+
     construct
     {
       hosts = new HashMap<string, SshHost> ();
@@ -116,7 +116,7 @@ namespace Synapse
         Utils.Logger.warning (this, "%s: %s", config_file.get_path (), e.message);
       }
     }
-    
+
     public void handle_ssh_config_update (FileMonitor monitor,
                                           File file,
                                           File? other_file,
@@ -131,7 +131,7 @@ namespace Synapse
 
     public bool handles_query (Query query)
     {
-      return hosts.size > 0 && 
+      return hosts.size > 0 &&
             ( QueryFlags.ACTIONS in query.query_type ||
               QueryFlags.INTERNET in query.query_type);
     }
@@ -143,7 +143,7 @@ namespace Synapse
       q.check_cancellable ();
 
       var results = new ResultSet ();
-      
+
       var matchers = Query.get_matchers_for_query (q.query_string, 0,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
 
@@ -193,7 +193,7 @@ namespace Synapse
           icon_name: "terminal",
           host_query: host_name
         );
-        
+
       }
     }
   }

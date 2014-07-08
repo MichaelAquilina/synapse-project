@@ -33,7 +33,7 @@ namespace Synapse
 
     public void deactivate ()
     {
-      
+
     }
 
     public unowned DataSink data_sink { get; set; }
@@ -107,7 +107,7 @@ namespace Synapse
         {
           this.title = text;
         }
-        
+
         this.mime_type = subject.mimetype;
 
         unowned string interpretation = subject.interpretation;
@@ -151,7 +151,7 @@ namespace Synapse
           return new ZeitgeistApplicationMatch (event, thumbnail_path, icon);
         else if (QueryFlags.PLACES in obj_type)
           return new ZeitgeistUriMatch (event, thumbnail_path, icon, true);
-        
+
         assert_not_reached ();
       }
 
@@ -189,7 +189,7 @@ namespace Synapse
         }
       }
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -222,7 +222,7 @@ namespace Synapse
 
       return RelevancyService.compute_relevancy (base_relevancy, pop);
     }
-    
+
     private static void update_min_max (string uri,
         ref long minimum, ref long maximum)
     {
@@ -308,10 +308,10 @@ namespace Synapse
                                                     "tomboy", note_filename);
             var note_f = File.new_for_path (note_path);
             bool exists = yield Utils.query_exists_async (note_f);
-            
+
             if (cancellable.is_cancelled ()) return;
             else if (!exists) continue;
-            
+
             icon = ContentType.get_icon ("application/x-note").to_string ();
           }
           else if (local_only && !is_application)
@@ -367,7 +367,7 @@ namespace Synapse
           if (!match_found) results.add (match_obj, Match.Score.POOR + Match.Score.INCREMENT_MINOR);
         }
       }
-      
+
       foreach (var entry in results.entries)
       {
         unowned ZeitgeistUriMatch? mo = entry.key as ZeitgeistUriMatch;
@@ -472,7 +472,7 @@ namespace Synapse
                                            query_type);
           ZeitgeistMatchFactory.init_extended_info_from_event ((ExtendedInfo) match_obj, event);
 
-          int relevancy = (int) ((events_size - event_index) / 
+          int relevancy = (int) ((events_size - event_index) /
             (float) events_size * Match.Score.HIGHEST);
           results.add (match_obj, relevancy);
         }
@@ -627,7 +627,7 @@ namespace Synapse
 
       return templates;
     }
-    
+
     public bool handles_empty_query ()
     {
       return true;

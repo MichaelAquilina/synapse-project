@@ -27,7 +27,7 @@ namespace UI.Widgets
   {
     private float orig_yalign = 0.5f;
     private bool _wrap = false;
-    public new bool wrap { 
+    public new bool wrap {
       get
       {
         return _wrap;
@@ -36,7 +36,7 @@ namespace UI.Widgets
       {
         _wrap = value;
         this.max_width_chars = _wrap ? -1 : 10;
-        this.set_ellipsize (_wrap ? Pango.EllipsizeMode.NONE : 
+        this.set_ellipsize (_wrap ? Pango.EllipsizeMode.NONE :
                                     Pango.EllipsizeMode.END);
         if (!_wrap) orig_yalign = this.yalign;
         this.yalign = _wrap ? 0.0f : orig_yalign;

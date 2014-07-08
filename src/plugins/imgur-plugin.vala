@@ -26,7 +26,7 @@ namespace Synapse
     LIMIT_REACHED,
     UNKNOWN_ERROR
   }
-  
+
   public class ImgUrPlugin: Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
@@ -67,7 +67,7 @@ namespace Synapse
         // open the uri and base64 encode it
         var f = File.new_for_uri (uri);
         var input = yield f.read_async (Priority.DEFAULT, null);
-        
+
         int chunk_size = 128*1024;
         uint8[] buffer = new uint8[chunk_size];
         char[] encode_buffer = new char[(chunk_size / 3 + 1) * 4 + 4];
@@ -87,7 +87,7 @@ namespace Synapse
         }
         size_t enc_close = Base64.encode_close (false, encode_buffer, ref state, ref save);
         encoded.append_len ((string) encode_buffer, (ssize_t) enc_close);
-        
+
         var call = proxy.new_call ();
 
         call.set_method ("POST");
@@ -106,7 +106,7 @@ namespace Synapse
         if (err != null) throw err;
 
         unowned string limit_remaining = call.lookup_response_header ("X-RateLimit-Remaining");
-        
+
         unowned string reset_time = call.lookup_response_header ("X-RateLimit-Reset");
 
         if (call.get_status_code () != 200)
@@ -149,10 +149,10 @@ namespace Synapse
             }
           }
         }
-        
+
         throw new UploadError.UNKNOWN_ERROR ("Unable to parse result");
       }
-      
+
       protected virtual void process_result (string? url, Match? target = null)
       {
         string msg;
@@ -204,7 +204,7 @@ namespace Synapse
             {
               Utils.Logger.warning (this, "%s", err.message);
             }
-            
+
             process_result (url, target);
           });
         }
@@ -226,7 +226,7 @@ namespace Synapse
         }
       }
     }
-    
+
     private class ImgUrToContactAction : ImgUrAction
     {
       public ImgUrToContactAction ()
@@ -237,7 +237,7 @@ namespace Synapse
                 icon_name: "document-send", has_thumbnail: false,
                 default_relevancy: Match.Score.AVERAGE - Match.Score.INCREMENT_MINOR);
       }
-      
+
       protected override void process_result (string? url, Match? target = null)
       {
         unowned ContactMatch? contact = target as ContactMatch;
@@ -250,12 +250,12 @@ namespace Synapse
           contact.send_message (url, true);
         }
       }
-      
+
       public override bool needs_target ()
       {
         return true;
       }
-      
+
       public override QueryFlags target_flags ()
       {
         return QueryFlags.CONTACTS;
@@ -315,7 +315,7 @@ namespace Synapse
           }
         }
       }
-      
+
       return results;
     }
   }

@@ -26,7 +26,7 @@ namespace Synapse
   interface PurpleInterface : Object {
       public const string UNIQUE_NAME = "im.pidgin.purple.PurpleService";
       public const string OBJECT_PATH = "/im/pidgin/purple/PurpleObject";
-      
+
       public abstract string purple_account_get_protocol_name (int account) throws IOError;
       public abstract int purple_buddy_get_account (int buddy) throws IOError;
       public abstract string purple_buddy_get_name (int buddy) throws IOError;
@@ -34,15 +34,15 @@ namespace Synapse
       public abstract string purple_buddy_icon_get_full_path (int icon) throws IOError;
       public abstract int purple_buddy_get_icon (int buddy) throws IOError;
       public abstract int purple_buddy_is_online (int buddy) throws IOError;
-      
+
       public abstract int[] purple_accounts_get_all_active () throws IOError;
       public abstract int[] purple_find_buddies (int account, string pattern = "") throws IOError;
-      
+
       public abstract int purple_conversation_new (int type, int account, string name) throws IOError;
       public abstract void purple_conversation_present (int conv) throws IOError;
       public abstract int purple_conv_im (int conv) throws IOError;
       public abstract void purple_conv_im_send (int im, string mess) throws IOError;
-      
+
       public abstract signal void account_added (int acc);
       public abstract signal void account_removed (int acc);
       public abstract signal void buddy_added (int buddy);
@@ -50,7 +50,7 @@ namespace Synapse
       public abstract signal void buddy_signed_on (int buddy);
       public abstract signal void buddy_signed_off (int buddy);
       public abstract signal void buddy_icon_changed (int buddy);
-      
+
       public abstract void serv_send_file (int conn, string who, string file) throws IOError;
       public abstract int purple_account_get_connection (int account) throws IOError;
   }
@@ -61,12 +61,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     static void register_plugin ()
@@ -81,7 +81,7 @@ namespace Synapse
         _ ("Pidgin is not installed.")
       );
     }
-    
+
     static construct
     {
       register_plugin ();
@@ -97,17 +97,17 @@ namespace Synapse
                   icon_name: "document-send", has_thumbnail: false,
                   default_relevancy: Match.Score.AVERAGE);
       }
-      
+
       public override void do_execute (Match match, Match? target = null)
       {
         unowned Contact? c = target as Contact;
         return_if_fail (c != null);
         unowned UriMatch? u = match as UriMatch;
         return_if_fail (u != null);
-        
+
         c.send_file (u.uri);
       }
-      
+
       public override bool valid_for_match (Match match)
       {
         switch (match.match_type)
@@ -120,27 +120,27 @@ namespace Synapse
             return false;
         }
       }
-      
+
       public override bool needs_target ()
       {
         return true;
       }
-      
+
       public override QueryFlags target_flags ()
       {
         return QueryFlags.CONTACTS;
       }
     }
-    
+
     private class Contact: ContactMatch
     {
       public PidginPlugin plugin { get; construct set; }
-      
+
       public int account_id { get; construct set; }
       public int contact_id { get; construct set; }
       public string name { get; construct set; }
       public bool online { get; set; }
-      
+
       public Contact (PidginPlugin plugin, int account_id, int contact_id, string name, bool online,
                            string alias, string? icon_path, string description)
       {
@@ -160,18 +160,18 @@ namespace Synapse
       {
         plugin.send_message (this, message, present);
       }
-      
+
       public override void open_chat ()
       {
         plugin.open_chat (this);
       }
-      
+
       public void send_file (string path)
       {
         plugin.send_file (this, path);
       }
     }
-    
+
     private void send_file (Contact contact, string uri)
     {
       File f;
@@ -195,7 +195,7 @@ namespace Synapse
         Utils.Logger.warning (this, "Cannot send file to %s", contact.title);
       }
     }
-    
+
     private void send_message (Contact contact, string? message, bool present)
     {
       try {
@@ -211,7 +211,7 @@ namespace Synapse
         Utils.Logger.warning (this, "Cannot open chat for %s", contact.title);
       }
     }
-    
+
     private void open_chat (Contact contact)
     {
       send_message (contact, null, true);
@@ -240,17 +240,17 @@ namespace Synapse
         });
       }
     }
-    
+
     private void connect_to_signals ()
     {
       p.account_added.connect ((acc)=>{
         init_contacts.begin ();
       });
-      
+
       p.account_removed.connect ((acc)=>{
         init_contacts.begin ();
       });
-      
+
       p.buddy_added.connect ((buddy)=>{
         contact_changed (buddy, -1, 1);
       });
@@ -268,7 +268,7 @@ namespace Synapse
         contact_changed (buddy, -1, 1);
       });
     }
-    
+
     private void contact_changed (int buddy, int online = -1, int addremove = -1)
     {
       if (online >= 0)
@@ -285,22 +285,22 @@ namespace Synapse
           contacts.unset (buddy);
       }
     }
-    
+
     private Gee.List<BaseAction> actions;
-    
+
     construct
     {
       actions = new Gee.ArrayList<BaseAction> ();
       actions.add (new SendToContact ());
-      
+
       contacts = new Gee.HashMap<int, Contact> ();
       var service = DBusService.get_default ();
-      
+
       if (service.name_has_owner (PurpleInterface.UNIQUE_NAME))
       {
         connect_to_bus ();
       }
-      
+
       service.owner_changed.connect ((name, is_owned)=>{
         if (name == PurpleInterface.UNIQUE_NAME)
         {
@@ -314,13 +314,13 @@ namespace Synapse
         }
       });
     }
-    
+
     public ResultSet? find_for_match (ref Query query, Match match)
     {
       if (p == null) return null;
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
-      
+
       if (query_empty)
       {
         foreach (var action in actions)
@@ -349,7 +349,7 @@ namespace Synapse
 
       return results;
     }
-    
+
     private async void get_contact (int buddy, int account = -1, string? protocol = null) throws IOError
     {
       if (p == null) return;
@@ -358,22 +358,22 @@ namespace Synapse
         account = p.purple_buddy_get_account (buddy);
       if (protocol == null)
         prot = p.purple_account_get_protocol_name (account);
-      
+
       string alias = p.purple_buddy_get_alias (buddy);
       string name = p.purple_buddy_get_name (buddy);
-      
+
       bool online = p.purple_buddy_is_online (buddy) > 0;
-      
+
       if (alias == null || alias == "") alias = name;
-      
+
       int iconid = p.purple_buddy_get_icon (buddy);
       string icon = null;
       if (iconid > 0)
         icon = p.purple_buddy_icon_get_full_path (iconid);
-      
+
       contacts[buddy] = new Contact (this, account, buddy, name, online, alias, icon, "%s (%s)".printf (name, prot));
     }
-    
+
     private async void init_contacts ()
     {
       contacts.clear ();
@@ -385,34 +385,34 @@ namespace Synapse
           if (p == null) return;
           var protocol = p.purple_account_get_protocol_name (account);
           var buddies = p.purple_find_buddies (account);
-          
+
           foreach (var buddy in buddies)
           {
             if (p == null) return;
             yield get_contact (buddy, account, protocol);
           }
         }
-      
+
       } catch (IOError err) {
         Utils.Logger.warning (this, "Cannot load Pidgin contacts");
       }
     }
-    
+
     public bool handles_query (Query query)
     {
       return (QueryFlags.CONTACTS in query.query_type);
     }
-    
+
     public async ResultSet? search (Query q) throws SearchError
     {
       // we only search for actions
       if (!(QueryFlags.CONTACTS in q.query_type)) return null;
 
       var result = new ResultSet ();
-      
+
       var matchers = Query.get_matchers_for_query (q.query_string, 0,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
-      
+
       var matches = contacts.entries;
 
       foreach (var contact in matches)

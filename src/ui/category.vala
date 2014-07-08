@@ -37,7 +37,7 @@ namespace Synapse.Gui
         this.name = name;
         this.flags = flags;
       }
-      
+
       public Category.from_string (string key)
       {
         string[] nameflags = key.split ("@", 2);
@@ -53,12 +53,12 @@ namespace Synapse.Gui
         }
         // else keep defaults
       }
-      
+
       public static string name_query_to_string (string name, QueryFlags flags)
       {
         return "%s@%u".printf (name, flags);
       }
-      
+
       public string to_string () {
         return "%s@%u".printf (this.name, this.flags);
       }
@@ -77,23 +77,23 @@ namespace Synapse.Gui
         Category.name_query_to_string ( _("Internet"), QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE )
       };
     }
-    
+
     public int default_category_index {
       get; set; default = 3;
     }
-    
+
     public Gee.List<Category> categories {
       get {
         return _categories;
       }
     }
-    
+
     public Gee.Map<QueryFlags, string> labels {
       get {
         return _labels;
       }
     }
-    
+
     public Gee.Map<QueryFlags, string> _labels;
     private Gee.List<Category> _categories;
     construct
@@ -103,11 +103,11 @@ namespace Synapse.Gui
       init_labels ();
       this.update_categories ();
     }
-    
+
     private void init_labels ()
     {
       //_labels.set (QueryFlags.ALL, _("All")); // Do not remove!
-      
+
       _labels.set (QueryFlags.INCLUDE_REMOTE, _("Include remote content"));
       _labels.set (QueryFlags.ACTIONS, _("Actions"));
       _labels.set (QueryFlags.PLACES, _("Places"));
@@ -120,7 +120,7 @@ namespace Synapse.Gui
       //_labels.set (QueryFlags.FILES, _("Files"));
       _labels.set (QueryFlags.UNCATEGORIZED, _("Uncategorized"));
     }
-    
+
     public void update_categories ()
     {
       _categories.clear ();

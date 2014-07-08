@@ -27,19 +27,19 @@ namespace Synapse.Gui
   {
     /* Search strings */
     public string[] query = new string[SearchingFor.COUNT];
-    
+
     /* Result Sets */
     public Gee.List<Match>[] results = new Gee.List<Match>[SearchingFor.COUNT];
 
     /* Focus */
     public Entry<int, Match>[] focus = new Entry<int, Match>[SearchingFor.COUNT];
-    
+
     /* Category */
     public int selected_category = 0;
-    
+
     /* SearchingFor */
     public SearchingFor searching_for = SearchingFor.SOURCES;
-    
+
     /* returns results[searching_for] != null && .size > 0 */
     public bool has_results ()
     {
@@ -50,19 +50,19 @@ namespace Synapse.Gui
     {
       return focus[searching_for];
     }
-    
+
     public void set_actual_focus (int i)
     {
       focus[searching_for].key = i;
       focus[searching_for].value = results[searching_for].get (i);
     }
-    
+
     public bool needs_target ()
     {
-      return focus[SearchingFor.ACTIONS].value != null && 
+      return focus[SearchingFor.ACTIONS].value != null &&
              focus[SearchingFor.ACTIONS].value.needs_target ();
     }
-    
+
     public void clear (int default_category = -1)
     {
       searching_for = SearchingFor.SOURCES;
@@ -76,7 +76,7 @@ namespace Synapse.Gui
       if (default_category >= 0)
         selected_category = default_category;
     }
-    
+
     public void clear_searching_for (SearchingFor i, bool clear_query = true)
     {
       // Synapse.Utils.Logger.log (this, "CLEAR: %u", i);
@@ -85,7 +85,7 @@ namespace Synapse.Gui
       results[i] = null;
       if (clear_query) query[i] = "";
     }
-    
+
     construct
     {
       for (int i = 0; i < SearchingFor.COUNT; i++)

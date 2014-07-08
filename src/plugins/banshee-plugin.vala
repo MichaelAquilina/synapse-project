@@ -25,41 +25,41 @@ namespace Synapse
   interface BansheePlayerEngine : Object {
       public const string UNIQUE_NAME = "org.bansheeproject.Banshee";
       public const string OBJECT_PATH = "/org/bansheeproject/Banshee/PlayerEngine";
-      
+
       public abstract void play () throws IOError;
       public abstract void pause () throws IOError;
       public abstract void open (string uri) throws IOError;
   }
-  
+
   [DBus (name = "org.bansheeproject.Banshee.PlaybackController")]
   interface BansheePlaybackController : Object {
       public const string UNIQUE_NAME = "org.bansheeproject.Banshee";
       public const string OBJECT_PATH = "/org/bansheeproject/Banshee/PlaybackController";
-      
+
       public abstract void next (bool restart) throws IOError;
       public abstract void previous (bool restart) throws IOError;
   }
-  
+
   [DBus (name = "org.bansheeproject.Banshee.PlayQueue")]
   interface BansheePlayQueue : Object {
       public const string UNIQUE_NAME = "org.bansheeproject.Banshee";
       public const string OBJECT_PATH = "/org/bansheeproject/Banshee/SourceManager/PlayQueue";
-      
+
       public abstract void enqueue_uri (string uri, bool prepend) throws IOError;
   }
-  
+
   public class BansheeActions: Object, Activatable, ItemProvider, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     static void register_plugin ()
@@ -85,7 +85,7 @@ namespace Synapse
     private abstract class BansheeAction: Match
     {
       public int default_relevancy { get; set; }
-      
+
       public abstract bool valid_for_match (Match match);
       // stupid Vala...
       public abstract void execute_internal (Match? match);
@@ -102,7 +102,7 @@ namespace Synapse
         return banshee_running ? default_relevancy + Match.Score.INCREMENT_LARGE : default_relevancy;
       }
     }
-    
+
     private abstract class BansheeControlMatch: Match
     {
       public override void execute (Match? match)
@@ -111,7 +111,7 @@ namespace Synapse
       }
 
       public abstract void do_action ();
-      
+
       public virtual bool action_available ()
       {
         return DBusService.get_default ().name_has_owner (
@@ -185,7 +185,7 @@ namespace Synapse
           BansheePlaybackController player = Bus.get_proxy_sync (BusType.SESSION,
                                            BansheePlaybackController.UNIQUE_NAME,
                                            BansheePlaybackController.OBJECT_PATH);
-          
+
           player.next (false);
         } catch (IOError e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
@@ -310,23 +310,23 @@ namespace Synapse
     {
       actions = new Gee.ArrayList<BansheeAction> ();
       matches = new Gee.ArrayList<BansheeControlMatch> ();
-      
+
       actions.add (new PlayNow());
       actions.add (new AddToPlaylist());
-      
+
       matches.add (new Play ());
       matches.add (new Pause ());
       matches.add (new Previous ());
       matches.add (new Next ());
     }
-    
+
     public async ResultSet? search (Query q) throws SearchError
     {
       // we only search for actions
       if (!(QueryFlags.ACTIONS in q.query_type)) return null;
 
       var result = new ResultSet ();
-      
+
       var matchers = Query.get_matchers_for_query (q.query_string, 0,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
 
@@ -352,7 +352,7 @@ namespace Synapse
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
-      
+
       if (query_empty)
       {
         foreach (var action in actions)
@@ -380,7 +380,7 @@ namespace Synapse
           }
         }
       }
-      
+
       return results;
     }
   }

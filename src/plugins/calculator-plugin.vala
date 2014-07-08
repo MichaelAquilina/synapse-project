@@ -27,12 +27,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class Result: Match
@@ -72,7 +72,7 @@ namespace Synapse
     {
       /* The regex describes a string which *resembles* a mathematical expression. It does not
          check for pairs of parantheses to be used correctly and only whitespace-stripped strings
-         will match. Basically it matches strings of the form: 
+         will match. Basically it matches strings of the form:
          "paratheses_open* number (operator paratheses_open* number paratheses_close*)+"
       */
       try
@@ -83,14 +83,14 @@ namespace Synapse
         Utils.Logger.error (this, "Error creating regexp.");
       }
     }
-    
+
     public bool handles_query (Query query)
     {
       return (QueryFlags.ACTIONS in query.query_type);
     }
 
     public async ResultSet? search (Query query) throws SearchError
-    { 
+    {
       string input = query.query_string.replace (" ", "").replace (",", ".");
       bool matched = regex.match (input);
       if (!matched && input.length > 1)

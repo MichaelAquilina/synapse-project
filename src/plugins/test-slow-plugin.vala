@@ -27,12 +27,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class TestResult: Match
@@ -45,7 +45,7 @@ namespace Synapse
                 match_type: MatchType.UNKNOWN);
       }
     }
-    
+
     public async ResultSet? search (Query q) throws SearchError
     {
       Idle.add (search.callback);

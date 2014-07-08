@@ -58,7 +58,7 @@ namespace Synapse
 
     public void deactivate ()
     {
-      
+
     }
 
     private class OpenSearchParser: Object
@@ -81,7 +81,7 @@ namespace Synapse
       public string description { get; set; }
       public string query_url { get; set; }
       public string suggestion_url { get; set; }
-      
+
       construct
       {
         context = new MarkupParseContext (parser, 0, this, null);
@@ -91,7 +91,7 @@ namespace Synapse
       {
         return context.parse (content, -1);
       }
-      
+
       public bool has_valid_result ()
       {
         return is_opensearch && has_name && has_desc && has_url;
@@ -102,7 +102,7 @@ namespace Synapse
         uint len = strv_length (attrs);
         bool main_type = false;
         bool suggestion_type = false;
-        
+
         for (uint i=0; i<len; i++)
         {
           switch (attrs[i])
@@ -143,7 +143,7 @@ namespace Synapse
           default: break;
         }
       }
-      
+
       private void end (MarkupParseContext ctx, string name) throws MarkupError
       {
         switch (name)
@@ -155,14 +155,14 @@ namespace Synapse
           default: break;
         }
       }
-      
+
       private void text (MarkupParseContext ctx, string text, size_t text_len) throws MarkupError
       {
         if (in_name_elem) short_name = text;
         else if (in_description_elem) description = text;
       }
     }
-    
+
     private class SearchAction: Match
     {
       public int default_relevancy { get; set; default = Match.Score.INCREMENT_MINOR; }
@@ -181,7 +181,7 @@ namespace Synapse
           warning ("%s", err.message);
         }
       }
-      
+
       protected string get_query_url (string query)
       {
         string result;
@@ -192,7 +192,7 @@ namespace Synapse
 
         return result;
       }
-      
+
       protected string get_lang ()
       {
         string? result = null;
@@ -216,7 +216,7 @@ namespace Synapse
                 has_thumbnail: false, icon_name: "applications-internet");
       }
     }
-    
+
     private class Config: ConfigObject
     {
       public bool use_internal { get; set; default = true; }
@@ -234,7 +234,7 @@ namespace Synapse
         }
       }
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -266,7 +266,7 @@ namespace Synapse
       var cs = ConfigService.get_default ();
       config = (Config) cs.get_config ("plugins", "opensearch", typeof (Config));
     }
-    
+
     private async void load_xmls ()
     {
       OpenSearchParser parser;
@@ -310,7 +310,7 @@ namespace Synapse
           yield f.load_contents_async (null, out file_contents, null);
           contents = (string) file_contents;
           len = file_contents.length;
-          
+
           parser = new OpenSearchParser ();
           parser.parse (contents);
           if (parser.has_valid_result ())
@@ -327,7 +327,7 @@ namespace Synapse
         }
       }
     }
-    
+
     public bool handles_unknown ()
     {
       return true;

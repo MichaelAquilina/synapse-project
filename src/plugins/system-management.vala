@@ -31,7 +31,7 @@ namespace Synapse
     public abstract async void suspend () throws IOError;
     public abstract async bool hibernate_allowed () throws IOError;
     public abstract async bool suspend_allowed () throws IOError;
-    
+
     public abstract async void about_to_sleep () throws IOError;
   }
 
@@ -40,7 +40,7 @@ namespace Synapse
   {
     public const string UNIQUE_NAME = "org.freedesktop.ConsoleKit";
     public const string OBJECT_PATH = "/org/freedesktop/ConsoleKit/Manager";
-    
+
     public abstract void restart () throws IOError;
     public abstract void stop () throws IOError;
     public abstract async bool can_restart () throws IOError;
@@ -52,7 +52,7 @@ namespace Synapse
   {
     public const string UNIQUE_NAME = "org.freedesktop.login1";
     public const string OBJECT_PATH = "/org/freedesktop/login1";
-    
+
     public abstract void reboot (bool interactive) throws IOError;
     public abstract void suspend (bool interactive) throws IOError;
     public abstract void hibernate (bool interactive) throws IOError;
@@ -69,12 +69,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private abstract class SystemAction: Match
@@ -140,7 +140,7 @@ namespace Synapse
       {
         return allowed;
       }
-      
+
       private async void do_suspend ()
       {
         try
@@ -240,7 +240,7 @@ namespace Synapse
       {
         return allowed;
       }
-      
+
       private async void do_hibernate ()
       {
         try
@@ -491,7 +491,7 @@ namespace Synapse
       if (!(QueryFlags.ACTIONS in q.query_type)) return null;
 
       var result = new ResultSet ();
-      
+
       var matchers = Query.get_matchers_for_query (q.query_string, 0,
         RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
 

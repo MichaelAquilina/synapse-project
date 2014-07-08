@@ -47,7 +47,7 @@ namespace Synapse.Gui
       PASTE,
       PASTE_SELECTION,
       EXIT_SYNAPSE,
-      
+
       TOTAL_COMMANDS
     }
 
@@ -70,7 +70,7 @@ namespace Synapse.Gui
     public string paste { get; set; default = "<Control>v"; }
     public string alt_paste { get; set; default = "<Shift>Insert"; }
     public string exit { get; set; default = "<Control>q"; }
-    
+
     private class KeyComboStorage: GLib.Object
     {
       private class ModCmd : GLib.Object
@@ -87,14 +87,14 @@ namespace Synapse.Gui
           return (int)(a.mods) - (int)(b.mods);
         }
       }
- 
+
       private Gee.Map<uint, Gee.List<ModCmd>> map;
-      
+
       construct
       {
         map = new Gee.HashMap<uint, Gee.List<ModCmd>> ();
       }
-      
+
       public void set_keycombo_command (uint keyval, Gdk.ModifierType mods, Commands cmd)
       {
         Gee.List<ModCmd> list = null;
@@ -110,13 +110,13 @@ namespace Synapse.Gui
         list.add (new ModCmd (mods, cmd));
         list.sort (ModCmd.compare);
       }
-      
+
       public Commands get_command_for_keycombo (uint keyval, Gdk.ModifierType mods)
       {
         Gee.List<ModCmd> list = null;
         list = map.get (keyval);
         if (list == null) return Commands.INVALID_COMMAND;
-        
+
         // if mods, and there aren't modded key combo, start with default cmd
         Commands cmd = mods > 0 &&
                        list.size == 1 &&
@@ -137,21 +137,21 @@ namespace Synapse.Gui
         }
         return cmd;
       }
-      
+
       public void clear ()
       {
         map.clear ();
       }
     }
-    
+
     private KeyComboStorage kcs;
-    
+
     construct
     {
       kcs = new KeyComboStorage ();
       update_bindings ();
     }
-    
+
     public void update_bindings ()
     {
       kcs.clear ();
@@ -197,8 +197,8 @@ namespace Synapse.Gui
       name_to_key_mod (exit, out keyval, out mods);
       kcs.set_keycombo_command (keyval, mods, Commands.EXIT_SYNAPSE);
     }
-    
-    
+
+
     /* Clear all non relevant masks like the ones used in IBUS */
     public static uint mod_normalize_mask = Gtk.accelerator_get_default_mod_mask ();
 
@@ -213,7 +213,7 @@ namespace Synapse.Gui
       // Synapse.Utils.Logger.log (this, get_name_from_key (keyval, mod));
       return kcs.get_command_for_keycombo (keyval, mod);
     }
-    
+
     public static string? get_name_from_key (uint keyval, Gdk.ModifierType mods)
     {
       mods = mods & mod_normalize_mask;
@@ -223,7 +223,7 @@ namespace Synapse.Gui
       }
       unowned string keyname = Gdk.keyval_name (Gdk.keyval_to_lower (keyval));
       if (keyname == null) return null;
-      
+
       string res = "";
       if (Gdk.ModifierType.SHIFT_MASK in mods) res += "<Shift>";
       if (Gdk.ModifierType.CONTROL_MASK in mods) res += "<Control>";
@@ -239,7 +239,7 @@ namespace Synapse.Gui
       res += keyname;
       return res;
     }
-    
+
     public static void name_to_key_mod (string name, out uint keyval, out Gdk.ModifierType mod)
     {
       keyval = 0;

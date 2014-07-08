@@ -51,9 +51,9 @@ namespace Synapse
 
       HIGHEST = 100000
     }
-    
+
     public signal void executed ();
-    
+
     // properties
     public string title { get; construct set; }
     public string description { get; construct set; }
@@ -66,7 +66,7 @@ namespace Synapse
     {
       Utils.Logger.error (this, "execute () is not implemented");
     }
-    
+
     public virtual void execute_with_target (Match source, Match? target = null)
     {
       if (target == null)
@@ -74,18 +74,18 @@ namespace Synapse
       else
         Utils.Logger.error (this, "execute_with_target () is not implemented");
     }
-    
+
     public virtual bool needs_target ()
     {
       return false;
     }
-    
+
     public virtual QueryFlags target_flags ()
     {
       return QueryFlags.ALL;
     }
   }
-  
+
   public abstract class ApplicationMatch: Match
   {
     public AppInfo? app_info { get; set; }
@@ -99,7 +99,7 @@ namespace Synapse
     public QueryFlags file_type { get; set; }
     public string mime_type { get; set; }
   }
-  
+
   public abstract class ContactMatch: Match
   {
     public abstract void send_message (string message, bool present);
@@ -110,20 +110,20 @@ namespace Synapse
   {
     public abstract string? extended_info { get; set; }
   }
-  
+
   public enum TextOrigin
   {
     UNKNOWN,
     CLIPBOARD
   }
-  
+
   public abstract class TextMatch: Match
   {
     public TextOrigin text_origin { get; set; }
 
     public abstract string get_text ();
   }
-  
+
   public abstract class SearchMatch: Match, SearchProvider
   {
     public Match search_source { get; set; }

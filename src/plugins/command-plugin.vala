@@ -27,12 +27,12 @@ namespace Synapse
 
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class CommandObject: ApplicationMatch
@@ -56,7 +56,7 @@ namespace Synapse
         }
       }
     }
-    
+
     static void register_plugin ()
     {
       DataSink.PluginRegistry.get_default ().register_plugin (
@@ -67,7 +67,7 @@ namespace Synapse
         register_plugin
       );
     }
-    
+
     static construct
     {
       register_plugin ();
@@ -89,7 +89,7 @@ namespace Synapse
         critical ("%s", err.message);
       }
     }
-    
+
     private CommandObject? create_co (string exec)
     {
       // ignore results that will be returned by DesktopFilePlugin
@@ -114,7 +114,7 @@ namespace Synapse
 
       return co;
     }
-    
+
     private void command_executed (Match match)
     {
       CommandObject? co = match as CommandObject;
@@ -167,7 +167,7 @@ namespace Synapse
       {
         result.add (create_co (stripped), Match.Score.VERY_GOOD);
       }
-      
+
       q.check_cancellable ();
 
       return result;

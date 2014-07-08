@@ -44,15 +44,15 @@ namespace Synapse
   public class CommonActions: Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
-    
+
     public void activate ()
     {
-      
+
     }
 
     public void deactivate ()
     {
-      
+
     }
 
     private class Runner: BaseAction
@@ -80,7 +80,7 @@ namespace Synapse
           {
             var display = Gdk.Display.get_default ();
             app.launch (null, display.get_app_launch_context ());
-            
+
             RelevancyService.get_default ().application_launched (app);
           }
           catch (Error err)
@@ -159,7 +159,7 @@ namespace Synapse
         }
       }
     }
-    
+
     private class Opener: BaseAction
     {
       public Opener ()
@@ -212,10 +212,10 @@ namespace Synapse
             return false;
         }
       }
-      
+
       private Regex web_uri;
       private Regex file_path;
-      
+
       construct
       {
         try
@@ -291,7 +291,7 @@ namespace Synapse
         {
           unowned UriMatch? uri_match = match as UriMatch;
           return_if_fail (uri_match != null);
-          
+
           /*
            // just wow, Gtk and also Vala are trying really hard to make this hard to do...
           Gtk.TargetEntry[] no_entries = {};
@@ -326,7 +326,7 @@ namespace Synapse
             return false;
         }
       }
-      
+
       public override int get_relevancy_for_match (Match match)
       {
         unowned TextMatch? text_match = match as TextMatch;
@@ -334,7 +334,7 @@ namespace Synapse
         {
           return 0;
         }
-        
+
         return default_relevancy;
       }
     }
@@ -356,7 +356,7 @@ namespace Synapse
     {
       bool query_empty = query.query_string == "";
       var results = new ResultSet ();
-      
+
       if (query_empty)
       {
         foreach (var action in actions)
@@ -387,7 +387,7 @@ namespace Synapse
 
       return results;
     }
-    
+
     public static void open_uri (string uri)
     {
       var f = File.new_for_uri (uri);

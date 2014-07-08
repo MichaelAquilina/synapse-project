@@ -174,7 +174,7 @@ namespace Synapse
 
           index++;
         }
-        
+
         /* Get popularity for web uris */
         subject.interpretation = Zeitgeist.NFO.WEBSITE;
         subject.uri = "";
@@ -211,7 +211,7 @@ namespace Synapse
 
       uri_popularity = popularity_map;
     }
-    
+
     public float get_application_popularity (string desktop_id)
     {
       if (application_popularity.has_key (desktop_id))
@@ -221,7 +221,7 @@ namespace Synapse
 
       return 0.0f;
     }
-    
+
     public float get_uri_popularity (string uri)
     {
       if (uri_popularity.has_key (uri))
@@ -231,7 +231,7 @@ namespace Synapse
 
       return 0.0f;
     }
-    
+
     private void reload_relevancies ()
     {
       Idle.add_full (Priority.LOW, () =>
@@ -240,7 +240,7 @@ namespace Synapse
         return false;
       });
     }
-    
+
     public void application_launched (AppInfo app_info)
     {
       // FIXME: get rid of this maverick-specific workaround
