@@ -65,7 +65,7 @@ namespace Synapse
       Utils.Logger.error (this, "execute () is not implemented");
     }
     
-    public virtual void execute_with_target (Match? source, Match? target = null)
+    public virtual void execute_with_target (Match source, Match? target = null)
     {
       if (target == null) execute (source);
       else Utils.Logger.error (this, "execute () is not implemented");

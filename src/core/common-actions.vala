@@ -39,8 +39,8 @@ namespace Synapse
       return default_relevancy;
     }
 
-    public abstract void do_execute (Match? source, Match? target = null);
-    public void execute_with_target (Match? source, Match? target = null)
+    public abstract void do_execute (Match source, Match? target = null);
+    public void execute_with_target (Match source, Match? target = null)
     {
       do_execute (source, target);
       if (notify_match) source.executed ();
@@ -81,11 +81,11 @@ namespace Synapse
                 default_relevancy: Match.Score.EXCELLENT);
       }
 
-      public override void do_execute (Match? match, Match? target = null)
+      public override void do_execute (Match match, Match? target = null)
       {
         if (match.match_type == MatchType.APPLICATION)
         {
-          ApplicationMatch? app_match = match as ApplicationMatch;
+          unowned ApplicationMatch? app_match = match as ApplicationMatch;
           return_if_fail (app_match != null);
 
           AppInfo app = app_match.app_info ??
@@ -118,7 +118,7 @@ namespace Synapse
           case MatchType.ACTION:
             return true;
           case MatchType.APPLICATION:
-            ApplicationMatch? am = match as ApplicationMatch;
+            unowned ApplicationMatch? am = match as ApplicationMatch;
             return am == null || !am.needs_terminal;
           default:
             return false;
@@ -137,11 +137,11 @@ namespace Synapse
                 default_relevancy: Match.Score.BELOW_AVERAGE);
       }
 
-      public override void do_execute (Match? match, Match? target = null)
+      public override void do_execute (Match match, Match? target = null)
       {
         if (match.match_type == MatchType.APPLICATION)
         {
-          ApplicationMatch? app_match = match as ApplicationMatch;
+          unowned ApplicationMatch? app_match = match as ApplicationMatch;
           return_if_fail (app_match != null);
 
           AppInfo original = app_match.app_info ??
@@ -167,7 +167,7 @@ namespace Synapse
         switch (match.match_type)
         {
           case MatchType.APPLICATION:
-            ApplicationMatch? am = match as ApplicationMatch;
+            unowned ApplicationMatch? am = match as ApplicationMatch;
             return am != null;
           default:
             return false;
@@ -186,9 +186,9 @@ namespace Synapse
                 default_relevancy: Match.Score.GOOD);
       }
 
-      public override void do_execute (Match? match, Match? target = null)
+      public override void do_execute (Match match, Match? target = null)
       {
-        UriMatch uri_match = match as UriMatch;
+        unowned UriMatch? uri_match = match as UriMatch;
 
         if (uri_match != null)
         {
@@ -256,10 +256,11 @@ namespace Synapse
                 default_relevancy: Match.Score.AVERAGE);
       }
 
-      public override void do_execute (Match? match, Match? target = null)
+      public override void do_execute (Match match, Match? target = null)
       {
-        UriMatch uri_match = match as UriMatch;
+        unowned UriMatch? uri_match = match as UriMatch;
         return_if_fail (uri_match != null);
+
         var f = File.new_for_uri (uri_match.uri);
         f = f.get_parent ();
         try
@@ -278,8 +279,9 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        if (match.match_type != MatchType.GENERIC_URI) return false;
-        UriMatch uri_match = match as UriMatch;
+        unowned UriMatch? uri_match = match as UriMatch;
+        return_val_if_fail (uri_match != null, false);
+
         var f = File.new_for_uri (uri_match.uri);
         var parent = f.get_parent ();
         return parent != null && f.is_native ();
@@ -297,12 +299,12 @@ namespace Synapse
                 default_relevancy: Match.Score.AVERAGE);
       }
 
-      public override void do_execute (Match? match, Match? target = null)
+      public override void do_execute (Match match, Match? target = null)
       {
         var cb = Gtk.Clipboard.get (Gdk.Atom.NONE);
         if (match.match_type == MatchType.GENERIC_URI)
         {
-          UriMatch uri_match = match as UriMatch;
+          unowned UriMatch? uri_match = match as UriMatch;
           return_if_fail (uri_match != null);
           
           /*
@@ -318,7 +320,9 @@ namespace Synapse
         }
         else if (match.match_type == MatchType.TEXT)
         {
-          TextMatch? text_match = match as TextMatch;
+          unowned TextMatch? text_match = match as TextMatch;
+          return_if_fail (text_match != null);
+
           string content = text_match != null ? text_match.get_text () : match.title;
 
           cb.set_text (content, -1);
@@ -340,7 +344,7 @@ namespace Synapse
       
       public override int get_relevancy_for_match (Match match)
       {
-        TextMatch? text_match = match as TextMatch;
+        unowned TextMatch? text_match = match as TextMatch;
         if (text_match != null && text_match.text_origin == TextOrigin.CLIPBOARD)
         {
           return 0;
