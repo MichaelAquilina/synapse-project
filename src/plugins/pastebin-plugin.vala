@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private class PastebinAction: BaseAction
+    private class PastebinAction: Action
     {
       public PastebinAction ()
       {

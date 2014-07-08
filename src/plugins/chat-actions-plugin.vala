@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private class OpenChat: BaseAction
+    private class OpenChat: Action
     {
       public OpenChat ()
       {
@@ -59,7 +59,7 @@ namespace Synapse
       }
     }
 
-    private class SendMessage: BaseAction
+    private class SendMessage: Action
     {
       public SendMessage ()
       {
@@ -94,7 +94,7 @@ namespace Synapse
       }
     }
 
-    private class SendMessageTo: BaseAction
+    private class SendMessageTo: Action
     {
       public SendMessageTo ()
       {
@@ -146,11 +146,11 @@ namespace Synapse
       register_plugin ();
     }
 
-    private Gee.List<BaseAction> actions;
+    private Gee.List<Action> actions;
 
     construct
     {
-      actions = new Gee.ArrayList<BaseAction> ();
+      actions = new Gee.ArrayList<Action> ();
 
       actions.add (new OpenChat ());
       actions.add (new SendMessage ());

@@ -44,7 +44,7 @@ namespace Synapse
       actions.clear ();
     }
 
-    private class ImgUrAction: BaseAction
+    private class ImgUrAction: Action
     {
       public ImgUrAction ()
       {

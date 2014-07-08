@@ -20,7 +20,7 @@
 
 namespace Synapse
 {
-  public abstract class BaseAction: Match
+  public abstract class Action: Match
   {
     public int default_relevancy { get; set; }
     public bool notify_match { get; set; default = true; }
@@ -55,7 +55,7 @@ namespace Synapse
 
     }
 
-    private class Runner: BaseAction
+    private class Runner: Action
     {
       public Runner ()
       {
@@ -111,7 +111,7 @@ namespace Synapse
       }
     }
 
-    private class TerminalRunner: BaseAction
+    private class TerminalRunner: Action
     {
       public TerminalRunner ()
       {
@@ -160,7 +160,7 @@ namespace Synapse
       }
     }
 
-    private class Opener: BaseAction
+    private class Opener: Action
     {
       public Opener ()
       {
@@ -230,7 +230,7 @@ namespace Synapse
       }
     }
 
-    private class OpenFolder: BaseAction
+    private class OpenFolder: Action
     {
       public OpenFolder ()
       {
@@ -273,7 +273,7 @@ namespace Synapse
       }
     }
 
-    private class ClipboardCopy: BaseAction
+    private class ClipboardCopy: Action
     {
       public ClipboardCopy ()
       {
@@ -339,11 +339,11 @@ namespace Synapse
       }
     }
 
-    private Gee.List<BaseAction> actions;
+    private Gee.List<Action> actions;
 
     construct
     {
-      actions = new Gee.ArrayList<BaseAction> ();
+      actions = new Gee.ArrayList<Action> ();
 
       actions.add (new Runner ());
       actions.add (new TerminalRunner ());

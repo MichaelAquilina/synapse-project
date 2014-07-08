@@ -87,7 +87,7 @@ namespace Synapse
       register_plugin ();
     }
 
-    private class SendToContact: BaseAction
+    private class SendToContact: Action
     {
       public SendToContact ()
       {
@@ -286,11 +286,11 @@ namespace Synapse
       }
     }
 
-    private Gee.List<BaseAction> actions;
+    private Gee.List<Action> actions;
 
     construct
     {
-      actions = new Gee.ArrayList<BaseAction> ();
+      actions = new Gee.ArrayList<Action> ();
       actions.add (new SendToContact ());
 
       contacts = new Gee.HashMap<int, Contact> ();

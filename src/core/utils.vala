@@ -181,7 +181,7 @@ namespace Synapse
         }
         else if (level == LogLevelFlags.LEVEL_WARNING)
         {
-          header = @"$(RED)[$(cur_time) $(domain_str)Warning]$(RESET)";
+          header = @"$(YELLOW)[$(cur_time) $(domain_str)Warning]$(RESET)";
         }
         else if (level == LogLevelFlags.LEVEL_CRITICAL || level == LogLevelFlags.LEVEL_ERROR)
         {
