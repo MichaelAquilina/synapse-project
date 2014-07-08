@@ -387,9 +387,10 @@ namespace Synapse
               null
             );
             
-            // let's determine the file type
+            // let's determine the file type if unavailable the generic "unknown" type is set.
+			// On UNIX this is the "application/octet-stream" mimetype
             unowned string mime_type = 
-              fi.get_attribute_string (FileAttribute.STANDARD_FAST_CONTENT_TYPE);
+              fi.get_attribute_string (FileAttribute.STANDARD_FAST_CONTENT_TYPE) ?? "application/octet-stream";
             if (ContentType.is_unknown (mime_type))
             {
               file_type = QueryFlags.UNCATEGORIZED;
