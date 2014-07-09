@@ -259,7 +259,7 @@ namespace Synapse
       }
     }
 
-    private Gee.Map<string, Gee.List<OpenWithAction> > mimetype_map;
+    private Gee.Map<string, Gee.List<OpenWithAction>> mimetype_map;
 
     public ResultSet? find_for_match (ref Query query, Match match)
     {

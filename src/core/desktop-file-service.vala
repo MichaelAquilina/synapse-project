@@ -214,8 +214,8 @@ namespace Synapse
     private Gee.List<FileMonitor> directory_monitors;
     private Gee.List<DesktopFileInfo> all_desktop_files;
     private Gee.List<DesktopFileInfo> non_hidden_desktop_files;
-    private Gee.Map<unowned string, Gee.List<DesktopFileInfo> > mimetype_map;
-    private Gee.Map<string, Gee.List<DesktopFileInfo> > exec_map;
+    private Gee.Map<unowned string, Gee.List<DesktopFileInfo>> mimetype_map;
+    private Gee.Map<string, Gee.List<DesktopFileInfo>> exec_map;
     private Gee.Map<string, DesktopFileInfo> desktop_id_map;
     private Gee.MultiMap<string, string> mimetype_parent_map;
 
@@ -511,10 +511,10 @@ namespace Synapse
     {
       // create mimetype maps
       mimetype_map =
-        new Gee.HashMap<unowned string, Gee.List<DesktopFileInfo> > ();
+        new Gee.HashMap<unowned string, Gee.List<DesktopFileInfo>> ();
       // and exec map
       exec_map =
-        new Gee.HashMap<string, Gee.List<DesktopFileInfo> > ();
+        new Gee.HashMap<string, Gee.List<DesktopFileInfo>> ();
       // and desktop id map
       desktop_id_map =
         new Gee.HashMap<string, DesktopFileInfo> ();
