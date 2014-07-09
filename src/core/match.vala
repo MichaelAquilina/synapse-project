@@ -86,18 +86,34 @@ namespace Synapse
     }
   }
 
-  public abstract class ApplicationMatch: Match
+  public class ApplicationMatch: Match
   {
     public AppInfo? app_info { get; set; }
     public bool needs_terminal { get; set; }
     public string? filename { get; construct set; }
+
+    construct
+    {
+      match_type = MatchType.APPLICATION;
+      has_thumbnail = false;
+      icon_name = "";
+      thumbnail_path = "";
+    }
   }
 
-  public abstract class UriMatch: Match
+  public class UriMatch: Match
   {
     public string uri { get; set; }
     public QueryFlags file_type { get; set; }
     public string mime_type { get; set; }
+
+    construct
+    {
+      match_type = MatchType.GENERIC_URI;
+      has_thumbnail = false;
+      icon_name = "";
+      thumbnail_path = "";
+    }
   }
 
   public abstract class ContactMatch: Match
