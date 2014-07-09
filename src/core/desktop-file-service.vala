@@ -73,8 +73,6 @@ namespace Synapse
 
     public EnvironmentType show_in { get; set; default = EnvironmentType.ALL; }
 
-    private static const string GROUP = "Desktop Entry";
-
     public DesktopFileInfo.for_keyfile (string path, KeyFile keyfile,
                                         string desktop_id)
     {
@@ -116,14 +114,14 @@ namespace Synapse
     {
       try
       {
-        if (keyfile.get_string (GROUP, "Type") != "Application")
+        if (keyfile.get_string (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_TYPE) != KeyFileDesktop.TYPE_APPLICATION)
         {
           throw new DesktopFileError.UNINTERESTING_ENTRY ("Not Application-type desktop entry");
         }
 
-        if (keyfile.has_key (GROUP, "Categories"))
+        if (keyfile.has_key (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_CATEGORIES))
         {
-          string[] categories = keyfile.get_string_list (GROUP, "Categories");
+          string[] categories = keyfile.get_string_list (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_CATEGORIES);
           if ("Screensaver" in categories)
           {
             throw new DesktopFileError.UNINTERESTING_ENTRY ("Screensaver desktop entry");
@@ -146,13 +144,13 @@ namespace Synapse
         }
 
         // check for hidden desktop files
-        if (keyfile.has_key (GROUP, "Hidden") &&
-          keyfile.get_boolean (GROUP, "Hidden"))
+        if (keyfile.has_key (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_HIDDEN) &&
+          keyfile.get_boolean (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_HIDDEN))
         {
           is_hidden = true;
         }
-        if (keyfile.has_key (GROUP, "NoDisplay") &&
-          keyfile.get_boolean (GROUP, "NoDisplay"))
+        if (keyfile.has_key (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_NO_DISPLAY) &&
+          keyfile.get_boolean (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_NO_DISPLAY))
         {
           is_hidden = true;
         }
@@ -163,23 +161,23 @@ namespace Synapse
           new ThemedIcon ("application-default-icon");
         icon_name = icon.to_string ();
 
-        if (keyfile.has_key (GROUP, "MimeType"))
+        if (keyfile.has_key (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_MIME_TYPE))
         {
-          mime_types = keyfile.get_string_list (GROUP, "MimeType");
+          mime_types = keyfile.get_string_list (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_MIME_TYPE);
         }
-        if (keyfile.has_key (GROUP, "Terminal"))
+        if (keyfile.has_key (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_TERMINAL))
         {
-          needs_terminal = keyfile.get_boolean (GROUP, "Terminal");
+          needs_terminal = keyfile.get_boolean (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_TERMINAL);
         }
-        if (keyfile.has_key (GROUP, "OnlyShowIn"))
+        if (keyfile.has_key (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_ONLY_SHOW_IN))
         {
-          show_in = parse_environments (keyfile.get_string_list (GROUP,
-                                                                 "OnlyShowIn"));
+          show_in = parse_environments (keyfile.get_string_list (KeyFileDesktop.GROUP,
+                                                                 KeyFileDesktop.KEY_ONLY_SHOW_IN));
         }
-        else if (keyfile.has_key (GROUP, "NotShowIn"))
+        else if (keyfile.has_key (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_NOT_SHOW_IN))
         {
-          var not_show = parse_environments (keyfile.get_string_list (GROUP,
-                                                                  "NotShowIn"));
+          var not_show = parse_environments (keyfile.get_string_list (KeyFileDesktop.GROUP,
+                                             KeyFileDesktop.KEY_NOT_SHOW_IN));
           show_in = EnvironmentType.ALL ^ not_show;
         }
 
