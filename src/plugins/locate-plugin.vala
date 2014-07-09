@@ -79,7 +79,7 @@ namespace Synapse
 
     static void register_plugin ()
     {
-      DataSink.PluginRegistry.get_default ().register_plugin (
+      PluginRegistry.get_default ().register_plugin (
         typeof (LocatePlugin),
         _ ("Locate"),
         _ ("Runs locate command to find files on the filesystem."),

@@ -64,7 +64,7 @@ namespace Synapse
 
     static void register_plugin ()
     {
-      DataSink.PluginRegistry.get_default ().register_plugin (
+      PluginRegistry.get_default ().register_plugin (
         typeof (BansheeActions),
         "Banshee",
         _ ("Control Banshee and add items to playlists."),

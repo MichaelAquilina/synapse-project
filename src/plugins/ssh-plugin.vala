@@ -61,7 +61,7 @@ namespace Synapse
 
     static void register_plugin ()
     {
-      DataSink.PluginRegistry.get_default ().register_plugin (
+      PluginRegistry.get_default ().register_plugin (
         typeof (SshPlugin),
     		"SSH", // Plugin title
         _ ("Connect to host with SSH"), // description

@@ -50,7 +50,7 @@ namespace Synapse
     // register your plugin in the UI
     static void register_plugin ()
     {
-      DataSink.PluginRegistry.get_default ().register_plugin (
+      PluginRegistry.get_default ().register_plugin (
         typeof (SelectionPlugin),
         _ ("Selection"), // plugin title
         _ ("Provides actions for currently selected text."), // description

@@ -53,7 +53,7 @@ namespace Synapse
     // register your plugin in the UI
     static void register_plugin ()
     {
-      DataSink.PluginRegistry.get_default ().register_plugin (
+      PluginRegistry.get_default ().register_plugin (
         typeof (HelloWorldPlugin),
         _ ("Hello world"), // plugin title
         _ ("An example plugin."), // description

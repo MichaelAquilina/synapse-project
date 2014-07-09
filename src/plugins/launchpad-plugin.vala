@@ -242,7 +242,7 @@ namespace Synapse
 
     static void register_plugin ()
     {
-      DataSink.PluginRegistry.get_default ().register_plugin (
+      PluginRegistry.get_default ().register_plugin (
         typeof (LaunchpadPlugin),
         "Launchpad",
         _ ("Find bugs and branches on Launchpad."),

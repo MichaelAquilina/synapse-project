@@ -132,7 +132,7 @@ namespace Synapse
 
     static void register_plugin ()
     {
-      DataSink.PluginRegistry.get_default ().register_plugin (
+      PluginRegistry.get_default ().register_plugin (
         typeof (GnomeSessionPlugin),
         "GNOME Session",
         _ ("Log out from your session."),

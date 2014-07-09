@@ -261,7 +261,7 @@ namespace Synapse
 
     static void register_plugin ()
     {
-      DataSink.PluginRegistry.get_default ().register_plugin (
+      PluginRegistry.get_default ().register_plugin (
         typeof (PastebinPlugin),
         _ ("Pastebin"),
         _ ("Upload files to pastebin."),

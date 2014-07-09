@@ -61,7 +61,7 @@ namespace Synapse
 
     static void register_plugin ()
     {
-      DataSink.PluginRegistry.get_default ().register_plugin (
+      PluginRegistry.get_default ().register_plugin (
         typeof (ChromiumPlugin),
         _ ("Chromium Plugin"),
         _ ("Browse and open Chromium bookmarks."),

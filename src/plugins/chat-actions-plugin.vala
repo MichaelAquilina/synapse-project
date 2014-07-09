@@ -132,7 +132,7 @@ namespace Synapse
 
     static void register_plugin ()
     {
-      DataSink.PluginRegistry.get_default ().register_plugin (
+      PluginRegistry.get_default ().register_plugin (
         typeof (ChatActions),
         _ ("Chat actions"),
         _ ("Open chat, or send a message with your favorite IM"),

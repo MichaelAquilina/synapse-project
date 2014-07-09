@@ -81,7 +81,7 @@ namespace Synapse
 
     static void register_plugin ()
     {
-      DataSink.PluginRegistry.get_default ().register_plugin (
+      PluginRegistry.get_default ().register_plugin (
         typeof (ZeitgeistRelated),
         _ ("Related files"),
         _ ("Finds files related to other search results using Zeitgeist."),

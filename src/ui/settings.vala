@@ -28,11 +28,11 @@ namespace Synapse.Gui
   {
     class PluginTileObject: UI.Widgets.AbstractTileObject
     {
-      public DataSink.PluginRegistry.PluginInfo pi { get; construct set; }
+      public PluginInfo pi { get; construct set; }
 
       public signal void configure ();
 
-      public PluginTileObject (DataSink.PluginRegistry.PluginInfo info)
+      public PluginTileObject (PluginInfo info)
       {
         GLib.Object (name: info.title,
                      description: info.description,
@@ -95,8 +95,8 @@ namespace Synapse.Gui
 
       public void refresh ()
       {
-        DataSink.PluginRegistry.PluginInfo info;
-        var registry = DataSink.PluginRegistry.get_default ();
+        PluginInfo info;
+        var registry = PluginRegistry.get_default ();
         info = registry.get_plugin_info_for_type (pi.plugin_type);
 
         if (pi.runnable != info.runnable)
@@ -177,14 +177,14 @@ namespace Synapse.Gui
     private void init_plugin_tiles ()
     {
       tile_view.clear ();
-      var arr = new Gee.ArrayList<DataSink.PluginRegistry.PluginInfo> ();
-      arr.add_all (DataSink.PluginRegistry.get_default ().get_plugins ());
+      var arr = new Gee.ArrayList<PluginInfo> ();
+      arr.add_all (PluginRegistry.get_default ().get_plugins ());
       arr.sort ((a, b) =>
       {
-        unowned DataSink.PluginRegistry.PluginInfo p1 =
-          (DataSink.PluginRegistry.PluginInfo) a;
-        unowned DataSink.PluginRegistry.PluginInfo p2 =
-          (DataSink.PluginRegistry.PluginInfo) b;
+        unowned PluginInfo p1 =
+          (PluginInfo) a;
+        unowned PluginInfo p2 =
+          (PluginInfo) b;
         return strcmp (p1.title, p2.title);
       });
 

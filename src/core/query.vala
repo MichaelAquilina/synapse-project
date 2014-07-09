@@ -54,10 +54,10 @@ namespace Synapse
 
     ACTIONS         = 1 << 3,
 
-      AUDIO           = 1 << 4,
-      VIDEO           = 1 << 5,
-      DOCUMENTS       = 1 << 6,
-      IMAGES          = 1 << 7,
+    AUDIO           = 1 << 4,
+    VIDEO           = 1 << 5,
+    DOCUMENTS       = 1 << 6,
+    IMAGES          = 1 << 7,
     FILES           = AUDIO | VIDEO | DOCUMENTS | IMAGES,
 
     PLACES          = 1 << 8,

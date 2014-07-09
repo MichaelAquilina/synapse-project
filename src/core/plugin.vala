@@ -55,5 +55,95 @@ namespace Synapse
       return false;
     }
   }
+
+  // don't move into a class, gir doesn't like it
+  [CCode (has_target = false)]
+  public delegate void PluginRegisterFunc ();
+
+  public class PluginInfo
+  {
+    public Type plugin_type;
+    public string title;
+    public string description;
+    public string icon_name;
+    public PluginRegisterFunc register_func;
+    public bool runnable;
+    public string runnable_error;
+    public PluginInfo (Type type, string title, string desc,
+                       string icon_name, PluginRegisterFunc reg_func,
+                       bool runnable, string runnable_error)
+    {
+      this.plugin_type = type;
+      this.title = title;
+      this.description = desc;
+      this.icon_name = icon_name;
+      this.register_func = reg_func;
+      this.runnable = runnable;
+      this.runnable_error = runnable_error;
+    }
+  }
+
+  public class PluginRegistry : Object
+  {
+    public static unowned PluginRegistry instance = null;
+
+    private Gee.List<PluginInfo> plugins;
+
+    construct
+    {
+      instance = this;
+      plugins = new Gee.ArrayList<PluginInfo> ();
+    }
+
+    ~PluginRegistry ()
+    {
+      instance = null;
+    }
+
+    public static PluginRegistry get_default ()
+    {
+      return instance ?? new PluginRegistry ();
+    }
+
+    public void register_plugin (Type plugin_type,
+                                 string title,
+                                 string description,
+                                 string icon_name,
+                                 PluginRegisterFunc reg_func,
+                                 bool runnable = true,
+                                 string runnable_error = "")
+    {
+      // FIXME: how about a frickin Type -> PluginInfo map?!
+      int index = -1;
+      for (int i=0; i < plugins.size; i++)
+      {
+        if (plugins[i].plugin_type == plugin_type)
+        {
+          index = i;
+          break;
+        }
+      }
+      if (index >= 0) plugins.remove_at (index);
+
+      var p = new PluginInfo (plugin_type, title, description, icon_name,
+                              reg_func, runnable, runnable_error);
+      plugins.add (p);
+    }
+
+    public Gee.List<PluginInfo> get_plugins ()
+    {
+      return plugins.read_only_view;
+    }
+
+    public PluginInfo? get_plugin_info_for_type (Type plugin_type)
+    {
+      foreach (PluginInfo pi in plugins)
+      {
+        if (pi.plugin_type == plugin_type) return pi;
+      }
+
+      return null;
+    }
+  }
 }
 
