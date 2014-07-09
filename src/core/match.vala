@@ -92,12 +92,12 @@ namespace Synapse
     public bool needs_terminal { get; set; }
     public string? filename { get; construct set; }
 
-    construct
+    public ApplicationMatch ()
     {
-      match_type = MatchType.APPLICATION;
-      has_thumbnail = false;
-      icon_name = "";
-      thumbnail_path = "";
+      Object (match_type : MatchType.APPLICATION,
+              has_thumbnail : false,
+              icon_name : "",
+              thumbnail_path : "");
     }
   }
 
@@ -107,12 +107,12 @@ namespace Synapse
     public QueryFlags file_type { get; set; }
     public string mime_type { get; set; }
 
-    construct
+    public UriMatch ()
     {
-      match_type = MatchType.GENERIC_URI;
-      has_thumbnail = false;
-      icon_name = "";
-      thumbnail_path = "";
+      Object (match_type : MatchType.GENERIC_URI,
+              has_thumbnail : false,
+              icon_name : "",
+              thumbnail_path : "");
     }
   }
 
