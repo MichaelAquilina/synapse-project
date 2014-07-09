@@ -146,7 +146,7 @@ namespace Synapse
         {
           if (command.has_prefix (stripped))
           {
-            result.add (create_co (command), Match.Score.AVERAGE);
+            result.add (create_co (command), MatchScore.AVERAGE);
           }
         }
 
@@ -159,13 +159,13 @@ namespace Synapse
           if (args[0] == "rm") return null;
           CommandObject? co = create_co (stripped);
           if (co == null) return null;
-          result.add (co, Match.Score.POOR);
+          result.add (co, MatchScore.POOR);
           co.executed.connect (this.command_executed);
         }
       }
       else
       {
-        result.add (create_co (stripped), Match.Score.VERY_GOOD);
+        result.add (create_co (stripped), MatchScore.VERY_GOOD);
       }
 
       q.check_cancellable ();

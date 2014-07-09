@@ -52,7 +52,7 @@ namespace Synapse
                 description: _ ("Upload selection to imgur image sharer"),
                 match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
-                default_relevancy: Match.Score.AVERAGE - Match.Score.INCREMENT_MINOR);
+                default_relevancy: MatchScore.AVERAGE - MatchScore.INCREMENT_MINOR);
       }
 
       private Rest.Proxy proxy;
@@ -235,7 +235,7 @@ namespace Synapse
                 description: _ ("Upload selection to imgur image sharer, and send the link to contact"),
                 match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
-                default_relevancy: Match.Score.AVERAGE - Match.Score.INCREMENT_MINOR);
+                default_relevancy: MatchScore.AVERAGE - MatchScore.INCREMENT_MINOR);
       }
 
       protected override void process_result (string? url, Match? target = null)

@@ -63,7 +63,7 @@ namespace Synapse
                 description: _ ("Run an application, action or script"),
                 icon_name: "system-run", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.EXCELLENT);
+                default_relevancy: MatchScore.EXCELLENT);
       }
 
       public override void do_execute (Match match, Match? target = null)
@@ -119,7 +119,7 @@ namespace Synapse
                 description: _ ("Run application or command in terminal"),
                 icon_name: "terminal", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.BELOW_AVERAGE);
+                default_relevancy: MatchScore.BELOW_AVERAGE);
       }
 
       public override void do_execute (Match match, Match? target = null)
@@ -168,7 +168,7 @@ namespace Synapse
                 description: _ ("Open using default application"),
                 icon_name: "fileopen", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.GOOD);
+                default_relevancy: MatchScore.GOOD);
       }
 
       public override void do_execute (Match match, Match? target = null)
@@ -238,7 +238,7 @@ namespace Synapse
                 description: _ ("Open folder containing this file"),
                 icon_name: "folder-open", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.AVERAGE);
+                default_relevancy: MatchScore.AVERAGE);
       }
 
       public override void do_execute (Match match, Match? target = null)
@@ -281,7 +281,7 @@ namespace Synapse
                 description: _ ("Copy selection to clipboard"),
                 icon_name: "gtk-copy", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.AVERAGE);
+                default_relevancy: MatchScore.AVERAGE);
       }
 
       public override void do_execute (Match match, Match? target = null)

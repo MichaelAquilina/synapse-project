@@ -153,7 +153,7 @@ namespace Synapse
         {
           if (matcher.key.match (host.host_query))
           {
-            results.add (host, matcher.value - Match.Score.INCREMENT_SMALL);
+            results.add (host, matcher.value - MatchScore.INCREMENT_SMALL);
             break;
           }
         }

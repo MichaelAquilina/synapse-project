@@ -48,7 +48,7 @@ namespace Synapse
 
     private class LocateItem: SearchMatch
     {
-      public int default_relevancy { get; set; default = Match.Score.INCREMENT_SMALL; }
+      public int default_relevancy { get; set; default = MatchScore.INCREMENT_SMALL; }
 
       // for SearchMatch interface
       public override async Gee.List<Match> search (string query,
@@ -169,8 +169,8 @@ namespace Synapse
         yield fi.initialize ();
         if (fi.match_obj != null && fi.file_type in q.query_type)
         {
-          int relevancy = Match.Score.INCREMENT_SMALL; // FIXME: relevancy
-          if (fi.uri.has_prefix ("file:///home/")) relevancy += Match.Score.INCREMENT_MINOR;
+          int relevancy = MatchScore.INCREMENT_SMALL; // FIXME: relevancy
+          if (fi.uri.has_prefix ("file:///home/")) relevancy += MatchScore.INCREMENT_MINOR;
           result.add (fi.match_obj, relevancy);
         }
         q.check_cancellable ();

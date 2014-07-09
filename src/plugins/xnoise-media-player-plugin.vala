@@ -85,7 +85,7 @@ namespace Synapse
       {
         bool xnoise_running = DBusService.get_default ().name_has_owner (
           XnoisePlayerEngine.UNIQUE_NAME);
-        return xnoise_running ? default_relevancy + Match.Score.INCREMENT_LARGE : default_relevancy;
+        return xnoise_running ? default_relevancy + MatchScore.INCREMENT_LARGE : default_relevancy;
       }
     }
 
@@ -323,7 +323,7 @@ namespace Synapse
                 icon_name: "media-playback-start",
                 has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.ABOVE_AVERAGE
+                default_relevancy: MatchScore.ABOVE_AVERAGE
                 );
       }
 
@@ -401,7 +401,7 @@ namespace Synapse
         {
           if (matcher.key.match (action.title))
           {
-            result.add (action, matcher.value - Match.Score.INCREMENT_SMALL);
+            result.add (action, matcher.value - MatchScore.INCREMENT_SMALL);
             break;
           }
         }

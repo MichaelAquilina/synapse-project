@@ -43,7 +43,7 @@ namespace Synapse
                 description: _ ("Pastebin selection"),
                 match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
-                default_relevancy: Match.Score.AVERAGE);
+                default_relevancy: MatchScore.AVERAGE);
       }
 
       protected async string? pastebin_file (string path)
@@ -232,7 +232,7 @@ namespace Synapse
                 description: _ ("Pastebin selection"),
                 match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
-                default_relevancy: Match.Score.AVERAGE);
+                default_relevancy: MatchScore.AVERAGE);
       }
 
       protected override void process_pastebin_result (string? url, Match? target = null)

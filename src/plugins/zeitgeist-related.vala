@@ -50,7 +50,7 @@ namespace Synapse
 
     private class RelatedItem: SearchMatch
     {
-      public int default_relevancy { get; set; default = Match.Score.INCREMENT_SMALL; }
+      public int default_relevancy { get; set; default = MatchScore.INCREMENT_SMALL; }
 
       // for SearchMatch interface
       public override async Gee.List<Match> search (string query,

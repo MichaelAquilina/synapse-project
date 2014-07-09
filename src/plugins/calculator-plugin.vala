@@ -125,7 +125,7 @@ namespace Synapse
             double d = double.parse (solution);
             Result result = new Result (d, query.query_string);
             ResultSet results = new ResultSet ();
-            results.add (result, Match.Score.AVERAGE);
+            results.add (result, MatchScore.AVERAGE);
             query.check_cancellable ();
             return results;
           }

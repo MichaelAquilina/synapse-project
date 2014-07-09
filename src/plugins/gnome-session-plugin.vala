@@ -182,7 +182,7 @@ namespace Synapse
         {
           if (matcher.key.match (action.title))
           {
-            result.add (action, matcher.value - Match.Score.INCREMENT_SMALL);
+            result.add (action, matcher.value - MatchScore.INCREMENT_SMALL);
             break;
           }
         }

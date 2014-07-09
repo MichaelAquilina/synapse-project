@@ -43,7 +43,7 @@ namespace Synapse
                 description: _ ("Open a chat with selected contact"),
                 icon_name: "empathy", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.EXCELLENT);
+                default_relevancy: MatchScore.EXCELLENT);
       }
 
       public override void do_execute (Match match, Match? target = null)
@@ -67,7 +67,7 @@ namespace Synapse
                 description: _ ("Send a message to the contact"),
                 icon_name: "message", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.VERY_GOOD);
+                default_relevancy: MatchScore.VERY_GOOD);
       }
 
       public override void do_execute (Match match, Match? target = null)
@@ -102,7 +102,7 @@ namespace Synapse
                 description: _ ("Send a message to a contact"),
                 icon_name: "message", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.VERY_GOOD);
+                default_relevancy: MatchScore.VERY_GOOD);
       }
 
       public override void do_execute (Match match, Match? target = null)

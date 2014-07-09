@@ -165,7 +165,7 @@ namespace Synapse
 
     private class SearchAction: Match
     {
-      public int default_relevancy { get; set; default = Match.Score.INCREMENT_MINOR; }
+      public int default_relevancy { get; set; default = MatchScore.INCREMENT_MINOR; }
       public string query_template { get; construct set; }
 
       public override void execute (Match? match)

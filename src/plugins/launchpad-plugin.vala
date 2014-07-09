@@ -317,7 +317,7 @@ namespace Synapse
         if (uri != null)
         {
           result.add (new LaunchpadObject (title, description, uri),
-                      Match.Score.EXCELLENT);
+                      MatchScore.EXCELLENT);
         }
       }
       else if (bug_regex.match (stripped, 0, out mi))
@@ -328,7 +328,7 @@ namespace Synapse
         title = _ ("Launchpad: Bug #%s").printf (bug_num);
         description = uri;
         result.add (new LaunchpadObject (title, description, uri),
-                    Match.Score.ABOVE_AVERAGE);
+                    MatchScore.ABOVE_AVERAGE);
       }
 
       q.check_cancellable ();

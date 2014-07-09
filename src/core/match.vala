@@ -20,6 +20,25 @@
 
 namespace Synapse
 {
+  public enum MatchScore
+  {
+    INCREMENT_MINOR = 2000,
+    INCREMENT_SMALL = 5000,
+    INCREMENT_MEDIUM = 10000,
+    INCREMENT_LARGE = 20000,
+    URI_PENALTY = 15000,
+
+    POOR = 50000,
+    BELOW_AVERAGE = 60000,
+    AVERAGE = 70000,
+    ABOVE_AVERAGE = 75000,
+    GOOD = 80000,
+    VERY_GOOD = 85000,
+    EXCELLENT = 90000,
+
+    HIGHEST = 100000
+  }
+
   public enum MatchType
   {
     UNKNOWN = 0,
@@ -33,25 +52,6 @@ namespace Synapse
 
   public abstract class Match: Object
   {
-    public enum Score
-    {
-      INCREMENT_MINOR = 2000,
-      INCREMENT_SMALL = 5000,
-      INCREMENT_MEDIUM = 10000,
-      INCREMENT_LARGE = 20000,
-      URI_PENALTY = 15000,
-
-      POOR = 50000,
-      BELOW_AVERAGE = 60000,
-      AVERAGE = 70000,
-      ABOVE_AVERAGE = 75000,
-      GOOD = 80000,
-      VERY_GOOD = 85000,
-      EXCELLENT = 90000,
-
-      HIGHEST = 100000
-    }
-
     public signal void executed ();
 
     // properties

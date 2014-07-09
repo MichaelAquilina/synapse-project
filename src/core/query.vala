@@ -141,7 +141,7 @@ namespace Synapse
       try
       {
         re = new Regex ("^(%s)$".printf (Regex.escape_string (query)), flags);
-        results[re] = Match.Score.HIGHEST;
+        results[re] = MatchScore.HIGHEST;
       }
       catch (RegexError err)
       {
@@ -150,7 +150,7 @@ namespace Synapse
       try
       {
         re = new Regex ("^(%s)".printf (Regex.escape_string (query)), flags);
-        results[re] = Match.Score.EXCELLENT;
+        results[re] = MatchScore.EXCELLENT;
       }
       catch (RegexError err)
       {
@@ -159,7 +159,7 @@ namespace Synapse
       try
       {
         re = new Regex ("\\b(%s)".printf (Regex.escape_string (query)), flags);
-        results[re] = Match.Score.VERY_GOOD;
+        results[re] = MatchScore.VERY_GOOD;
       }
       catch (RegexError err)
       {
@@ -180,7 +180,7 @@ namespace Synapse
         try
         {
           re = new Regex (pattern, flags);
-          results[re] = Match.Score.GOOD;
+          results[re] = MatchScore.GOOD;
         }
         catch (RegexError err)
         {
@@ -198,7 +198,7 @@ namespace Synapse
             try
             {
               re = new Regex (reversed, flags);
-              results[re] = Match.Score.GOOD - Match.Score.INCREMENT_MINOR;
+              results[re] = MatchScore.GOOD - MatchScore.INCREMENT_MINOR;
             }
             catch (RegexError err)
             {
@@ -218,7 +218,7 @@ namespace Synapse
             try
             {
               re = new Regex (any_order, flags);
-              results[re] = Match.Score.AVERAGE + Match.Score.INCREMENT_MINOR;
+              results[re] = MatchScore.AVERAGE + MatchScore.INCREMENT_MINOR;
             }
             catch (RegexError err)
             {
@@ -232,7 +232,7 @@ namespace Synapse
         try
         {
           re = new Regex ("(%s)".printf (Regex.escape_string (query)), flags);
-          results[re] = Match.Score.BELOW_AVERAGE;
+          results[re] = MatchScore.BELOW_AVERAGE;
         }
         catch (RegexError err)
         {
@@ -256,7 +256,7 @@ namespace Synapse
         try
         {
           re = new Regex (pattern, flags);
-          results[re] = Match.Score.ABOVE_AVERAGE;
+          results[re] = MatchScore.ABOVE_AVERAGE;
         }
         catch (RegexError err)
         {
@@ -270,7 +270,7 @@ namespace Synapse
         try
         {
           re = new Regex (pattern, flags);
-          results[re] = Match.Score.POOR;
+          results[re] = MatchScore.POOR;
         }
         catch (RegexError err)
         {

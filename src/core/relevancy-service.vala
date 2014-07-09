@@ -85,12 +85,12 @@ namespace Synapse
     {
       // FIXME: let's experiment here
       // the other idea is to use base_relevancy * (1.0f + modifier)
-      int relevancy = (int) (base_relevancy + modifier * Match.Score.INCREMENT_LARGE * 2);
-      //int relevancy = base_relevancy + (int) (modifier * Match.Score.HIGHEST);
+      int relevancy = (int) (base_relevancy + modifier * MatchScore.INCREMENT_LARGE * 2);
+      //int relevancy = base_relevancy + (int) (modifier * MatchScore.HIGHEST);
       return relevancy;
       // FIXME: this clamping should be done, but it screws up the popularity
       //   for very popular items with high match score
-      //return int.min (relevancy, Match.Score.HIGHEST);
+      //return int.min (relevancy, MatchScore.HIGHEST);
     }
   }
 }

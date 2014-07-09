@@ -85,7 +85,7 @@ namespace Synapse
       {
         // if the user searches for "hello" + anything, we'll add our result
         var results = new ResultSet ();
-        results.add (new WorldMatch (), Match.Score.AVERAGE);
+        results.add (new WorldMatch (), MatchScore.AVERAGE);
 
         // make sure this method is called before returning any results
         query.check_cancellable ();

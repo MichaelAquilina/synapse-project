@@ -62,7 +62,7 @@ namespace Synapse
                 description: _ ("Rename the file to..."),
                 icon_name: "stock_save-as", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.AVERAGE);
+                default_relevancy: MatchScore.AVERAGE);
       }
 
       public override void execute_with_target (Match source, Match? target = null)

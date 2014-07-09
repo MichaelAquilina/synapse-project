@@ -431,11 +431,11 @@ namespace Synapse
                 if (fi.match_obj != null && fi.file_type in q.query_type)
                 {
                   //Does match only the path, use base_relevancy like ZG plugin does for non-matched
-                  int base_relevancy = Match.Score.POOR + Match.Score.INCREMENT_MINOR;
+                  int base_relevancy = MatchScore.POOR + MatchScore.INCREMENT_MINOR;
                   if (matcher.key.match (fi.match_obj.title))
                   {
                     //Matches title! Great news!
-                    base_relevancy = matcher.value - Match.Score.URI_PENALTY;
+                    base_relevancy = matcher.value - MatchScore.URI_PENALTY;
                   }
                   float pop = rel_srv.get_uri_popularity (fi.uri);
                   results.add (fi.match_obj,

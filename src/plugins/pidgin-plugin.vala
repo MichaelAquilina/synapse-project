@@ -95,7 +95,7 @@ namespace Synapse
                   description: _ ("Send selected file within Pidgin"),
                   match_type: MatchType.ACTION,
                   icon_name: "document-send", has_thumbnail: false,
-                  default_relevancy: Match.Score.AVERAGE);
+                  default_relevancy: MatchScore.AVERAGE);
       }
 
       public override void do_execute (Match match, Match? target = null)
@@ -422,7 +422,7 @@ namespace Synapse
         {
           if (matcher.key.match (contact.value.title))
           {
-            result.add (contact.value, matcher.value - Match.Score.INCREMENT_SMALL);
+            result.add (contact.value, matcher.value - MatchScore.INCREMENT_SMALL);
             break;
           }
         }

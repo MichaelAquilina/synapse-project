@@ -99,7 +99,7 @@ namespace Synapse
       {
         bool banshee_running = DBusService.get_default ().name_has_owner (
           BansheePlayerEngine.UNIQUE_NAME);
-        return banshee_running ? default_relevancy + Match.Score.INCREMENT_LARGE : default_relevancy;
+        return banshee_running ? default_relevancy + MatchScore.INCREMENT_LARGE : default_relevancy;
       }
     }
 
@@ -223,7 +223,7 @@ namespace Synapse
                 description: _ ("Add the song to Banshee playlist"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.AVERAGE);
+                default_relevancy: MatchScore.AVERAGE);
       }
 
       public override void execute_internal (Match? match)
@@ -265,7 +265,7 @@ namespace Synapse
                 description: _ ("Clears the current playlist and plays the song"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
-                default_relevancy: Match.Score.ABOVE_AVERAGE);
+                default_relevancy: MatchScore.ABOVE_AVERAGE);
       }
 
       public override void execute_internal (Match? match)
@@ -337,7 +337,7 @@ namespace Synapse
         {
           if (matcher.key.match (action.title))
           {
-            result.add (action, matcher.value - Match.Score.INCREMENT_SMALL);
+            result.add (action, matcher.value - MatchScore.INCREMENT_SMALL);
             break;
           }
         }

@@ -266,7 +266,7 @@ namespace Synapse
         if (!(uri in uris))
         {
           bool is_application = uri.has_prefix ("application://");
-          int relevancy_penalty = Match.Score.URI_PENALTY;
+          int relevancy_penalty = MatchScore.URI_PENALTY;
           string? thumbnail_path = null;
           string? icon = null;
           uris.add (uri);
@@ -291,7 +291,7 @@ namespace Synapse
               // decrease relevancy of hidden files
               if (fi.get_is_hidden ())
               {
-                relevancy_penalty += Match.Score.INCREMENT_MEDIUM;
+                relevancy_penalty += MatchScore.INCREMENT_MEDIUM;
               }
             }
             catch (Error err)
@@ -325,7 +325,7 @@ namespace Synapse
           }
           else // non native (mostly remote uris)
           {
-            relevancy_penalty += Match.Score.INCREMENT_SMALL;
+            relevancy_penalty += MatchScore.INCREMENT_SMALL;
             unowned string mimetype = subject.mimetype;
             if (mimetype != null && mimetype != "")
             {
@@ -364,7 +364,7 @@ namespace Synapse
               break;
             }
           }
-          if (!match_found) results.add (match_obj, Match.Score.POOR + Match.Score.INCREMENT_MINOR);
+          if (!match_found) results.add (match_obj, MatchScore.POOR + MatchScore.INCREMENT_MINOR);
         }
       }
 
@@ -376,8 +376,8 @@ namespace Synapse
           long len = mo.uri.length;
 
           float mult = (len - minimum) / (float)(maximum - minimum);
-          int adjusted_relevancy = entry.value - (int)(mult * Match.Score.INCREMENT_MINOR);
-          if (mo.uri.index_of ("?") != -1) adjusted_relevancy -= Match.Score.INCREMENT_SMALL;
+          int adjusted_relevancy = entry.value - (int)(mult * MatchScore.INCREMENT_MINOR);
+          if (mo.uri.index_of ("?") != -1) adjusted_relevancy -= MatchScore.INCREMENT_SMALL;
           real_results.add (mo, adjusted_relevancy);
         }
         else
@@ -410,7 +410,7 @@ namespace Synapse
         if (!(uri in uris))
         {
           bool is_application = uri.has_prefix ("application://");
-          int relevancy_penalty = Match.Score.URI_PENALTY;
+          int relevancy_penalty = MatchScore.URI_PENALTY;
           string? thumbnail_path = null;
           string? icon = null;
           uris.add (uri);
@@ -435,7 +435,7 @@ namespace Synapse
               // decrease relevancy of hidden files
               if (fi.get_is_hidden ())
               {
-                relevancy_penalty += Match.Score.INCREMENT_MEDIUM;
+                relevancy_penalty += MatchScore.INCREMENT_MEDIUM;
               }
             }
             catch (Error err)
@@ -455,7 +455,7 @@ namespace Synapse
           }
           else
           {
-            relevancy_penalty += Match.Score.INCREMENT_SMALL;
+            relevancy_penalty += MatchScore.INCREMENT_SMALL;
             unowned string mimetype = subject.mimetype;
             if (mimetype != null && mimetype != "")
             {
@@ -473,7 +473,7 @@ namespace Synapse
           ZeitgeistMatchFactory.init_extended_info_from_event ((ExtendedInfo) match_obj, event);
 
           int relevancy = (int) ((events_size - event_index) /
-            (float) events_size * Match.Score.HIGHEST);
+            (float) events_size * MatchScore.HIGHEST);
           results.add (match_obj, relevancy);
         }
       }

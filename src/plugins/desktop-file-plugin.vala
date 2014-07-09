@@ -161,7 +161,7 @@ namespace Synapse
           }
           else if (unaccented_title != null && matcher.key.match (unaccented_title))
           {
-            results.add (dfm, compute_relevancy (dfm, matcher.value - Match.Score.INCREMENT_SMALL));
+            results.add (dfm, compute_relevancy (dfm, matcher.value - MatchScore.INCREMENT_SMALL));
             matched = true;
             break;
           }
@@ -169,7 +169,7 @@ namespace Synapse
         if (!matched && dfm.exec.has_prefix (q.query_string))
         {
           results.add (dfm, compute_relevancy (dfm, dfm.exec == q.query_string ?
-            Match.Score.VERY_GOOD : Match.Score.AVERAGE - Match.Score.INCREMENT_SMALL));
+            MatchScore.VERY_GOOD : MatchScore.AVERAGE - MatchScore.INCREMENT_SMALL));
         }
       }
     }
@@ -303,7 +303,7 @@ namespace Synapse
       {
         foreach (var action in ow_list)
         {
-          rs.add (action, Match.Score.POOR);
+          rs.add (action, MatchScore.POOR);
         }
       }
       else
