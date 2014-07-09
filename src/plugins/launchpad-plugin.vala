@@ -60,18 +60,15 @@ namespace Synapse
       HashTable<string, string>? step1_result = null;
 
       // i'm quite sure this leaks as hell, but it works :)
-      authorize_button.clicked.connect (() =>
-      {
+      authorize_button.clicked.connect (() => {
         authorize_button.hide ();
         spinner.show ();
         spinner.start ();
-        auth_object.auth_step1.begin ((obj, res) =>
-        {
+        auth_object.auth_step1.begin ((obj, res) => {
           // FIXME: handle error
           step1_result = auth_object.auth_step1.end (res);
           auth_object.auth_step2 (step1_result.lookup ("oauth_token"));
-          Timeout.add_seconds (5, () =>
-          {
+          Timeout.add_seconds (5, () => {
             spinner.hide ();
             spinner.stop ();
             label.show ();
@@ -82,16 +79,14 @@ namespace Synapse
         });
       });
 
-      proceed_button.clicked.connect (() =>
-      {
+      proceed_button.clicked.connect (() => {
         proceed_button.hide ();
         label.hide ();
         spinner.show ();
         spinner.start ();
         auth_object.auth_step3.begin (step1_result.lookup ("oauth_token"),
                                       step1_result.lookup ("oauth_token_secret"),
-                                      (obj, res) =>
-        {
+                                      (obj, res) => {
           spinner.hide ();
           try
           {
@@ -176,8 +171,7 @@ namespace Synapse
         call.add_param ("oauth_signature_method", "PLAINTEXT");
         call.add_param ("oauth_signature", "&");
 
-        call.run_async ((call_obj, error, obj) =>
-        {
+        call.run_async ((call_obj, error, obj) => {
           err = error;
           auth_step1.callback ();
         }, this);
@@ -209,8 +203,7 @@ namespace Synapse
         call.add_param ("oauth_signature_method", "PLAINTEXT");
         call.add_param ("oauth_signature", "&" + token_secret);
 
-        call.run_async ((call_obj, error, obj) =>
-        {
+        call.run_async ((call_obj, error, obj) => {
           err = error;
           auth_step3.callback ();
         }, this);

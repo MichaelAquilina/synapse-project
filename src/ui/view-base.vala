@@ -185,7 +185,7 @@ namespace Synapse
         flag_selector.add_text (c.name);
       }
       flag_selector.selected = controller.category_config.default_category_index;
-      flag_selector.selection_changed.connect (()=>{
+      flag_selector.selection_changed.connect (() => {
         controller.category_changed_event (flag_selector.selected);
       });
 
@@ -204,7 +204,9 @@ namespace Synapse
       if (menu != null)
       {
         menu.get_menu ().show.connect (this.force_grab);
-        menu.settings_clicked.connect (()=>{ controller.show_settings_requested (); });
+        menu.settings_clicked.connect (() => {
+          controller.show_settings_requested ();
+        });
       }
 
        // gtk3 no longer calls this itself on startup

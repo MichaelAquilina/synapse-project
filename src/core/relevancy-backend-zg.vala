@@ -234,8 +234,7 @@ namespace Synapse
 
     private void reload_relevancies ()
     {
-      Idle.add_full (Priority.LOW, () =>
-      {
+      Idle.add_full (Priority.LOW, () => {
         load_application_relevancies.begin ();
         return false;
       });

@@ -120,7 +120,9 @@ namespace Synapse
       ConfigObject config_object = get_config (group, key, config_type);
       // make sure the lambda doesn't take a ref on the config_object
       unowned ConfigObject co = config_object;
-      co.notify.connect (() => { this.set_config (group, key, co); });
+      co.notify.connect (() => {
+        this.set_config (group, key, co);
+      });
       return config_object;
     }
 

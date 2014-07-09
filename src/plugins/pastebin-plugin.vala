@@ -187,8 +187,7 @@ namespace Synapse
             Utils.Logger.warning (this, "Unable to get path for %s", uri_match.uri);
             return;
           }
-          pastebin_file.begin (path, (obj, res) =>
-          {
+          pastebin_file.begin (path, (obj, res) => {
             string? url = pastebin_file.end (res);
             process_pastebin_result (url, target);
           });
@@ -198,8 +197,7 @@ namespace Synapse
           unowned TextMatch? text_match = match as TextMatch;
           return_if_fail (text_match != null);
           string content = text_match != null ? text_match.get_text () : match.title;
-          pastebin_text.begin (content, (obj, res) =>
-          {
+          pastebin_text.begin (content, (obj, res) => {
             string? url = pastebin_text.end (res);
             process_pastebin_result (url, target);
           });

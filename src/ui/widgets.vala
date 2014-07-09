@@ -189,7 +189,7 @@ namespace Synapse.Gui
     {
       if (tid != 0) return;
 
-      tid = Timeout.add (40, ()=>{
+      tid = Timeout.add (40, () => {
         offset = (offset - 1) % (_anim_width);
         queue_draw ();
         return true;
@@ -249,7 +249,7 @@ namespace Synapse.Gui
       {
         if (tid == 0)
         {
-          tid = Timeout.add (INITIAL_TIMEOUT, ()=>{
+          tid = Timeout.add (INITIAL_TIMEOUT, () => {
             tid = 0;
             start_animation ();
             return false;
@@ -909,8 +909,7 @@ namespace Synapse.Gui
     {
       if (active && timer_src_id == 0)
       {
-        timer_src_id = Timeout.add (1000 / 30, () =>
-        {
+        timer_src_id = Timeout.add (1000 / 30, () => {
           progress += 1.0f / 30;
           if (progress > 1.0f) progress = 0.0f;
           queue_draw ();
@@ -1010,12 +1009,13 @@ namespace Synapse.Gui
       Gtk.MenuItem item = null;
 
       item = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.PREFERENCES, null);
-      item.activate.connect (()=> {settings_clicked (); });
+      item.activate.connect (() => {
+        settings_clicked ();
+      });
       menu.append (item);
 
       item = new ImageMenuItem.from_stock (Gtk.Stock.ABOUT, null);
-      item.activate.connect (()=>
-      {
+      item.activate.connect (() => {
         var about = new SynapseAboutDialog ();
         about.run ();
         about.destroy ();
@@ -1179,7 +1179,7 @@ namespace Synapse.Gui
       }
       if (tid == 0)
       {
-        tid = Timeout.add (30, ()=>{
+        tid = Timeout.add (30, () => {
           return update_current_offset ();
         });
       }
@@ -1207,19 +1207,19 @@ namespace Synapse.Gui
       tid = 0;
       wmax = hmax = current_offset = 0;
       texts = new Gee.ArrayList<PangoReadyText> ();
-      this.label.style_updated.connect (()=>{
+      this.label.style_updated.connect (() => {
         update_all_sizes ();
         update_cached_surface ();
         queue_resize ();
         queue_draw ();
       });
-      this.size_allocate.connect (()=>{
+      this.size_allocate.connect (() => {
         if (tid == 0)
-          tid = Timeout.add (30, ()=>{
+          tid = Timeout.add (30, () => {
             return update_current_offset ();
           });
       });
-      this.notify["sensitive"].connect (()=>{
+      this.notify["sensitive"].connect (() => {
         update_cached_surface ();
         queue_draw ();
       });

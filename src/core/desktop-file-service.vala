@@ -456,8 +456,7 @@ namespace Synapse
         Source.remove (timer_id);
       }
 
-      timer_id = Timeout.add (5000, () =>
-      {
+      timer_id = Timeout.add (5000, () => {
         timer_id = 0;
         reload_desktop_files.begin ();
         return false;

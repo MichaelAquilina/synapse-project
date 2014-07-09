@@ -845,7 +845,7 @@ namespace Synapse.Gui
       if (Synapse.Utils.Logger.debug_enabled ()) return;
       // grab
       int i = 0;
-      Timeout.add (100, ()=>{
+      Timeout.add (100, () => {
         if (i >= 100)
           return false;
         ++i;

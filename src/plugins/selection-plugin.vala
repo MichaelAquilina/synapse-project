@@ -123,8 +123,7 @@ namespace Synapse
 
       if (cb_changed)
       {
-        clipboard.request_text ((cb, text) =>
-        {
+        clipboard.request_text ((cb, text) => {
           cb_text = text;
           search.callback ();
         });

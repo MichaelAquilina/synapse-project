@@ -243,27 +243,27 @@ namespace Synapse
 
     private void connect_to_signals ()
     {
-      p.account_added.connect ((acc)=>{
+      p.account_added.connect ((acc) => {
         init_contacts.begin ();
       });
 
-      p.account_removed.connect ((acc)=>{
+      p.account_removed.connect ((acc) => {
         init_contacts.begin ();
       });
 
-      p.buddy_added.connect ((buddy)=>{
+      p.buddy_added.connect ((buddy) => {
         contact_changed (buddy, -1, 1);
       });
-      p.buddy_removed.connect ((buddy)=>{
+      p.buddy_removed.connect ((buddy) => {
         contact_changed (buddy, -1, 0);
       });
-      p.buddy_signed_on.connect ((buddy)=>{
+      p.buddy_signed_on.connect ((buddy) => {
         contact_changed (buddy, 1);
       });
-      p.buddy_signed_off.connect ((buddy)=>{
+      p.buddy_signed_off.connect ((buddy) => {
         contact_changed (buddy, 0);
       });
-      p.buddy_icon_changed.connect ((buddy)=>{
+      p.buddy_icon_changed.connect ((buddy) => {
         contact_changed (buddy, -1, 0);
         contact_changed (buddy, -1, 1);
       });
@@ -301,7 +301,7 @@ namespace Synapse
         connect_to_bus ();
       }
 
-      service.owner_changed.connect ((name, is_owned)=>{
+      service.owner_changed.connect ((name, is_owned) => {
         if (name == PurpleInterface.UNIQUE_NAME)
         {
           if (is_owned)

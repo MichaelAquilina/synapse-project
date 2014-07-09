@@ -459,7 +459,7 @@ namespace Synapse.Gui
       this.size_allocate.connect (this.update_target_offsets);
       this.notify["behavior"].connect (this.update_target_offsets);
       this.notify["min-visible-rows"].connect (this.queue_resize);
-      this.notify["animation-enabled"].connect (()=>{
+      this.notify["animation-enabled"].connect (() => {
         this.update_current_offsets ();
       });
     }
@@ -742,7 +742,7 @@ namespace Synapse.Gui
           this.inhibit_move = true;
           this.set_indexes (this.dragdrop_target_item, this.dragdrop_target_item);
           this.selected_index_changed (this.select_index);
-          Timeout.add (Gtk.Settings.get_default ().gtk_double_click_time ,()=>{
+          Timeout.add (Gtk.Settings.get_default ().gtk_double_click_time ,() => {
             if (inhibit_move)
             {
               inhibit_move = false;
@@ -824,7 +824,7 @@ namespace Synapse.Gui
       this.visible_window = false;
       ch = Utils.ColorHelper.get_default ();
       build_ui();
-      this.notify["use-base-colors"].connect (()=>{
+      this.notify["use-base-colors"].connect (() => {
         view.use_base_colors = use_base_colors;
         if (use_base_colors)
         {
@@ -993,7 +993,7 @@ namespace Synapse.Gui
                             IController.DOWN_TO_SEE_RECENT,
                             "search");
         tts.add (m);
-        this.controller.handle_recent_activities.connect ((b)=>{
+        this.controller.handle_recent_activities.connect ((b) => {
           m.description = IController.DOWN_TO_SEE_RECENT;
           queue_draw ();
         });

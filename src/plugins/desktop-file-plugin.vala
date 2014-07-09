@@ -181,8 +181,7 @@ namespace Synapse
       if (loading_in_progress)
       {
         // wait
-        ulong signal_id = this.load_complete.connect (() =>
-        {
+        ulong signal_id = this.load_complete.connect (() => {
           search.callback ();
         });
         yield;

@@ -71,7 +71,7 @@ namespace Synapse
                                     "key-combo-config", key_combo_config,
                                     "category-config", category_config) as Gui.IController;
 
-      controller.show_settings_requested.connect (()=>{
+      controller.show_settings_requested.connect (() => {
         settings.show ();
         uint32 timestamp = Gtk.get_current_event_time ();
         /* Make sure that the settings window is showed */
@@ -105,13 +105,14 @@ namespace Synapse
       var indicator_menu = new Gtk.Menu ();
       var activate_item = new ImageMenuItem.with_label (_("Activate"));
       activate_item.set_image (new Gtk.Image.from_stock (Gtk.Stock.EXECUTE, Gtk.IconSize.MENU));
-      activate_item.activate.connect (() =>
-      {
+      activate_item.activate.connect (() => {
         show_ui ();
       });
       indicator_menu.append (activate_item);
       var settings_item = new ImageMenuItem.from_stock (Gtk.Stock.PREFERENCES, null);
-      settings_item.activate.connect (() => { settings.show (); });
+      settings_item.activate.connect (() => {
+        settings.show ();
+      });
       indicator_menu.append (settings_item);
       indicator_menu.append (new SeparatorMenuItem ());
       var quit_item = new ImageMenuItem.from_stock (Gtk.Stock.QUIT, null);
@@ -128,26 +129,22 @@ namespace Synapse
       indicator.set_menu (indicator_menu);
       if (settings.indicator_active) indicator.set_status (AppIndicator.IndicatorStatus.ACTIVE);
 
-      settings.notify["indicator-active"].connect (() =>
-      {
+      settings.notify["indicator-active"].connect (() => {
         indicator.set_status (settings.indicator_active ?
           AppIndicator.IndicatorStatus.ACTIVE : AppIndicator.IndicatorStatus.PASSIVE);
       });
 #else
       status_icon = new StatusIcon.from_icon_name ("synapse");
 
-      status_icon.popup_menu.connect ((icon, button, event_time) =>
-      {
+      status_icon.popup_menu.connect ((icon, button, event_time) => {
         indicator_menu.popup (null, null, status_icon.position_menu, button, event_time);
       });
-      status_icon.activate.connect (() =>
-      {
+      status_icon.activate.connect (() => {
         show_ui ();
       });
       status_icon.set_visible (settings.indicator_active);
 
-      settings.notify["indicator-active"].connect (() =>
-      {
+      settings.notify["indicator-active"].connect (() => {
         status_icon.set_visible (settings.indicator_active);
       });
 #endif
@@ -289,8 +286,7 @@ namespace Synapse
         else
         {
           var launcher = new UILauncher ();
-          app.activate.connect (() =>
-          {
+          app.activate.connect (() => {
             launcher.show_ui ();
           });
 

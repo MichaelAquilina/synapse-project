@@ -255,8 +255,7 @@ namespace Synapse
       //bool folder_query_only = (q.query_type & QueryFlags.LOCAL_CONTENT) == QueryFlags.PLACES;
       // wait for our signal or cancellable
       ResultSet? zg_rs = null;
-      ulong sig_id = this.zeitgeist_search_complete.connect ((rs, q_id) =>
-      {
+      ulong sig_id = this.zeitgeist_search_complete.connect ((rs, q_id) => {
         if (q_id != query_id) return;
         // let's mine directories ZG is aware of
         if (rs != null)
@@ -266,8 +265,7 @@ namespace Synapse
         }
         search.callback ();
       });
-      ulong canc_sig_id = q.cancellable.connect (() =>
-      {
+      ulong canc_sig_id = q.cancellable.connect (() => {
         // who knows what thread this runs in
         SignalHandler.block (this, sig_id); // is this thread-safe?
         Idle.add (search.callback);

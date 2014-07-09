@@ -58,18 +58,18 @@ namespace Synapse.Gui
 
         Synapse.Utils.Logger.log (view, "Using %s input method.", im_context.get_context_id ());
 
-        v.focus_in_event.connect ( ()=> {
+        v.focus_in_event.connect (() => {
           im_context.reset ();
           im_context.focus_in ();
           return false;
         });
 
-        v.focus_out_event.connect ( ()=>{
+        v.focus_out_event.connect (() => {
           im_context.focus_out ();
           return false;
         });
       }
-      this.view.vanished.connect (()=>{
+      this.view.vanished.connect (() => {
         reset_search (true, true);
       });
     }
@@ -214,7 +214,7 @@ namespace Synapse.Gui
            (!action.needs_target () && target != null)
          ) return; // can't do that
 
-      Timeout.add (20, ()=>{
+      Timeout.add (20, () => {
         action.execute_with_target (source, target);
         return false;
       });
@@ -613,7 +613,7 @@ namespace Synapse.Gui
                               what == SearchingFor.SOURCES ? qf : model.focus[SearchingFor.ACTIONS].value.target_flags (),
                               last_result_set,
                               current_cancellable[what],
-                              (obj, res)=>{
+                              (obj, res) => {
         try
         {
           var rs = (obj as SearchProvider).search.end (res);

@@ -143,8 +143,7 @@ namespace Synapse
       int NUM_COMPONENTS = 2;
 
       dbus_name_cache = DBusService.get_default ();
-      dbus_name_cache.initialize.begin (() =>
-      {
+      dbus_name_cache.initialize.begin (() => {
         initialized_components++;
         if (initialized_components >= NUM_COMPONENTS)
         {
@@ -154,8 +153,7 @@ namespace Synapse
 
       desktop_file_service = DesktopFileService.get_default ();
       desktop_file_service.reload_done.connect (this.check_plugins);
-      desktop_file_service.initialize.begin (() =>
-      {
+      desktop_file_service.initialize.begin (() => {
         initialized_components++;
         if (initialized_components >= NUM_COMPONENTS)
         {
@@ -165,7 +163,10 @@ namespace Synapse
 
       yield;
 
-      Idle.add (() => { this.load_plugins (); return false; });
+      Idle.add (() => {
+        this.load_plugins ();
+        return false;
+      });
     }
 
     private void check_plugins ()
@@ -390,8 +391,7 @@ namespace Synapse
         cancellables.prepend (c);
         q.cancellable = c;
         // magic comes here
-        data_plugin.search.begin (q, (src_obj, res) =>
-        {
+        data_plugin.search.begin (q, (src_obj, res) => {
           unowned ItemProvider? plugin = src_obj as ItemProvider;
           return_if_fail (plugin != null);
 
@@ -417,8 +417,7 @@ namespace Synapse
 
       if (cancellable != null)
       {
-        cancellable.connect (() =>
-        {
+        cancellable.connect (() => {
           foreach (var c in cancellables) c.cancel ();
         });
       }

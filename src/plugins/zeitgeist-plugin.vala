@@ -659,8 +659,7 @@ namespace Synapse
       {
         // wait for the current search to finish
         ulong sig_id;
-        sig_id = this.notify["search-in-progress"].connect (() =>
-        {
+        sig_id = this.notify["search-in-progress"].connect (() => {
           if (search_in_progress) return;
           search.callback ();
         });

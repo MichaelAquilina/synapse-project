@@ -97,8 +97,7 @@ namespace Synapse
 
         Error? err = null;
 
-        call.run_async ((call_obj, error, obj) =>
-        {
+        call.run_async ((call_obj, error, obj) => {
           err = error;
           upload_file.callback ();
         }, this);
@@ -192,8 +191,7 @@ namespace Synapse
         {
           unowned UriMatch? uri_match = match as UriMatch;
           return_if_fail (uri_match != null);
-          upload_file.begin (uri_match.uri, (obj, res) =>
-          {
+          upload_file.begin (uri_match.uri, (obj, res) => {
             string? url = null;
             try
             {

@@ -282,8 +282,7 @@ namespace Synapse
       // FIXME: why it doesn't work without this?
       sorted_results.set_data ("entries-ref", entries);
       sorted_results.add_all (entries);
-      sorted_results.sort ((a, b) =>
-      {
+      sorted_results.sort ((a, b) => {
         unowned Gee.Map.Entry<Regex, int> e1 = (Gee.Map.Entry<Regex, int>) a;
         unowned Gee.Map.Entry<Regex, int> e2 = (Gee.Map.Entry<Regex, int>) b;
         return e2.value - e1.value;

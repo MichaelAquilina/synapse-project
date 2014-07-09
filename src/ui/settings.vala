@@ -55,8 +55,7 @@ namespace Synapse.Gui
           new Gtk.Image.from_stock (Gtk.Stock.HELP,
                                     Gtk.IconSize.SMALL_TOOLBAR));
         help_button.set_tooltip_markup (_("About this plugin"));
-        help_button.clicked.connect (() =>
-        {
+        help_button.clicked.connect (() => {
           string id = Synapse.Utils.extract_type_name (pi.plugin_type);
           string address = "http://synapse.zeitgeist-project.com/wiki/index.php?title=Plugins/%s". printf (id);
           Synapse.CommonActions.open_uri (address);
@@ -70,8 +69,7 @@ namespace Synapse.Gui
             new Gtk.Image.from_stock (Gtk.Stock.PREFERENCES,
                                       Gtk.IconSize.SMALL_TOOLBAR));
           config_button.set_tooltip_markup (_("Configure plugin"));
-          config_button.clicked.connect (() =>
-          {
+          config_button.clicked.connect (() => {
             this.configure ();
           });
 
@@ -158,7 +156,10 @@ namespace Synapse.Gui
       build_ui ();
 
       this.tile_view.map.connect (this.init_plugin_tiles);
-      this.tile_view.visibility_notify_event.connect (() => { this.refresh_tiles (); return false; });
+      this.tile_view.visibility_notify_event.connect (() => {
+        this.refresh_tiles ();
+        return false;
+      });
     }
 
     private void init_themes ()
@@ -179,12 +180,9 @@ namespace Synapse.Gui
       tile_view.clear ();
       var arr = new Gee.ArrayList<PluginInfo> ();
       arr.add_all (PluginRegistry.get_default ().get_plugins ());
-      arr.sort ((a, b) =>
-      {
-        unowned PluginInfo p1 =
-          (PluginInfo) a;
-        unowned PluginInfo p2 =
-          (PluginInfo) b;
+      arr.sort ((a, b) => {
+        unowned PluginInfo p1 = (PluginInfo) a;
+        unowned PluginInfo p2 = (PluginInfo) b;
         return strcmp (p1.title, p2.title);
       });
 
@@ -194,15 +192,13 @@ namespace Synapse.Gui
         tile_view.append_tile (tile);
         tile.update_state (data_sink.is_plugin_enabled (pi.plugin_type));
 
-        tile.active_changed.connect ((tile_obj) =>
-        {
+        tile.active_changed.connect ((tile_obj) => {
           PluginTileObject pto = tile_obj as PluginTileObject;
           pto.update_state (!tile_obj.enabled);
           data_sink.set_plugin_enabled (pto.pi.plugin_type, tile_obj.enabled);
         });
 
-        tile.configure.connect ((tile_obj) =>
-        {
+        tile.configure.connect ((tile_obj) => {
           PluginTileObject pto = tile_obj as PluginTileObject;
           var plugin = data_sink.get_plugin (pto.pi.plugin_type.name ()) as Configurable;
           return_if_fail (plugin != null);
@@ -329,8 +325,7 @@ namespace Synapse.Gui
       /* Notification icon */
       var notification = new CheckButton.with_label (_("Show notification icon"));
       notification.active = config.show_indicator;
-      notification.toggled.connect ((tb) =>
-      {
+      notification.toggled.connect ((tb) => {
         config.show_indicator = tb.get_active ();
         this.notify_property ("indicator-active");
       });
@@ -370,9 +365,7 @@ namespace Synapse.Gui
       ren = new CellRendererAccel ();
       (ren as CellRendererAccel).editable = true;
       (ren as CellRendererAccel).accel_mode = Gtk.CellRendererAccelMode.OTHER;
-      (ren as CellRendererAccel).accel_edited.connect (
-        (a, path, accel_key, accel_mods, keycode) =>
-      {
+      (ren as CellRendererAccel).accel_edited.connect ((a, path, accel_key, accel_mods, keycode) => {
         string? keyname = KeyComboConfig.get_name_from_key (accel_key, accel_mods);
 
         int index = int.parse (path);
@@ -395,9 +388,7 @@ namespace Synapse.Gui
         model.get_iter_from_string (out iter, path);
         model.set (iter, 1, keyname);
       });
-      (ren as CellRendererAccel).accel_cleared.connect (
-        (a, path) =>
-      {
+      (ren as CellRendererAccel).accel_cleared.connect ((a, path) => {
         int index = int.parse (path);
         if (index == 0) this.set_keybinding ("");
       });
@@ -445,7 +436,9 @@ namespace Synapse.Gui
       var bbox = new Gtk.HButtonBox ();
       bbox.set_layout (Gtk.ButtonBoxStyle.END);
       var close_button = new Gtk.Button.from_stock (Gtk.Stock.CLOSE);
-      close_button.clicked.connect (() => { this.hide (); });
+      close_button.clicked.connect (() => {
+        this.hide ();
+      });
       bbox.pack_start (close_button);
 
       main_vbox.pack_start (bbox, false);

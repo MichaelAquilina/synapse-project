@@ -147,12 +147,9 @@ namespace Synapse
           // sort the map according to hits
           Gee.List<Gee.Map.Entry<string, int>> sorted_dirs = new Gee.ArrayList<Gee.Map.Entry<string, int>> ();
           sorted_dirs.add_all (dir_hits.entries);
-          sorted_dirs.sort ((a, b) =>
-          {
-            unowned Gee.Map.Entry<string, int> e1 =
-              (Gee.Map.Entry<string, int>) a;
-            unowned Gee.Map.Entry<string, int> e2 =
-              (Gee.Map.Entry<string, int>) b;
+          sorted_dirs.sort ((a, b) => {
+            unowned Gee.Map.Entry<string, int> e1 = (Gee.Map.Entry<string, int>) a;
+            unowned Gee.Map.Entry<string, int> e2 = (Gee.Map.Entry<string, int>) b;
             return e2.value - e1.value;
           });
 
@@ -264,12 +261,9 @@ namespace Synapse
         {
           if (entry.value > min_hit) sort_array.add (entry);
         }
-        sort_array.sort ((a, b) =>
-        {
-          unowned Gee.Map.Entry<unowned string, int> e1 =
-            (Gee.Map.Entry<unowned string, int>) a;
-          unowned Gee.Map.Entry<unowned string, int> e2 =
-            (Gee.Map.Entry<unowned string, int>) b;
+        sort_array.sort ((a, b) => {
+          unowned Gee.Map.Entry<unowned string, int> e1 = (Gee.Map.Entry<unowned string, int>) a;
+          unowned Gee.Map.Entry<unowned string, int> e2 = (Gee.Map.Entry<unowned string, int>) b;
           return e2.value - e1.value;
         });
 
@@ -479,8 +473,7 @@ namespace Synapse
       while (processing_query)
       {
         ulong sig_id;
-        sig_id = this.notify["processing-query"].connect (() =>
-        {
+        sig_id = this.notify["processing-query"].connect (() => {
           if (processing_query) return;
           wait_for_processing_finished.callback ();
         });
@@ -510,8 +503,7 @@ namespace Synapse
       Gee.Set<string> uris = new Gee.HashSet<string> ();
 
       // wait for our signal or cancellable
-      ulong sig_id = this.zeitgeist_search_complete.connect ((rs, q_id) =>
-      {
+      ulong sig_id = this.zeitgeist_search_complete.connect ((rs, q_id) => {
         if (q_id != query_id) return;
         // let's mine directories ZG is aware of
         foreach (var match in rs)
@@ -523,8 +515,7 @@ namespace Synapse
         original_rs = rs;
         search.callback ();
       });
-      ulong canc_sig_id = q.cancellable.connect (() =>
-      {
+      ulong canc_sig_id = q.cancellable.connect (() => {
         // who knows what thread this runs in
         SignalHandler.block (this, sig_id); // is this thread-safe?
         Idle.add (search.callback); // FIXME: this could cause issues
