@@ -133,7 +133,7 @@ namespace Synapse
 
         if (app_info == null)
         {
-          throw new DesktopFileError.UNINTERESTING_ENTRY ("Unable to create AppInfo");
+          throw new DesktopFileError.UNINTERESTING_ENTRY ("Unable to create AppInfo for %s".printf (filename));
         }
 
         name = app_info.get_name ();
