@@ -41,17 +41,6 @@ namespace Synapse
 
     }
 
-    private class MatchObject: UriMatch
-    {
-      public MatchObject (string? thumbnail_path, string? icon)
-      {
-        Object (match_type: MatchType.GENERIC_URI,
-                has_thumbnail: thumbnail_path != null,
-                icon_name: icon ?? "",
-                thumbnail_path: thumbnail_path ?? "");
-      }
-    }
-
     private class DirectoryInfo
     {
       public string path;
@@ -312,7 +301,7 @@ namespace Synapse
           continue;
         }
         var child = directory.get_child (name);
-        var file_info = new Utils.FileInfo (child.get_uri (), typeof (MatchObject));
+        var file_info = new Utils.FileInfo (child.get_uri (), typeof (UriMatch));
         di.files[file_info.uri] = file_info;
       }
     }

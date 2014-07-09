@@ -37,17 +37,6 @@ namespace Synapse
 
     }
 
-    private class MatchObject: UriMatch
-    {
-      public MatchObject (string? thumbnail_path, string? icon)
-      {
-        Object (match_type: MatchType.GENERIC_URI,
-                has_thumbnail: thumbnail_path != null,
-                icon_name: icon ?? "",
-                thumbnail_path: thumbnail_path ?? "");
-      }
-    }
-
     private class RelatedItem: SearchMatch
     {
       public int default_relevancy { get; set; default = MatchScore.INCREMENT_SMALL; }

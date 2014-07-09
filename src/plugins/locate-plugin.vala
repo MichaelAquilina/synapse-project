@@ -35,17 +35,6 @@ namespace Synapse
 
     }
 
-    private class MatchObject: UriMatch
-    {
-      public MatchObject (string? thumbnail_path, string? icon)
-      {
-        Object (match_type: MatchType.GENERIC_URI,
-                has_thumbnail: thumbnail_path != null,
-                icon_name: icon ?? "",
-                thumbnail_path: thumbnail_path ?? "");
-      }
-    }
-
     private class LocateItem: SearchMatch
     {
       public int default_relevancy { get; set; default = MatchScore.INCREMENT_SMALL; }
@@ -165,7 +154,7 @@ namespace Synapse
 
       foreach (string s in uris)
       {
-        var fi = new Utils.FileInfo (s, typeof (MatchObject));
+        var fi = new Utils.FileInfo (s, typeof (UriMatch));
         yield fi.initialize ();
         if (fi.match_obj != null && fi.file_type in q.query_type)
         {
