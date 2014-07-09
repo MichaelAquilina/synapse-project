@@ -26,7 +26,7 @@
 
 namespace Synapse
 {
-  public class DirectoryPlugin: Object, Activatable, ItemProvider
+  public class DirectoryPlugin : Object, Activatable, ItemProvider
   {
     public unowned DataSink data_sink { get; construct; }
     public bool enabled { get; set; default = true; }
@@ -41,7 +41,7 @@ namespace Synapse
 
     }
 
-    private class MatchObject: UriMatch
+    private class MatchObject : UriMatch
     {
       public MatchObject (string uri)
       {
@@ -99,7 +99,7 @@ namespace Synapse
       }
     }
 
-    private class Config: ConfigObject
+    private class Config : ConfigObject
     {
       public bool home_dir_children_only { get; set; default = true; }
     }

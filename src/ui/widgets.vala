@@ -362,7 +362,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class SchemaContainer: Gtk.Container
+  public class SchemaContainer : Gtk.Container
   {
     public class Schema : GLib.Object
     {
@@ -562,7 +562,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class SelectionContainer: Gtk.Container
+  public class SelectionContainer : Gtk.Container
   {
     protected Gee.List<Widget> children;
     private int active_child = 0;
@@ -641,7 +641,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class Throbber: Spinner
+  public class Throbber : Spinner
   {
     construct
     {
@@ -658,7 +658,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class SensitiveWidget: Gtk.EventBox
+  public class SensitiveWidget : Gtk.EventBox
   {
     private Widget _widget;
     public Widget widget {get {return this._widget;}}
@@ -681,7 +681,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class NamedIcon: Gtk.Image
+  public class NamedIcon : Gtk.Image
   {
     public string not_found_name {get; set; default = "unknown";}
     private string current;
@@ -775,7 +775,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class FakeInput: Gtk.Alignment
+  public class FakeInput : Gtk.Alignment
   {
     public bool draw_input {get; set; default = true;}
     public double input_alpha {get; set; default = 1.0;}
@@ -894,7 +894,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class MenuThrobber: MenuButton
+  public class MenuThrobber : MenuButton
   {
     public bool active { get; set; default = false; }
     private float progress = 0.0f;
@@ -967,7 +967,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class FakeButton: EventBox
+  public class FakeButton : EventBox
   {
     construct
     {
@@ -996,7 +996,7 @@ namespace Synapse.Gui
     public virtual signal void released () {}
   }
 
-  public class MenuButton: FakeButton
+  public class MenuButton : FakeButton
   {
     public double button_scale { get; set; default = 1.0; }
     private bool entered;
@@ -1128,7 +1128,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class SynapseAboutDialog: Gtk.AboutDialog
+  public class SynapseAboutDialog : Gtk.AboutDialog
   {
     public SynapseAboutDialog ()
     {

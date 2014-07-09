@@ -46,7 +46,7 @@ namespace Synapse
 </OpenSearchDescription>
 """;
 
-  public class OpenSearchPlugin: Object, Activatable, ActionProvider
+  public class OpenSearchPlugin : Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -61,7 +61,7 @@ namespace Synapse
 
     }
 
-    private class OpenSearchParser: Object
+    private class OpenSearchParser : Object
     {
       const MarkupParser parser =
       {
@@ -163,7 +163,7 @@ namespace Synapse
       }
     }
 
-    private class SearchAction: Match
+    private class SearchAction : Match
     {
       public int default_relevancy { get; set; default = MatchScore.INCREMENT_MINOR; }
       public string query_template { get; construct set; }
@@ -217,7 +217,7 @@ namespace Synapse
       }
     }
 
-    private class Config: ConfigObject
+    private class Config : ConfigObject
     {
       public bool use_internal { get; set; default = true; }
 

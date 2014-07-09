@@ -55,7 +55,7 @@ namespace Synapse
       public abstract int purple_account_get_connection (int account) throws IOError;
   }
 
-  public class PidginPlugin: Object, Activatable, ItemProvider, ActionProvider
+  public class PidginPlugin : Object, Activatable, ItemProvider, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -87,7 +87,7 @@ namespace Synapse
       register_plugin ();
     }
 
-    private class SendToContact: Action
+    private class SendToContact : Action
     {
       public SendToContact ()
       {
@@ -132,7 +132,7 @@ namespace Synapse
       }
     }
 
-    private class Contact: ContactMatch
+    private class Contact : ContactMatch
     {
       public PidginPlugin plugin { get; construct set; }
 

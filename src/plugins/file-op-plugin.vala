@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class FileOpPlugin: Object, Activatable, ActionProvider
+  public class FileOpPlugin : Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private abstract class FileAction: Match
+    private abstract class FileAction : Match
     {
       public int default_relevancy { get; set; }
       public bool notify_match { get; set; default = true; }
@@ -54,7 +54,7 @@ namespace Synapse
       }
     }
 
-    private class RenameTo: FileAction
+    private class RenameTo : FileAction
     {
       public RenameTo ()
       {

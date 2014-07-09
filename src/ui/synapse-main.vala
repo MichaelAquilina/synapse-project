@@ -25,7 +25,7 @@ using UI;
 
 namespace Synapse
 {
-  public class UILauncher: GLib.Object
+  public class UILauncher : GLib.Object
   {
     private static bool is_startup = false;
     const OptionEntry[] options =

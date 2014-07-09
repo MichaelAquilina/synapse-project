@@ -39,7 +39,7 @@ namespace Synapse
     public abstract void open_uri (string uri) throws IOError;
   }
 
-  public class XnoiseActions: Object, Activatable, ItemProvider, ActionProvider
+  public class XnoiseActions : Object, Activatable, ItemProvider, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -69,7 +69,7 @@ namespace Synapse
       register_plugin ();
     }
 
-    private abstract class XnoiseAction: Match
+    private abstract class XnoiseAction : Match
     {
       public int default_relevancy { get; set; }
 
@@ -89,7 +89,7 @@ namespace Synapse
       }
     }
 
-    private abstract class XnoiseControlMatch: Match
+    private abstract class XnoiseControlMatch : Match
     {
       public override void execute (Match match)
       {
@@ -314,7 +314,7 @@ namespace Synapse
     }
 
     /* ACTIONS FOR MP3s */
-    private class OpenUri: XnoiseAction
+    private class OpenUri : XnoiseAction
     {
       public OpenUri ()
       {

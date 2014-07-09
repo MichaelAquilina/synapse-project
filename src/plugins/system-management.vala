@@ -22,7 +22,7 @@
 namespace Synapse
 {
   [DBus (name = "org.freedesktop.UPower")]
-  public interface UPowerObject: Object
+  public interface UPowerObject : Object
   {
     public const string UNIQUE_NAME = "org.freedesktop.UPower";
     public const string OBJECT_PATH = "/org/freedesktop/UPower";
@@ -36,7 +36,7 @@ namespace Synapse
   }
 
   [DBus (name = "org.freedesktop.ConsoleKit.Manager")]
-  public interface ConsoleKitObject: Object
+  public interface ConsoleKitObject : Object
   {
     public const string UNIQUE_NAME = "org.freedesktop.ConsoleKit";
     public const string OBJECT_PATH = "/org/freedesktop/ConsoleKit/Manager";
@@ -48,7 +48,7 @@ namespace Synapse
   }
 
   [DBus (name = "org.freedesktop.login1.Manager")]
-  public interface SystemdObject: Object
+  public interface SystemdObject : Object
   {
     public const string UNIQUE_NAME = "org.freedesktop.login1";
     public const string OBJECT_PATH = "/org/freedesktop/login1";
@@ -63,7 +63,7 @@ namespace Synapse
     public abstract string can_power_off () throws IOError;
   }
 
-  public class SystemManagementPlugin: Object, Activatable, ItemProvider
+  public class SystemManagementPlugin : Object, Activatable, ItemProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -77,7 +77,7 @@ namespace Synapse
 
     }
 
-    private abstract class SystemAction: Match
+    private abstract class SystemAction : Match
     {
       public override void execute (Match match)
       {
@@ -88,7 +88,7 @@ namespace Synapse
       public abstract bool action_allowed ();
     }
 
-    private class SuspendAction: SystemAction
+    private class SuspendAction : SystemAction
     {
       public SuspendAction ()
       {
@@ -188,7 +188,7 @@ namespace Synapse
       }
     }
 
-    private class HibernateAction: SystemAction
+    private class HibernateAction : SystemAction
     {
       public HibernateAction ()
       {
@@ -287,7 +287,7 @@ namespace Synapse
       }
     }
 
-    private class ShutdownAction: SystemAction
+    private class ShutdownAction : SystemAction
     {
       public ShutdownAction ()
       {
@@ -371,7 +371,7 @@ namespace Synapse
       }
     }
 
-    private class RestartAction: SystemAction
+    private class RestartAction : SystemAction
     {
       public RestartAction ()
       {

@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class PastebinPlugin: Object, Activatable, ActionProvider
+  public class PastebinPlugin : Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private class PastebinAction: Action
+    private class PastebinAction : Action
     {
       public PastebinAction ()
       {

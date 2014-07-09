@@ -23,7 +23,7 @@ using Gtk;
 
 namespace UI.Widgets
 {
-  public class Tile: Table
+  public class Tile : Table
   {
     private Button add_remove_button;
     private Box button_box;

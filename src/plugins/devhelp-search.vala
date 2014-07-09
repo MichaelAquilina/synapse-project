@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class DevhelpPlugin: Object, Activatable, ActionProvider
+  public class DevhelpPlugin : Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private class Search: Match
+    private class Search : Match
     {
       public int default_relevancy { get; set; default = 0; }
 

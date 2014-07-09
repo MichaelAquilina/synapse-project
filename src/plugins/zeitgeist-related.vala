@@ -23,7 +23,7 @@ using Zeitgeist;
 
 namespace Synapse
 {
-  public class ZeitgeistRelated: Object, Activatable, ActionProvider
+  public class ZeitgeistRelated : Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -37,7 +37,7 @@ namespace Synapse
 
     }
 
-    private class RelatedItem: SearchMatch
+    private class RelatedItem : SearchMatch
     {
       public int default_relevancy { get; set; default = MatchScore.INCREMENT_SMALL; }
 

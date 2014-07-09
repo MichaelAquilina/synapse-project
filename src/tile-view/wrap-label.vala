@@ -23,7 +23,7 @@ using Gtk;
 
 namespace UI.Widgets
 {
-  public class WrapLabel: Label
+  public class WrapLabel : Label
   {
     private float orig_yalign = 0.5f;
     private bool _wrap = false;

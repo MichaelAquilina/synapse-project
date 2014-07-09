@@ -76,7 +76,7 @@ namespace Synapse
     }
   }
 
-  public class DesktopFileInfo: Object
+  public class DesktopFileInfo : Object
   {
     public string desktop_id { get; construct set; }
     public string name { get; construct set; }

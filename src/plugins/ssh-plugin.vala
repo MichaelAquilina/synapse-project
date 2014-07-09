@@ -23,7 +23,7 @@ using Gee;
 
 namespace Synapse
 {
-  public class SshPlugin: Object, Activatable, ItemProvider
+  public class SshPlugin : Object, Activatable, ItemProvider
   {
     public  bool      enabled { get; set; default = true; }
     private HashMap<string, SshHost> hosts;

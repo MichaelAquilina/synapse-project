@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class CalculatorPlugin: Object, Activatable, ItemProvider
+  public class CalculatorPlugin : Object, Activatable, ItemProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private class Result: Match
+    private class Result : Match
     {
       public int default_relevancy { get; set; default = 0; }
 

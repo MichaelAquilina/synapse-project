@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class ChatActions: Object, Activatable, ActionProvider
+  public class ChatActions : Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private class OpenChat: Action
+    private class OpenChat : Action
     {
       public OpenChat ()
       {
@@ -59,7 +59,7 @@ namespace Synapse
       }
     }
 
-    private class SendMessage: Action
+    private class SendMessage : Action
     {
       public SendMessage ()
       {
@@ -94,7 +94,7 @@ namespace Synapse
       }
     }
 
-    private class SendMessageTo: Action
+    private class SendMessageTo : Action
     {
       public SendMessageTo ()
       {

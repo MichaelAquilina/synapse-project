@@ -114,7 +114,7 @@ namespace Synapse
       return null;
     }
 
-    public class VolumeObject: UriMatch
+    public class VolumeObject : UriMatch
     {
       private ulong changed_signal_id;
 

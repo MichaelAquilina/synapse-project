@@ -50,7 +50,7 @@ namespace Synapse
     CONTACT
   }
 
-  public abstract class Match: Object
+  public abstract class Match : Object
   {
     public signal void executed ();
 
@@ -86,7 +86,7 @@ namespace Synapse
     }
   }
 
-  public class ApplicationMatch: Match
+  public class ApplicationMatch : Match
   {
     public AppInfo? app_info { get; set; }
     public bool needs_terminal { get; set; }
@@ -101,7 +101,7 @@ namespace Synapse
     }
   }
 
-  public class UriMatch: Match
+  public class UriMatch : Match
   {
     public string uri { get; set; }
     public QueryFlags file_type { get; set; }
@@ -116,7 +116,7 @@ namespace Synapse
     }
   }
 
-  public abstract class ContactMatch: Match
+  public abstract class ContactMatch : Match
   {
     public abstract void send_message (string message, bool present);
     public abstract void open_chat ();
@@ -133,21 +133,21 @@ namespace Synapse
     CLIPBOARD
   }
 
-  public abstract class TextMatch: Match
+  public abstract class TextMatch : Match
   {
     public TextOrigin text_origin { get; set; }
 
     public abstract string get_text ();
   }
 
-  public abstract class SearchMatch: Match, SearchProvider
+  public abstract class SearchMatch : Match, SearchProvider
   {
     public Match search_source { get; set; }
 
     public abstract async Gee.List<Synapse.Match> search (string query, Synapse.QueryFlags flags, Synapse.ResultSet? dest_result_set, GLib.Cancellable? cancellable = null) throws Synapse.SearchError;
   }
 
-  public class DefaultMatch: Match
+  public class DefaultMatch : Match
   {
     public DefaultMatch (string query_string)
     {

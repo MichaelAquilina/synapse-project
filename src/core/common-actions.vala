@@ -20,7 +20,7 @@
 
 namespace Synapse
 {
-  public abstract class Action: Match
+  public abstract class Action : Match
   {
     public int default_relevancy { get; set; }
     public bool notify_match { get; set; default = true; }
@@ -41,7 +41,7 @@ namespace Synapse
     }
   }
 
-  public class CommonActions: Object, Activatable, ActionProvider
+  public class CommonActions : Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -55,7 +55,7 @@ namespace Synapse
 
     }
 
-    private class Runner: Action
+    private class Runner : Action
     {
       public Runner ()
       {
@@ -111,7 +111,7 @@ namespace Synapse
       }
     }
 
-    private class TerminalRunner: Action
+    private class TerminalRunner : Action
     {
       public TerminalRunner ()
       {
@@ -160,7 +160,7 @@ namespace Synapse
       }
     }
 
-    private class Opener: Action
+    private class Opener : Action
     {
       public Opener ()
       {
@@ -230,7 +230,7 @@ namespace Synapse
       }
     }
 
-    private class OpenFolder: Action
+    private class OpenFolder : Action
     {
       public OpenFolder ()
       {
@@ -273,7 +273,7 @@ namespace Synapse
       }
     }
 
-    private class ClipboardCopy: Action
+    private class ClipboardCopy : Action
     {
       public ClipboardCopy ()
       {

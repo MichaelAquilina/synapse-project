@@ -21,7 +21,7 @@
 
 namespace UI.Widgets
 {
-  public abstract class AbstractTileObject: Object
+  public abstract class AbstractTileObject : Object
   {
     public signal void icon_updated ();
     public signal void text_updated ();

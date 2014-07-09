@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class DesktopFilePlugin: Object, Activatable, ItemProvider, ActionProvider
+  public class DesktopFilePlugin : Object, Activatable, ItemProvider, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private class DesktopFileMatch: ApplicationMatch
+    private class DesktopFileMatch : ApplicationMatch
     {
       public DesktopFileInfo desktop_info { get; construct; }
       public string title_folded { get; construct; }
@@ -218,7 +218,7 @@ namespace Synapse
       return result;
     }
 
-    private class OpenWithAction: Action
+    private class OpenWithAction : Action
     {
       public DesktopFileInfo desktop_info { get; construct; }
 

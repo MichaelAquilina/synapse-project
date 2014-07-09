@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class DictionaryPlugin: Object, Activatable, ActionProvider
+  public class DictionaryPlugin : Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private class Define: Match
+    private class Define : Match
     {
       public int default_relevancy { get; set; default = 0; }
 

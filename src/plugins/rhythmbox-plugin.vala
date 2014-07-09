@@ -48,7 +48,7 @@ namespace Synapse
       //public abstract void stop () throws IOError;
   }
 
-  public class RhythmboxActions: Object, Activatable, ItemProvider, ActionProvider
+  public class RhythmboxActions : Object, Activatable, ItemProvider, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -89,7 +89,7 @@ namespace Synapse
       register_plugin ();
     }
 
-    private abstract class RhythmboxAction: Action
+    private abstract class RhythmboxAction : Action
     {
       public virtual int get_relevancy ()
       {
@@ -103,7 +103,7 @@ namespace Synapse
       }
     }
 
-    private abstract class RhythmboxControlMatch: Match
+    private abstract class RhythmboxControlMatch : Match
     {
       public override void execute (Match match)
       {
@@ -119,7 +119,7 @@ namespace Synapse
     }
 
     /* MATCHES of Type.ACTION */
-    private class Play: RhythmboxControlMatch
+    private class Play : RhythmboxControlMatch
     {
       public Play ()
       {
@@ -146,7 +146,7 @@ namespace Synapse
       }
     }
 
-    private class Pause: RhythmboxControlMatch
+    private class Pause : RhythmboxControlMatch
     {
       public Pause ()
       {
@@ -173,7 +173,7 @@ namespace Synapse
       }
     }
 
-    private class Next: RhythmboxControlMatch
+    private class Next : RhythmboxControlMatch
     {
       public Next ()
       {
@@ -199,7 +199,7 @@ namespace Synapse
       }
     }
 
-    private class Previous: RhythmboxControlMatch
+    private class Previous : RhythmboxControlMatch
     {
       public Previous ()
       {
@@ -226,7 +226,7 @@ namespace Synapse
       }
     }
     /* ACTIONS FOR MP3s */
-    private class AddToPlaylist: RhythmboxAction
+    private class AddToPlaylist : RhythmboxAction
     {
       public AddToPlaylist ()
       {
@@ -280,7 +280,7 @@ namespace Synapse
         }
       }
     }
-    private class PlayNow: RhythmboxAction
+    private class PlayNow : RhythmboxAction
     {
       public PlayNow ()
       {

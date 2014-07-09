@@ -48,7 +48,7 @@ namespace Synapse
       public abstract void enqueue_uri (string uri, bool prepend) throws IOError;
   }
 
-  public class BansheeActions: Object, Activatable, ItemProvider, ActionProvider
+  public class BansheeActions : Object, Activatable, ItemProvider, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -82,7 +82,7 @@ namespace Synapse
       register_plugin ();
     }
 
-    private abstract class BansheeAction: Match
+    private abstract class BansheeAction : Match
     {
       public int default_relevancy { get; set; }
 
@@ -103,7 +103,7 @@ namespace Synapse
       }
     }
 
-    private abstract class BansheeControlMatch: Match
+    private abstract class BansheeControlMatch : Match
     {
       public override void execute (Match match)
       {
@@ -120,7 +120,7 @@ namespace Synapse
     }
 
     /* MATCHES of Type.ACTION */
-    private class Play: BansheeControlMatch
+    private class Play : BansheeControlMatch
     {
       public Play ()
       {
@@ -148,7 +148,7 @@ namespace Synapse
         return true;
       }
     }
-    private class Pause: BansheeControlMatch
+    private class Pause : BansheeControlMatch
     {
       public Pause ()
       {
@@ -169,7 +169,7 @@ namespace Synapse
         }
       }
     }
-    private class Next: BansheeControlMatch
+    private class Next : BansheeControlMatch
     {
       public Next ()
       {
@@ -192,7 +192,7 @@ namespace Synapse
         }
       }
     }
-    private class Previous: BansheeControlMatch
+    private class Previous : BansheeControlMatch
     {
       public Previous ()
       {
@@ -215,7 +215,7 @@ namespace Synapse
       }
     }
     /* ACTIONS FOR MP3s */
-    private class AddToPlaylist: BansheeAction
+    private class AddToPlaylist : BansheeAction
     {
       public AddToPlaylist ()
       {
@@ -257,7 +257,7 @@ namespace Synapse
         }
       }
     }
-    private class PlayNow: BansheeAction
+    private class PlayNow : BansheeAction
     {
       public PlayNow ()
       {

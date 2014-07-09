@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class LocatePlugin: Object, Activatable, ActionProvider
+  public class LocatePlugin : Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private class LocateItem: SearchMatch
+    private class LocateItem : SearchMatch
     {
       public int default_relevancy { get; set; default = MatchScore.INCREMENT_SMALL; }
 

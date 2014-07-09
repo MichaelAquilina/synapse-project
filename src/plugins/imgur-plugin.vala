@@ -27,7 +27,7 @@ namespace Synapse
     UNKNOWN_ERROR
   }
 
-  public class ImgUrPlugin: Object, Activatable, ActionProvider
+  public class ImgUrPlugin : Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -44,7 +44,7 @@ namespace Synapse
       actions.clear ();
     }
 
-    private class ImgUrAction: Action
+    private class ImgUrAction : Action
     {
       public ImgUrAction ()
       {

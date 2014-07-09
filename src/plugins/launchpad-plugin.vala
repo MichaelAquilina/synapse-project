@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class LaunchpadPlugin: Object, Activatable, ItemProvider //, Configurable, ActionProvider
+  public class LaunchpadPlugin : Object, Activatable, ItemProvider //, Configurable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -114,7 +114,7 @@ namespace Synapse
       return box;
     }
 
-    private class LaunchpadAuthObject: Object
+    private class LaunchpadAuthObject : Object
     {
       const string CONSUMER_KEY = "Synapse.LaunchpadPlugin";
 /*
@@ -134,7 +134,7 @@ namespace Synapse
         return ht;
       }
 
-      private class Credentials: ConfigObject
+      private class Credentials : ConfigObject
       {
         public string token { get; set; default = ""; }
         public string token_secret { get; set; default = ""; }
@@ -228,7 +228,7 @@ namespace Synapse
 */
     }
 
-    private class LaunchpadObject: UriMatch
+    private class LaunchpadObject : UriMatch
     {
       public LaunchpadObject (string title, string desc, string uri)
       {

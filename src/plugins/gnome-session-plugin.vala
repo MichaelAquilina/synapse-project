@@ -22,7 +22,7 @@
 namespace Synapse
 {
   [DBus (name = "org.gnome.SessionManager")]
-  public interface GnomeSessionManager: Object
+  public interface GnomeSessionManager : Object
   {
     public const string UNIQUE_NAME = "org.gnome.SessionManager";
     public const string OBJECT_PATH = "/org/gnome/SessionManager";
@@ -33,7 +33,7 @@ namespace Synapse
     public abstract void logout (uint32 mode = 0) throws IOError;
   }
 
-  public class GnomeSessionPlugin: Object, Activatable, ItemProvider
+  public class GnomeSessionPlugin : Object, Activatable, ItemProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -47,7 +47,7 @@ namespace Synapse
 
     }
 
-    private class ShutDownAction: Match
+    private class ShutDownAction : Match
     {
       public ShutDownAction ()
       {
@@ -73,7 +73,7 @@ namespace Synapse
       }
     }
 
-    private class RebootAction: Match
+    private class RebootAction : Match
     {
       public RebootAction ()
       {
@@ -99,7 +99,7 @@ namespace Synapse
       }
     }
 
-    private class LogOutAction: Match
+    private class LogOutAction : Match
     {
       public LogOutAction ()
       {

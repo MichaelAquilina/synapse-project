@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class ZeitgeistPlugin: Object, Activatable, ItemProvider
+  public class ZeitgeistPlugin : Object, Activatable, ItemProvider
   {
     public bool enabled { get; set; default = true; }
 

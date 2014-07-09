@@ -71,7 +71,7 @@ namespace Synapse.Gui
     public string alt_paste { get; set; default = "<Shift>Insert"; }
     public string exit { get; set; default = "<Control>q"; }
 
-    private class KeyComboStorage: GLib.Object
+    private class KeyComboStorage : GLib.Object
     {
       private class ModCmd : GLib.Object
       {

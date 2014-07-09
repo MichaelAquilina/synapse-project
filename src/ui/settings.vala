@@ -26,7 +26,7 @@ namespace Synapse.Gui
 {
   public class SettingsWindow : Gtk.Window
   {
-    class PluginTileObject: UI.Widgets.AbstractTileObject
+    class PluginTileObject : UI.Widgets.AbstractTileObject
     {
       public PluginInfo pi { get; construct set; }
 
@@ -111,7 +111,7 @@ namespace Synapse.Gui
       }
     }
 
-    class UIConfig: ConfigObject
+    class UIConfig : ConfigObject
     {
       public string ui_type { get; set; default = "default"; }
       public bool show_indicator { get; set; default = true; }

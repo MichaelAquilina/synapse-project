@@ -20,7 +20,7 @@
 
 namespace Synapse
 {
-  public interface RelevancyBackend: Object
+  public interface RelevancyBackend : Object
   {
     public abstract float get_application_popularity (string desktop_id);
     public abstract float get_uri_popularity (string uri);

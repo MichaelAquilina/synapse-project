@@ -20,7 +20,7 @@
 
 namespace Synapse
 {
-  private class ZeitgeistRelevancyBackend: Object, RelevancyBackend
+  private class ZeitgeistRelevancyBackend : Object, RelevancyBackend
   {
     private Zeitgeist.Log zg_log;
     private Zeitgeist.DataSourceRegistry zg_dsr;

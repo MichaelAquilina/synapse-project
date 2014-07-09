@@ -22,7 +22,7 @@
 namespace Synapse
 {
   [DBus (name = "org.gnome.ScreenSaver")]
-  public interface GnomeScreenSaver: Object
+  public interface GnomeScreenSaver : Object
   {
     public const string UNIQUE_NAME = "org.gnome.ScreenSaver";
     public const string OBJECT_PATH = "/org/gnome/ScreenSaver";
@@ -30,7 +30,7 @@ namespace Synapse
     public abstract async void lock () throws IOError;
   }
 
-  public class GnomeScreenSaverPlugin: Object, Activatable, ItemProvider
+  public class GnomeScreenSaverPlugin : Object, Activatable, ItemProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -44,7 +44,7 @@ namespace Synapse
 
     }
 
-    private class LockScreenAction: Match
+    private class LockScreenAction : Match
     {
       public LockScreenAction ()
       {

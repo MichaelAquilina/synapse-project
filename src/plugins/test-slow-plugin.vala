@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class TestSlowPlugin: Object, Activatable, ItemProvider
+  public class TestSlowPlugin : Object, Activatable, ItemProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private class TestResult: Match
+    private class TestResult : Match
     {
       public TestResult (string query)
       {

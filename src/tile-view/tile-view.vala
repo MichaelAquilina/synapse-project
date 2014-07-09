@@ -23,7 +23,7 @@ using Gtk;
 
 namespace UI.Widgets
 {
-  public class TileView: EventBox
+  public class TileView : EventBox
   {
     private List<Tile> tiles = new List<Tile> ();
     private Box box = new Box (Gtk.Orientation.VERTICAL, 0);

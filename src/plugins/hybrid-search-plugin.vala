@@ -26,7 +26,7 @@
 
 namespace Synapse
 {
-  public class HybridSearchPlugin: Object, Activatable, ItemProvider
+  public class HybridSearchPlugin : Object, Activatable, ItemProvider
   {
     public unowned DataSink data_sink { get; construct; }
     public bool enabled { get; set; default = true; }

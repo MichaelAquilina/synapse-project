@@ -793,7 +793,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class ResultBox: EventBox
+  public class ResultBox : EventBox
   {
     private const int VISIBLE_RESULTS = 5;
     private const int ICON_SIZE = 36;
@@ -937,7 +937,7 @@ namespace Synapse.Gui
     }
   }
 
-  public class SpecificMatchList: MatchListView
+  public class SpecificMatchList : MatchListView
   {
     protected IController controller;
     protected Model model;

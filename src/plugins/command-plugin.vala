@@ -21,7 +21,7 @@
 
 namespace Synapse
 {
-  public class CommandPlugin: Object, Activatable, ItemProvider
+  public class CommandPlugin : Object, Activatable, ItemProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -35,7 +35,7 @@ namespace Synapse
 
     }
 
-    private class CommandObject: ApplicationMatch
+    private class CommandObject : ApplicationMatch
     {
       public string command { get; construct set; }
 
