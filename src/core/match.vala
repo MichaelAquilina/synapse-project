@@ -62,7 +62,7 @@ namespace Synapse
     public string thumbnail_path { get; construct set; }
     public MatchType match_type { get; construct set; }
 
-    public virtual void execute (Match? match)
+    public virtual void execute (Match match)
     {
       Utils.Logger.error (this, "execute () is not implemented");
     }

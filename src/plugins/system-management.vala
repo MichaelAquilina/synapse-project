@@ -79,7 +79,7 @@ namespace Synapse
 
     private abstract class SystemAction: Match
     {
-      public override void execute (Match? match)
+      public override void execute (Match match)
       {
         this.do_action ();
       }

@@ -168,7 +168,7 @@ namespace Synapse
       public int default_relevancy { get; set; default = MatchScore.INCREMENT_MINOR; }
       public string query_template { get; construct set; }
 
-      public override void execute (Match? match)
+      public override void execute (Match match)
       {
         try
         {

@@ -105,7 +105,7 @@ namespace Synapse
 
     private abstract class RhythmboxControlMatch: Match
     {
-      public override void execute (Match? match)
+      public override void execute (Match match)
       {
         do_action ();
       }
@@ -303,6 +303,7 @@ namespace Synapse
           RhythmboxPlayer player = Bus.get_proxy_sync (BusType.SESSION,
                                            RhythmboxPlayer.UNIQUE_NAME,
                                            RhythmboxPlayer.OBJECT_PATH);
+
           if (!(player.playback_status == "Playing"))
             player.play ();
           player.open_uri (uri.uri);

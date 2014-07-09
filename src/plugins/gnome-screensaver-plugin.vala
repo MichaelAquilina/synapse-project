@@ -53,7 +53,7 @@ namespace Synapse
                 icon_name: "system-lock-screen", has_thumbnail: false);
       }
 
-      public override void execute (Match? match)
+      public override void execute (Match match)
       {
         GnomeScreenSaverPlugin.lock_screen ();
       }

@@ -74,9 +74,9 @@ namespace Synapse
       public int default_relevancy { get; set; }
 
       public abstract bool valid_for_match (Match match);
-      public abstract void execute_internal (Match? match);
+      public abstract void execute_internal (Match match);
 
-      public override void execute (Match? match)
+      public override void execute (Match match)
       {
         execute_internal (match);
       }
@@ -91,7 +91,7 @@ namespace Synapse
 
     private abstract class XnoiseControlMatch: Match
     {
-      public override void execute (Match? match)
+      public override void execute (Match match)
       {
         this.do_action ();
       }
@@ -327,7 +327,7 @@ namespace Synapse
                 );
       }
 
-      public override void execute_internal (Match? match)
+      public override void execute_internal (Match match)
       {
         return_if_fail (match.match_type == MatchType.GENERIC_URI);
         unowned UriMatch? uri = match as UriMatch;

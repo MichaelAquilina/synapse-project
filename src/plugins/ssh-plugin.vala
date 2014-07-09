@@ -168,7 +168,7 @@ namespace Synapse
     {
       public string host_query { get; construct set; }
 
-      public override void execute (Match? match)
+      public override void execute (Match match)
       {
         try
         {

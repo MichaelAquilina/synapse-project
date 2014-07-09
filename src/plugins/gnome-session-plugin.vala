@@ -56,7 +56,7 @@ namespace Synapse
                 icon_name: "system-shutdown", has_thumbnail: false);
       }
 
-      public override void execute (Match? match)
+      public override void execute (Match match)
       {
         try
         {
@@ -82,7 +82,7 @@ namespace Synapse
                 icon_name: "gnome-session-reboot", has_thumbnail: false);
       }
 
-      public override void execute (Match? match)
+      public override void execute (Match match)
       {
         try
         {
@@ -108,7 +108,7 @@ namespace Synapse
                 icon_name: "gnome-session-logout", has_thumbnail: false);
       }
 
-      public override void execute (Match? match)
+      public override void execute (Match match)
       {
         try
         {

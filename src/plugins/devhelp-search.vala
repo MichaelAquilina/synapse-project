@@ -39,7 +39,7 @@ namespace Synapse
     {
       public int default_relevancy { get; set; default = 0; }
 
-      public override void execute (Match? match)
+      public override void execute (Match match)
       {
         try
         {
