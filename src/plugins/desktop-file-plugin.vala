@@ -45,7 +45,7 @@ namespace Synapse
 
       public DesktopFileMatch (DesktopFileInfo info)
       {
-        Object (desktop_info : info);
+        Object (desktop_info : info, match_type: MatchType.APPLICATION);
       }
 
       construct
