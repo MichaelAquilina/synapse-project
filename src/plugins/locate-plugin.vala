@@ -105,7 +105,7 @@ namespace Synapse
       // strip query
       q.query_string = q.query_string.strip ();
       // ignore short searches
-      if (common_flags == 0 || q.query_string.length <= 1) return null;
+      if (common_flags == 0 || q.query_string.char_count () <= 1) return null;
 
       q.check_cancellable ();
 

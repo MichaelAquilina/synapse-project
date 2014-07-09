@@ -201,8 +201,7 @@ namespace Synapse
       // FIXME: spawn new thread and do the search there?
       var result = new ResultSet ();
 
-      // FIXME: make sure this is one unichar, not just byte
-      if (q.query_string.length == 1)
+      if (q.query_string.char_count () == 1)
       {
         var flags = MatcherFlags.NO_SUBSTRING | MatcherFlags.NO_PARTIAL |
                     MatcherFlags.NO_FUZZY;

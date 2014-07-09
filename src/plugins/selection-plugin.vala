@@ -88,7 +88,11 @@ namespace Synapse
       {
         this.content = content;
         string chugged = content.chug ();
-        string shortened = chugged.substring (0, int.min ((int)chugged.length, 100));
+        string shortened;
+        if (chugged.char_count () > 100)
+          shortened = chugged.substring (0, chugged.index_of_nth_char (100));
+        else
+          shortened = chugged;
         description = shortened.replace ("\n", " ");
       }
     }

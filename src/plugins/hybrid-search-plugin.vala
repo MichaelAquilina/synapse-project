@@ -227,7 +227,7 @@ namespace Synapse
         }
       }
 
-      int q_len = current_query == null ? 1 : (int) current_query.length;
+      int q_len = current_query == null ? 1 : current_query.char_count ();
       foreach (var dir in dirs)
       {
         if (directory_hits.has_key (dir))
@@ -493,7 +493,7 @@ namespace Synapse
     public async ResultSet? search (Query q) throws SearchError
     {
       // ignore short searches
-      if (q.query_string.length <= 1) return null;
+      if (q.query_string.char_count () <= 1) return null;
 
       // FIXME: what about deleting one character?
       if (current_query != null && !q.query_string.has_prefix (current_query))
@@ -572,7 +572,7 @@ namespace Synapse
         hit_level++;
 
         // we weren't cancelled and we should have some directories and hits
-        if (hit_level > 1 && q.query_string.length >= 3)
+        if (hit_level > 1 && q.query_string.char_count () >= 3)
         {
           // we want [current_level_uris / last_level_uris > 0.66]
           if (current_level_uris * 3 > 2 * last_level_uris)
