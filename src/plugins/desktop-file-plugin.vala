@@ -37,35 +37,27 @@ namespace Synapse
 
     private class DesktopFileMatch: ApplicationMatch
     {
-      private string? title_folded = null;
-      public unowned string get_title_folded ()
+      public DesktopFileInfo desktop_info { get; construct; }
+      public string title_folded { get; construct; }
+      public string title_unaccented { get; construct; }
+      public string desktop_id { get; construct; }
+      public string exec { get; construct; }
+
+      public DesktopFileMatch (DesktopFileInfo info)
       {
-        if (title_folded == null) title_folded = title.casefold ();
-        return title_folded;
+        Object (desktop_info : info);
       }
 
-      public string? title_unaccented { get; set; default = null; }
-      public string? desktop_id { get; set; default = null; }
-
-      public string exec { get; set; }
-
-      public DesktopFileMatch.for_info (DesktopFileInfo info)
+      construct
       {
-        Object (filename: info.filename, match_type: MatchType.APPLICATION);
-
-        init_from_info (info);
-      }
-
-      private void init_from_info (DesktopFileInfo info)
-      {
-        this.title = info.name;
-        this.description = info.comment;
-        this.icon_name = info.icon_name;
-        this.exec = info.exec;
-        this.needs_terminal = info.needs_terminal;
-        this.title_folded = info.get_name_folded ();
-        this.title_unaccented = Utils.remove_accents (this.title_folded);
-        this.desktop_id = "application://" + info.desktop_id;
+        title = desktop_info.name;
+        description = desktop_info.comment;
+        icon_name = desktop_info.icon_name;
+        exec = desktop_info.exec;
+        needs_terminal = desktop_info.needs_terminal;
+        title_folded = desktop_info.get_name_folded () ?? title.casefold ();
+        title_unaccented = Utils.remove_accents (title_folded);
+        desktop_id = "application://" + desktop_info.desktop_id;
       }
     }
 
@@ -118,7 +110,7 @@ namespace Synapse
 
       foreach (DesktopFileInfo dfi in dfs.get_desktop_files ())
       {
-        desktop_files.add (new DesktopFileMatch.for_info (dfi));
+        desktop_files.add (new DesktopFileMatch (dfi));
       }
 
       loading_in_progress = false;
@@ -145,7 +137,7 @@ namespace Synapse
 
       foreach (var dfm in desktop_files)
       {
-        unowned string folded_title = dfm.get_title_folded ();
+        unowned string folded_title = dfm.title_folded;
         unowned string unaccented_title = dfm.title_unaccented;
         bool matched = false;
         // FIXME: we need to do much smarter relevancy computation in fuzzy re
@@ -226,26 +218,23 @@ namespace Synapse
       return result;
     }
 
-    private class OpenWithAction: Match
+    private class OpenWithAction: Action
     {
-      public DesktopFileInfo desktop_info { get; private set; }
+      public DesktopFileInfo desktop_info { get; construct; }
 
       public OpenWithAction (DesktopFileInfo info)
       {
-        Object ();
-
-        init_with_info (info);
+        Object (desktop_info : info);
       }
 
-      private void init_with_info (DesktopFileInfo info)
+      construct
       {
-        this.title = _ ("Open with %s").printf (info.name);
-        this.icon_name = info.icon_name;
-        this.description = _ ("Opens current selection using %s").printf (info.name);
-        this.desktop_info = info;
+        title = _ ("Open with %s").printf (desktop_info.name);
+        icon_name = desktop_info.icon_name;
+        description = _ ("Opens current selection using %s").printf (desktop_info.name);
       }
 
-      public override void execute (Match? match)
+      public override void do_execute (Match match, Match? target = null)
       {
         unowned UriMatch? uri_match = match as UriMatch;
         return_if_fail (uri_match != null);
@@ -262,6 +251,11 @@ namespace Synapse
         {
           warning ("%s", err.message);
         }
+      }
+
+      public override bool valid_for_match (Match match)
+      {
+        return (match.match_type == MatchType.GENERIC_URI && match is UriMatch);
       }
     }
 
