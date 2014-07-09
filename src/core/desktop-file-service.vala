@@ -26,29 +26,58 @@ namespace Synapse
     UNINTERESTING_ENTRY
   }
 
+  // registered environments from http://standards.freedesktop.org/menu-spec/latest
+  [Flags]
+  public enum DesktopEnvironmentType
+  {
+    GNOME = 1 << 0,
+    KDE   = 1 << 1,
+    LXDE  = 1 << 2,
+    MATE  = 1 << 3,
+    RAZOR = 1 << 4,
+    ROX   = 1 << 5,
+    TDE   = 1 << 6,
+    UNITY = 1 << 7,
+    XFCE  = 1 << 8,
+    EDE   = 1 << 9,
+    CINNAMON = 1 << 10,
+    PANTHEON = 1 << 11,
+
+    OLD   = 1 << 12,
+    ALL   = 0xFFF;
+
+    public static DesktopEnvironmentType from_strings (string[] environments)
+    {
+      DesktopEnvironmentType result = 0;
+      foreach (unowned string env in environments)
+      {
+        string env_up = env.up ();
+        switch (env_up)
+        {
+          case "GNOME": result |= DesktopEnvironmentType.GNOME; break;
+          case "KDE": result |= DesktopEnvironmentType.KDE; break;
+          case "LXDE": result |= DesktopEnvironmentType.LXDE; break;
+          case "MATE": result |= DesktopEnvironmentType.MATE; break;
+          case "RAZOR": result |= DesktopEnvironmentType.RAZOR; break;
+          case "ROX": result |= DesktopEnvironmentType.ROX; break;
+          case "TDE": result |= DesktopEnvironmentType.TDE; break;
+          case "UNITY": result |= DesktopEnvironmentType.UNITY; break;
+          case "XFCE": result |= DesktopEnvironmentType.XFCE; break;
+          case "EDE": result |= DesktopEnvironmentType.EDE; break;
+          case "CINNAMON": result |= DesktopEnvironmentType.CINNAMON; break;
+          case "OLD": result |= DesktopEnvironmentType.OLD; break;
+
+          case "PANTHEON": result |= DesktopEnvironmentType.PANTHEON; break;
+
+          default: warning ("%s is not understood", env); break;
+        }
+      }
+      return result;
+    }
+  }
+
   public class DesktopFileInfo: Object
   {
-    // registered environments from http://standards.freedesktop.org/menu-spec/latest
-    [Flags]
-    public enum EnvironmentType
-    {
-      GNOME = 1 << 0,
-      KDE   = 1 << 1,
-      LXDE  = 1 << 2,
-      MATE  = 1 << 3,
-      RAZOR = 1 << 4,
-      ROX   = 1 << 5,
-      TDE   = 1 << 6,
-      UNITY = 1 << 7,
-      XFCE  = 1 << 8,
-      EDE   = 1 << 9,
-      CINNAMON = 1 << 10,
-      PANTHEON = 1 << 11,
-
-      OLD   = 1 << 12,
-      ALL   = 0xFFF
-    }
-
     public string desktop_id { get; construct set; }
     public string name { get; construct set; }
     public string comment { get; set; default = ""; }
@@ -71,7 +100,7 @@ namespace Synapse
       return name_folded;
     }
 
-    public EnvironmentType show_in { get; set; default = EnvironmentType.ALL; }
+    public DesktopEnvironmentType show_in { get; set; default = DesktopEnvironmentType.ALL; }
 
     public DesktopFileInfo.for_keyfile (string path, KeyFile keyfile,
                                         string desktop_id)
@@ -79,35 +108,6 @@ namespace Synapse
       Object (filename: path, desktop_id: desktop_id);
 
       init_from_keyfile (keyfile);
-    }
-
-    private EnvironmentType parse_environments (string[] environments)
-    {
-      EnvironmentType result = 0;
-      foreach (unowned string env in environments)
-      {
-        string env_up = env.up ();
-        switch (env_up)
-        {
-          case "GNOME": result |= EnvironmentType.GNOME; break;
-          case "KDE": result |= EnvironmentType.KDE; break;
-          case "LXDE": result |= EnvironmentType.LXDE; break;
-          case "MATE": result |= EnvironmentType.MATE; break;
-          case "RAZOR": result |= EnvironmentType.RAZOR; break;
-          case "ROX": result |= EnvironmentType.ROX; break;
-          case "TDE": result |= EnvironmentType.TDE; break;
-          case "UNITY": result |= EnvironmentType.UNITY; break;
-          case "XFCE": result |= EnvironmentType.XFCE; break;
-          case "EDE": result |= EnvironmentType.EDE; break;
-          case "CINNAMON": result |= EnvironmentType.CINNAMON; break;
-          case "OLD": result |= EnvironmentType.OLD; break;
-
-          case "PANTHEON": result |= EnvironmentType.PANTHEON; break;
-
-          default: warning ("%s is not understood", env); break;
-        }
-      }
-      return result;
     }
 
     private void init_from_keyfile (KeyFile keyfile)
@@ -157,8 +157,7 @@ namespace Synapse
 
         comment = app_info.get_description () ?? "";
 
-        var icon = app_info.get_icon () ??
-          new ThemedIcon ("application-default-icon");
+        var icon = app_info.get_icon () ?? new ThemedIcon ("application-default-icon");
         icon_name = icon.to_string ();
 
         if (keyfile.has_key (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_MIME_TYPE))
@@ -171,14 +170,14 @@ namespace Synapse
         }
         if (keyfile.has_key (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_ONLY_SHOW_IN))
         {
-          show_in = parse_environments (keyfile.get_string_list (KeyFileDesktop.GROUP,
+          show_in = DesktopEnvironmentType.from_strings (keyfile.get_string_list (KeyFileDesktop.GROUP,
                                                                  KeyFileDesktop.KEY_ONLY_SHOW_IN));
         }
         else if (keyfile.has_key (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_NOT_SHOW_IN))
         {
-          var not_show = parse_environments (keyfile.get_string_list (KeyFileDesktop.GROUP,
+          var not_show = DesktopEnvironmentType.from_strings (keyfile.get_string_list (KeyFileDesktop.GROUP,
                                              KeyFileDesktop.KEY_NOT_SHOW_IN));
-          show_in = EnvironmentType.ALL ^ not_show;
+          show_in = DesktopEnvironmentType.ALL ^ not_show;
         }
 
         // special case these, people are using them quite often and wonder
@@ -255,11 +254,10 @@ namespace Synapse
       init_once.leave (true);
     }
 
-    private DesktopFileInfo.EnvironmentType session_type =
-      DesktopFileInfo.EnvironmentType.GNOME;
+    private DesktopEnvironmentType session_type = DesktopEnvironmentType.GNOME;
     private string session_type_str = "GNOME";
 
-    public DesktopFileInfo.EnvironmentType get_environment ()
+    public DesktopEnvironmentType get_environment ()
     {
       return this.session_type;
     }
@@ -279,62 +277,62 @@ namespace Synapse
 
       if (session.has_prefix ("unity") || session.has_prefix ("ubuntu"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.UNITY;
+        session_type = DesktopEnvironmentType.UNITY;
         session_type_str = "Unity";
       }
       else if (session.has_prefix ("kde"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.KDE;
+        session_type = DesktopEnvironmentType.KDE;
         session_type_str = "KDE";
       }
       else if (session.has_prefix ("gnome"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.GNOME;
+        session_type = DesktopEnvironmentType.GNOME;
         session_type_str = "GNOME";
       }
       else if (session.has_prefix ("lx"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.LXDE;
+        session_type = DesktopEnvironmentType.LXDE;
         session_type_str = "LXDE";
       }
       else if (session.has_prefix ("xfce"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.XFCE;
+        session_type = DesktopEnvironmentType.XFCE;
         session_type_str = "XFCE";
       }
       else if (session.has_prefix ("mate"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.MATE;
+        session_type = DesktopEnvironmentType.MATE;
         session_type_str = "MATE";
       }
       else if (session.has_prefix ("razor"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.RAZOR;
+        session_type = DesktopEnvironmentType.RAZOR;
         session_type_str = "Razor";
       }
       else if (session.has_prefix ("tde"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.TDE;
+        session_type = DesktopEnvironmentType.TDE;
         session_type_str = "TDE";
       }
       else if (session.has_prefix ("rox"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.ROX;
+        session_type = DesktopEnvironmentType.ROX;
         session_type_str = "ROX";
       }
       else if (session.has_prefix ("ede"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.ROX;
+        session_type = DesktopEnvironmentType.ROX;
         session_type_str = "EDE";
       }
       else if (session.has_prefix ("cinnamon"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.ROX;
+        session_type = DesktopEnvironmentType.ROX;
         session_type_str = "Cinnamon";
       }
       else if (session.has_prefix ("pantheon"))
       {
-        session_type = DesktopFileInfo.EnvironmentType.ROX;
+        session_type = DesktopEnvironmentType.ROX;
         session_type_str = "Pantheon";
       }
       else
