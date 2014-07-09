@@ -50,6 +50,7 @@ namespace Synapse
 
       construct
       {
+        filename = desktop_info.filename;
         title = desktop_info.name;
         description = desktop_info.comment;
         icon_name = desktop_info.icon_name;
