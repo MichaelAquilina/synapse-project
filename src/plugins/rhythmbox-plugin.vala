@@ -22,35 +22,30 @@
 
 namespace Synapse
 {
-  [DBus (name = "org.gnome.Rhythmbox.Shell")]
-  interface RhythmboxShell : Object {
-      public const string UNIQUE_NAME = "org.gnome.Rhythmbox";
-      public const string OBJECT_PATH = "/org/gnome/Rhythmbox/Shell";
+  [DBus (name = "org.gnome.Rhythmbox3.PlayQueue")]
+  interface RhythmboxPlayQueue : Object {
+      public const string UNIQUE_NAME = "org.gnome.Rhythmbox3";
+      public const string OBJECT_PATH = "/org/gnome/Rhythmbox3/PlayQueue";
 
-      [DBus (name = "addToQueue")]
       public abstract void add_to_queue (string uri) throws IOError;
-      /*
-      [DBus (name = "clearQueue")]
-      public abstract void clear_queue () throws IOError;
-      */
-      [DBus (name = "loadURI")]
-      public abstract void load_uri (string uri, bool b) throws IOError;
-
+      //public abstract void clear_queue () throws IOError;
+      //public abstract void remove_from_queue (string uri) throws IOError;
   }
 
-  [DBus (name = "org.gnome.Rhythmbox.Player")]
+  [DBus (name = "org.mpris.MediaPlayer2.Player")]
   interface RhythmboxPlayer : Object {
-      public const string UNIQUE_NAME = "org.gnome.Rhythmbox";
-      public const string OBJECT_PATH = "/org/gnome/Rhythmbox/Player";
+      public const string UNIQUE_NAME = "org.gnome.Rhythmbox3";
+      public const string OBJECT_PATH = "/org/mpris/MediaPlayer2";
 
-      [DBus (name = "getPlaying")]
-      public abstract bool get_playing () throws IOError;
-      [DBus (name = "next")]
+      public abstract string playback_status { owned get; }
+
       public abstract void next () throws IOError;
-      [DBus (name = "previous")]
+      public abstract void open_uri (string uri) throws IOError;
+      public abstract void pause () throws IOError;
+      public abstract void play () throws IOError;
+      //public abstract void play_pause () throws IOError;
       public abstract void previous () throws IOError;
-      [DBus (name = "playPause")]
-      public abstract void play_pause (bool b) throws IOError;
+      //public abstract void stop () throws IOError;
   }
 
   public class RhythmboxActions: Object, Activatable, ItemProvider, ActionProvider
@@ -94,24 +89,17 @@ namespace Synapse
       register_plugin ();
     }
 
-    private abstract class RhythmboxAction: Match
+    private abstract class RhythmboxAction: Action
     {
-      public int default_relevancy { get; set; }
-
-      public abstract bool valid_for_match (Match match);
-      // stupid Vala...
-      public abstract void execute_internal (Match? match);
-
-      public override void execute (Match? match)
-      {
-        execute_internal (match);
-      }
-
       public virtual int get_relevancy ()
       {
-        bool rb_running = DBusService.get_default ().name_has_owner (
-          RhythmboxPlayer.UNIQUE_NAME);
+        bool rb_running = DBusService.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
         return rb_running ? default_relevancy + MatchScore.INCREMENT_LARGE : default_relevancy;
+      }
+
+      public virtual bool action_available ()
+      {
+        return DBusService.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
       }
     }
 
@@ -119,15 +107,14 @@ namespace Synapse
     {
       public override void execute (Match? match)
       {
-        this.do_action ();
+        do_action ();
       }
 
       public abstract void do_action ();
 
       public virtual bool action_available ()
       {
-        return DBusService.get_default ().name_has_owner (
-          RhythmboxPlayer.UNIQUE_NAME);
+        return DBusService.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
       }
     }
 
@@ -146,44 +133,20 @@ namespace Synapse
       {
         try
         {
-          bool player_opened = DBusService.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
           RhythmboxPlayer player = Bus.get_proxy_sync (BusType.SESSION,
                                            RhythmboxPlayer.UNIQUE_NAME,
                                            RhythmboxPlayer.OBJECT_PATH);
 
-          player.play_pause (true);
-          if (!player_opened)
-          {
-            /* Try to play 10 times = 5 seconds waiting for RB to start */
-            int i = 0;
-            Timeout.add (500, () =>
-            {
-              ++i;
-              try
-              {
-                if (i <= 10 && !player.get_playing ())
-                {
-                  player.play_pause (true);
-                  return true;
-                }
-              }
-              catch (Error err) { }
-              return false;
-            });
-          }
+          player.play ();
         }
         catch (IOError e)
         {
           Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
         }
       }
-
-      public override bool action_available ()
-      {
-        return true;
-      }
     }
-    private class Pause: Play
+
+    private class Pause: RhythmboxControlMatch
     {
       public Pause ()
       {
@@ -193,12 +156,23 @@ namespace Synapse
                 match_type: MatchType.ACTION);
       }
 
-      public override bool action_available ()
+      public override void do_action ()
       {
-        return DBusService.get_default ().name_has_owner (
-          RhythmboxPlayer.UNIQUE_NAME);
+        try
+        {
+          RhythmboxPlayer player = Bus.get_proxy_sync (BusType.SESSION,
+                                           RhythmboxPlayer.UNIQUE_NAME,
+                                           RhythmboxPlayer.OBJECT_PATH);
+
+          player.pause ();
+        }
+        catch (IOError e)
+        {
+          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
+        }
       }
     }
+
     private class Next: RhythmboxControlMatch
     {
       public Next ()
@@ -217,11 +191,14 @@ namespace Synapse
                                            RhythmboxPlayer.OBJECT_PATH);
 
           player.next ();
-        } catch (IOError e) {
-          stderr.printf ("Rythmbox is not available.\n%s", e.message);
+        } 
+        catch (IOError e)
+        {
+          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
         }
       }
     }
+
     private class Previous: RhythmboxControlMatch
     {
       public Previous ()
@@ -241,8 +218,10 @@ namespace Synapse
 
           player.previous ();
           player.previous ();
-        } catch (IOError e) {
-          stderr.printf ("Rythmbox is not available.\n%s", e.message);
+        } 
+        catch (IOError e)
+        {
+          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
         }
       }
     }
@@ -258,26 +237,30 @@ namespace Synapse
                 default_relevancy: MatchScore.AVERAGE);
       }
 
-      public override void execute_internal (Match? match)
+      public override void do_execute (Match match, Match? target = null)
       {
         return_if_fail (match.match_type == MatchType.GENERIC_URI);
         unowned UriMatch? uri = match as UriMatch;
         return_if_fail (uri != null);
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
-        try {
-          RhythmboxShell shell = Bus.get_proxy_sync (BusType.SESSION,
-                                           RhythmboxShell.UNIQUE_NAME,
-                                           RhythmboxShell.OBJECT_PATH);
+
+        try
+        {
+          RhythmboxPlayQueue shell = Bus.get_proxy_sync (BusType.SESSION,
+                                           RhythmboxPlayQueue.UNIQUE_NAME,
+                                           RhythmboxPlayQueue.OBJECT_PATH);
 
           RhythmboxPlayer player = Bus.get_proxy_sync (BusType.SESSION,
                                            RhythmboxPlayer.UNIQUE_NAME,
                                            RhythmboxPlayer.OBJECT_PATH);
 
           shell.add_to_queue (uri.uri);
-          if (!player.get_playing())
-            player.play_pause (true);
-        } catch (IOError e) {
-          stderr.printf ("Rythmbox is not available.\n%s", e.message);
+          if (!(player.playback_status == "Playing"))
+            player.play ();
+        } 
+        catch (IOError e)
+        {
+          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
         }
       }
 
@@ -308,25 +291,25 @@ namespace Synapse
                 default_relevancy: MatchScore.ABOVE_AVERAGE);
       }
 
-      public override void execute_internal (Match? match)
+      public override void do_execute (Match match, Match? target = null)
       {
         return_if_fail (match.match_type == MatchType.GENERIC_URI);
         unowned UriMatch? uri = match as UriMatch;
         return_if_fail (uri != null);
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0);
-        try {
-          RhythmboxShell shell = Bus.get_proxy_sync (BusType.SESSION,
-                                           RhythmboxShell.UNIQUE_NAME,
-                                           RhythmboxShell.OBJECT_PATH);
 
+        try
+        {
           RhythmboxPlayer player = Bus.get_proxy_sync (BusType.SESSION,
                                            RhythmboxPlayer.UNIQUE_NAME,
                                            RhythmboxPlayer.OBJECT_PATH);
-          if (!player.get_playing())
-            player.play_pause (true);
-          shell.load_uri (uri.uri, true);
-        } catch (IOError e) {
-          stderr.printf ("Rythmbox is not available.\n%s", e.message);
+          if (!(player.playback_status == "Playing"))
+            player.play ();
+          player.open_uri (uri.uri);
+        } 
+        catch (IOError e)
+        {
+          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
         }
       }
 
