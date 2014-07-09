@@ -91,8 +91,8 @@ namespace Synapse.Gui
     public abstract void vanish ();
     public abstract void summon_or_vanish ();
 
-    public abstract Synapse.Gui.Model controller_model {get; construct set;}
-    public abstract Synapse.Gui.IController controller {get; construct set;}
+    public abstract Synapse.Gui.Model controller_model { get; construct set; }
+    public abstract Synapse.Gui.IController controller { get; construct set; }
 
     public abstract void update_focused_source (Entry<int, Match> m);
     public abstract void update_focused_action (Entry<int, Match> m);

@@ -517,8 +517,8 @@ namespace Synapse
 
     protected Synapse.Gui.Model model = null;
 
-    public Synapse.Gui.Model controller_model {get; construct set;}
-    public Synapse.Gui.IController controller {get; construct set;}
+    public Synapse.Gui.Model controller_model { get; construct set; }
+    public Synapse.Gui.IController controller { get; construct set; }
 
     public virtual void update_focused_source (Entry<int, Match> m){}
     public virtual void update_focused_action (Entry<int, Match> m){}

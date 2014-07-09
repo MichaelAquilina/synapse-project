@@ -28,10 +28,9 @@ namespace Synapse.Gui
     /* Found in config:  ui->categories */
     public class Category : GLib.Object
     {
-      public string name {get; set; default = _("All");}
-      public QueryFlags flags {
-        get; set; default = QueryFlags.ALL;
-      }
+      public string name { get; set; default = _("All"); }
+      public QueryFlags flags { get; set; default = QueryFlags.ALL; }
+
       public Category (string name, QueryFlags flags = QueryFlags.ALL)
       {
         this.name = name;

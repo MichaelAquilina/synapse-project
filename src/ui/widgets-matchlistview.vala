@@ -28,31 +28,31 @@ namespace Synapse.Gui
   public class MatchViewRenderer : MatchListView.MatchViewRendererBase
   {
     // the size of Match and Action icons
-    public int icon_size {get; set; default = 32;}
+    public int icon_size { get; set; default = 32; }
     // top and bottom row's padding
-    public int cell_vpadding {get; set; default = 2;}
+    public int cell_vpadding { get; set; default = 2; }
     // left and right padding on each component of the row
-    public int cell_hpadding {get; set; default = 3;}
+    public int cell_hpadding { get; set; default = 3; }
     //hilight matched text into selected match's title
-    public bool hilight_on_selected {get; set; default = false;}
+    public bool hilight_on_selected { get; set; default = false; }
     //shows the pattern after the title if hilight doesn't match the title
-    public bool show_pattern_in_hilight {get; set; default = false;}
+    public bool show_pattern_in_hilight { get; set; default = false; }
     //shows extended info when present (ie "xx minutes ago")
-    public bool show_extended_info {get; set; default = true;}
+    public bool show_extended_info { get; set; default = true; }
     //hides extended info on selected row if present
-    public bool hide_extended_on_selected {get; set; default = false;}
+    public bool hide_extended_on_selected { get; set; default = false; }
     //overlay action icon to the text, or reserve space for action icon shrinking labels
-    public bool overlay_action {get; set; default = false;}
+    public bool overlay_action { get; set; default = false; }
     //the string pattern to use in the hilight
-    public new string pattern {get; set; default = "";}
+    public new string pattern { get; set; default = ""; }
     //the Action match to use to retrive the action icon to show
-    public Match action {get; set; default = null;}
+    public Match action { get; set; default = null; }
     //the markup of the title
-    public string title_markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>";}
+    public string title_markup { get; set; default = "<span size=\"medium\"><b>%s</b></span>"; }
     //the markup of the description
-    public string description_markup {get; set; default = "<span size=\"small\">%s</span>";}
+    public string description_markup { get; set; default = "<span size=\"small\">%s</span>"; }
     //the markup of the extended info **extend info is already inserted into description markup**
-    public string extended_info_markup {get; set; default = "%s";}
+    public string extended_info_markup { get; set; default = "%s"; }
 
     private int text_height = 1;
 
@@ -963,7 +963,7 @@ namespace Synapse.Gui
 
     private bool has_results = false;
     private MatchViewRenderer rend;
-    public MatchViewRenderer get_match_renderer () {return rend;}
+    public MatchViewRenderer get_match_renderer () { return rend; }
 
     public SpecificMatchList (IController controller, Model model, SearchingFor sf)
     {

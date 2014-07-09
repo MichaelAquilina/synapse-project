@@ -367,7 +367,7 @@ namespace Synapse.Gui
     public class Schema : GLib.Object
     {
       private Allocation[] _positions = {};
-      public Allocation[] positions { get {return _positions;} }
+      public Allocation[] positions { get { return _positions; } }
       public Schema ()
       {
 
@@ -661,7 +661,7 @@ namespace Synapse.Gui
   public class SensitiveWidget : Gtk.EventBox
   {
     private Widget _widget;
-    public Widget widget {get {return this._widget;}}
+    public Widget widget { get { return this._widget; }}
 
     public SensitiveWidget (Widget widget)
     {
@@ -683,7 +683,7 @@ namespace Synapse.Gui
 
   public class NamedIcon : Gtk.Image
   {
-    public string not_found_name {get; set; default = "unknown";}
+    public string not_found_name { get; set; default = "unknown"; }
     private string current;
     private IconSize current_size;
 
@@ -777,16 +777,16 @@ namespace Synapse.Gui
 
   public class FakeInput : Gtk.Alignment
   {
-    public bool draw_input {get; set; default = true;}
-    public double input_alpha {get; set; default = 1.0;}
-    public double border_radius {get; set; default = 3.0;}
-    public double shadow_height {get; set; default = 3;}
-    public double focus_height {get; set; default = 3;}
+    public bool draw_input { get; set; default = true; }
+    public double input_alpha { get; set; default = 1.0; }
+    public double border_radius { get; set; default = 3.0; }
+    public double shadow_height { get; set; default = 3; }
+    public double focus_height { get; set; default = 3; }
 
     private Utils.ColorHelper ch;
     public Widget? focus_widget
     {
-      get {return _focus_widget;}
+      get { return _focus_widget; }
       set {
         if (value == _focus_widget)
           return;
@@ -1010,7 +1010,7 @@ namespace Synapse.Gui
       Gtk.MenuItem item = null;
 
       item = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.PREFERENCES, null);
-      item.activate.connect (()=> {settings_clicked ();});
+      item.activate.connect (()=> {settings_clicked (); });
       menu.append (item);
 
       item = new ImageMenuItem.from_stock (Gtk.Stock.ABOUT, null);
@@ -1150,20 +1150,20 @@ namespace Synapse.Gui
   public class HTextSelector : EventBox
   {
     private const int ARROW_SIZE = 7;
-    public string selected_markup {get; set; default = "<span size=\"medium\"><b>%s</b></span>";}
-    public string unselected_markup {get; set; default = "<span size=\"small\">%s</span>";}
-    public int padding {get; set; default = 18;}
-    public bool show_arrows {get; set; default = true;}
-    public bool animation_enabled {get; set; default = true;}
+    public string selected_markup { get; set; default = "<span size=\"medium\"><b>%s</b></span>"; }
+    public string unselected_markup { get; set; default = "<span size=\"small\">%s</span>"; }
+    public int padding { get; set; default = 18; }
+    public bool show_arrows { get; set; default = true; }
+    public bool animation_enabled { get; set; default = true; }
     private class PangoReadyText
     {
-      public string text {get; set; default = "";}
-      public int offset {get; set; default = 0;}
-      public int width {get; set; default = 0;}
-      public int height {get; set; default = 0;}
+      public string text { get; set; default = ""; }
+      public int offset { get; set; default = 0; }
+      public int width { get; set; default = 0; }
+      public int height { get; set; default = 0; }
     }
     private int _selected;
-    public int selected {get {return _selected;} set {
+    public int selected { get { return _selected; } set {
       if (value == _selected ||
           value < 0 ||
           value >= texts.size)
