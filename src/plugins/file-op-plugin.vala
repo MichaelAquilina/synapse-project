@@ -58,8 +58,8 @@ namespace Synapse
     {
       public RenameTo ()
       {
-        Object (title: _ ("Rename to"),
-                description: _ ("Rename the file to..."),
+        Object (title: _("Rename to"),
+                description: _("Rename the file to..."),
                 icon_name: "stock_save-as", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.AVERAGE);
@@ -119,8 +119,8 @@ namespace Synapse
     {
       PluginRegistry.get_default ().register_plugin (
         typeof (FileOpPlugin),
-        _ ("File Operations"),
-        _ ("Copy, Cut, Paste and Delete files"),
+        _("File Operations"),
+        _("Copy, Cut, Paste and Delete files"),
         "stock_copy",
         register_plugin
       );

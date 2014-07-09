@@ -39,8 +39,8 @@ namespace Synapse
     {
       public OpenChat ()
       {
-        Object (title: _ ("Open chat"),
-                description: _ ("Open a chat with selected contact"),
+        Object (title: _("Open chat"),
+                description: _("Open a chat with selected contact"),
                 icon_name: "empathy", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.EXCELLENT);
@@ -63,8 +63,8 @@ namespace Synapse
     {
       public SendMessage ()
       {
-        Object (title: _ ("Send a message"),
-                description: _ ("Send a message to the contact"),
+        Object (title: _("Send a message"),
+                description: _("Send a message to the contact"),
                 icon_name: "message", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.VERY_GOOD);
@@ -98,8 +98,8 @@ namespace Synapse
     {
       public SendMessageTo ()
       {
-        Object (title: _ ("Send message to.."),
-                description: _ ("Send a message to a contact"),
+        Object (title: _("Send message to.."),
+                description: _("Send a message to a contact"),
                 icon_name: "message", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.VERY_GOOD);
@@ -134,8 +134,8 @@ namespace Synapse
     {
       PluginRegistry.get_default ().register_plugin (
         typeof (ChatActions),
-        _ ("Chat actions"),
-        _ ("Open chat, or send a message with your favorite IM"),
+        _("Chat actions"),
+        _("Open chat, or send a message with your favorite IM"),
         "empathy",
         register_plugin
       );

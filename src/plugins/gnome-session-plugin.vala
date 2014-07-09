@@ -51,8 +51,8 @@ namespace Synapse
     {
       public ShutDownAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _ ("Shut Down"),
-                description: _ ("Turn your computer off"),
+        Object (match_type: MatchType.ACTION, title: _("Shut Down"),
+                description: _("Turn your computer off"),
                 icon_name: "system-shutdown", has_thumbnail: false);
       }
 
@@ -77,8 +77,8 @@ namespace Synapse
     {
       public RebootAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _ ("Restart"),
-                description: _ ("Restart your computer"),
+        Object (match_type: MatchType.ACTION, title: _("Restart"),
+                description: _("Restart your computer"),
                 icon_name: "gnome-session-reboot", has_thumbnail: false);
       }
 
@@ -103,8 +103,8 @@ namespace Synapse
     {
       public LogOutAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _ ("Log Out"),
-                description: _ ("Close your session and return to the login screen"),
+        Object (match_type: MatchType.ACTION, title: _("Log Out"),
+                description: _("Close your session and return to the login screen"),
                 icon_name: "gnome-session-logout", has_thumbnail: false);
       }
 
@@ -135,11 +135,11 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (GnomeSessionPlugin),
         "GNOME Session",
-        _ ("Log out from your session."),
+        _("Log out from your session."),
         "gnome-session-logout",
         register_plugin,
         DBusService.get_default ().name_has_owner (GnomeSessionManager.UNIQUE_NAME),
-        _ ("Gnome Session Manager wasn't found")
+        _("Gnome Session Manager wasn't found")
       );
     }
 

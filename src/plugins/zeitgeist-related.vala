@@ -62,8 +62,8 @@ namespace Synapse
         Object (match_type: MatchType.SEARCH,
                 has_thumbnail: false,
                 icon_name: "search",
-                title: _ ("Find related"),
-                description: _ ("Find resources related to this result"));
+                title: _("Find related"),
+                description: _("Find resources related to this result"));
         this.plugin = plugin;
       }
     }
@@ -72,12 +72,12 @@ namespace Synapse
     {
       PluginRegistry.get_default ().register_plugin (
         typeof (ZeitgeistRelated),
-        _ ("Related files"),
-        _ ("Finds files related to other search results using Zeitgeist."),
+        _("Related files"),
+        _("Finds files related to other search results using Zeitgeist."),
         "search",
         register_plugin,
         DBusService.get_default ().name_is_activatable ("org.gnome.zeitgeist.Engine"),
-        _ ("Zeitgeist is not installed")
+        _("Zeitgeist is not installed")
       );
     }
 

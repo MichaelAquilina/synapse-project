@@ -41,7 +41,7 @@ namespace Synapse
 
       public CommandObject (string cmd)
       {
-        Object (title: cmd, description: _ ("Run command"), command: cmd,
+        Object (title: cmd, description: _("Run command"), command: cmd,
                 icon_name: "application-x-executable",
                 match_type: MatchType.APPLICATION,
                 needs_terminal: cmd.has_prefix ("sudo "));
@@ -62,7 +62,7 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (CommandPlugin),
         "Command Search",
-        _ ("Find and execute arbitrary commands."),
+        _("Find and execute arbitrary commands."),
         "system-run",
         register_plugin
       );

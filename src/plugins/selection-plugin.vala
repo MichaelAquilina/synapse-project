@@ -52,8 +52,8 @@ namespace Synapse
     {
       PluginRegistry.get_default ().register_plugin (
         typeof (SelectionPlugin),
-        _ ("Selection"), // plugin title
-        _ ("Provides actions for currently selected text."), // description
+        _("Selection"), // plugin title
+        _("Provides actions for currently selected text."), // description
         "edit-select-all", // icon name
         register_plugin // reference to this function
       );

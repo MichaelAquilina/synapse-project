@@ -49,10 +49,10 @@ namespace Synapse
       var spinner = new Gtk.Spinner ();
       box.pack_start (spinner);
 
-      var label = new Gtk.Label (_ ("Please press the Finish button once you login to Launchpad with your web browser"));
+      var label = new Gtk.Label (_("Please press the Finish button once you login to Launchpad with your web browser"));
       label.set_width_chars (40);
       label.set_line_wrap (true);
-      var proceed_button = new Gtk.Button.with_label (_ ("Finish authorization"));
+      var proceed_button = new Gtk.Button.with_label (_("Finish authorization"));
       box.pack_start (label);
       box.pack_start (proceed_button, true, false);
 
@@ -99,11 +99,11 @@ namespace Synapse
             Utils.Logger.log (this, "token: %s", step3_result.lookup ("oauth_token"));
             Utils.Logger.log (this, "token_secret: %s", step3_result.lookup ("oauth_token_secret"));
 
-            label.set_text (_ ("Successfully authenticated"));
+            label.set_text (_("Successfully authenticated"));
           }
           catch (Error e)
           {
-            label.set_text (_ ("Authentication failed") + " (%s)".printf (e.message));
+            label.set_text (_("Authentication failed") + " (%s)".printf (e.message));
           }
 
           label.show ();
@@ -245,7 +245,7 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (LaunchpadPlugin),
         "Launchpad",
-        _ ("Find bugs and branches on Launchpad."),
+        _("Find bugs and branches on Launchpad."),
         "applications-internet",
         register_plugin
       );
@@ -296,21 +296,21 @@ namespace Synapse
         {
           // project link (lp:synapse)
           uri = "https://code.launchpad.net/" + branch;
-          title = _ ("Launchpad: Bazaar branches for %s").printf (branch);
+          title = _("Launchpad: Bazaar branches for %s").printf (branch);
           description = uri;
         }
         else if (groups.length == 2 && !branch.has_prefix ("~"))
         {
           // series link (lp:synapse/0.3)
           uri = "https://code.launchpad.net/" + branch;
-          title = _ ("Launchpad: Series %s for Project %s").printf (groups[1], groups[0]);
+          title = _("Launchpad: Series %s for Project %s").printf (groups[1], groups[0]);
           description = uri;
         }
         else if (branch.has_prefix ("~"))
         {
           // branch link (lp:~mhr3/synapse/lp-plugin)
           uri = "https://code.launchpad.net/" + branch;
-          title = _ ("Launchpad: Bazaar branch %s").printf (branch);
+          title = _("Launchpad: Bazaar branch %s").printf (branch);
           description = uri;
         }
 
@@ -325,7 +325,7 @@ namespace Synapse
         string bug_num = mi.fetch (1);
 
         uri = "https://bugs.launchpad.net/bugs/" + bug_num;
-        title = _ ("Launchpad: Bug #%s").printf (bug_num);
+        title = _("Launchpad: Bug #%s").printf (bug_num);
         description = uri;
         result.add (new LaunchpadObject (title, description, uri),
                     MatchScore.ABOVE_AVERAGE);

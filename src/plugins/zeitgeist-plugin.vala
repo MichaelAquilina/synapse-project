@@ -185,7 +185,7 @@ namespace Synapse
         }
         else
         {
-          match.extended_info = _ ("long time ago");
+          match.extended_info = _("long time ago");
         }
       }
     }
@@ -195,11 +195,11 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (ZeitgeistPlugin),
         "Zeitgeist",
-        _ ("Search various items logged by Zeitgeist."),
+        _("Search various items logged by Zeitgeist."),
         "zeitgeist",
         register_plugin,
         DBusService.get_default ().name_is_activatable (UNIQUE_NAME),
-        _ ("Zeitgeist is not installed")
+        _("Zeitgeist is not installed")
       );
     }
 

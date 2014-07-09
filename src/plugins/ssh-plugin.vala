@@ -64,12 +64,12 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (SshPlugin),
     		"SSH", // Plugin title
-        _ ("Connect to host with SSH"), // description
+        _("Connect to host with SSH"), // description
         "terminal",	// icon name
         register_plugin, // reference to this function
     		// true if user's system has all required components which the plugin needs
         (Environment.find_program_in_path ("ssh") != null),
-        _ ("ssh is not installed") // error message
+        _("ssh is not installed") // error message
       );
     }
 

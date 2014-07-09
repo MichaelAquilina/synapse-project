@@ -67,7 +67,7 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (DesktopFilePlugin),
         "Application Search",
-        _ ("Search for and run applications on your computer."),
+        _("Search for and run applications on your computer."),
         "system-run",
         register_plugin
       );
@@ -229,9 +229,9 @@ namespace Synapse
 
       construct
       {
-        title = _ ("Open with %s").printf (desktop_info.name);
+        title = _("Open with %s").printf (desktop_info.name);
         icon_name = desktop_info.icon_name;
-        description = _ ("Opens current selection using %s").printf (desktop_info.name);
+        description = _("Opens current selection using %s").printf (desktop_info.name);
       }
 
       public override void do_execute (Match match, Match? target = null)

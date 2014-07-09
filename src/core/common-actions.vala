@@ -59,8 +59,8 @@ namespace Synapse
     {
       public Runner ()
       {
-        Object (title: _ ("Run"),
-                description: _ ("Run an application, action or script"),
+        Object (title: _("Run"),
+                description: _("Run an application, action or script"),
                 icon_name: "system-run", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.EXCELLENT);
@@ -115,8 +115,8 @@ namespace Synapse
     {
       public TerminalRunner ()
       {
-        Object (title: _ ("Run in Terminal"),
-                description: _ ("Run application or command in terminal"),
+        Object (title: _("Run in Terminal"),
+                description: _("Run application or command in terminal"),
                 icon_name: "terminal", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.BELOW_AVERAGE);
@@ -164,8 +164,8 @@ namespace Synapse
     {
       public Opener ()
       {
-        Object (title: _ ("Open"),
-                description: _ ("Open using default application"),
+        Object (title: _("Open"),
+                description: _("Open using default application"),
                 icon_name: "fileopen", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.GOOD);
@@ -234,8 +234,8 @@ namespace Synapse
     {
       public OpenFolder ()
       {
-        Object (title: _ ("Open folder"),
-                description: _ ("Open folder containing this file"),
+        Object (title: _("Open folder"),
+                description: _("Open folder containing this file"),
                 icon_name: "folder-open", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.AVERAGE);
@@ -277,8 +277,8 @@ namespace Synapse
     {
       public ClipboardCopy ()
       {
-        Object (title: _ ("Copy to Clipboard"),
-                description: _ ("Copy selection to clipboard"),
+        Object (title: _("Copy to Clipboard"),
+                description: _("Copy selection to clipboard"),
                 icon_name: "gtk-copy", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.AVERAGE);

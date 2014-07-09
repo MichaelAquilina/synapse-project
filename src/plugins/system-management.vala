@@ -92,8 +92,8 @@ namespace Synapse
     {
       public SuspendAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _ ("Suspend"),
-                description: _ ("Put your computer into suspend mode"),
+        Object (match_type: MatchType.ACTION, title: _("Suspend"),
+                description: _("Put your computer into suspend mode"),
                 icon_name: "system-suspend", has_thumbnail: false);
       }
 
@@ -192,8 +192,8 @@ namespace Synapse
     {
       public HibernateAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _ ("Hibernate"),
-                description: _ ("Put your computer into hibernation mode"),
+        Object (match_type: MatchType.ACTION, title: _("Hibernate"),
+                description: _("Put your computer into hibernation mode"),
                 icon_name: "system-hibernate", has_thumbnail: false);
       }
 
@@ -291,8 +291,8 @@ namespace Synapse
     {
       public ShutdownAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _ ("Shut Down"),
-                description: _ ("Turn your computer off"),
+        Object (match_type: MatchType.ACTION, title: _("Shut Down"),
+                description: _("Turn your computer off"),
                 icon_name: "system-shutdown", has_thumbnail: false);
       }
 
@@ -375,8 +375,8 @@ namespace Synapse
     {
       public RestartAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _ ("Restart"),
-                description: _ ("Restart your computer"),
+        Object (match_type: MatchType.ACTION, title: _("Restart"),
+                description: _("Restart your computer"),
                 icon_name: "system-restart", has_thumbnail: false);
       }
 
@@ -460,12 +460,12 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (SystemManagementPlugin),
         "System Management",
-        _ ("Suspend, hibernate, restart or shutdown your computer."),
+        _("Suspend, hibernate, restart or shutdown your computer."),
         "system-restart",
         register_plugin,
         DBusService.get_default ().service_is_available (SystemdObject.UNIQUE_NAME) ||
         DBusService.get_default ().service_is_available (ConsoleKitObject.UNIQUE_NAME),
-        _ ("ConsoleKit wasn't found")
+        _("ConsoleKit wasn't found")
       );
     }
 

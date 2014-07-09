@@ -48,8 +48,8 @@ namespace Synapse
     {
       public ImgUrAction ()
       {
-        Object (title: _ ("Upload to imgur"),
-                description: _ ("Upload selection to imgur image sharer"),
+        Object (title: _("Upload to imgur"),
+                description: _("Upload selection to imgur image sharer"),
                 match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
                 default_relevancy: MatchScore.AVERAGE - MatchScore.INCREMENT_MINOR);
@@ -161,11 +161,11 @@ namespace Synapse
           var cb = Gtk.Clipboard.get (Gdk.Atom.NONE);
           cb.set_text (url, -1);
 
-          msg = _ ("The selection was successfully uploaded and its URL was copied to clipboard.");
+          msg = _("The selection was successfully uploaded and its URL was copied to clipboard.");
         }
         else
         {
-          msg = _ ("An error occurred during upload, please check the log for more information.");
+          msg = _("An error occurred during upload, please check the log for more information.");
         }
 
         try
@@ -173,7 +173,7 @@ namespace Synapse
           // yey for breaking API!
           var notification = Object.new (
             typeof (Notify.Notification),
-            summary: _ ("Synapse - Imgur"),
+            summary: _("Synapse - Imgur"),
             body: msg,
             icon_name: "synapse",
             null) as Notify.Notification;
@@ -231,8 +231,8 @@ namespace Synapse
     {
       public ImgUrToContactAction ()
       {
-        Object (title: _ ("Upload to imgur to contact.."),
-                description: _ ("Upload selection to imgur image sharer, and send the link to contact"),
+        Object (title: _("Upload to imgur to contact.."),
+                description: _("Upload selection to imgur image sharer, and send the link to contact"),
                 match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
                 default_relevancy: MatchScore.AVERAGE - MatchScore.INCREMENT_MINOR);
@@ -266,8 +266,8 @@ namespace Synapse
     {
       PluginRegistry.get_default ().register_plugin (
         typeof (ImgUrPlugin),
-        _ ("Imgur"),
-        _ ("Share images using imgur."),
+        _("Imgur"),
+        _("Share images using imgur."),
         "document-send",
         register_plugin
       );

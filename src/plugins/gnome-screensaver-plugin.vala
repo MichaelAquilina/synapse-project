@@ -48,8 +48,8 @@ namespace Synapse
     {
       public LockScreenAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _ ("Lock Screen"),
-                description: _ ("Locks screen and starts screensaver."),
+        Object (match_type: MatchType.ACTION, title: _("Lock Screen"),
+                description: _("Locks screen and starts screensaver."),
                 icon_name: "system-lock-screen", has_thumbnail: false);
       }
 
@@ -77,11 +77,11 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (GnomeScreenSaverPlugin),
         "Gnome screensaver plugin",
-        _ ("Lock screen of your computer."),
+        _("Lock screen of your computer."),
         "system-lock-screen",
         register_plugin,
         DBusService.get_default ().name_is_activatable (GnomeScreenSaver.UNIQUE_NAME),
-        _ ("Gnome Screen Saver wasn't found")
+        _("Gnome Screen Saver wasn't found")
       );
     }
 

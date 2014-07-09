@@ -76,11 +76,11 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (RhythmboxActions),
         "Rhythmbox",
-        _ ("Control Rhythmbox and add items to playlists."),
+        _("Control Rhythmbox and add items to playlists."),
         "rhythmbox",
         register_plugin,
         DBusService.get_default ().name_is_activatable (RhythmboxPlayer.UNIQUE_NAME),
-        _ ("Rhythmbox is not installed")
+        _("Rhythmbox is not installed")
       );
     }
 
@@ -123,8 +123,8 @@ namespace Synapse
     {
       public Play ()
       {
-        Object (title: _ ("Play"),
-                description: _ ("Start playback in Rhythmbox"),
+        Object (title: _("Play"),
+                description: _("Start playback in Rhythmbox"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -150,8 +150,8 @@ namespace Synapse
     {
       public Pause ()
       {
-        Object (title: _ ("Pause"),
-                description: _ ("Pause playback in Rhythmbox"),
+        Object (title: _("Pause"),
+                description: _("Pause playback in Rhythmbox"),
                 icon_name: "media-playback-pause", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -177,8 +177,8 @@ namespace Synapse
     {
       public Next ()
       {
-        Object (title: _ ("Next"),
-                description: _ ("Plays the next song in Rhythmbox's playlist"),
+        Object (title: _("Next"),
+                description: _("Plays the next song in Rhythmbox's playlist"),
                 icon_name: "media-skip-forward", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -203,8 +203,8 @@ namespace Synapse
     {
       public Previous ()
       {
-        Object (title: _ ("Previous"),
-                description: _ ("Plays the previous song in Rhythmbox's playlist"),
+        Object (title: _("Previous"),
+                description: _("Plays the previous song in Rhythmbox's playlist"),
                 icon_name: "media-skip-backward", has_thumbnail: false,
                 match_type: MatchType.ACTION);
       }
@@ -230,8 +230,8 @@ namespace Synapse
     {
       public AddToPlaylist ()
       {
-        Object (title: _ ("Enqueue in Rhythmbox"),
-                description: _ ("Add the song to Rhythmbox playlist"),
+        Object (title: _("Enqueue in Rhythmbox"),
+                description: _("Add the song to Rhythmbox playlist"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.AVERAGE);
@@ -284,8 +284,8 @@ namespace Synapse
     {
       public PlayNow ()
       {
-        Object (title: _ ("Play in Rhythmbox"),
-                description: _ ("Clears the current playlist and plays the song"),
+        Object (title: _("Play in Rhythmbox"),
+                description: _("Clears the current playlist and plays the song"),
                 icon_name: "media-playback-start", has_thumbnail: false,
                 match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.ABOVE_AVERAGE);

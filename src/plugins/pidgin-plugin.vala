@@ -74,11 +74,11 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (PidginPlugin),
         "Pidgin",
-        _ ("Get access to your Pidgin contacts"),
+        _("Get access to your Pidgin contacts"),
         "pidgin",
         register_plugin,
         Environment.find_program_in_path ("pidgin") != null,
-        _ ("Pidgin is not installed.")
+        _("Pidgin is not installed.")
       );
     }
 
@@ -91,8 +91,8 @@ namespace Synapse
     {
       public SendToContact ()
       {
-        Object (title: _ ("Send in chat to.."),
-                  description: _ ("Send selected file within Pidgin"),
+        Object (title: _("Send in chat to.."),
+                  description: _("Send selected file within Pidgin"),
                   match_type: MatchType.ACTION,
                   icon_name: "document-send", has_thumbnail: false,
                   default_relevancy: MatchScore.AVERAGE);

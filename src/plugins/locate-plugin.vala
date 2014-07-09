@@ -60,8 +60,8 @@ namespace Synapse
         Object (match_type: MatchType.SEARCH,
                 has_thumbnail: false,
                 icon_name: "search",
-                title: _ ("Locate"),
-                description: _ ("Locate files with this name on the filesystem"));
+                title: _("Locate"),
+                description: _("Locate files with this name on the filesystem"));
         this.plugin = plugin;
       }
     }
@@ -70,12 +70,12 @@ namespace Synapse
     {
       PluginRegistry.get_default ().register_plugin (
         typeof (LocatePlugin),
-        _ ("Locate"),
-        _ ("Runs locate command to find files on the filesystem."),
+        _("Locate"),
+        _("Runs locate command to find files on the filesystem."),
         "search",
         register_plugin,
         Environment.find_program_in_path ("locate") != null,
-        _ ("Unable to find \"locate\" binary")
+        _("Unable to find \"locate\" binary")
       );
     }
 

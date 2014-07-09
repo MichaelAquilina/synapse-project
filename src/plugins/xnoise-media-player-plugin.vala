@@ -56,11 +56,11 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (XnoiseActions),
         "Xnoise",
-        _ ("Control Xnoise media player."),
+        _("Control Xnoise media player."),
         "xnoise",
         register_plugin,
         Environment.find_program_in_path ("xnoise") != null,
-        _ ("Xnoise is not installed!")
+        _("Xnoise is not installed!")
       );
     }
 
@@ -111,8 +111,8 @@ namespace Synapse
     {
       public Quit ()
       {
-        Object (title:         _ ("Quit"),
-                description:   _ ("Quit Xnoise"),
+        Object (title:         _("Quit"),
+                description:   _("Quit Xnoise"),
                 icon_name:     "gtk-close",
                 has_thumbnail: false,
                 match_type:    MatchType.ACTION
@@ -136,8 +136,8 @@ namespace Synapse
     {
       public Raise ()
       {
-        Object (title:         _ ("Raise"),
-                description:   _ ("Show Xnoise"),
+        Object (title:         _("Raise"),
+                description:   _("Show Xnoise"),
                 icon_name:     "xnoise",
                 has_thumbnail: false,
                 match_type:    MatchType.ACTION
@@ -161,8 +161,8 @@ namespace Synapse
     {
       public Play ()
       {
-        Object (title:         _ ("Play"),
-                description:   _ ("Start playback in Xnoise"),
+        Object (title:         _("Play"),
+                description:   _("Start playback in Xnoise"),
                 icon_name:     "media-playback-start",
                 has_thumbnail: false,
                 match_type:    MatchType.ACTION
@@ -186,8 +186,8 @@ namespace Synapse
     {
       public TogglePlaying ()
       {
-        Object (title:         _ ("TogglePlaying"),
-                description:   _ ("Start/Pause playback in Xnoise"),
+        Object (title:         _("TogglePlaying"),
+                description:   _("Start/Pause playback in Xnoise"),
                 icon_name:     "media-playback-pause",
                 has_thumbnail: false,
                 match_type:    MatchType.ACTION
@@ -216,8 +216,8 @@ namespace Synapse
     {
       public Pause ()
       {
-        Object (title:         _ ("Pause"),
-                description:   _ ("Pause playback in Xnoise"),
+        Object (title:         _("Pause"),
+                description:   _("Pause playback in Xnoise"),
                 icon_name:     "media-playback-pause",
                 has_thumbnail: false,
                 match_type:    MatchType.ACTION
@@ -241,8 +241,8 @@ namespace Synapse
     {
       public Next ()
       {
-        Object (title:         _ ("Next"),
-                description:   _ ("Plays the next song in Xnoise's playlist"),
+        Object (title:         _("Next"),
+                description:   _("Plays the next song in Xnoise's playlist"),
                 icon_name:     "media-skip-forward",
                 has_thumbnail: false,
                 match_type:    MatchType.ACTION
@@ -267,8 +267,8 @@ namespace Synapse
     {
       public Previous ()
       {
-        Object (title:         _ ("Previous"),
-                description:   _ ("Plays the previous song in Xnoise's playlist"),
+        Object (title:         _("Previous"),
+                description:   _("Plays the previous song in Xnoise's playlist"),
                 icon_name:     "media-skip-backward",
                 has_thumbnail: false,
                 match_type:    MatchType.ACTION
@@ -292,8 +292,8 @@ namespace Synapse
     {
       public Stop ()
       {
-        Object (title:         _ ("Stop"),
-                description:   _ ("Stops the playback of Xnoise"),
+        Object (title:         _("Stop"),
+                description:   _("Stops the playback of Xnoise"),
                 icon_name:     "media-playback-stop",
                 has_thumbnail: false,
                 match_type:    MatchType.ACTION
@@ -318,8 +318,8 @@ namespace Synapse
     {
       public OpenUri ()
       {
-        Object (title: _ ("Play in Xnoise"),
-                description: _ ("Queues and plays the song"),
+        Object (title: _("Play in Xnoise"),
+                description: _("Queues and plays the song"),
                 icon_name: "media-playback-start",
                 has_thumbnail: false,
                 match_type: MatchType.ACTION,

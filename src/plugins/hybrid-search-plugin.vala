@@ -59,7 +59,7 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (HybridSearchPlugin),
         "Hybrid Search",
-        _ ("Improve results returned by the Zeitgeist plugin by looking " +
+        _("Improve results returned by the Zeitgeist plugin by looking " +
         "for similar files on the filesystem."),
         "search",
         register_plugin

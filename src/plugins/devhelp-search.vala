@@ -56,8 +56,8 @@ namespace Synapse
 
       public Search ()
       {
-        Object (title: _ ("Search in Devhelp"),
-                description: _ ("Search documentation for this symbol"),
+        Object (title: _("Search in Devhelp"),
+                description: _("Search documentation for this symbol"),
                 has_thumbnail: false, icon_name: "devhelp");
       }
     }
@@ -67,11 +67,11 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (DevhelpPlugin),
         "Devhelp",
-        _ ("Search documentation using Devhelp."),
+        _("Search documentation using Devhelp."),
         "devhelp",
         register_plugin,
         Environment.find_program_in_path ("devhelp") != null,
-        _ ("Devhelp is not installed")
+        _("Devhelp is not installed")
       );
     }
 

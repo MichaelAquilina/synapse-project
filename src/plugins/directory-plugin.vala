@@ -109,7 +109,7 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (DirectoryPlugin),
         "Directory Search",
-        _ ("Open commonly used directories."),
+        _("Open commonly used directories."),
         "folder",
         register_plugin
       );

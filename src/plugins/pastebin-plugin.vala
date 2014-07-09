@@ -39,8 +39,8 @@ namespace Synapse
     {
       public PastebinAction ()
       {
-        Object (title: _ ("Pastebin"),
-                description: _ ("Pastebin selection"),
+        Object (title: _("Pastebin"),
+                description: _("Pastebin selection"),
                 match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
                 default_relevancy: MatchScore.AVERAGE);
@@ -149,11 +149,11 @@ namespace Synapse
           var cb = Gtk.Clipboard.get (Gdk.Atom.NONE);
           cb.set_text (url, -1);
 
-          msg = _ ("The selection was successfully uploaded and its URL was copied to clipboard.");
+          msg = _("The selection was successfully uploaded and its URL was copied to clipboard.");
         }
         else
         {
-          msg = _ ("An error occurred during upload, please check the log for more information.");
+          msg = _("An error occurred during upload, please check the log for more information.");
         }
 
         try
@@ -161,7 +161,7 @@ namespace Synapse
           // yey for breaking API!
           var notification = Object.new (
             typeof (Notify.Notification),
-            summary: _ ("Synapse - Pastebin"),
+            summary: _("Synapse - Pastebin"),
             body: msg,
             icon_name: "synapse",
             null) as Notify.Notification;
@@ -228,8 +228,8 @@ namespace Synapse
     {
       public PastebinToContactAction ()
       {
-        Object (title: _ ("Pastebin to contact.."),
-                description: _ ("Pastebin selection"),
+        Object (title: _("Pastebin to contact.."),
+                description: _("Pastebin selection"),
                 match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
                 default_relevancy: MatchScore.AVERAGE);
@@ -263,12 +263,12 @@ namespace Synapse
     {
       PluginRegistry.get_default ().register_plugin (
         typeof (PastebinPlugin),
-        _ ("Pastebin"),
-        _ ("Upload files to pastebin."),
+        _("Pastebin"),
+        _("Upload files to pastebin."),
         "document-send",
         register_plugin,
         Environment.find_program_in_path ("pastebinit") != null,
-        _ ("Unable to find \"pastebinit\" program")
+        _("Unable to find \"pastebinit\" program")
       );
     }
 

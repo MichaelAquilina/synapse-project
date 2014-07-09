@@ -240,7 +240,7 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (OpenSearchPlugin),
         "OpenSearch",
-        _ ("Search the web."),
+        _("Search the web."),
         "applications-internet",
         register_plugin
       );
@@ -252,10 +252,10 @@ namespace Synapse
 
       // keep in sync with the internal XMLs!
       unowned string dummy;
-      dummy = N_ ("Google");
-      dummy = N_ ("Search the web using google.com");
-      dummy = N_ ("Google Maps");
-      dummy = N_ ("Search using Google Maps");
+      dummy = N_("Google");
+      dummy = N_("Search the web using google.com");
+      dummy = N_("Google Maps");
+      dummy = N_("Search using Google Maps");
     }
 
     private Gee.List<SearchAction> actions;
@@ -283,8 +283,8 @@ namespace Synapse
             parser.parse (s);
             if (parser.has_valid_result ())
             {
-              actions.add (new SearchAction (_ (parser.short_name),
-                                             _ (parser.description),
+              actions.add (new SearchAction (_(parser.short_name),
+                                             _(parser.description),
                                              parser.query_url));
             }
           }

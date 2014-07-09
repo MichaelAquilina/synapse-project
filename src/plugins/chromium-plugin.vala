@@ -63,12 +63,12 @@ namespace Synapse
     {
       PluginRegistry.get_default ().register_plugin (
         typeof (ChromiumPlugin),
-        _ ("Chromium Plugin"),
-        _ ("Browse and open Chromium bookmarks."),
+        _("Chromium Plugin"),
+        _("Browse and open Chromium bookmarks."),
         "chromium",
         register_plugin,
         Environment.find_program_in_path ("chromium") != null,
-        _ ("Chromium is not installed")
+        _("Chromium is not installed")
       );
     }
 

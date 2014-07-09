@@ -55,12 +55,12 @@ namespace Synapse
     {
       PluginRegistry.get_default ().register_plugin (
         typeof (HelloWorldPlugin),
-        _ ("Hello world"), // plugin title
-        _ ("An example plugin."), // description
+        _("Hello world"), // plugin title
+        _("An example plugin."), // description
         "system-run", // icon name
         register_plugin, // reference to this function
         Environment.find_program_in_path ("ls") != null, // true if user's system has all required components which the plugin needs
-        _ ("ls is not installed") // error message
+        _("ls is not installed") // error message
       );
     }
 
