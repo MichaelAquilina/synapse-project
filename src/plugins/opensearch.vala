@@ -46,6 +46,18 @@ namespace Synapse
 </OpenSearchDescription>
 """;
 
+  private const string DUCKDUCKGO_SEARCH_XML = """
+<?xml version="1.0" encoding="utf-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"> 
+  <ShortName>DuckDuckGo</ShortName> 
+  <Description>Search DuckDuckGo</Description> 
+  <InputEncoding>UTF-8</InputEncoding> 
+  <LongName>DuckDuckGo Search</LongName> 
+  <Url type="text/html" method="get" template="https://duckduckgo.com/?q={searchTerms}"/>
+  <Url type="application/x-suggestions+json" template="https://ac.duckduckgo.com/ac/?q={searchTerms}&amp;type=list"/>
+</OpenSearchDescription> 
+""";
+
   public class OpenSearchPlugin : Object, Activatable, ActionProvider
   {
     public bool enabled { get; set; default = true; }
@@ -58,7 +70,6 @@ namespace Synapse
 
     public void deactivate ()
     {
-
     }
 
     private class OpenSearchParser : Object
@@ -252,6 +263,8 @@ namespace Synapse
 
       // keep in sync with the internal XMLs!
       unowned string dummy;
+      dummy = N_("DuckDuckGo");
+      dummy = N_("Search the web using duckduckgo.com");
       dummy = N_("Google");
       dummy = N_("Search the web using google.com");
       dummy = N_("Google Maps");
@@ -273,6 +286,7 @@ namespace Synapse
       if (config.use_internal)
       {
         Gee.List<unowned string> internals = new Gee.ArrayList<unowned string> ();
+        internals.add (DUCKDUCKGO_SEARCH_XML);
         internals.add (GOOGLE_SEARCH_XML);
         internals.add (GOOGLE_MAPS_XML);
         foreach (unowned string s in internals)
