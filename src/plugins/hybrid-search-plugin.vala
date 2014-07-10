@@ -368,12 +368,7 @@ namespace Synapse
         try
         {
           var dir_info = yield dir.query_info_async ("time::*", 0, 0, null);
-#if VALA_0_16
           var t = dir_info.get_modification_time ();
-#else
-          var t = TimeVal ();
-          dir_info.get_modification_time (out t);
-#endif
           if (t.tv_sec > di.last_update.tv_sec)
           {
             // the directory was changed, let's update
