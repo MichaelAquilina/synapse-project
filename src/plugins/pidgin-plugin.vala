@@ -168,7 +168,7 @@ namespace Synapse
       f = File.new_for_uri (uri);
       if (!f.query_exists ())
       {
-        Utils.Logger.warning (this, _("File \"%s\"does not exist."), uri);
+        warning (_("File \"%s\"does not exist."), uri);
         return;
       }
       string path = f.get_path ();
@@ -176,13 +176,13 @@ namespace Synapse
         int conn = p.purple_account_get_connection (contact.account_id);
         if (conn <= 0)
         {
-          Utils.Logger.warning (this, "Cannot send file to %s", contact.title);
+          warning ("Cannot send file to %s", contact.title);
           return;
         }
         p.serv_send_file (conn, contact.name, path);
       } catch (IOError err)
       {
-        Utils.Logger.warning (this, "Cannot send file to %s", contact.title);
+        warning ("Cannot send file to %s", contact.title);
       }
     }
 
@@ -198,7 +198,7 @@ namespace Synapse
         if (present) p.purple_conversation_present (conv);
       } catch (IOError err)
       {
-        Utils.Logger.warning (this, "Cannot open chat for %s", contact.title);
+        warning ("Cannot open chat for %s", contact.title);
       }
     }
 
@@ -384,7 +384,7 @@ namespace Synapse
         }
 
       } catch (IOError err) {
-        Utils.Logger.warning (this, "Cannot load Pidgin contacts");
+        warning ("Cannot load Pidgin contacts");
       }
     }
 

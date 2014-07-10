@@ -250,7 +250,7 @@ namespace Synapse
       //   otoh the gio module won't pick it up if it's not should_show
       if (zg_gio_module != 0)
       {
-        Utils.Logger.debug (this, "libzg-gio-module detected, not pushing");
+        debug ("libzg-gio-module detected, not pushing");
         reload_relevancies ();
         return;
       }
@@ -273,7 +273,7 @@ namespace Synapse
         app_uri = "application://" + Path.get_basename (filename);
       }
 
-      Utils.Logger.debug (this, "launched \"%s\", pushing to ZG", app_uri);
+      debug ("launched \"%s\", pushing to ZG", app_uri);
       push_app_launch (app_uri, app_info.get_display_name ());
 
       // and refresh

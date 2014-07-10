@@ -141,7 +141,7 @@ namespace Synapse
       model = controller_model;
       old_alloc = {1, 1};
       update_wm ();
-      if (is_kwin) Synapse.Utils.Logger.log (this, "Using KWin compatibility mode.");
+      if (is_kwin) message ("Using KWin compatibility mode.");
 
       cache_enabled = true;
       bg_cache = new Gee.HashMap<string, Cairo.Surface> ();
@@ -248,7 +248,7 @@ namespace Synapse
         comp = false;
         visual = screen.get_system_visual();
       }
-      Synapse.Utils.Logger.log (this, "Screen is%s composited.", comp ? "": " NOT");
+      message ("Screen is%s composited.", comp ? "": " NOT");
       this.set_visual (visual);
 
       update_wm ();

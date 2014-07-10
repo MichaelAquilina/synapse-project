@@ -76,7 +76,7 @@ namespace Synapse
 
     public void application_launched (AppInfo app_info)
     {
-      Utils.Logger.debug (this, "application launched");
+      debug ("application launched");
       if (backend == null) return;
       backend.application_launched (app_info);
     }

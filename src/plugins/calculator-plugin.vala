@@ -84,7 +84,7 @@ namespace Synapse
         regex = new Regex ("^\\(*(-?\\d+([.,]\\d+)?)([*/+-^]\\(*(-?\\d+([.,]\\d+)?)\\)*)+$",
                          RegexCompileFlags.OPTIMIZE);
       } catch (Error e) {
-        Utils.Logger.error (this, "Error creating regexp.");
+        critical ("Error creating regexp.");
       }
     }
 

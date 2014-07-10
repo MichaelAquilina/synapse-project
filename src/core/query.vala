@@ -124,7 +124,7 @@ namespace Synapse
     {
       /* create a couple of regexes and try to help with matching
        * match with these regular expressions (with descending score):
-       * 1) ^query$
+       * 1) ^query
        * 2) ^query
        * 3) \bquery
        * 4) split to words and seach \bword1.+\bword2 (if there are 2+ words)

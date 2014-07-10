@@ -98,7 +98,7 @@ namespace Synapse
 
     ~DataSink ()
     {
-      Utils.Logger.debug (this, "DataSink died...");
+      debug ("DataSink died...");
     }
 
     private DataSinkConfiguration config;

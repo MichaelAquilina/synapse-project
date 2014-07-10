@@ -84,7 +84,7 @@ namespace Synapse
         }
         catch (Error err)
         {
-          Utils.Logger.warning (this, "%s", err.message);
+          warning ("%s", err.message);
         }
 
         return null;
@@ -134,7 +134,7 @@ namespace Synapse
         }
         catch (Error err)
         {
-          Utils.Logger.warning (this, "%s", err.message);
+          warning ("%s", err.message);
         }
 
         return null;
@@ -169,7 +169,7 @@ namespace Synapse
         }
         catch (Error err)
         {
-          Utils.Logger.warning (this, "%s", err.message);
+          warning ("%s", err.message);
         }
       }
 
@@ -183,7 +183,7 @@ namespace Synapse
           string path = f.get_path ();
           if (path == null)
           {
-            Utils.Logger.warning (this, "Unable to get path for %s", uri_match.uri);
+            warning ("Unable to get path for %s", uri_match.uri);
             return;
           }
           pastebin_file.begin (path, (obj, res) => {

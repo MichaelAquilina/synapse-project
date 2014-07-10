@@ -210,7 +210,7 @@ namespace Synapse.Gui
         keyval = Gdk.Key.Return;
       }
       Gdk.ModifierType mod = event.state & mod_normalize_mask;
-      // Synapse.Utils.Logger.log (this, get_name_from_key (keyval, mod));
+      // message (get_name_from_key (keyval, mod));
       return kcs.get_command_for_keycombo (keyval, mod);
     }
 

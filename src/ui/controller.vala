@@ -56,7 +56,7 @@ namespace Synapse.Gui
       {
         Gtk.Window v = this.view as Gtk.Window;
 
-        Synapse.Utils.Logger.log (view, "Using %s input method.", im_context.get_context_id ());
+        message ("Using %s input method.", im_context.get_context_id ());
 
         v.focus_in_event.connect (() => {
           im_context.reset ();
@@ -526,7 +526,7 @@ namespace Synapse.Gui
      */
     protected void reset_search (bool notify = true, bool reset_flags = true)
     {
-      // Synapse.Utils.Logger.log (this, "RESET");
+      // message ("RESET");
       for (int i = 0; i < SearchingFor.COUNT; i++)
       {
         current_cancellable[i].cancel ();
@@ -563,7 +563,7 @@ namespace Synapse.Gui
 
     private void search_for_matches (SearchingFor what, bool search_with_empty = false, SearchProvider? search_provider = null)
     {
-      // Synapse.Utils.Logger.log (this, "search_for_matches: %u", what);
+      // message ("search_for_matches: %u", what);
 
       current_cancellable[what].cancel ();
       current_cancellable[what] = new Cancellable ();
@@ -627,7 +627,7 @@ namespace Synapse.Gui
 
     private void send_partial_results (SearchingFor what, ResultSet rs)
     {
-      // Synapse.Utils.Logger.log (this, "partial_matches: %u", what);
+      // message ("partial_matches: %u", what);
       /* Search not ready */
       view.set_throbber_visible (true);
       partial_result_sent[what] = true;
@@ -680,7 +680,7 @@ namespace Synapse.Gui
 
     private void search_ready (SearchingFor what, Gee.List<Match> res)
     {
-      // Synapse.Utils.Logger.log (this, "ready_for_matches: %u", what);
+      // message ("ready_for_matches: %u", what);
       if (!partial_result_sent[what])
       {
         /* reset current focus */
@@ -751,7 +751,7 @@ namespace Synapse.Gui
 
     private void search_for_actions ()
     {
-      // Synapse.Utils.Logger.log (this, "search_for_actions");
+      // message ("search_for_actions");
       /* We are searching for actions => reset target & notify */
       if (model.results[SearchingFor.TARGETS] != null)
       {

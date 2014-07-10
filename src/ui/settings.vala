@@ -269,7 +269,7 @@ namespace Synapse.Gui
         {
           string cannot_bind = _("Shortcut already in use");
           cannot_bind = "%s: \"%s\"".printf (cannot_bind, keyname);
-          Synapse.Utils.Logger.warning (this, cannot_bind);
+          warning (cannot_bind);
           var d = new Gtk.MessageDialog (this, 0, MessageType.ERROR,
                                          ButtonsType.CLOSE,
                                          "%s", cannot_bind);

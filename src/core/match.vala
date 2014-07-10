@@ -52,7 +52,7 @@ namespace Synapse
 
     public virtual void execute (Match match)
     {
-      Utils.Logger.error (this, "execute () is not implemented");
+      critical ("execute () is not implemented");
     }
 
     public virtual void execute_with_target (Match source, Match? target = null)
@@ -60,7 +60,7 @@ namespace Synapse
       if (target == null)
         execute (source);
       else
-        Utils.Logger.error (this, "execute_with_target () is not implemented");
+        critical ("execute_with_target () is not implemented");
     }
 
     public virtual bool needs_target ()

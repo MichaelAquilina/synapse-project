@@ -180,7 +180,7 @@ namespace Synapse
         }
         catch (Error err)
         {
-          Utils.Logger.warning (this, "%s", err.message);
+          warning ("%s", err.message);
         }
       }
 
@@ -195,11 +195,11 @@ namespace Synapse
             try
             {
               url = upload_file.end (res);
-              Utils.Logger.log (this, "%s", url);
+              message ("%s", url);
             }
             catch (Error err)
             {
-              Utils.Logger.warning (this, "%s", err.message);
+              warning ("%s", err.message);
             }
 
             process_result (url, target);

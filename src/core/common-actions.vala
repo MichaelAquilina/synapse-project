@@ -83,7 +83,7 @@ namespace Synapse
           }
           catch (Error err)
           {
-            Utils.Logger.warning (this, "%s", err.message);
+            warning ("%s", err.message);
           }
         }
         else if (match is ActionMatch)
@@ -137,7 +137,7 @@ namespace Synapse
           }
           catch (Error err)
           {
-            Utils.Logger.warning (this, "%s", err.message);
+            warning ("%s", err.message);
           }
         }
       }
@@ -205,7 +205,7 @@ namespace Synapse
         }
         catch (Error err)
         {
-          Utils.Logger.warning (this, "%s", err.message);
+          warning ("%s", err.message);
         }
       }
     }
@@ -237,7 +237,7 @@ namespace Synapse
         }
         catch (Error err)
         {
-          Utils.Logger.warning (this, "%s", err.message);
+          warning ("%s", err.message);
         }
       }
 
@@ -369,7 +369,7 @@ namespace Synapse
       }
       catch (Error err)
       {
-        Utils.Logger.warning (null, "%s", err.message);
+        warning ("%s", err.message);
       }
     }
   }

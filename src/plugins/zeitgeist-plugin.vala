@@ -737,7 +737,7 @@ namespace Synapse
         if (!q.is_cancelled ())
         {
           // we don't care about message about being cancelled
-          Utils.Logger.warning (this, "Zeitgeist search failed: %s", err.message);
+          warning ("Zeitgeist search failed: %s", err.message);
         }
       }
 
@@ -745,7 +745,7 @@ namespace Synapse
 
       q.check_cancellable ();
 
-      Utils.Logger.debug (this, "search took %d ms", (int)(timer.elapsed ()*1000));
+      debug ("search took %d ms", (int)(timer.elapsed ()*1000));
 
       return result;
     }

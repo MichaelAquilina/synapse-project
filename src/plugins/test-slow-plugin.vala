@@ -57,7 +57,7 @@ namespace Synapse
 
       q.check_cancellable ();
 
-      Utils.Logger.debug (this, "finished search for \"%s\"", q.query_string);
+      debug ("finished search for \"%s\"", q.query_string);
 
       var rs = new ResultSet ();
       rs.add (new TestResult (q.query_string), 0);

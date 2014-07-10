@@ -105,7 +105,7 @@ namespace Synapse
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.quit ();
         } catch (IOError e) {
-          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
+          warning ("Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -128,7 +128,7 @@ namespace Synapse
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.raise ();
         } catch (IOError e) {
-          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
+          warning ("Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -151,7 +151,7 @@ namespace Synapse
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.play ();
         } catch (IOError e) {
-          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
+          warning ("Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -174,7 +174,7 @@ namespace Synapse
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.toggle_playing ();
         } catch (IOError e) {
-          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
+          warning ("Xnoise is not available.\n%s", e.message);
         }
       }
 
@@ -202,7 +202,7 @@ namespace Synapse
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.pause ();
         } catch (IOError e) {
-          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
+          warning ("Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -226,7 +226,7 @@ namespace Synapse
 
           player.next ();
         } catch (IOError e) {
-          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
+          warning ("Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -249,7 +249,7 @@ namespace Synapse
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.previous ();
         } catch (IOError e) {
-          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
+          warning ("Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -272,7 +272,7 @@ namespace Synapse
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.stop ();
         } catch (IOError e) {
-          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
+          warning ("Xnoise is not available.\n%s", e.message);
         }
       }
     }
@@ -304,7 +304,7 @@ namespace Synapse
           player.open_uri (uri.uri);
           player.play ();
         } catch (IOError e) {
-          Utils.Logger.warning (this, "Xnoise is not available.\n%s", e.message);
+          warning ("Xnoise is not available.\n%s", e.message);
         }
       }
 

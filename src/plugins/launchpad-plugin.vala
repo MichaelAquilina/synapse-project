@@ -91,8 +91,8 @@ namespace Synapse
           try
           {
             var step3_result = auth_object.auth_step3.end (res);
-            Utils.Logger.log (this, "token: %s", step3_result.lookup ("oauth_token"));
-            Utils.Logger.log (this, "token_secret: %s", step3_result.lookup ("oauth_token_secret"));
+            message ("token: %s", step3_result.lookup ("oauth_token"));
+            message ("token_secret: %s", step3_result.lookup ("oauth_token_secret"));
 
             label.set_text (_("Successfully authenticated"));
           }
@@ -260,7 +260,7 @@ namespace Synapse
       }
       catch (RegexError err)
       {
-        Utils.Logger.warning (this, "Unable to construct regex: %s", err.message);
+        warning ("Unable to construct regex: %s", err.message);
       }
     }
 

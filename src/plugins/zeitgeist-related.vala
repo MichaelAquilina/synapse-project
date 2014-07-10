@@ -107,7 +107,7 @@ namespace Synapse
       if (m is UriMatch)
       {
         unowned UriMatch um = (UriMatch) m;
-        Utils.Logger.debug (this, "searching for items related to %s", um.uri);
+        debug ("searching for items related to %s", um.uri);
 
         s = new Subject ();
         s.uri = um.uri;
@@ -135,12 +135,12 @@ namespace Synapse
 
         if (app_id == null || app_id == "")
         {
-          Utils.Logger.warning (this, "Unable to extract application id!");
+          warning ("Unable to extract application id!");
           return null;
         }
 
         app_id = "application://" + app_id;
-        Utils.Logger.debug (this, "searching for items related to %s", app_id);
+        debug ("searching for items related to %s", app_id);
 
         e = new Event ();
         e.actor = app_id;
@@ -195,7 +195,7 @@ namespace Synapse
       }
       catch (Error err)
       {
-        Utils.Logger.warning (this, "%s", err.message);
+        warning ("%s", err.message);
       }
 
       q.check_cancellable ();

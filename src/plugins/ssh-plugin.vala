@@ -53,7 +53,7 @@ namespace Synapse
       }
       catch (IOError e)
       {
-        Utils.Logger.warning (this, "Failed to start monitoring changes of ssh client config file");
+        warning ("Failed to start monitoring changes of ssh client config file");
       }
     }
 
@@ -104,7 +104,7 @@ namespace Synapse
               string host_stripped = host.strip ();
               if (host_stripped != "" && host_stripped.index_of ("*") == -1 && host_stripped.index_of ("?") == -1)
               {
-                Utils.Logger.debug (this, "host added: %s\n", host_stripped);
+                debug ("host added: %s\n", host_stripped);
                 hosts.set (host_stripped, new SshHost (host_stripped));
               }
             }
@@ -113,7 +113,7 @@ namespace Synapse
       }
       catch (Error e)
       {
-        Utils.Logger.warning (this, "%s: %s", config_file.get_path (), e.message);
+        warning ("%s: %s", config_file.get_path (), e.message);
       }
     }
 
@@ -124,7 +124,7 @@ namespace Synapse
     {
       if (event_type == FileMonitorEvent.CHANGES_DONE_HINT)
       {
-        Utils.Logger.log (this, "ssh_config is changed, reparsing");
+        message ("ssh_config is changed, reparsing");
         parse_ssh_config.begin ();
       }
     }

@@ -133,7 +133,7 @@ namespace Synapse
         }
         catch (IOError e)
         {
-          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
+          warning ("Rythmbox is not available.\n%s", e.message);
         }
       }
     }
@@ -159,7 +159,7 @@ namespace Synapse
         }
         catch (IOError e)
         {
-          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
+          warning ("Rythmbox is not available.\n%s", e.message);
         }
       }
     }
@@ -184,7 +184,7 @@ namespace Synapse
         } 
         catch (IOError e)
         {
-          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
+          warning ("Rythmbox is not available.\n%s", e.message);
         }
       }
     }
@@ -210,7 +210,7 @@ namespace Synapse
         } 
         catch (IOError e)
         {
-          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
+          warning ("Rythmbox is not available.\n%s", e.message);
         }
       }
     }
@@ -247,7 +247,7 @@ namespace Synapse
         } 
         catch (IOError e)
         {
-          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
+          warning ("Rythmbox is not available.\n%s", e.message);
         }
       }
 
@@ -285,7 +285,7 @@ namespace Synapse
         } 
         catch (IOError e)
         {
-          Utils.Logger.warning (this, "Rythmbox is not available.\n%s", e.message);
+          warning ("Rythmbox is not available.\n%s", e.message);
         }
       }
 

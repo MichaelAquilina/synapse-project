@@ -207,7 +207,7 @@ namespace Synapse
     private void bind_keyboard_shortcut ()
     {
       current_shortcut = key_combo_config.activate;
-      Utils.Logger.log (this, "Binding activation to %s", current_shortcut);
+      message ("Binding activation to %s", current_shortcut);
       settings.set_keybinding (current_shortcut, false);
       Keybinder.bind (current_shortcut, handle_shortcut, this);
     }
@@ -263,7 +263,8 @@ namespace Synapse
     }
     public static int main (string[] argv)
     {
-      Utils.Logger.log (null, "Starting up...");
+      Utils.Logger.initialize ();
+      message ("Starting up...");
       ibus_fix ();
       Intl.bindtextdomain ("synapse", Config.DATADIR + "/locale");
       var context = new OptionContext (" - Synapse");
@@ -280,7 +281,7 @@ namespace Synapse
 
         var app = new GLib.Application ("org.gnome.Synapse", ApplicationFlags.FLAGS_NONE);
         if (!app.register () || app.get_is_remote ()) {
-          Utils.Logger.log (null, "Synapse is already running, activating...");
+          message ("Synapse is already running, activating...");
           app.activate ();
         }
         else

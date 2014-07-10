@@ -841,7 +841,7 @@ namespace Synapse.Gui
       window.get_window ().raise ();
       window.get_window ().focus (timestamp);
 
-      if (Synapse.Utils.Logger.debug_enabled ()) return;
+      if (Synapse.Utils.Logger.DisplayLevel == Synapse.Utils.Logger.LogLevel.DEBUG) return;
       // grab
       int i = 0;
       Timeout.add (100, () => {
@@ -854,7 +854,7 @@ namespace Synapse.Gui
     /* Code from Gnome-Do */
     public static void unpresent_window (Gtk.Window window)
     {
-      if (Synapse.Utils.Logger.debug_enabled ()) return;
+      if (Synapse.Utils.Logger.DisplayLevel == Synapse.Utils.Logger.LogLevel.DEBUG) return;
       uint32 time = Gtk.get_current_event_time();
 
       var pointer = Gdk.Display.get_default ().get_device_manager ().get_client_pointer ();

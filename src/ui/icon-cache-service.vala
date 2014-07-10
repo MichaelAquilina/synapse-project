@@ -68,7 +68,7 @@ namespace Synapse.Gui
     public void clear_cache ()
     {
       map.clear ();
-      Synapse.Utils.Logger.debug (this, "Icon Cache cleared.");
+      debug ("Icon Cache cleared.");
     }
 
     public void reduce_cache ()
@@ -86,7 +86,7 @@ namespace Synapse.Gui
         }
       }
       keys.clear ();
-      Synapse.Utils.Logger.debug (this, "Cache freed/size: %d/%d", i, map.size);
+      debug ("Cache freed/size: %d/%d", i, map.size);
     }
 
     public Gdk.Pixbuf? get_icon (string name, int pixel_size)

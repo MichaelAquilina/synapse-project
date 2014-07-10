@@ -176,12 +176,12 @@ namespace Synapse
           {
             z += x.value.files.size;
           }
-          Utils.Logger.log (this, "keeps in cache now %d file names", z);
+          message ("keeps in cache now %d file names", z);
         }
       }
       catch (Error err)
       {
-        Utils.Logger.warning (this, "Unable to parse %s", recent.get_path ());
+        warning ("Unable to parse %s", recent.get_path ());
       }
 
       initialization_done = true;
@@ -303,7 +303,7 @@ namespace Synapse
     private async void update_directory_contents (GLib.File directory,
                                                   DirectoryInfo di) throws Error
     {
-      Utils.Logger.debug (this, "Scanning %s", directory.get_path ());
+      debug ("Scanning %s", directory.get_path ());
       var enumerator = yield directory.enumerate_children_async (
         FileAttribute.STANDARD_NAME, 0, 0);
       var files = yield enumerator.next_files_async (1024, 0);
@@ -377,7 +377,7 @@ namespace Synapse
         }
         catch (Error err)
         {
-          Utils.Logger.warning (this, "%s", err.message);
+          warning ("%s", err.message);
         }
 
         var rel_srv = RelevancyService.get_default ();
@@ -442,7 +442,7 @@ namespace Synapse
 
       if (directories.size == 0) q.check_cancellable ();
 
-      Utils.Logger.debug (this, "found %d extra uris (ZG returned %d)",
+      debug ("found %d extra uris (ZG returned %d)",
         results.size, original_rs == null ? 0 : original_rs.size);
 
       return results;

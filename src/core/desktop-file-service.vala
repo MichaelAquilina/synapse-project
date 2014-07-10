@@ -190,7 +190,7 @@ namespace Synapse
       }
       catch (Error err)
       {
-        Utils.Logger.warning (this, "%s", err.message);
+        warning ("%s", err.message);
         is_valid = false;
       }
     }
@@ -367,7 +367,7 @@ namespace Synapse
         // screensavers don't interest us, skip those
         if (path != null && path.has_suffix ("/screensavers")) return;
 
-        Utils.Logger.debug (this, "Searching for desktop files in: %s", path);
+        debug ("Searching for desktop files in: %s", path);
         bool exists = yield Utils.query_exists_async (directory);
         if (!exists) return;
         /* Check if we already scanned this directory // lp:686624 */
@@ -538,7 +538,7 @@ namespace Synapse
         }
         catch (RegexError err)
         {
-          Utils.Logger.error (this, "%s", err.message);
+          critical ("%s", err.message);
         }
         exec = exec.strip ();
         // update exec map
