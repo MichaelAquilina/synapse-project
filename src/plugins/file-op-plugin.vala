@@ -27,12 +27,42 @@ namespace Synapse
 
     public void activate ()
     {
-
     }
 
     public void deactivate ()
     {
+    }
 
+    private class Remove: Action
+    {
+      public Remove()
+      {
+        Object (title: _("Remove"),
+                description: _("Move to Trash"),
+                icon_name: "user-trash", has_thumbnail: false,
+                default_relevancy: MatchScore.POOR);
+      }
+
+      public override void do_execute (Match source, Match? target = null)
+      {
+        unowned UriMatch uri_match = source as UriMatch;
+        return_if_fail (uri_match != null);
+
+        var f = File.new_for_uri (uri_match.uri);
+        try
+        {
+           f.trash ();
+        }
+        catch (Error err)
+        {
+          warning ("%s", err.message);
+        }
+      }
+
+      public override bool valid_for_match (Match match)
+      {
+        return (match is UriMatch);
+      }
     }
 
     private class RenameTo : Action
@@ -110,6 +140,7 @@ namespace Synapse
     {
       actions = new Gee.ArrayList<Action> ();
 
+      actions.add (new Remove ());
       actions.add (new RenameTo ());
     }
 
