@@ -73,6 +73,7 @@ namespace Synapse.Gui
         Category.name_query_to_string ( _("Documents"), QueryFlags.DOCUMENTS ),
         Category.name_query_to_string ( _("Images"), QueryFlags.IMAGES ),
         Category.name_query_to_string ( _("Video"), QueryFlags.VIDEO ),
+        Category.name_query_to_string ( _("Contacts"), QueryFlags.CONTACTS ),
         Category.name_query_to_string ( _("Internet"), QueryFlags.INTERNET | QueryFlags.INCLUDE_REMOTE )
       };
     }

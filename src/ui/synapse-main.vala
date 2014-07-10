@@ -175,9 +175,9 @@ namespace Synapse
         typeof (SshPlugin),
         typeof (XnoiseActions),
         typeof (ChromiumPlugin),
-        // typeof (FileOpPlugin),
-        // typeof (PidginPlugin),
-        // typeof (ChatActions),
+        typeof (FileOpPlugin),
+        typeof (PidginPlugin),
+        typeof (ChatActions),
 #if HAVE_ZEITGEIST
         typeof (ZeitgeistPlugin),
         typeof (ZeitgeistRelated),
