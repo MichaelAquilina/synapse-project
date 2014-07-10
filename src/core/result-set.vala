@@ -22,8 +22,8 @@ namespace Synapse
 {
   public class ResultSet : Object, Gee.Traversable<Match>, Gee.Iterable <Gee.Map.Entry <Match, int>>
   {
-    protected Gee.Map<Match, int> matches;
-    protected Gee.Set<unowned string> uris;
+    Gee.Map<Match, int> matches;
+    Gee.Set<unowned string> uris;
 
     public ResultSet ()
     {

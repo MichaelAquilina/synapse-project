@@ -126,7 +126,7 @@ namespace Synapse
 
   public abstract class TextMatch : Match
   {
-    public TextOrigin text_origin { get; set; }
+    public TextOrigin text_origin { get; construct; }
 
     public abstract string get_text ();
   }
