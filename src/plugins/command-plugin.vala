@@ -116,7 +116,7 @@ namespace Synapse
 
     private void command_executed (Match match)
     {
-      CommandObject? co = match as CommandObject;
+      unowned CommandObject? co = match as CommandObject;
       if (co == null) return;
 
       past_commands.add (co.command);

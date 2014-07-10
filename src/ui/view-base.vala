@@ -485,7 +485,7 @@ namespace Synapse
         return false;
       }
 
-      UriMatch? um = model.focus[sf].value as UriMatch;
+      unowned UriMatch? um = model.focus[sf].value as UriMatch;
       if (um == null)
       {
         dragdrop_name = "";

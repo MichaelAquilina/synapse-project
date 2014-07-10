@@ -356,16 +356,13 @@ namespace Synapse.Gui
       model = new Gtk.ListStore (2, typeof (string), typeof (string));
       treeview.set_model (model);
 
-      Gtk.CellRenderer ren;
-      Gtk.TreeViewColumn col;
-      ren = new CellRendererText ();
-      col = new TreeViewColumn.with_attributes (_("Action"), ren, "text", 0);
+      var col = new TreeViewColumn.with_attributes (_("Action"), new CellRendererText (), "text", 0);
       treeview.append_column (col);
 
-      ren = new CellRendererAccel ();
-      (ren as CellRendererAccel).editable = true;
-      (ren as CellRendererAccel).accel_mode = Gtk.CellRendererAccelMode.OTHER;
-      (ren as CellRendererAccel).accel_edited.connect ((a, path, accel_key, accel_mods, keycode) => {
+      var ren = new CellRendererAccel ();
+      ren.editable = true;
+      ren.accel_mode = Gtk.CellRendererAccelMode.OTHER;
+      ren.accel_edited.connect ((a, path, accel_key, accel_mods, keycode) => {
         string? keyname = KeyComboConfig.get_name_from_key (accel_key, accel_mods);
 
         int index = int.parse (path);
@@ -388,7 +385,7 @@ namespace Synapse.Gui
         model.get_iter_from_string (out iter, path);
         model.set (iter, 1, keyname);
       });
-      (ren as CellRendererAccel).accel_cleared.connect ((a, path) => {
+      ren.accel_cleared.connect ((a, path) => {
         int index = int.parse (path);
         if (index == 0) this.set_keybinding ("");
       });

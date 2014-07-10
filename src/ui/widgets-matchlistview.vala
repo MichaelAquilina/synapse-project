@@ -213,7 +213,7 @@ namespace Synapse.Gui
       if (has_extended_info)
       {
         ctx.save ();
-        s = Markup.printf_escaped (extended_info_markup, (m as ExtendedInfo).extended_info ?? "");
+        s = Markup.printf_escaped (extended_info_markup, ((ExtendedInfo) m).extended_info ?? "");
         s = description_markup.printf (s);
         layout.set_markup (s, -1);
         layout.set_width (Pango.SCALE * width_for_description);

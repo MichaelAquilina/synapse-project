@@ -447,7 +447,7 @@ namespace Synapse.Gui
 
       private void theme_changed (Object o, ParamSpec p)
       {
-        var new_theme = (o as Gtk.Settings).gtk_theme_name;
+        var new_theme = ((Gtk.Settings) o).gtk_theme_name;
         if (new_theme == current_theme)
           return;
         current_theme = new_theme;
