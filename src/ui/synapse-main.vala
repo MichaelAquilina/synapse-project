@@ -162,6 +162,7 @@ namespace Synapse
         // item providing plugins
         typeof (DesktopFilePlugin),
         typeof (HybridSearchPlugin),
+        typeof (GnomeBookmarksPlugin),
         typeof (GnomeSessionPlugin),
         typeof (GnomeScreenSaverPlugin),
         typeof (SystemManagementPlugin),

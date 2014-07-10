@@ -41,6 +41,7 @@ libplugins_la_VALASOURCES = \
 	ssh-plugin.vala \
 	dictionary.vala \
 	directory-plugin.vala \
+	gnome-bookmarks-plugin.vala \
 	gnome-session-plugin.vala \
 	gnome-screensaver-plugin.vala \
 	hello-world-plugin.vala \
