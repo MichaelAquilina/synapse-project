@@ -152,9 +152,9 @@ namespace Synapse
     public abstract async Gee.List<Synapse.Match> search (string query, Synapse.QueryFlags flags, Synapse.ResultSet? dest_result_set, GLib.Cancellable? cancellable = null) throws Synapse.SearchError;
   }
 
-  public class DefaultMatch : Match
+  public class UnknownMatch : Match
   {
-    public DefaultMatch (string query_string)
+    public UnknownMatch (string query_string)
     {
       Object (title: query_string, description: "", has_thumbnail: false,
               icon_name: "unknown", match_type: MatchType.UNKNOWN);

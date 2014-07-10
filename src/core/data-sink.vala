@@ -432,7 +432,7 @@ namespace Synapse
 
       if (has_unknown_handlers && query_stripped != "")
       {
-        var unknown_match = new DefaultMatch (query);
+        var unknown_match = new UnknownMatch (query);
         bool add_to_rs = false;
         if (QueryFlags.ACTIONS in flags || QueryFlags.TEXT in flags)
         {

@@ -494,7 +494,7 @@ namespace Synapse.Gui
       if (m.value == null) target_icon.set_icon_name ("");
       else
       {
-        if (m.value is DefaultMatch)
+        if (m.value is UnknownMatch)
           target_icon.set_icon_name ("text-plain");
         else
         {
