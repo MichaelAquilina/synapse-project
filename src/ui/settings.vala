@@ -58,7 +58,7 @@ namespace Synapse.Gui
         help_button.clicked.connect (() => {
           string id = Synapse.Utils.extract_type_name (pi.plugin_type);
           string address = "http://synapse.zeitgeist-project.com/wiki/index.php?title=Plugins/%s". printf (id);
-          Synapse.CommonActions.open_uri (address);
+          Synapse.Utils.open_uri (address);
         });
         add_user_button (help_button);
 

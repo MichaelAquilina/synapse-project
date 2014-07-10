@@ -70,6 +70,23 @@ namespace Synapse
       return exists;
     }
 
+    public static void open_uri (string uri)
+    {
+      var f = File.new_for_uri (uri);
+      try
+      {
+        var app_info = f.query_default_handler (null);
+        List<File> files = new List<File> ();
+        files.prepend (f);
+        var display = Gdk.Display.get_default ();
+        app_info.launch (files, display.get_app_launch_context ());
+      }
+      catch (Error err)
+      {
+        warning ("%s", err.message);
+      }
+    }
+
     public static string extract_type_name (Type obj_type)
     {
       string obj_class = obj_type.name ();

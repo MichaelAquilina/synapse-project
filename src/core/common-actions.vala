@@ -47,12 +47,10 @@ namespace Synapse
 
     public void activate ()
     {
-
     }
 
     public void deactivate ()
     {
-
     }
 
     private class Runner : Action
@@ -164,7 +162,7 @@ namespace Synapse
 
         if (uri_match != null)
         {
-          CommonActions.open_uri (uri_match.uri);
+          Utils.open_uri (uri_match.uri);
         }
         else if (file_path.match (match.title))
         {
@@ -179,11 +177,11 @@ namespace Synapse
           {
             f = File.new_for_path (match.title);
           }
-          CommonActions.open_uri (f.get_uri ());
+          Utils.open_uri (f.get_uri ());
         }
         else
         {
-          CommonActions.open_uri (match.title);
+          Utils.open_uri (match.title);
         }
       }
 
@@ -354,23 +352,6 @@ namespace Synapse
       }
 
       return results;
-    }
-
-    public static void open_uri (string uri)
-    {
-      var f = File.new_for_uri (uri);
-      try
-      {
-        var app_info = f.query_default_handler (null);
-        List<File> files = new List<File> ();
-        files.prepend (f);
-        var display = Gdk.Display.get_default ();
-        app_info.launch (files, display.get_app_launch_context ());
-      }
-      catch (Error err)
-      {
-        warning ("%s", err.message);
-      }
     }
   }
 }

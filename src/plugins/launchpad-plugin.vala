@@ -187,7 +187,7 @@ namespace Synapse
       public void auth_step2 (string oauth_token)
       {
         // https://launchpad.net/+authorize-token?oauth_token={oauth_token}
-        CommonActions.open_uri ("https://launchpad.net/+authorize-token?oauth_token=" + oauth_token);
+        Utils.open_uri ("https://launchpad.net/+authorize-token?oauth_token=" + oauth_token);
       }
 
       public async HashTable<string, string> auth_step3 (string oauth_token,
