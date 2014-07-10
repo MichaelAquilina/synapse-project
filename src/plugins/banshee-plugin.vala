@@ -82,36 +82,22 @@ namespace Synapse
       register_plugin ();
     }
 
-    private abstract class BansheeAction : Match
+    private abstract class BansheeAction : Action
     {
-      public int default_relevancy { get; set; }
-
-      public abstract bool valid_for_match (Match match);
-      // stupid Vala...
-      public abstract void execute_internal (Match match);
-
-      public override void execute (Match match)
-      {
-        execute_internal (match);
-      }
-
       public virtual int get_relevancy ()
       {
-        bool banshee_running = DBusService.get_default ().name_has_owner (
-          BansheePlayerEngine.UNIQUE_NAME);
+        bool banshee_running = DBusService.get_default ().name_has_owner (BansheePlayerEngine.UNIQUE_NAME);
         return banshee_running ? default_relevancy + MatchScore.INCREMENT_LARGE : default_relevancy;
+      }
+
+      public virtual bool action_available ()
+      {
+        return DBusService.get_default ().name_has_owner (BansheePlayerEngine.UNIQUE_NAME);
       }
     }
 
-    private abstract class BansheeControlMatch : Match
+    private abstract class BansheeControlMatch : ActionMatch
     {
-      public override void execute (Match match)
-      {
-        this.do_action ();
-      }
-
-      public abstract void do_action ();
-
       public virtual bool action_available ()
       {
         return DBusService.get_default ().name_has_owner (
@@ -226,7 +212,7 @@ namespace Synapse
                 default_relevancy: MatchScore.AVERAGE);
       }
 
-      public override void execute_internal (Match match)
+      public override void do_execute (Match match, Match? target = null)
       {
         return_if_fail (match.match_type == MatchType.GENERIC_URI);
         unowned UriMatch? uri = match as UriMatch;
@@ -268,7 +254,7 @@ namespace Synapse
                 default_relevancy: MatchScore.ABOVE_AVERAGE);
       }
 
-      public override void execute_internal (Match match)
+      public override void do_execute (Match match, Match? target = null)
       {
         return_if_fail (match.match_type == MatchType.GENERIC_URI);
         unowned UriMatch? uri = match as UriMatch;

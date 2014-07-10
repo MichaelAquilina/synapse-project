@@ -103,15 +103,8 @@ namespace Synapse
       }
     }
 
-    private abstract class RhythmboxControlMatch : Match
+    private abstract class RhythmboxControlMatch : ActionMatch
     {
-      public override void execute (Match match)
-      {
-        do_action ();
-      }
-
-      public abstract void do_action ();
-
       public virtual bool action_available ()
       {
         return DBusService.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);

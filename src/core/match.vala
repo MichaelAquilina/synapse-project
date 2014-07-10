@@ -86,6 +86,11 @@ namespace Synapse
     }
   }
 
+  public abstract class ActionMatch : Match
+  {
+    public abstract void do_action ();
+  }
+
   public class ApplicationMatch : Match
   {
     public AppInfo? app_info { get; set; }

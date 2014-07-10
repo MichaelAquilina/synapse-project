@@ -69,40 +69,20 @@ namespace Synapse
       register_plugin ();
     }
 
-    private abstract class XnoiseAction : Match
+    private abstract class XnoiseAction : Action
     {
-      public int default_relevancy { get; set; }
-
-      public abstract bool valid_for_match (Match match);
-      public abstract void execute_internal (Match match);
-
-      public override void execute (Match match)
-      {
-        execute_internal (match);
-      }
-
       public virtual int get_relevancy ()
       {
-        bool xnoise_running = DBusService.get_default ().name_has_owner (
-          XnoisePlayerEngine.UNIQUE_NAME);
+        bool xnoise_running = DBusService.get_default ().name_has_owner (XnoisePlayerEngine.UNIQUE_NAME);
         return xnoise_running ? default_relevancy + MatchScore.INCREMENT_LARGE : default_relevancy;
       }
     }
 
-    private abstract class XnoiseControlMatch : Match
+    private abstract class XnoiseControlMatch : ActionMatch
     {
-      public override void execute (Match match)
-      {
-        this.do_action ();
-      }
-
-      public abstract void do_action ();
-
       public virtual bool action_available ()
       {
-        return DBusService.get_default ().name_has_owner (
-          XnoisePlayerEngine.UNIQUE_NAME
-        );
+        return DBusService.get_default ().name_has_owner (XnoisePlayerEngine.UNIQUE_NAME);
       }
     }
 
@@ -327,7 +307,7 @@ namespace Synapse
                 );
       }
 
-      public override void execute_internal (Match match)
+      public override void do_execute (Match match, Match? target = null)
       {
         return_if_fail (match.match_type == MatchType.GENERIC_URI);
         unowned UriMatch? uri = match as UriMatch;

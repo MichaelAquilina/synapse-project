@@ -68,10 +68,9 @@ namespace Synapse
 
       public override void do_execute (Match match, Match? target = null)
       {
-        if (match.match_type == MatchType.APPLICATION)
+        if (match is ApplicationMatch)
         {
-          unowned ApplicationMatch? app_match = match as ApplicationMatch;
-          return_if_fail (app_match != null);
+          unowned ApplicationMatch app_match = (ApplicationMatch) match;
 
           AppInfo app = app_match.app_info ??
             new DesktopAppInfo.from_filename (app_match.filename);
@@ -88,9 +87,17 @@ namespace Synapse
             Utils.Logger.warning (this, "%s", err.message);
           }
         }
-        else // MatchType.ACTION
+        else if (match is ActionMatch)
         {
-          match.execute (null);
+          ((ActionMatch) match).do_action ();
+        }
+        else if (match is Action)
+        {
+          ((Action) match).do_execute (match, target);
+        }
+        else
+        {
+          warning ("'%s' is not be handled here", match.title);
         }
       }
 

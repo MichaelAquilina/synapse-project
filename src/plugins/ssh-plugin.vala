@@ -164,11 +164,11 @@ namespace Synapse
       return results;
     }
 
-    private class SshHost : Match
+    private class SshHost : ActionMatch
     {
       public string host_query { get; construct set; }
 
-      public override void execute (Match match)
+      public override void do_action ()
       {
         try
         {

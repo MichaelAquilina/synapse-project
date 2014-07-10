@@ -77,14 +77,8 @@ namespace Synapse
 
     }
 
-    private abstract class SystemAction : Match
+    private abstract class SystemAction : ActionMatch
     {
-      public override void execute (Match match)
-      {
-        this.do_action ();
-      }
-
-      public abstract void do_action ();
       public abstract bool action_allowed ();
     }
 

@@ -47,7 +47,7 @@ namespace Synapse
 
     }
 
-    private class ShutDownAction : Match
+    private class ShutDownAction : ActionMatch
     {
       public ShutDownAction ()
       {
@@ -56,7 +56,7 @@ namespace Synapse
                 icon_name: "system-shutdown", has_thumbnail: false);
       }
 
-      public override void execute (Match match)
+      public override void do_action ()
       {
         try
         {
@@ -73,7 +73,7 @@ namespace Synapse
       }
     }
 
-    private class RebootAction : Match
+    private class RebootAction : ActionMatch
     {
       public RebootAction ()
       {
@@ -82,7 +82,7 @@ namespace Synapse
                 icon_name: "gnome-session-reboot", has_thumbnail: false);
       }
 
-      public override void execute (Match match)
+      public override void do_action ()
       {
         try
         {
@@ -99,7 +99,7 @@ namespace Synapse
       }
     }
 
-    private class LogOutAction : Match
+    private class LogOutAction : ActionMatch
     {
       public LogOutAction ()
       {
@@ -108,7 +108,7 @@ namespace Synapse
                 icon_name: "gnome-session-logout", has_thumbnail: false);
       }
 
-      public override void execute (Match match)
+      public override void do_action ()
       {
         try
         {

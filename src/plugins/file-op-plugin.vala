@@ -35,26 +35,7 @@ namespace Synapse
 
     }
 
-    private abstract class FileAction : Match
-    {
-      public int default_relevancy { get; set; }
-      public bool notify_match { get; set; default = true; }
-
-      public abstract bool valid_for_match (Match match);
-
-      public virtual int get_relevancy_for_match (Match match)
-      {
-        return default_relevancy;
-      }
-
-      public override void execute_with_target (Match source, Match? target = null)
-      {
-        if (target == null) execute (source);
-        else Utils.Logger.error (this, "execute () is not implemented");
-      }
-    }
-
-    private class RenameTo : FileAction
+    private class RenameTo : Action
     {
       public RenameTo ()
       {
@@ -65,7 +46,7 @@ namespace Synapse
                 default_relevancy: MatchScore.AVERAGE);
       }
 
-      public override void execute_with_target (Match source, Match? target = null)
+      public override void do_execute (Match source, Match? target = null)
       {
         if (target == null) return; // not possible
 
@@ -92,7 +73,8 @@ namespace Synapse
         }
       }
 
-      public override bool needs_target () {
+      public override bool needs_target ()
+      {
         return true;
       }
 
@@ -131,11 +113,11 @@ namespace Synapse
       register_plugin ();
     }
 
-    private Gee.List<FileAction> actions;
+    private Gee.List<Action> actions;
 
     construct
     {
-      actions = new Gee.ArrayList<FileAction> ();
+      actions = new Gee.ArrayList<Action> ();
 
       actions.add (new RenameTo ());
     }

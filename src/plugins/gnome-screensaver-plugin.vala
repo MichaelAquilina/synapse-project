@@ -44,7 +44,7 @@ namespace Synapse
 
     }
 
-    private class LockScreenAction : Match
+    private class LockScreenAction : ActionMatch
     {
       public LockScreenAction ()
       {
@@ -53,7 +53,7 @@ namespace Synapse
                 icon_name: "system-lock-screen", has_thumbnail: false);
       }
 
-      public override void execute (Match match)
+      public override void do_action ()
       {
         GnomeScreenSaverPlugin.lock_screen ();
       }
