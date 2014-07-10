@@ -35,14 +35,13 @@ namespace Synapse
 
     }
 
-    private class TestResult : Match
+    private class TestResult : UnknownMatch
     {
       public TestResult (string query)
       {
         Object (title: "Test result for " + query.strip (),
                 description: "by TestSlowPlugin",
-                icon_name: "unknown", has_thumbnail: false,
-                match_type: MatchType.UNKNOWN);
+                icon_name: "unknown", has_thumbnail: false);
       }
     }
 

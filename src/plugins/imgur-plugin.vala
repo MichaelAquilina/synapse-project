@@ -50,7 +50,6 @@ namespace Synapse
       {
         Object (title: _("Upload to imgur"),
                 description: _("Upload selection to imgur image sharer"),
-                match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
                 default_relevancy: MatchScore.AVERAGE - MatchScore.INCREMENT_MINOR);
       }
@@ -187,10 +186,10 @@ namespace Synapse
 
       public override void do_execute (Match match, Match? target = null)
       {
-        if (match.match_type == MatchType.GENERIC_URI && match is UriMatch)
+        if (match is UriMatch)
         {
-          unowned UriMatch? uri_match = match as UriMatch;
-          return_if_fail (uri_match != null);
+          unowned UriMatch uri_match = (UriMatch) match as UriMatch;
+
           upload_file.begin (uri_match.uri, (obj, res) => {
             string? url = null;
             try
@@ -210,18 +209,16 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        switch (match.match_type)
-        {
-          case MatchType.GENERIC_URI:
-            unowned UriMatch? um = match as UriMatch;
-            return_val_if_fail (um != null, false);
-            // FIXME: maybe we shouldn't care about the real path?
-            var f = File.new_for_uri (um.uri);
-            if (f.get_path () == null) return false;
-            return ContentType.is_a (um.mime_type, "image/*");
-          default:
-            return false;
-        }
+        unowned UriMatch? um = match as UriMatch;
+        if (um == null)
+          return false;
+
+        // FIXME: maybe we shouldn't care about the real path?
+        var f = File.new_for_uri (um.uri);
+        if (f.get_path () == null)
+          return false;
+
+        return ContentType.is_a (um.mime_type, "image/*");
       }
     }
 
@@ -231,7 +228,6 @@ namespace Synapse
       {
         Object (title: _("Upload to imgur to contact.."),
                 description: _("Upload selection to imgur image sharer, and send the link to contact"),
-                match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
                 default_relevancy: MatchScore.AVERAGE - MatchScore.INCREMENT_MINOR);
       }

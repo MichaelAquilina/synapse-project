@@ -186,7 +186,6 @@ namespace Synapse
       public SshHost (string host_name)
       {
         Object (
-          match_type: MatchType.ACTION,
           title: host_name,
           description: _("Connect with SSH"),
           has_thumbnail: false,

@@ -45,7 +45,7 @@ namespace Synapse
 
       public DesktopFileMatch (DesktopFileInfo info)
       {
-        Object (desktop_info : info, match_type: MatchType.APPLICATION);
+        Object (desktop_info : info);
       }
 
       construct
@@ -254,7 +254,7 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        return (match.match_type == MatchType.GENERIC_URI && match is UriMatch);
+        return (match is UriMatch);
       }
     }
 
@@ -262,12 +262,8 @@ namespace Synapse
 
     public ResultSet? find_for_match (ref Query query, Match match)
     {
-      if (match.match_type != MatchType.GENERIC_URI) return null;
-
       unowned UriMatch? uri_match = match as UriMatch;
-      return_val_if_fail (uri_match != null, null);
-
-      if (uri_match.mime_type == null) return null;
+      if (uri_match == null || uri_match.mime_type == null) return null;
 
       Gee.List<OpenWithAction> ow_list = mimetype_map[uri_match.mime_type];
       /* Query DesktopFileService only if is necessary */

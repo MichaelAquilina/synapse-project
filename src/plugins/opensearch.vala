@@ -335,11 +335,8 @@ namespace Synapse
 
     public ResultSet? find_for_match (ref Query query, Match match)
     {
-      if (match.match_type != MatchType.UNKNOWN &&
-          match.match_type != MatchType.TEXT)
-      {
-        return null;
-      }
+      if (!(match is UnknownMatch || match is TextMatch)) return null;
+
       var my_flags = QueryFlags.ACTIONS | QueryFlags.INTERNET;
       if ((query.query_type & my_flags) == 0) return null;
 

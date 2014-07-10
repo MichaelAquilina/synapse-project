@@ -42,7 +42,6 @@ namespace Synapse
         Object (title: _("Rename to"),
                 description: _("Rename the file to..."),
                 icon_name: "stock_save-as", has_thumbnail: false,
-                match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.AVERAGE);
       }
 
@@ -85,15 +84,7 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        switch (match.match_type)
-        {
-          case MatchType.GENERIC_URI:
-            unowned UriMatch? um = match as UriMatch;
-            return_val_if_fail (um != null, false);
-            return (um.file_type & QueryFlags.FILES) != 0;
-          default:
-            return false;
-        }
+        return (match is UriMatch && (((UriMatch) match).file_type & QueryFlags.FILES) != 0);
       }
     }
 

@@ -45,8 +45,7 @@ namespace Synapse
     {
       public MatchObject (string uri)
       {
-        Object (match_type: MatchType.GENERIC_URI,
-                has_thumbnail: false,
+        Object (has_thumbnail: false,
                 uri: uri,
                 file_type: QueryFlags.UNCATEGORIZED,
                 mime_type: "inode/directory");

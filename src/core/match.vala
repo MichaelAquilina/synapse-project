@@ -39,17 +39,6 @@ namespace Synapse
     HIGHEST = 100000
   }
 
-  public enum MatchType
-  {
-    UNKNOWN = 0,
-    TEXT,
-    APPLICATION,
-    GENERIC_URI,
-    ACTION,
-    SEARCH,
-    CONTACT
-  }
-
   public abstract class Match : Object
   {
     public signal void executed ();
@@ -60,7 +49,6 @@ namespace Synapse
     public string icon_name { get; construct set; }
     public bool has_thumbnail { get; construct set; }
     public string thumbnail_path { get; construct set; }
-    public MatchType match_type { get; construct set; }
 
     public virtual void execute (Match match)
     {
@@ -99,8 +87,7 @@ namespace Synapse
 
     public ApplicationMatch ()
     {
-      Object (match_type : MatchType.APPLICATION,
-              has_thumbnail : false,
+      Object (has_thumbnail : false,
               icon_name : "",
               thumbnail_path : "");
     }
@@ -114,8 +101,7 @@ namespace Synapse
 
     public UriMatch ()
     {
-      Object (match_type : MatchType.GENERIC_URI,
-              has_thumbnail : false,
+      Object (has_thumbnail : false,
               icon_name : "",
               thumbnail_path : "");
     }
@@ -157,7 +143,7 @@ namespace Synapse
     public UnknownMatch (string query_string)
     {
       Object (title: query_string, description: "", has_thumbnail: false,
-              icon_name: "unknown", match_type: MatchType.UNKNOWN);
+              icon_name: "unknown");
     }
   }
 }

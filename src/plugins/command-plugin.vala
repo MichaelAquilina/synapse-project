@@ -43,7 +43,6 @@ namespace Synapse
       {
         Object (title: cmd, description: _("Run command"), command: cmd,
                 icon_name: "application-x-executable",
-                match_type: MatchType.APPLICATION,
                 needs_terminal: cmd.has_prefix ("sudo "));
 
         try

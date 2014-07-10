@@ -51,7 +51,7 @@ namespace Synapse
     {
       public ShutDownAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _("Shut Down"),
+        Object (title: _("Shut Down"),
                 description: _("Turn your computer off"),
                 icon_name: "system-shutdown", has_thumbnail: false);
       }
@@ -77,7 +77,7 @@ namespace Synapse
     {
       public RebootAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _("Restart"),
+        Object (title: _("Restart"),
                 description: _("Restart your computer"),
                 icon_name: "gnome-session-reboot", has_thumbnail: false);
       }
@@ -103,7 +103,7 @@ namespace Synapse
     {
       public LogOutAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _("Log Out"),
+        Object (title: _("Log Out"),
                 description: _("Close your session and return to the login screen"),
                 icon_name: "gnome-session-logout", has_thumbnail: false);
       }

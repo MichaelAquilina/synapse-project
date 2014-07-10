@@ -59,8 +59,7 @@ namespace Synapse
 
       public RelatedItem (ZeitgeistRelated plugin)
       {
-        Object (match_type: MatchType.SEARCH,
-                has_thumbnail: false,
+        Object (has_thumbnail: false,
                 icon_name: "search",
                 title: _("Find related"),
                 description: _("Find resources related to this result"));
@@ -213,8 +212,7 @@ namespace Synapse
       */
 
       if (q.query_type == QueryFlags.ACTIONS) return null;
-      if (match.match_type != MatchType.GENERIC_URI
-        && match.match_type != MatchType.APPLICATION) return null;
+      if (!(match is UriMatch || match is ApplicationMatch)) return null;
 
       // strip query
       q.query_string = q.query_string.strip ();

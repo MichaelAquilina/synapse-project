@@ -93,7 +93,6 @@ namespace Synapse
       {
         Object (title: _("Send in chat to.."),
                   description: _("Send selected file within Pidgin"),
-                  match_type: MatchType.ACTION,
                   icon_name: "document-send", has_thumbnail: false,
                   default_relevancy: MatchScore.AVERAGE);
       }
@@ -110,15 +109,7 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        switch (match.match_type)
-        {
-          case MatchType.GENERIC_URI:
-            unowned UriMatch? um = match as UriMatch;
-            return_val_if_fail (um != null, false);
-            return (um.file_type & QueryFlags.FILES) != 0;
-          default:
-            return false;
-        }
+        return (match is UriMatch && (((UriMatch) match).file_type & QueryFlags.FILES) != 0);
       }
 
       public override bool needs_target ()
@@ -150,7 +141,6 @@ namespace Synapse
                 name: name,
                 icon_name: icon_path ?? "stock_person",
                 has_thumbnail: false,
-                match_type: MatchType.CONTACT,
                 plugin: plugin,
                 account_id: account_id,
                 contact_id: contact_id);

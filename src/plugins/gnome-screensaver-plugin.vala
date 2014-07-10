@@ -48,7 +48,7 @@ namespace Synapse
     {
       public LockScreenAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _("Lock Screen"),
+        Object (title: _("Lock Screen"),
                 description: _("Locks screen and starts screensaver."),
                 icon_name: "system-lock-screen", has_thumbnail: false);
       }

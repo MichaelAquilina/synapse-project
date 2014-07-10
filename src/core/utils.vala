@@ -383,7 +383,6 @@ namespace Synapse
               "uri", uri,
               "title", fi.get_display_name (),
               "description", f.get_parse_name (),
-              "match-type", MatchType.GENERIC_URI,
               null
             );
 

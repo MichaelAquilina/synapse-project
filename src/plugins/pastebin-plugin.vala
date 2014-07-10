@@ -41,7 +41,6 @@ namespace Synapse
       {
         Object (title: _("Pastebin"),
                 description: _("Pastebin selection"),
-                match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
                 default_relevancy: MatchScore.AVERAGE);
       }
@@ -176,10 +175,10 @@ namespace Synapse
 
       public override void do_execute (Match match, Match? target = null)
       {
-        if (match.match_type == MatchType.GENERIC_URI && match is UriMatch)
+        if (match is UriMatch)
         {
-          unowned UriMatch? uri_match = match as UriMatch;
-          return_if_fail (uri_match != null);
+          unowned UriMatch uri_match = (UriMatch) match;
+
           var f = File.new_for_uri (uri_match.uri);
           string path = f.get_path ();
           if (path == null)
@@ -192,10 +191,10 @@ namespace Synapse
             process_pastebin_result (url, target);
           });
         }
-        else if (match.match_type == MatchType.TEXT)
+        else if (match is TextMatch)
         {
-          unowned TextMatch? text_match = match as TextMatch;
-          return_if_fail (text_match != null);
+          unowned TextMatch text_match = (TextMatch) match;
+
           string content = text_match != null ? text_match.get_text () : match.title;
           pastebin_text.begin (content, (obj, res) => {
             string? url = pastebin_text.end (res);
@@ -206,19 +205,18 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        switch (match.match_type)
-        {
-          case MatchType.TEXT:
-            return true;
-          case MatchType.GENERIC_URI:
-            unowned UriMatch um = match as UriMatch;
-            return_val_if_fail (um != null, false);
-            var f = File.new_for_uri (um.uri);
-            if (f.get_path () == null) return false;
-            return ContentType.is_a (um.mime_type, "text/*");
-          default:
-            return false;
-        }
+        if (match is TextMatch)
+          return true;
+
+        unowned UriMatch um = match as UriMatch;
+        if (um == null)
+          return false;
+
+        var f = File.new_for_uri (um.uri);
+        if (f.get_path () == null)
+          return false;
+
+        return ContentType.is_a (um.mime_type, "text/*");
       }
     }
 
@@ -228,7 +226,6 @@ namespace Synapse
       {
         Object (title: _("Pastebin to contact.."),
                 description: _("Pastebin selection"),
-                match_type: MatchType.ACTION,
                 icon_name: "document-send", has_thumbnail: false,
                 default_relevancy: MatchScore.AVERAGE);
       }

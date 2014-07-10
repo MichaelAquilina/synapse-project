@@ -62,7 +62,6 @@ namespace Synapse
         Object (title: _("Run"),
                 description: _("Run an application, action or script"),
                 icon_name: "system-run", has_thumbnail: false,
-                match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.EXCELLENT);
       }
 
@@ -103,18 +102,9 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        switch (match.match_type)
-        {
-          case MatchType.SEARCH:
-            return true;
-          case MatchType.ACTION:
-            return true;
-          case MatchType.APPLICATION:
-            unowned ApplicationMatch? am = match as ApplicationMatch;
-            return am == null || !am.needs_terminal;
-          default:
-            return false;
-        }
+        return (match is Action ||
+                match is ActionMatch ||
+               (match is ApplicationMatch && !(((ApplicationMatch) match).needs_terminal)));
       }
     }
 
@@ -125,16 +115,14 @@ namespace Synapse
         Object (title: _("Run in Terminal"),
                 description: _("Run application or command in terminal"),
                 icon_name: "terminal", has_thumbnail: false,
-                match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.BELOW_AVERAGE);
       }
 
       public override void do_execute (Match match, Match? target = null)
       {
-        if (match.match_type == MatchType.APPLICATION)
+        if (match is ApplicationMatch)
         {
-          unowned ApplicationMatch? app_match = match as ApplicationMatch;
-          return_if_fail (app_match != null);
+          unowned ApplicationMatch app_match = (ApplicationMatch) match;
 
           AppInfo original = app_match.app_info ??
             new DesktopAppInfo.from_filename (app_match.filename);
@@ -156,14 +144,7 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        switch (match.match_type)
-        {
-          case MatchType.APPLICATION:
-            unowned ApplicationMatch? am = match as ApplicationMatch;
-            return am != null;
-          default:
-            return false;
-        }
+        return (match is ApplicationMatch);
       }
     }
 
@@ -174,7 +155,6 @@ namespace Synapse
         Object (title: _("Open"),
                 description: _("Open using default application"),
                 icon_name: "fileopen", has_thumbnail: false,
-                match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.GOOD);
       }
 
@@ -209,15 +189,8 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        switch (match.match_type)
-        {
-          case MatchType.GENERIC_URI:
-            return true;
-          case MatchType.UNKNOWN:
-            return web_uri.match (match.title) || file_path.match (match.title);
-          default:
-            return false;
-        }
+        return (match is UriMatch || 
+               (match is UnknownMatch && (web_uri.match (match.title) || file_path.match (match.title))));
       }
 
       private Regex web_uri;
@@ -244,7 +217,6 @@ namespace Synapse
         Object (title: _("Open folder"),
                 description: _("Open folder containing this file"),
                 icon_name: "folder-open", has_thumbnail: false,
-                match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.AVERAGE);
       }
 
@@ -287,17 +259,15 @@ namespace Synapse
         Object (title: _("Copy to Clipboard"),
                 description: _("Copy selection to clipboard"),
                 icon_name: "gtk-copy", has_thumbnail: false,
-                match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.AVERAGE);
       }
 
       public override void do_execute (Match match, Match? target = null)
       {
         var cb = Gtk.Clipboard.get (Gdk.Atom.NONE);
-        if (match.match_type == MatchType.GENERIC_URI)
+        if (match is UriMatch)
         {
-          unowned UriMatch? uri_match = match as UriMatch;
-          return_if_fail (uri_match != null);
+          unowned UriMatch uri_match = (UriMatch) match;
 
           /*
            // just wow, Gtk and also Vala are trying really hard to make this hard to do...
@@ -310,10 +280,9 @@ namespace Synapse
           */
           cb.set_text (uri_match.uri, -1);
         }
-        else if (match.match_type == MatchType.TEXT)
+        else if (match is TextMatch)
         {
-          unowned TextMatch? text_match = match as TextMatch;
-          return_if_fail (text_match != null);
+          unowned TextMatch text_match = (TextMatch) match;
 
           string content = text_match != null ? text_match.get_text () : match.title;
 
@@ -323,15 +292,7 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        switch (match.match_type)
-        {
-          case MatchType.GENERIC_URI:
-            return true;
-          case MatchType.TEXT:
-            return true;
-          default:
-            return false;
-        }
+        return (match is UriMatch || match is TextMatch);
       }
 
       public override int get_relevancy_for_match (Match match)

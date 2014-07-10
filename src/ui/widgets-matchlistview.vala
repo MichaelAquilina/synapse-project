@@ -947,8 +947,7 @@ namespace Synapse.Gui
     {
       public LabelMatch (string title, string description, string icon_name)
       {
-        GLib.Object (match_type: MatchType.ACTION,
-                     title: title,
+        GLib.Object (title: title,
                      description: description,
                      icon_name: icon_name,
                      has_thumbnail: false);

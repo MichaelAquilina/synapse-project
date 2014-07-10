@@ -98,12 +98,11 @@ namespace Synapse
     }
 
     // define our Match object
-    private class WorldMatch : Match
+    private class WorldMatch : UnknownMatch
     {
       public WorldMatch ()
       {
-        Object (match_type: MatchType.UNKNOWN,
-                title: "HelloWorld",
+        Object (title: "HelloWorld",
                 description: "Result from HelloWorldPlugin",
                 has_thumbnail: false, icon_name: "system-run");
       }

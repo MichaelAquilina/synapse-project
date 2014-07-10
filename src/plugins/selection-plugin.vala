@@ -73,7 +73,6 @@ namespace Synapse
                 description : "",
                 icon_name: "edit-select-all",
                 has_thumbnail: false,
-                match_type: MatchType.TEXT,
                 text_origin: TextOrigin.CLIPBOARD);
       }
 

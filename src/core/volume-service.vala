@@ -126,10 +126,12 @@ namespace Synapse
           description = ""; // FIXME
           icon_name = value.get_icon ().to_string ();
           has_thumbnail = false;
-          match_type = value.get_mount () != null ?
-            MatchType.GENERIC_URI : MatchType.ACTION;
+          // FIXME
+          //match_type = value.get_mount () != null ?
+          //  MatchType.GENERIC_URI : MatchType.ACTION;
 
-          if (match_type == MatchType.GENERIC_URI)
+          //if (match_type == MatchType.GENERIC_URI)
+          if (value.get_mount () != null)
           {
             uri = value.get_mount ().get_root ().get_uri ();
             file_type = QueryFlags.PLACES;

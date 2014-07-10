@@ -42,7 +42,6 @@ namespace Synapse
         Object (title: _("Open chat"),
                 description: _("Open a chat with selected contact"),
                 icon_name: "empathy", has_thumbnail: false,
-                match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.EXCELLENT);
       }
 
@@ -55,7 +54,7 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        return match.match_type == MatchType.CONTACT;
+        return (match is ContactMatch);
       }
     }
 
@@ -66,7 +65,6 @@ namespace Synapse
         Object (title: _("Send a message"),
                 description: _("Send a message to the contact"),
                 icon_name: "message", has_thumbnail: false,
-                match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.VERY_GOOD);
       }
 
@@ -79,7 +77,7 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        return match.match_type == MatchType.CONTACT;
+        return (match is ContactMatch);
       }
 
 
@@ -101,7 +99,6 @@ namespace Synapse
         Object (title: _("Send message to.."),
                 description: _("Send a message to a contact"),
                 icon_name: "message", has_thumbnail: false,
-                match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.VERY_GOOD);
       }
 
@@ -116,7 +113,7 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        return match.match_type == MatchType.TEXT;
+        return (match is TextMatch);
       }
 
       public override bool needs_target ()

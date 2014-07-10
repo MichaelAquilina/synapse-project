@@ -49,8 +49,7 @@ namespace Synapse
                                         string? thumbnail_path,
                                         string? icon)
       {
-        Object (match_type: MatchType.APPLICATION,
-                has_thumbnail: thumbnail_path != null,
+        Object (has_thumbnail: thumbnail_path != null,
                 icon_name: icon ?? "",
                 thumbnail_path: thumbnail_path ?? "");
 
@@ -78,8 +77,7 @@ namespace Synapse
                                 string? icon,
                                 bool use_origin = false)
       {
-        Object (match_type: MatchType.GENERIC_URI,
-                has_thumbnail: thumbnail_path != null,
+        Object (has_thumbnail: thumbnail_path != null,
                 icon_name: icon ?? "",
                 thumbnail_path: thumbnail_path ?? "");
 

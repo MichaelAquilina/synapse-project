@@ -108,9 +108,8 @@ namespace Synapse.Gui
 
     public static string get_printable_description (Match match)
     {
-      UriMatch? m = match as UriMatch;
-
-      if (m == null || m.match_type != MatchType.GENERIC_URI)
+      unowned UriMatch? m = match as UriMatch;
+      if (m == null)
       {
         return match.description; // not an UriMatch
       }

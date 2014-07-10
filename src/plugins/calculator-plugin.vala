@@ -35,16 +35,20 @@ namespace Synapse
 
     }
 
-    private class Result : Match
+    private class Result : TextMatch
     {
       public int default_relevancy { get; set; default = 0; }
 
       public Result (double result, string match_string)
       {
-        Object (match_type: MatchType.TEXT,
-                title: "%g".printf (result),
+        Object (title: "%g".printf (result),
                 description: "%s = %g".printf (match_string, result),
                 has_thumbnail: false, icon_name: "accessories-calculator");
+      }
+
+      public override string get_text ()
+      {
+        return description;
       }
     }
 

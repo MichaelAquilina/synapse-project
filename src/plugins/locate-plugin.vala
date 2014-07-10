@@ -57,8 +57,7 @@ namespace Synapse
 
       public LocateItem (LocatePlugin plugin)
       {
-        Object (match_type: MatchType.SEARCH,
-                has_thumbnail: false,
+        Object (has_thumbnail: false,
                 icon_name: "search",
                 title: _("Locate"),
                 description: _("Locate files with this name on the filesystem"));
@@ -175,7 +174,7 @@ namespace Synapse
 
       var common_flags = q.query_type & our_results;
       // ignore short searches
-      if (common_flags == 0 || match.match_type != MatchType.UNKNOWN) return null;
+      if (common_flags == 0 || !(match is UnknownMatch)) return null;
 
       // strip query
       q.query_string = q.query_string.strip ();

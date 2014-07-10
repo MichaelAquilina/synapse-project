@@ -86,7 +86,7 @@ namespace Synapse
     {
       public SuspendAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _("Suspend"),
+        Object (title: _("Suspend"),
                 description: _("Put your computer into suspend mode"),
                 icon_name: "system-suspend", has_thumbnail: false);
       }
@@ -186,7 +186,7 @@ namespace Synapse
     {
       public HibernateAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _("Hibernate"),
+        Object (title: _("Hibernate"),
                 description: _("Put your computer into hibernation mode"),
                 icon_name: "system-hibernate", has_thumbnail: false);
       }
@@ -285,7 +285,7 @@ namespace Synapse
     {
       public ShutdownAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _("Shut Down"),
+        Object (title: _("Shut Down"),
                 description: _("Turn your computer off"),
                 icon_name: "system-shutdown", has_thumbnail: false);
       }
@@ -369,7 +369,7 @@ namespace Synapse
     {
       public RestartAction ()
       {
-        Object (match_type: MatchType.ACTION, title: _("Restart"),
+        Object (title: _("Restart"),
                 description: _("Restart your computer"),
                 icon_name: "system-restart", has_thumbnail: false);
       }

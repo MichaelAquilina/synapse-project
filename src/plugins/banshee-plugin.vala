@@ -112,8 +112,7 @@ namespace Synapse
       {
         Object (title: _("Play"),
                 description: _("Start playback in Banshee"),
-                icon_name: "media-playback-start", has_thumbnail: false,
-                match_type: MatchType.ACTION);
+                icon_name: "media-playback-start", has_thumbnail: false);
       }
 
       public override void do_action ()
@@ -140,8 +139,7 @@ namespace Synapse
       {
         Object (title: _("Pause"),
                 description: _("Pause playback in Banshee"),
-                icon_name: "media-playback-pause", has_thumbnail: false,
-                match_type: MatchType.ACTION);
+                icon_name: "media-playback-pause", has_thumbnail: false);
       }
       public override void do_action ()
       {
@@ -161,8 +159,7 @@ namespace Synapse
       {
         Object (title: _("Next"),
                 description: _("Plays the next song in Banshee's playlist"),
-                icon_name: "media-skip-forward", has_thumbnail: false,
-                match_type: MatchType.ACTION);
+                icon_name: "media-skip-forward", has_thumbnail: false);
       }
 
       public override void do_action ()
@@ -184,8 +181,7 @@ namespace Synapse
       {
         Object (title: _("Previous"),
                 description: _("Plays the previous song in Banshee's playlist"),
-                icon_name: "media-skip-backward", has_thumbnail: false,
-                match_type: MatchType.ACTION);
+                icon_name: "media-skip-backward", has_thumbnail: false);
       }
 
       public override void do_action ()
@@ -208,13 +204,11 @@ namespace Synapse
         Object (title: _("Enqueue in Banshee"),
                 description: _("Add the song to Banshee playlist"),
                 icon_name: "media-playback-start", has_thumbnail: false,
-                match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.AVERAGE);
       }
 
       public override void do_execute (Match match, Match? target = null)
       {
-        return_if_fail (match.match_type == MatchType.GENERIC_URI);
         unowned UriMatch? uri = match as UriMatch;
         return_if_fail (uri != null);
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0 ||
@@ -232,15 +226,12 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        switch (match.match_type)
-        {
-          case MatchType.GENERIC_URI:
-            unowned UriMatch? uri = match as UriMatch;
-            return_val_if_fail (uri != null, false);
-            return ((uri.file_type & QueryFlags.AUDIO) != 0);
-          default:
-            return false;
-        }
+        unowned UriMatch? uri_match = match as UriMatch;
+        if (uri_match == null)
+          return false;
+
+        return ((uri_match.file_type & QueryFlags.AUDIO) != 0 ||
+                (uri_match.file_type & QueryFlags.VIDEO) != 0);
       }
     }
     private class PlayNow : BansheeAction
@@ -250,13 +241,11 @@ namespace Synapse
         Object (title: _("Play in Banshee"),
                 description: _("Clears the current playlist and plays the song"),
                 icon_name: "media-playback-start", has_thumbnail: false,
-                match_type: MatchType.ACTION,
                 default_relevancy: MatchScore.ABOVE_AVERAGE);
       }
 
       public override void do_execute (Match match, Match? target = null)
       {
-        return_if_fail (match.match_type == MatchType.GENERIC_URI);
         unowned UriMatch? uri = match as UriMatch;
         return_if_fail (uri != null);
         return_if_fail ((uri.file_type & QueryFlags.AUDIO) != 0 ||
@@ -274,19 +263,12 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        switch (match.match_type)
-        {
-          case MatchType.GENERIC_URI:
-            unowned UriMatch? uri = match as UriMatch;
-            return_val_if_fail (uri != null, false);
-            if ((uri.file_type & QueryFlags.AUDIO) != 0 ||
-                (uri.file_type & QueryFlags.VIDEO) != 0)
-              return true;
-            else
-              return false;
-          default:
-            return false;
-        }
+        unowned UriMatch? uri_match = match as UriMatch;
+        if (uri_match == null)
+          return false;
+
+        return ((uri_match.file_type & QueryFlags.AUDIO) != 0 ||
+                (uri_match.file_type & QueryFlags.VIDEO) != 0);
       }
     }
     private Gee.List<BansheeAction> actions;
