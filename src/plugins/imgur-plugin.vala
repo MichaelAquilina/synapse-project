@@ -188,7 +188,7 @@ namespace Synapse
       {
         if (match is UriMatch)
         {
-          unowned UriMatch uri_match = (UriMatch) match as UriMatch;
+          unowned UriMatch uri_match = (UriMatch) match;
 
           upload_file.begin (uri_match.uri, (obj, res) => {
             string? url = null;
