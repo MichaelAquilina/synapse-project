@@ -51,14 +51,25 @@ MIN_JSON_VERSION=0.10.0
 
 PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   glib-2.0 >= $MIN_GLIB_VERSION \
+  gdk-x11-3.0 >= $MIN_GTK_VERSION \
   gtk+-3.0 >= $MIN_GTK_VERSION \
+  gio-2.0 >= $MIN_GLIB_VERSION \
+  gio-unix-2.0 \
   gobject-2.0 \
   gee-0.8 >= $MIN_GEE_VERSION \
-  gio-unix-2.0 \
-  keybinder-3.0 \
   json-glib-1.0 >= $MIN_JSON_VERSION \
+  keybinder-3.0 \
   libnotify
   )
+SYNAPSE_MODULES_VALAFLAGS=" --pkg gdk-x11-3.0 \
+  --pkg gtk+-3.0 \
+  --pkg gio-2.0 \
+  --pkg gio-unix-2.0 \
+  --pkg gee-0.8 \
+  --pkg json-glib-1.0 \
+  --pkg keybinder-3.0 \
+  --pkg libnotify"
+AC_SUBST(SYNAPSE_MODULES_VALAFLAGS)
 
 
 AC_ARG_ENABLE(librest,
@@ -84,6 +95,8 @@ if test "x$enable_zeitgeist" = "xyes" ; then
 	PKG_CHECK_EXISTS([zeitgeist-2.0 >= $MIN_ZEITGEIST_VERSION],,
 	                 AC_MSG_ERROR([zeitgeist-2.0 is not installed]))
 	PKG_CHECK_MODULES(ZEITGEIST, zeitgeist-2.0 >= $MIN_ZEITGEIST_VERSION)
+	ZEITGEIST_VALAFLAGS=" --pkg zeitgeist-2.0 -D HAVE_ZEITGEIST"
+	AC_SUBST(ZEITGEIST_VALAFLAGS)
 	AC_DEFINE(HAVE_ZEITGEIST, 1, [Have Zeitgeist])
 fi
 AM_CONDITIONAL(HAVE_ZEITGEIST, test "x$enable_zeitgeist" = "xyes")
@@ -98,21 +111,24 @@ if test "x$enable_indicator" = "xyes" ; then
 	PKG_CHECK_EXISTS([appindicator3-0.1],,
 	                 AC_MSG_ERROR([appindicator3-0.1 is not installed]))
 	PKG_CHECK_MODULES(APP_INDICATOR, appindicator3-0.1)
+	APP_INDICATOR_VALAFLAGS=" --pkg appindicator3-0.1 -D HAVE_INDICATOR"
+	AC_SUBST(APP_INDICATOR_VALAFLAGS)
 	AC_DEFINE(HAVE_INDICATOR, 1, [Have AppIndicator])
 fi
 AM_CONDITIONAL(HAVE_INDICATOR, test "x$enable_indicator" = "xyes")
 
-REST_PKG_NAME=rest-0.7
 if test "x$enable_librest" = "xauto" ; then
-	PKG_CHECK_EXISTS([$REST_PKG_NAME],
+	PKG_CHECK_EXISTS([rest-0.7],
 	                 enable_librest="yes",
 	                 enable_librest="no")
 fi
 
 if test "x$enable_librest" = "xyes" ; then
-	PKG_CHECK_EXISTS([$REST_PKG_NAME],,
-	                 AC_MSG_ERROR([$REST_PKG_NAME is not installed]))
-	PKG_CHECK_MODULES(REST, $REST_PKG_NAME)
+	PKG_CHECK_EXISTS([rest-0.7],,
+	                 AC_MSG_ERROR([rest-0.7 is not installed]))
+	PKG_CHECK_MODULES(REST, rest-0.7)
+	REST_VALAFLAGS=" --pkg rest-0.7 -D HAVE_LIBREST"
+	AC_SUBST(REST_VALAFLAGS)
 	AC_DEFINE(HAVE_LIBREST, 1, [Have librest])
 fi
 AM_CONDITIONAL(HAVE_LIBREST, test "x$enable_librest" = "xyes")

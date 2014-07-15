@@ -6,17 +6,14 @@ noinst_LTLIBRARIES = libsynapsecore.la
 VAPIDIR = $(top_srcdir)/vapi
 
 libsynapsecore_la_VALAFLAGS = \
-	--pkg gtk+-3.0 \
-	--pkg gee-0.8 \
-	--pkg json-glib-1.0 \
-	--pkg gio-unix-2.0 \
+	$(SYNAPSE_MODULES_VALAFLAGS) \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
 	-g \
 	$(NULL)
 
-libsynapsecore_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h -w $(LIBM)
-libsynapsecore_la_LIBADD = $(SYNAPSE_MODULES_LIBS)
+libsynapsecore_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h -w
+libsynapsecore_la_LIBADD = $(SYNAPSE_MODULES_LIBS) $(LIBM)
 libsynapsecore_la_VALASOURCES = \
 	common-actions.vala \
 	config-service.vala \
@@ -34,7 +31,7 @@ libsynapsecore_la_VALASOURCES = \
 
 if HAVE_ZEITGEIST
 libsynapsecore_la_VALASOURCES += relevancy-backend-zg.vala
-libsynapsecore_la_VALAFLAGS += --pkg zeitgeist-2.0 -D HAVE_ZEITGEIST
+libsynapsecore_la_VALAFLAGS += $(ZEITGEIST_VALAFLAGS)
 libsynapsecore_la_CFLAGS += $(ZEITGEIST_CFLAGS)
 libsynapsecore_la_LIBADD += $(ZEITGEIST_LIBS)
 endif

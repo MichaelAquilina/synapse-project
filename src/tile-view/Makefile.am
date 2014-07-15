@@ -6,7 +6,7 @@ noinst_LTLIBRARIES = libtileview.la
 VAPIDIR = $(top_srcdir)/vapi
 
 libtileview_la_VALAFLAGS = \
-	--pkg gtk+-3.0 \
+	$(SYNAPSE_MODULES_VALAFLAGS) \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
 	-g \

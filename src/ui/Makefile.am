@@ -6,14 +6,7 @@ bin_PROGRAMS = synapse
 VAPIDIR = $(top_srcdir)/vapi
 
 synapse_VALAFLAGS = \
-	--pkg gtk+-3.0 \
-	--pkg gdk-x11-3.0 \
-	--pkg gio-2.0 \
-	--pkg gio-unix-2.0 \
-	--pkg gee-0.8 \
-	--pkg json-glib-1.0 \
-	--pkg keybinder-3.0 \
-	--pkg libnotify \
+	$(SYNAPSE_MODULES_VALAFLAGS) \
 	--vapidir $(top_builddir)/src/core \
 	--pkg synapse-core \
 	--vapidir $(top_builddir)/src/plugins \
@@ -42,19 +35,19 @@ synapse_LDADD = \
 	$(NULL)
 
 if HAVE_INDICATOR
-synapse_VALAFLAGS += --pkg appindicator3-0.1 -D HAVE_INDICATOR
+synapse_VALAFLAGS += $(APP_INDICATOR_VALAFLAGS)
 synapse_CFLAGS += $(APP_INDICATOR_CFLAGS)
 synapse_LDADD += $(APP_INDICATOR_LIBS)
 endif
 
 if HAVE_LIBREST
-synapse_VALAFLAGS += -D HAVE_LIBREST
+synapse_VALAFLAGS += $(REST_VALAFLAGS)
 synapse_CFLAGS += $(REST_CFLAGS)
 synapse_LDADD += $(REST_LIBS)
 endif
 
 if HAVE_ZEITGEIST
-synapse_VALAFLAGS += --pkg zeitgeist-2.0 -D HAVE_ZEITGEIST
+synapse_VALAFLAGS += $(ZEITGEIST_VALAFLAGS)
 synapse_CFLAGS += $(ZEITGEIST_CFLAGS)
 synapse_LDADD += $(ZEITGEIST_LIBS)
 endif
