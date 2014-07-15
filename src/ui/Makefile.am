@@ -66,7 +66,6 @@ synapse_VALASOURCES = \
 	icon-cache-service.vala \
 	utils.vala \
 	settings.vala \
-	inspector.vala \
 	tile-view/abstract-tile-object.vala \
 	tile-view/tile.vala \
 	tile-view/tile-view.vala \
