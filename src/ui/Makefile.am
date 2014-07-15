@@ -12,8 +12,6 @@ synapse_VALAFLAGS = \
 	--pkg synapse-core \
 	--vapidir $(top_builddir)/src/plugins \
 	--pkg plugins \
-	--vapidir $(top_builddir)/src/tile-view \
-	--pkg tile-view \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
 	$(NULL)
@@ -23,14 +21,12 @@ synapse_CFLAGS = \
 	-include config.h -w \
 	-I$(top_builddir)/src/core \
 	-I$(top_builddir)/src/plugins \
-	-I$(top_builddir)/src/tile-view \
 	$(NULL)
 
 synapse_LDADD = \
 	$(SYNAPSE_MODULES_LIBS) \
 	$(top_builddir)/src/core/libsynapsecore.la \
 	$(top_builddir)/src/plugins/libplugins.la \
-	$(top_builddir)/src/tile-view/libtileview.la \
 	$(LIBM) \
 	$(NULL)
 
@@ -71,6 +67,10 @@ synapse_VALASOURCES = \
 	utils.vala \
 	settings.vala \
 	inspector.vala \
+	tile-view/abstract-tile-object.vala \
+	tile-view/tile.vala \
+	tile-view/tile-view.vala \
+	tile-view/wrap-label.vala \
 	$(NULL)
 
 GENERATED_C_FILES = $(synapse_VALASOURCES:.vala=.c)
@@ -80,7 +80,7 @@ synapse_SOURCES = $(synapse_VALASOURCES:.vala=.c)
 # flags (ie --disable-indicator won't rebuild the Vala sources)
 
 #synapse_vala.stamp: $(addprefix $(srcdir)/,$(synapse_VALASOURCES)) Makefile
-synapse_vala.stamp: $(synapse_VALASOURCES) $(top_builddir)/src/core/synapse-core.vapi $(top_builddir)/src/plugins/plugins.vapi $(top_builddir)/src/tile-view/tile-view.vapi Makefile
+synapse_vala.stamp: $(synapse_VALASOURCES) $(top_builddir)/src/core/synapse-core.vapi $(top_builddir)/src/plugins/plugins.vapi Makefile
 	$(AM_V_VALA)$(VALAC) $(synapse_VALAFLAGS) $(VALAFLAGS) -C $(filter %.vala %.c,$^)
 	$(AM_V_at)touch $@
 

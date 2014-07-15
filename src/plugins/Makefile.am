@@ -20,10 +20,12 @@ libplugins_la_CFLAGS = \
 	-include config.h -w \
 	-I$(top_builddir)/src/core \
 	$(NULL)
+
 libplugins_la_LIBADD = \
 	$(SYNAPSE_MODULES_LIBS) \
 	$(top_builddir)/src/core/libsynapsecore.la \
 	$(NULL)
+
 libplugins_la_VALASOURCES = \
 	banshee-plugin.vala \
 	calculator-plugin.vala \

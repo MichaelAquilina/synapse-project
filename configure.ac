@@ -141,7 +141,6 @@ data/Makefile
 src/Makefile
 src/core/Makefile
 src/plugins/Makefile
-src/tile-view/Makefile
 src/ui/Makefile
 po/Makefile.in
 vapi/Makefile
