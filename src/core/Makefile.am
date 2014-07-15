@@ -9,7 +9,6 @@ libsynapsecore_la_VALAFLAGS = \
 	--pkg gtk+-3.0 \
 	--pkg gee-0.8 \
 	--pkg json-glib-1.0 \
-	--pkg dbus-glib-1 \
 	--pkg gio-unix-2.0 \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \

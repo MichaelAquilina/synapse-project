@@ -6,7 +6,6 @@ bin_PROGRAMS = synapse
 VAPIDIR = $(top_srcdir)/vapi
 
 synapse_VALAFLAGS = \
-	--pkg dbus-glib-1 \
 	--pkg gtk+-3.0 \
 	--pkg gdk-x11-3.0 \
 	--pkg gio-2.0 \
