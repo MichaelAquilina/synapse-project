@@ -7,12 +7,12 @@ noinst_LTLIBRARIES = libplugins.la
 VAPIDIR = $(top_srcdir)/vapi
 
 libplugins_la_VALAFLAGS = \
+	$(SYNAPSE_COMMON_VALAFLAGS) \
 	$(SYNAPSE_MODULES_VALAFLAGS) \
 	--vapidir $(top_builddir)/src/core \
 	--pkg synapse-core \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
-	-g \
 	$(NULL)
 
 libplugins_la_CFLAGS = \

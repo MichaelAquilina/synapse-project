@@ -6,6 +6,7 @@ bin_PROGRAMS = synapse
 VAPIDIR = $(top_srcdir)/vapi
 
 synapse_VALAFLAGS = \
+	$(SYNAPSE_COMMON_VALAFLAGS) \
 	$(SYNAPSE_MODULES_VALAFLAGS) \
 	--vapidir $(top_builddir)/src/core \
 	--pkg synapse-core \
@@ -15,7 +16,6 @@ synapse_VALAFLAGS = \
 	--pkg tile-view \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
-	-g \
 	$(NULL)
 
 synapse_CFLAGS = \

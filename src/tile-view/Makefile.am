@@ -6,10 +6,10 @@ noinst_LTLIBRARIES = libtileview.la
 VAPIDIR = $(top_srcdir)/vapi
 
 libtileview_la_VALAFLAGS = \
+	$(SYNAPSE_COMMON_VALAFLAGS) \
 	$(SYNAPSE_MODULES_VALAFLAGS) \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
-	-g \
 	$(NULL)
 
 libtileview_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h

@@ -6,10 +6,10 @@ noinst_LTLIBRARIES = libsynapsecore.la
 VAPIDIR = $(top_srcdir)/vapi
 
 libsynapsecore_la_VALAFLAGS = \
+	$(SYNAPSE_COMMON_VALAFLAGS) \
 	$(SYNAPSE_MODULES_VALAFLAGS) \
 	--vapidir $(VAPIDIR) \
 	$(VAPIDIR)/config.vapi \
-	-g \
 	$(NULL)
 
 libsynapsecore_la_CFLAGS = $(SYNAPSE_MODULES_CFLAGS) -include config.h -w

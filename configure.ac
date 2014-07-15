@@ -71,6 +71,8 @@ SYNAPSE_MODULES_VALAFLAGS=" --pkg gdk-x11-3.0 \
   --pkg libnotify"
 AC_SUBST(SYNAPSE_MODULES_VALAFLAGS)
 
+SYNAPSE_COMMON_VALAFLAGS=" --target-glib=2.28 --thread -g"
+AC_SUBST(SYNAPSE_COMMON_VALAFLAGS)
 
 AC_ARG_ENABLE(librest,
               AS_HELP_STRING([--enable-librest[=@<:@no/auto/yes@:>@]],[Build support for plugins using librest ]),
