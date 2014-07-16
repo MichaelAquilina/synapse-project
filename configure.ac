@@ -56,6 +56,7 @@ PKG_CHECK_MODULES(SYNAPSE_MODULES, \
   gio-2.0 >= $MIN_GLIB_VERSION \
   gio-unix-2.0 \
   gobject-2.0 \
+  gthread-2.0 \
   gee-0.8 >= $MIN_GEE_VERSION \
   json-glib-1.0 >= $MIN_JSON_VERSION \
   keybinder-3.0 \
