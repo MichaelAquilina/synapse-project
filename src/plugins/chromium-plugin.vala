@@ -66,7 +66,7 @@ namespace Synapse
         _("Browse and open Chromium bookmarks."),
         "chromium",
         register_plugin,
-        Environment.find_program_in_path ("chromium") != null,
+        Environment.find_program_in_path ("chromium") != null || Environment.find_program_in_path ("chromium-browser") != null,
         _("Chromium is not installed")
       );
     }
