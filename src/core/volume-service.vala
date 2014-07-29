@@ -170,7 +170,8 @@ namespace Synapse
       {
         if (changed_signal_id != 0)
         {
-          SignalHandler.disconnect (_volume, changed_signal_id);
+          //FIXME leeds to lock up
+          //SignalHandler.disconnect (_volume, changed_signal_id);
           changed_signal_id = 0;
         }
       }
