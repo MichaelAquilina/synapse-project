@@ -322,17 +322,17 @@ namespace Synapse
       }
       else if (session.has_prefix ("ede"))
       {
-        session_type = DesktopEnvironmentType.ROX;
+        session_type = DesktopEnvironmentType.EDE;
         session_type_str = "EDE";
       }
       else if (session.has_prefix ("cinnamon"))
       {
-        session_type = DesktopEnvironmentType.ROX;
+        session_type = DesktopEnvironmentType.CINNAMON;
         session_type_str = "Cinnamon";
       }
       else if (session.has_prefix ("pantheon"))
       {
-        session_type = DesktopEnvironmentType.ROX;
+        session_type = DesktopEnvironmentType.PANTHEON;
         session_type_str = "Pantheon";
       }
       else
