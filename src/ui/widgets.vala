@@ -1134,12 +1134,13 @@ namespace Synapse.Gui
     {
       string[] devs = {"Michal Hruby <michal.mhr@gmail.com>",
                        "Alberto Aldegheri <albyrock87+dev@gmail.com>",
-                       "Tom Beckmann <tom@elementaryos.org>"};
+                       "Tom Beckmann <tom@elementaryos.org>",
+                       "Rico Tzschichholz <ricotz@ubuntu.com>"};
       string[] artists = devs;
       artists += "Ian Cylkowski <designbyizo@gmail.com>";
       GLib.Object (artists : artists,
                    authors : devs,
-                   copyright : "Copyright (C) 2010-2014 " + string.joinv ("\n", devs),
+                   copyright : "Copyright (C) 2010-2015 " + string.joinv ("\n", devs),
                    program_name: "Synapse",
                    logo_icon_name : "synapse",
                    version: Config.VERSION,
