@@ -8,6 +8,8 @@ VAPIDIR = $(top_srcdir)/vapi
 synapse_VALAFLAGS = \
 	$(SYNAPSE_COMMON_VALAFLAGS) \
 	$(SYNAPSE_MODULES_VALAFLAGS) \
+	--basedir $(srcdir) \
+	--directory $(builddir) \
 	--vapidir $(top_builddir)/src/core \
 	--pkg synapse-core \
 	--vapidir $(top_builddir)/src/plugins \
