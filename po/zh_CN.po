@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: synapse-project\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-02-22 20:34+0000\n"
-"PO-Revision-Date: 2011-04-08 08:38+0000\n"
-"Last-Translator: skatiger <skatiger@gmail.com>\n"
+"POT-Creation-Date: 2015-01-28 19:17+0000\n"
+"PO-Revision-Date: 2015-02-24 00:54+0000\n"
+"Last-Translator: cnsworder <Unknown>\n"
 "Language-Team: Chinese (Simplified) <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-02-23 07:34+0000\n"
-"X-Generator: Launchpad (build 16926)\n"
+"X-Launchpad-Export-Date: 2015-02-25 05:29+0000\n"
+"X-Generator: Launchpad (build 17355)\n"
 
 #: ../data/synapse.desktop.in.h:1
 msgid "Synapse"
@@ -24,55 +24,59 @@ msgstr "Synapse"
 
 #: ../data/synapse.desktop.in.h:2
 msgid "Search everything you do."
-msgstr "查您所需，找你所想。"
+msgstr "搜索你想要的。"
 
 #. activate has to stay in first position!
-#: ../src/ui/synapse-main.vala:106 ../src/ui/settings.vala:244
+#: ../src/ui/synapse-main.vala:106 ../src/ui/settings.vala:240
 msgid "Activate"
 msgstr "激活"
 
 #. Whooot?! This cannot be true!
-#: ../src/ui/category.vala:31 ../src/ui/category.vala:72
+#: ../src/ui/category.vala:31 ../src/ui/category.vala:71
 #: ../src/ui/category.vala:135
 msgid "All"
 msgstr "全部"
 
-#: ../src/ui/category.vala:69 ../src/ui/category.vala:112
+#: ../src/ui/category.vala:68 ../src/ui/category.vala:112
 msgid "Actions"
 msgstr "动作"
 
-#: ../src/ui/category.vala:70 ../src/ui/category.vala:114
+#: ../src/ui/category.vala:69 ../src/ui/category.vala:114
 msgid "Audio"
 msgstr "音频"
 
-#: ../src/ui/category.vala:71 ../src/ui/category.vala:115
+#: ../src/ui/category.vala:70 ../src/ui/category.vala:115
 msgid "Applications"
 msgstr "应用程序"
 
-#: ../src/ui/category.vala:73 ../src/ui/category.vala:113
+#: ../src/ui/category.vala:72 ../src/ui/category.vala:113
 msgid "Places"
-msgstr ""
+msgstr "位置"
 
-#: ../src/ui/category.vala:74 ../src/ui/category.vala:116
+#: ../src/ui/category.vala:73 ../src/ui/category.vala:116
 msgid "Documents"
 msgstr "文档"
 
-#: ../src/ui/category.vala:75 ../src/ui/category.vala:117
+#: ../src/ui/category.vala:74 ../src/ui/category.vala:117
 msgid "Images"
 msgstr "图片"
 
-#: ../src/ui/category.vala:76 ../src/ui/category.vala:118
+#: ../src/ui/category.vala:75 ../src/ui/category.vala:118
 msgid "Video"
 msgstr "视频"
 
+#: ../src/ui/category.vala:76
+msgid "Contacts"
+msgstr "联系人"
+
 #: ../src/ui/category.vala:77 ../src/ui/category.vala:119
 msgid "Internet"
-msgstr "Internet"
+msgstr "网络"
 
 #. _labels.set (QueryFlags.ALL, _("All")); // Do not remove!
 #: ../src/ui/category.vala:111
 msgid "Include remote content"
-msgstr "包含非本地内容"
+msgstr "远程内容"
 
 #. _labels.set (QueryFlags.FILES, _("Files"));
 #: ../src/ui/category.vala:121
@@ -93,7 +97,7 @@ msgstr "未找到近期活动。"
 
 #: ../src/ui/controller.vala:33
 msgid "Type to search..."
-msgstr "搜索关键字..."
+msgstr "输入进行搜索..."
 
 #: ../src/ui/controller.vala:517
 msgid "...or press down key to browse recent activities"
@@ -102,7 +106,7 @@ msgstr "...或按下键来查看近期动作"
 #: ../src/ui/view-virgilio.vala:204 ../src/ui/widgets-matchlistview.vala:936
 #, c-format
 msgid "<b>%d of %d</b>"
-msgstr ""
+msgstr "<b>%d 中 %d</b>"
 
 #: ../src/ui/settings.vala:48
 msgid "Status"
@@ -120,150 +124,150 @@ msgstr "禁用插件"
 msgid "About this plugin"
 msgstr "关于插件"
 
-#: ../src/ui/settings.vala:72 ../src/ui/settings.vala:211
+#: ../src/ui/settings.vala:71 ../src/ui/settings.vala:207
 msgid "Configure plugin"
 msgstr "配置插件"
 
-#: ../src/ui/settings.vala:88 ../src/ui/settings.vala:465
+#: ../src/ui/settings.vala:86 ../src/ui/settings.vala:455
 msgid "Disabled"
-msgstr "禁用"
+msgstr "已禁用"
 
-#: ../src/ui/settings.vala:92
+#: ../src/ui/settings.vala:90
 msgid "Enabled"
-msgstr "启用"
+msgstr "已启用"
 
-#: ../src/ui/settings.vala:146
+#: ../src/ui/settings.vala:144
 msgid "Synapse - Settings"
 msgstr "Synapse - 设置"
 
-#: ../src/ui/settings.vala:168
+#: ../src/ui/settings.vala:169
 msgid "Default"
 msgstr "默认"
 
-#: ../src/ui/settings.vala:169
-msgid "Essential"
-msgstr ""
-
 #: ../src/ui/settings.vala:170
-msgid "Doish"
-msgstr ""
+msgid "Essential"
+msgstr "基本的"
 
 #: ../src/ui/settings.vala:171
-msgid "Side Doish"
-msgstr ""
+msgid "Doish"
+msgstr "Doish"
 
 #: ../src/ui/settings.vala:172
-msgid "Virgilio"
-msgstr ""
+msgid "Side Doish"
+msgstr "Side Doish"
 
-#: ../src/ui/settings.vala:245
+#: ../src/ui/settings.vala:173
+msgid "Virgilio"
+msgstr "Virgilio"
+
+#: ../src/ui/settings.vala:241
 msgid "Execute"
 msgstr "运行"
 
-#: ../src/ui/settings.vala:246
+#: ../src/ui/settings.vala:242
 msgid "Execute without hiding"
-msgstr ""
+msgstr "不隐藏运行"
 
-#: ../src/ui/settings.vala:247
+#: ../src/ui/settings.vala:243
 msgid "Alternative Delete"
-msgstr ""
+msgstr "选择性删除"
 
-#: ../src/ui/settings.vala:248
+#: ../src/ui/settings.vala:244
 msgid "Next Result"
 msgstr "下一结果"
 
-#: ../src/ui/settings.vala:249
+#: ../src/ui/settings.vala:245
 msgid "Previous Result"
 msgstr "上一结果"
 
-#: ../src/ui/settings.vala:250
+#: ../src/ui/settings.vala:246
 msgid "First Result"
 msgstr "第一个结果"
 
-#: ../src/ui/settings.vala:251
+#: ../src/ui/settings.vala:247
 msgid "Last Result"
 msgstr "最后结果"
 
-#: ../src/ui/settings.vala:252
+#: ../src/ui/settings.vala:248
 msgid "Next 5 Results"
 msgstr "下五个结果"
 
-#: ../src/ui/settings.vala:253
+#: ../src/ui/settings.vala:249
 msgid "Previous 5 Results"
 msgstr "上五个结果"
 
-#: ../src/ui/settings.vala:254
+#: ../src/ui/settings.vala:250
 msgid "Next Category"
-msgstr ""
+msgstr "下一个类别"
 
-#: ../src/ui/settings.vala:255
+#: ../src/ui/settings.vala:251
 msgid "Previous Category"
-msgstr ""
+msgstr "前一个类别"
 
-#: ../src/ui/settings.vala:256
+#: ../src/ui/settings.vala:252
 msgid "Next Pane"
-msgstr ""
+msgstr "下一个面板"
 
-#: ../src/ui/settings.vala:257
+#: ../src/ui/settings.vala:253
 msgid "Previous Pane"
-msgstr ""
+msgstr "上一个面板"
 
-#: ../src/ui/settings.vala:258
+#: ../src/ui/settings.vala:254
 msgid "Paste"
 msgstr "粘贴"
 
-#: ../src/ui/settings.vala:259
+#: ../src/ui/settings.vala:255
 msgid "Paste current selection"
-msgstr ""
+msgstr "粘贴选中"
 
-#: ../src/ui/settings.vala:260
-#: ../src/plugins/xnoise-media-player-plugin.vala:129
+#: ../src/ui/settings.vala:256
+#: ../src/plugins/xnoise-media-player-plugin.vala:94
 msgid "Quit"
-msgstr ""
+msgstr "退出"
 
-#: ../src/ui/settings.vala:274
+#: ../src/ui/settings.vala:270
 msgid "Shortcut already in use"
 msgstr "快捷键已被占用"
 
-#: ../src/ui/settings.vala:300
+#: ../src/ui/settings.vala:296
 msgid "General"
 msgstr "常规"
 
-#: ../src/ui/settings.vala:301
+#: ../src/ui/settings.vala:297
 msgid "Plugins"
 msgstr "插件"
 
-#: ../src/ui/settings.vala:307
+#: ../src/ui/settings.vala:303
 msgid "Behavior & Look"
 msgstr "行为和外观"
 
-#: ../src/ui/settings.vala:319
+#: ../src/ui/settings.vala:315
 msgid "Theme:"
 msgstr "主题:"
 
 #. Autostart checkbox
-#: ../src/ui/settings.vala:324
+#: ../src/ui/settings.vala:320
 msgid "Startup on login"
 msgstr "登录时启动"
 
 #. Notification icon
-#: ../src/ui/settings.vala:330
+#: ../src/ui/settings.vala:326
 msgid "Show notification icon"
 msgstr "显示通知区域图标"
 
-#: ../src/ui/settings.vala:345
+#: ../src/ui/settings.vala:340
 msgid "Shortcuts"
 msgstr "快捷键"
 
-#: ../src/ui/settings.vala:367
+#: ../src/ui/settings.vala:359
 msgid "Action"
 msgstr "动作"
 
-#: ../src/ui/settings.vala:404
+#: ../src/ui/settings.vala:392
 msgid "Shortcut"
 msgstr "快捷键"
 
-#: ../src/ui/settings.vala:423
+#: ../src/ui/settings.vala:411
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr "点击需要变更的快捷键后，设置快捷键"
 
@@ -275,54 +279,54 @@ msgstr "未搜索到符合条件的结果..."
 #: ../src/ui/widgets-matchlistview.vala:928
 #, c-format
 msgid "<b>1 of %d</b>"
-msgstr ""
+msgstr "<b>%d中的一个</b>"
 
 #. if is home dir
-#: ../src/ui/utils.vala:132
+#: ../src/ui/utils.vala:131
 msgid "Home"
-msgstr "Home"
+msgstr "主目录"
 
-#: ../src/ui/utils.vala:146
+#: ../src/ui/utils.vala:145
 msgid "Root"
-msgstr ""
+msgstr "根目录"
 
-#: ../src/core/common-actions.vala:77
+#: ../src/core/common-actions.vala:60
 msgid "Run"
-msgstr "执行"
+msgstr "运行"
 
-#: ../src/core/common-actions.vala:78
+#: ../src/core/common-actions.vala:61
 msgid "Run an application, action or script"
 msgstr "运行程序，动作或脚本"
 
-#: ../src/core/common-actions.vala:133
+#: ../src/core/common-actions.vala:113
 msgid "Run in Terminal"
 msgstr "在终端中运行"
 
-#: ../src/core/common-actions.vala:134
+#: ../src/core/common-actions.vala:114
 msgid "Run application or command in terminal"
 msgstr "在终端中运行程序或命令"
 
-#: ../src/core/common-actions.vala:182
+#: ../src/core/common-actions.vala:153
 msgid "Open"
 msgstr "打开"
 
-#: ../src/core/common-actions.vala:183
+#: ../src/core/common-actions.vala:154
 msgid "Open using default application"
 msgstr "使用默认应用程序打开"
 
-#: ../src/core/common-actions.vala:252
+#: ../src/core/common-actions.vala:215
 msgid "Open folder"
 msgstr "打开文件夹"
 
-#: ../src/core/common-actions.vala:253
+#: ../src/core/common-actions.vala:216
 msgid "Open folder containing this file"
 msgstr "打开所在文件夹"
 
-#: ../src/core/common-actions.vala:293
+#: ../src/core/common-actions.vala:257
 msgid "Copy to Clipboard"
 msgstr "复制到剪贴板"
 
-#: ../src/core/common-actions.vala:294
+#: ../src/core/common-actions.vala:258
 msgid "Copy selection to clipboard"
 msgstr "将选中内容复制到剪贴板"
 
@@ -333,264 +337,280 @@ msgstr "控制Banshee，添加音乐到播放列表。"
 #. DBusService.get_default ().name_is_activatable (BansheePlaybackController.UNIQUE_NAME), // doesn't work for banshee
 #: ../src/plugins/banshee-plugin.vala:76
 msgid "Banshee is not installed"
-msgstr "Banshee没有安装"
+msgstr "没有安装Banshee"
 
-#: ../src/plugins/banshee-plugin.vala:141
-#: ../src/plugins/rhythmbox-plugin.vala:153
-#: ../src/plugins/xnoise-media-player-plugin.vala:179
+#: ../src/plugins/banshee-plugin.vala:113
+#: ../src/plugins/rhythmbox-plugin.vala:119
+#: ../src/plugins/xnoise-media-player-plugin.vala:140
 msgid "Play"
-msgstr "Play"
+msgstr "播放"
 
-#: ../src/plugins/banshee-plugin.vala:142
+#: ../src/plugins/banshee-plugin.vala:114
 msgid "Start playback in Banshee"
 msgstr "Banshee开始播放"
 
-#: ../src/plugins/banshee-plugin.vala:169
-#: ../src/plugins/rhythmbox-plugin.vala:204
-#: ../src/plugins/xnoise-media-player-plugin.vala:234
+#: ../src/plugins/banshee-plugin.vala:140
+#: ../src/plugins/rhythmbox-plugin.vala:145
+#: ../src/plugins/xnoise-media-player-plugin.vala:191
 msgid "Pause"
-msgstr "Pause"
+msgstr "暂停"
 
-#: ../src/plugins/banshee-plugin.vala:170
+#: ../src/plugins/banshee-plugin.vala:141
 msgid "Pause playback in Banshee"
 msgstr "Banshee暂停播放"
 
-#: ../src/plugins/banshee-plugin.vala:190
-#: ../src/plugins/rhythmbox-plugin.vala:220
-#: ../src/plugins/xnoise-media-player-plugin.vala:259
+#: ../src/plugins/banshee-plugin.vala:160
+#: ../src/plugins/rhythmbox-plugin.vala:171
+#: ../src/plugins/xnoise-media-player-plugin.vala:214
 msgid "Next"
-msgstr "Next"
+msgstr "前进"
 
-#: ../src/plugins/banshee-plugin.vala:191
+#: ../src/plugins/banshee-plugin.vala:161
 msgid "Plays the next song in Banshee's playlist"
 msgstr "播放Banshee当前音乐列表中的下一首曲目"
 
-#: ../src/plugins/banshee-plugin.vala:213
-#: ../src/plugins/rhythmbox-plugin.vala:243
-#: ../src/plugins/xnoise-media-player-plugin.vala:285
+#: ../src/plugins/banshee-plugin.vala:182
+#: ../src/plugins/rhythmbox-plugin.vala:196
+#: ../src/plugins/xnoise-media-player-plugin.vala:238
 msgid "Previous"
-msgstr "Previous"
+msgstr "后退"
 
-#: ../src/plugins/banshee-plugin.vala:214
+#: ../src/plugins/banshee-plugin.vala:183
 msgid "Plays the previous song in Banshee's playlist"
 msgstr "播放Banshee当前音乐列表中的上一首曲目"
 
-#: ../src/plugins/banshee-plugin.vala:236
+#: ../src/plugins/banshee-plugin.vala:204
 msgid "Enqueue in Banshee"
 msgstr "加入Banshee队列"
 
-#: ../src/plugins/banshee-plugin.vala:237
+#: ../src/plugins/banshee-plugin.vala:205
 msgid "Add the song to Banshee playlist"
 msgstr "添加音乐到Banshee"
 
-#: ../src/plugins/banshee-plugin.vala:279
+#: ../src/plugins/banshee-plugin.vala:241
 msgid "Play in Banshee"
 msgstr "在Banshee中播放"
 
-#: ../src/plugins/banshee-plugin.vala:280
-#: ../src/plugins/rhythmbox-plugin.vala:317
+#: ../src/plugins/banshee-plugin.vala:242
+#: ../src/plugins/rhythmbox-plugin.vala:265
 msgid "Clears the current playlist and plays the song"
 msgstr "清空当前列表并播放音乐"
 
-#: ../src/plugins/calculator-plugin.vala:63
+#: ../src/plugins/calculator-plugin.vala:59
 msgid "Calculator"
 msgstr "计算器"
 
-#: ../src/plugins/calculator-plugin.vala:64
+#: ../src/plugins/calculator-plugin.vala:60
 msgid "Calculate basic expressions."
-msgstr ""
+msgstr "基本的数学公式"
 
-#: ../src/plugins/calculator-plugin.vala:68
+#: ../src/plugins/calculator-plugin.vala:64
 msgid "bc is not installed"
-msgstr "计算器插件未安装"
+msgstr "未安装计算插件"
 
 #: ../src/plugins/chat-actions-plugin.vala:42
 msgid "Open chat"
-msgstr ""
+msgstr "打开聊天"
 
 #: ../src/plugins/chat-actions-plugin.vala:43
 msgid "Open a chat with selected contact"
-msgstr ""
+msgstr "和联系人聊天"
+
+#: ../src/plugins/chat-actions-plugin.vala:65
+msgid "Send a message"
+msgstr "发送信息"
 
 #: ../src/plugins/chat-actions-plugin.vala:66
-msgid "Send a message"
-msgstr ""
-
-#: ../src/plugins/chat-actions-plugin.vala:67
 msgid "Send a message to the contact"
-msgstr ""
+msgstr "给联系人发送消息"
+
+#: ../src/plugins/chat-actions-plugin.vala:99
+msgid "Send message to.."
+msgstr "给...发送消息"
 
 #: ../src/plugins/chat-actions-plugin.vala:100
-msgid "Send message to.."
-msgstr ""
-
-#: ../src/plugins/chat-actions-plugin.vala:101
 msgid "Send a message to a contact"
-msgstr ""
+msgstr "给联系人发送消息"
 
-#: ../src/plugins/chat-actions-plugin.vala:136
+#: ../src/plugins/chat-actions-plugin.vala:134
 msgid "Chat actions"
-msgstr ""
+msgstr "聊天活动"
 
-#: ../src/plugins/chat-actions-plugin.vala:137
+#: ../src/plugins/chat-actions-plugin.vala:135
 msgid "Open chat, or send a message with your favorite IM"
-msgstr ""
+msgstr "使用收藏夹的IM聊天或发送信息"
 
-#: ../src/plugins/chromium-plugin.vala:79
+#: ../src/plugins/chromium-plugin.vala:65
 msgid "Chromium Plugin"
-msgstr ""
+msgstr "google浏览器插件"
 
-#: ../src/plugins/chromium-plugin.vala:80
+#: ../src/plugins/chromium-plugin.vala:66
 msgid "Browse and open Chromium bookmarks."
-msgstr ""
+msgstr "打开google浏览器书签"
 
-#: ../src/plugins/chromium-plugin.vala:84
+#: ../src/plugins/chromium-plugin.vala:70
 msgid "Chromium is not installed"
-msgstr ""
+msgstr "没有安装google浏览器"
 
-#: ../src/plugins/command-plugin.vala:56
+#: ../src/plugins/command-plugin.vala:44
 msgid "Run command"
 msgstr "运行命令"
 
-#: ../src/plugins/command-plugin.vala:77
+#: ../src/plugins/command-plugin.vala:64
 msgid "Find and execute arbitrary commands."
 msgstr "查找或执行任意命令"
 
-#: ../src/plugins/desktop-file-plugin.vala:90
+#: ../src/plugins/desktop-file-plugin.vala:70
 msgid "Search for and run applications on your computer."
 msgstr "搜索和运行应用程序"
 
-#: ../src/plugins/desktop-file-plugin.vala:263
+#: ../src/plugins/desktop-file-plugin.vala:231
 #, c-format
 msgid "Open with %s"
-msgstr "使用 %s 打开"
+msgstr "用 %s 打开"
 
-#: ../src/plugins/desktop-file-plugin.vala:265
+#: ../src/plugins/desktop-file-plugin.vala:233
 #, c-format
 msgid "Opens current selection using %s"
 msgstr "使用 %s 打开当前选择项"
 
-#: ../src/plugins/devhelp-search.vala:67
+#: ../src/plugins/devhelp-search.vala:59
 msgid "Search in Devhelp"
 msgstr "在Devhelp中搜索"
 
-#: ../src/plugins/devhelp-search.vala:68
+#: ../src/plugins/devhelp-search.vala:60
 msgid "Search documentation for this symbol"
 msgstr "在Devhelp文档中搜索..."
 
-#: ../src/plugins/devhelp-search.vala:78
+#: ../src/plugins/devhelp-search.vala:70
 msgid "Search documentation using Devhelp."
 msgstr "使用 Devhelp 搜索文档。"
 
-#: ../src/plugins/devhelp-search.vala:82
+#: ../src/plugins/devhelp-search.vala:74
 msgid "Devhelp is not installed"
-msgstr "Devhelp 没有安装"
+msgstr "没有安装Devhelp"
 
-#: ../src/plugins/dictionary.vala:67
+#: ../src/plugins/dictionary.vala:59
 msgid "Define"
 msgstr "定义"
 
-#: ../src/plugins/dictionary.vala:68
+#: ../src/plugins/dictionary.vala:60
 msgid "Look up definition in dictionary"
 msgstr "在Gnome Dictionary中查找定义"
 
-#: ../src/plugins/dictionary.vala:78
+#: ../src/plugins/dictionary.vala:70
 msgid "Look up definitions of words."
 msgstr "查找单词的定义."
 
-#: ../src/plugins/dictionary.vala:82
+#: ../src/plugins/dictionary.vala:74
 msgid "Gnome Dictionary is not installed"
 msgstr "Gnome Dictionary没有安装"
 
-#: ../src/plugins/directory-plugin.vala:125
+#: ../src/plugins/directory-plugin.vala:111
 msgid "Open commonly used directories."
 msgstr "打开常用目录."
 
-#: ../src/plugins/file-op-plugin.vala:77
+#: ../src/plugins/file-op-plugin.vala:40
+msgid "Remove"
+msgstr "移除"
+
+#: ../src/plugins/file-op-plugin.vala:41
+msgid "Move to Trash"
+msgstr "移动到回收站"
+
+#: ../src/plugins/file-op-plugin.vala:72
 msgid "Rename to"
-msgstr ""
+msgstr "重命名为"
 
-#: ../src/plugins/file-op-plugin.vala:78
+#: ../src/plugins/file-op-plugin.vala:73
 msgid "Rename the file to..."
-msgstr ""
+msgstr "重命名"
 
-#: ../src/plugins/file-op-plugin.vala:95 ../src/plugins/pidgin-plugin.vala:185
+#: ../src/plugins/file-op-plugin.vala:89 ../src/plugins/pidgin-plugin.vala:171
 #, c-format
 msgid "File \"%s\"does not exist."
-msgstr ""
+msgstr "\"%s\"不存在"
 
-#: ../src/plugins/file-op-plugin.vala:107
+#: ../src/plugins/file-op-plugin.vala:101
 #, c-format
 msgid "Cannot move \"%s\" to \"%s\""
-msgstr ""
+msgstr "不能够\"%s\"移动到\"%s\""
 
-#: ../src/plugins/file-op-plugin.vala:137
+#: ../src/plugins/file-op-plugin.vala:125
 msgid "File Operations"
-msgstr ""
+msgstr "文件操作"
 
-#: ../src/plugins/file-op-plugin.vala:138
+#: ../src/plugins/file-op-plugin.vala:126
 msgid "Copy, Cut, Paste and Delete files"
-msgstr ""
+msgstr "复制,剪切,粘贴和删除文件"
 
-#: ../src/plugins/gnome-screensaver-plugin.vala:59
+#: ../src/plugins/gnome-bookmarks-plugin.vala:61
+msgid "GNOME Bookmarks Plugin"
+msgstr "GNOME书签插件"
+
+#: ../src/plugins/gnome-bookmarks-plugin.vala:62
+msgid "Browse and open GNOME bookmarks."
+msgstr "打开GNOME书签"
+
+#: ../src/plugins/gnome-screensaver-plugin.vala:51
 msgid "Lock Screen"
-msgstr "锁定屏幕"
+msgstr "锁屏"
 
-#: ../src/plugins/gnome-screensaver-plugin.vala:60
+#: ../src/plugins/gnome-screensaver-plugin.vala:52
 msgid "Locks screen and starts screensaver."
 msgstr "进入屏保"
 
-#: ../src/plugins/gnome-screensaver-plugin.vala:84
+#: ../src/plugins/gnome-screensaver-plugin.vala:80
 msgid "Lock screen of your computer."
 msgstr "锁定屏幕"
 
-#: ../src/plugins/gnome-screensaver-plugin.vala:88
+#: ../src/plugins/gnome-screensaver-plugin.vala:84
 msgid "Gnome Screen Saver wasn't found"
-msgstr "Gnome Screen Saver未安装"
+msgstr "没有安装Gnome Screen Saver"
 
-#: ../src/plugins/hybrid-search-plugin.vala:86
+#: ../src/plugins/hybrid-search-plugin.vala:62
 msgid ""
 "Improve results returned by the Zeitgeist plugin by looking for similar "
 "files on the filesystem."
-msgstr ""
+msgstr "使用Zeitgeist插件来改善结果"
 
 #: ../src/plugins/imgur-plugin.vala:51
 msgid "Upload to imgur"
-msgstr "上传至imgur"
+msgstr "上传到imgur"
 
 #: ../src/plugins/imgur-plugin.vala:52
 msgid "Upload selection to imgur image sharer"
-msgstr "选中图片共享至imgur"
+msgstr "使用imgur共享图片"
 
-#: ../src/plugins/imgur-plugin.vala:164
-#: ../src/plugins/pastebin-plugin.vala:152
+#: ../src/plugins/imgur-plugin.vala:162
+#: ../src/plugins/pastebin-plugin.vala:151
 msgid ""
 "The selection was successfully uploaded and its URL was copied to clipboard."
 msgstr "选中图片上传完毕，URL已经保存在剪贴板中。"
 
-#: ../src/plugins/imgur-plugin.vala:168
-#: ../src/plugins/pastebin-plugin.vala:156
+#: ../src/plugins/imgur-plugin.vala:166
+#: ../src/plugins/pastebin-plugin.vala:155
 msgid ""
 "An error occurred during upload, please check the log for more information."
 msgstr "上传中差生错误，检查日志获取更多信息。"
 
-#: ../src/plugins/imgur-plugin.vala:176
+#: ../src/plugins/imgur-plugin.vala:174
 msgid "Synapse - Imgur"
 msgstr "Synapse - Imgur"
 
-#: ../src/plugins/imgur-plugin.vala:232
+#: ../src/plugins/imgur-plugin.vala:229
 msgid "Upload to imgur to contact.."
-msgstr ""
+msgstr "上传联系人到 imgur"
 
-#: ../src/plugins/imgur-plugin.vala:233
+#: ../src/plugins/imgur-plugin.vala:230
 msgid "Upload selection to imgur image sharer, and send the link to contact"
-msgstr ""
+msgstr "上传选中到 imgur图片共享, 并发送链接到联系人"
 
-#: ../src/plugins/imgur-plugin.vala:266
+#: ../src/plugins/imgur-plugin.vala:263
 msgid "Imgur"
 msgstr "Imgur"
 
-#: ../src/plugins/imgur-plugin.vala:267
+#: ../src/plugins/imgur-plugin.vala:264
 msgid "Share images using imgur."
 msgstr "使用imgur共享图片"
 
@@ -608,145 +628,153 @@ msgstr "点击浏览器中Finish按钮，登录Launchpad"
 msgid "Finish authorization"
 msgstr "认证完成"
 
-#: ../src/plugins/launchpad-plugin.vala:261
+#: ../src/plugins/launchpad-plugin.vala:240
 msgid "Find bugs and branches on Launchpad."
 msgstr "在Launchpad中查找bugs、branches"
 
 #. project link (lp:synapse)
-#: ../src/plugins/launchpad-plugin.vala:312
+#: ../src/plugins/launchpad-plugin.vala:291
 #, c-format
 msgid "Launchpad: Bazaar branches for %s"
-msgstr "Launchpad: Bazaar branches for %s"
+msgstr "Launchpad:从 %s 建立Bazaar 分支"
 
 #. series link (lp:synapse/0.3)
-#: ../src/plugins/launchpad-plugin.vala:319
+#: ../src/plugins/launchpad-plugin.vala:298
 #, c-format
 msgid "Launchpad: Series %s for Project %s"
-msgstr ""
+msgstr "Launchpad: %s组在项目 %s中"
 
 #. branch link (lp:~mhr3/synapse/lp-plugin)
-#: ../src/plugins/launchpad-plugin.vala:326
+#: ../src/plugins/launchpad-plugin.vala:305
 #, c-format
 msgid "Launchpad: Bazaar branch %s"
-msgstr ""
+msgstr "Launchpad: Bazaar 分支%s"
 
-#: ../src/plugins/launchpad-plugin.vala:341
+#: ../src/plugins/launchpad-plugin.vala:320
 #, c-format
 msgid "Launchpad: Bug #%s"
-msgstr ""
+msgstr "Launchpad: Bug #%s"
 
-#: ../src/plugins/locate-plugin.vala:95 ../src/plugins/locate-plugin.vala:105
+#: ../src/plugins/locate-plugin.vala:62 ../src/plugins/locate-plugin.vala:72
 msgid "Locate"
-msgstr ""
+msgstr "位置"
 
-#: ../src/plugins/locate-plugin.vala:96
+#: ../src/plugins/locate-plugin.vala:63
 msgid "Locate files with this name on the filesystem"
 msgstr "本地文件系统中的文件名"
 
-#: ../src/plugins/locate-plugin.vala:106
+#: ../src/plugins/locate-plugin.vala:73
 msgid "Runs locate command to find files on the filesystem."
 msgstr "执行本地命令在系统中查找文件"
 
-#: ../src/plugins/locate-plugin.vala:110
+#: ../src/plugins/locate-plugin.vala:77
 msgid "Unable to find \"locate\" binary"
-msgstr "仅能本地查找非二进制文件"
+msgstr "找不到\"locate\""
 
-#: ../src/plugins/opensearch.vala:252
+#: ../src/plugins/opensearch.vala:254
 msgid "Search the web."
 msgstr "Web搜索"
 
 #. keep in sync with the internal XMLs!
-#: ../src/plugins/opensearch.vala:264
+#: ../src/plugins/opensearch.vala:266
+msgid "DuckDuckGo"
+msgstr "DuckDuckGo"
+
+#: ../src/plugins/opensearch.vala:267
+msgid "Search the web using duckduckgo.com"
+msgstr "使用duckduckgo.com搜索"
+
+#: ../src/plugins/opensearch.vala:268
 msgid "Google"
 msgstr "Google"
 
-#: ../src/plugins/opensearch.vala:265
+#: ../src/plugins/opensearch.vala:269
 msgid "Search the web using google.com"
 msgstr "在Google.com搜索"
 
-#: ../src/plugins/opensearch.vala:266
+#: ../src/plugins/opensearch.vala:270
 msgid "Google Maps"
 msgstr "Google地图"
 
-#: ../src/plugins/opensearch.vala:267
+#: ../src/plugins/opensearch.vala:271
 msgid "Search using Google Maps"
 msgstr "搜索Google地图"
 
 #: ../src/plugins/pastebin-plugin.vala:42
-#: ../src/plugins/pastebin-plugin.vala:262
+#: ../src/plugins/pastebin-plugin.vala:261
 msgid "Pastebin"
-msgstr ""
+msgstr "Pastebin"
 
 #: ../src/plugins/pastebin-plugin.vala:43
-#: ../src/plugins/pastebin-plugin.vala:229
-msgid "Pastebin selection"
-msgstr ""
-
-#: ../src/plugins/pastebin-plugin.vala:164
-msgid "Synapse - Pastebin"
-msgstr ""
-
 #: ../src/plugins/pastebin-plugin.vala:228
+msgid "Pastebin selection"
+msgstr "Pastebin 选中"
+
+#: ../src/plugins/pastebin-plugin.vala:163
+msgid "Synapse - Pastebin"
+msgstr "Synapse - Pastebin"
+
+#: ../src/plugins/pastebin-plugin.vala:227
 msgid "Pastebin to contact.."
-msgstr ""
+msgstr "发送Pastebin到联系人"
 
-#: ../src/plugins/pastebin-plugin.vala:263
+#: ../src/plugins/pastebin-plugin.vala:262
 msgid "Upload files to pastebin."
-msgstr ""
+msgstr "上传文件到pastebin"
 
-#: ../src/plugins/pastebin-plugin.vala:267
+#: ../src/plugins/pastebin-plugin.vala:266
 msgid "Unable to find \"pastebinit\" program"
-msgstr ""
+msgstr "找不到'pastebinit'程序"
 
 #: ../src/plugins/pidgin-plugin.vala:77
 msgid "Get access to your Pidgin contacts"
-msgstr ""
+msgstr "获取Pidgin的联系人"
 
 #: ../src/plugins/pidgin-plugin.vala:81
 msgid "Pidgin is not installed."
-msgstr ""
+msgstr "没有安装Pidgin"
 
 #: ../src/plugins/pidgin-plugin.vala:94
 msgid "Send in chat to.."
-msgstr ""
+msgstr "和..聊天"
 
 #: ../src/plugins/pidgin-plugin.vala:95
 msgid "Send selected file within Pidgin"
-msgstr ""
+msgstr "使用Pidgin发送选中文件"
 
-#: ../src/plugins/rhythmbox-plugin.vala:84
+#: ../src/plugins/rhythmbox-plugin.vala:79
 msgid "Control Rhythmbox and add items to playlists."
 msgstr "控制Rhythmbox，添加音乐到播放列表。"
 
-#: ../src/plugins/rhythmbox-plugin.vala:88
+#: ../src/plugins/rhythmbox-plugin.vala:83
 msgid "Rhythmbox is not installed"
-msgstr "Rhythmbox没有安装"
+msgstr "没有安装Rhythmbox"
 
-#: ../src/plugins/rhythmbox-plugin.vala:154
+#: ../src/plugins/rhythmbox-plugin.vala:120
 msgid "Start playback in Rhythmbox"
 msgstr "Rhythmbox开始播放"
 
-#: ../src/plugins/rhythmbox-plugin.vala:205
+#: ../src/plugins/rhythmbox-plugin.vala:146
 msgid "Pause playback in Rhythmbox"
 msgstr "暂停Rhythmbox播放"
 
-#: ../src/plugins/rhythmbox-plugin.vala:221
+#: ../src/plugins/rhythmbox-plugin.vala:172
 msgid "Plays the next song in Rhythmbox's playlist"
 msgstr "播放Rhythmbox列表中的下一首曲目"
 
-#: ../src/plugins/rhythmbox-plugin.vala:244
+#: ../src/plugins/rhythmbox-plugin.vala:197
 msgid "Plays the previous song in Rhythmbox's playlist"
 msgstr "播放Rhythmbox列表中的上一首曲目"
 
-#: ../src/plugins/rhythmbox-plugin.vala:268
+#: ../src/plugins/rhythmbox-plugin.vala:222
 msgid "Enqueue in Rhythmbox"
 msgstr "加入Rhythmbox队列"
 
-#: ../src/plugins/rhythmbox-plugin.vala:269
+#: ../src/plugins/rhythmbox-plugin.vala:223
 msgid "Add the song to Rhythmbox playlist"
 msgstr "添加音乐到Rhythmbox播放列表"
 
-#: ../src/plugins/rhythmbox-plugin.vala:316
+#: ../src/plugins/rhythmbox-plugin.vala:264
 msgid "Play in Rhythmbox"
 msgstr "在Rhythmbox中播放"
 
@@ -759,9 +787,9 @@ msgstr "选择"
 msgid "Provides actions for currently selected text."
 msgstr "为当前选中文本内容提供动作。"
 
-#: ../src/plugins/selection-plugin.vala:81
+#: ../src/plugins/selection-plugin.vala:72
 msgid "Selected text"
-msgstr "选择的文字"
+msgstr "选择的文本"
 
 #. Plugin title
 #: ../src/plugins/ssh-plugin.vala:67
@@ -774,165 +802,165 @@ msgstr "链接至SSH主机"
 #. true if user's system has all required components which the plugin needs
 #: ../src/plugins/ssh-plugin.vala:72
 msgid "ssh is not installed"
-msgstr ""
+msgstr "没有安装ssh"
 
-#: ../src/plugins/ssh-plugin.vala:197
+#: ../src/plugins/ssh-plugin.vala:190
 msgid "Connect with SSH"
 msgstr "用 SSH 连接"
 
-#: ../src/plugins/system-management.vala:87
+#: ../src/plugins/system-management.vala:89
 msgid "Suspend"
-msgstr "Suspend"
+msgstr "待机"
 
-#: ../src/plugins/system-management.vala:88
+#: ../src/plugins/system-management.vala:90
 msgid "Put your computer into suspend mode"
 msgstr "计算机进入待机状态"
 
-#: ../src/plugins/system-management.vala:158
+#: ../src/plugins/system-management.vala:189
 msgid "Hibernate"
-msgstr "Hibernate"
+msgstr "休眠"
 
-#: ../src/plugins/system-management.vala:159
+#: ../src/plugins/system-management.vala:190
 msgid "Put your computer into hibernation mode"
 msgstr "计算机进入休眠状态"
 
-#: ../src/plugins/system-management.vala:228
+#: ../src/plugins/system-management.vala:288
 msgid "Shut Down"
-msgstr "Shut Down"
+msgstr "关机"
 
-#: ../src/plugins/system-management.vala:229
+#: ../src/plugins/system-management.vala:289
 msgid "Turn your computer off"
 msgstr "关闭计算机"
 
-#: ../src/plugins/system-management.vala:283
+#: ../src/plugins/system-management.vala:372
 msgid "Restart"
-msgstr "Restart"
+msgstr "重启"
 
-#: ../src/plugins/system-management.vala:284
+#: ../src/plugins/system-management.vala:373
 msgid "Restart your computer"
 msgstr "重启计算机"
 
-#: ../src/plugins/system-management.vala:339
+#: ../src/plugins/system-management.vala:457
 msgid "Suspend, hibernate, restart or shutdown your computer."
 msgstr "睡眠，休眠，重启或关机"
 
-#: ../src/plugins/system-management.vala:343
+#: ../src/plugins/system-management.vala:462
 msgid "ConsoleKit wasn't found"
-msgstr ""
+msgstr "没有发现控制台"
 
 #: ../src/plugins/xnoise-media-player-plugin.vala:59
 msgid "Control Xnoise media player."
-msgstr ""
+msgstr "控制Xnoise播放器"
 
 #: ../src/plugins/xnoise-media-player-plugin.vala:63
 msgid "Xnoise is not installed!"
-msgstr ""
+msgstr "没有安装Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:130
+#: ../src/plugins/xnoise-media-player-plugin.vala:95
 msgid "Quit Xnoise"
-msgstr ""
+msgstr "退出Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:154
+#: ../src/plugins/xnoise-media-player-plugin.vala:117
 msgid "Raise"
-msgstr ""
+msgstr "提升"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:155
+#: ../src/plugins/xnoise-media-player-plugin.vala:118
 msgid "Show Xnoise"
-msgstr ""
+msgstr "显示Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:180
+#: ../src/plugins/xnoise-media-player-plugin.vala:141
 msgid "Start playback in Xnoise"
-msgstr ""
+msgstr "使用Xnoise播放"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:204
+#: ../src/plugins/xnoise-media-player-plugin.vala:163
 msgid "TogglePlaying"
-msgstr ""
+msgstr "播放"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:205
+#: ../src/plugins/xnoise-media-player-plugin.vala:164
 msgid "Start/Pause playback in Xnoise"
-msgstr ""
+msgstr "Xnoise开始/暂停播放"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:235
+#: ../src/plugins/xnoise-media-player-plugin.vala:192
 msgid "Pause playback in Xnoise"
-msgstr ""
+msgstr "暂停Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:260
+#: ../src/plugins/xnoise-media-player-plugin.vala:215
 msgid "Plays the next song in Xnoise's playlist"
-msgstr ""
+msgstr "xnoise列表的下一首歌"
+
+#: ../src/plugins/xnoise-media-player-plugin.vala:239
+msgid "Plays the previous song in Xnoise's playlist"
+msgstr "xnoise列表的上一首歌"
+
+#: ../src/plugins/xnoise-media-player-plugin.vala:261
+msgid "Stop"
+msgstr "停止"
+
+#: ../src/plugins/xnoise-media-player-plugin.vala:262
+msgid "Stops the playback of Xnoise"
+msgstr "Xnoise停止播放"
+
+#: ../src/plugins/xnoise-media-player-plugin.vala:285
+msgid "Play in Xnoise"
+msgstr "Xnoise播放"
 
 #: ../src/plugins/xnoise-media-player-plugin.vala:286
-msgid "Plays the previous song in Xnoise's playlist"
-msgstr ""
-
-#: ../src/plugins/xnoise-media-player-plugin.vala:310
-msgid "Stop"
-msgstr ""
-
-#: ../src/plugins/xnoise-media-player-plugin.vala:311
-msgid "Stops the playback of Xnoise"
-msgstr ""
-
-#: ../src/plugins/xnoise-media-player-plugin.vala:336
-msgid "Play in Xnoise"
-msgstr ""
-
-#: ../src/plugins/xnoise-media-player-plugin.vala:337
 msgid "Queues and plays the song"
-msgstr ""
+msgstr "播放队列中的音乐"
 
-#: ../src/plugins/zeitgeist-plugin.vala:158
+#: ../src/plugins/zeitgeist-plugin.vala:162
 msgid "few moments ago"
 msgstr "稍等一下"
 
-#: ../src/plugins/zeitgeist-plugin.vala:163
+#: ../src/plugins/zeitgeist-plugin.vala:167
 #, c-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "%d 分钟前"
 
-#: ../src/plugins/zeitgeist-plugin.vala:168
+#: ../src/plugins/zeitgeist-plugin.vala:172
 #, c-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] "%d 小时前"
 
-#: ../src/plugins/zeitgeist-plugin.vala:173
+#: ../src/plugins/zeitgeist-plugin.vala:177
 #, c-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] "%d 天前"
 
-#: ../src/plugins/zeitgeist-plugin.vala:178
+#: ../src/plugins/zeitgeist-plugin.vala:182
 #, c-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
 msgstr[0] "%d 星期前"
 
-#: ../src/plugins/zeitgeist-plugin.vala:182
+#: ../src/plugins/zeitgeist-plugin.vala:186
 msgid "long time ago"
-msgstr ""
+msgstr "很久以前"
 
-#: ../src/plugins/zeitgeist-plugin.vala:192
+#: ../src/plugins/zeitgeist-plugin.vala:196
 msgid "Search various items logged by Zeitgeist."
 msgstr "使用Zeitgeist搜索记录。"
 
-#: ../src/plugins/zeitgeist-plugin.vala:196
-#: ../src/plugins/zeitgeist-related.vala:112
+#: ../src/plugins/zeitgeist-plugin.vala:200
+#: ../src/plugins/zeitgeist-related.vala:79
 msgid "Zeitgeist is not installed"
-msgstr "Zeitgeist没有安装"
+msgstr "没有安装Zeitgeist"
 
-#: ../src/plugins/zeitgeist-related.vala:97
+#: ../src/plugins/zeitgeist-related.vala:64
 msgid "Find related"
-msgstr ""
+msgstr "查找相关内容"
 
-#: ../src/plugins/zeitgeist-related.vala:98
+#: ../src/plugins/zeitgeist-related.vala:65
 msgid "Find resources related to this result"
-msgstr ""
+msgstr "返回相关资源"
 
-#: ../src/plugins/zeitgeist-related.vala:107
+#: ../src/plugins/zeitgeist-related.vala:74
 msgid "Related files"
-msgstr ""
+msgstr "相关文件"
 
-#: ../src/plugins/zeitgeist-related.vala:108
+#: ../src/plugins/zeitgeist-related.vala:75
 msgid "Finds files related to other search results using Zeitgeist."
-msgstr ""
+msgstr "在结果中使用Zeitgeist查找"

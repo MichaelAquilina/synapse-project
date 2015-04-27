@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: synapse-project\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-02-22 20:34+0000\n"
+"POT-Creation-Date: 2015-01-28 19:17+0000\n"
 "PO-Revision-Date: 2014-05-12 08:48+0000\n"
 "Last-Translator: Rizal Muttaqin <sundaralinux@gmail.com>\n"
 "Language-Team: Indonesian <id@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-05-13 06:08+0000\n"
-"X-Generator: Launchpad (build 17002)\n"
+"X-Launchpad-Export-Date: 2015-01-29 05:12+0000\n"
+"X-Generator: Launchpad (build 17306)\n"
 
 #: ../data/synapse.desktop.in.h:1
 msgid "Synapse"
@@ -27,43 +27,47 @@ msgid "Search everything you do."
 msgstr "Mencari setiap hal yang Anda lakukan"
 
 #. activate has to stay in first position!
-#: ../src/ui/synapse-main.vala:106 ../src/ui/settings.vala:244
+#: ../src/ui/synapse-main.vala:106 ../src/ui/settings.vala:240
 msgid "Activate"
 msgstr "Aktifkan"
 
 #. Whooot?! This cannot be true!
-#: ../src/ui/category.vala:31 ../src/ui/category.vala:72
+#: ../src/ui/category.vala:31 ../src/ui/category.vala:71
 #: ../src/ui/category.vala:135
 msgid "All"
 msgstr "Semuanya"
 
-#: ../src/ui/category.vala:69 ../src/ui/category.vala:112
+#: ../src/ui/category.vala:68 ../src/ui/category.vala:112
 msgid "Actions"
 msgstr "Tindakan-tindakan"
 
-#: ../src/ui/category.vala:70 ../src/ui/category.vala:114
+#: ../src/ui/category.vala:69 ../src/ui/category.vala:114
 msgid "Audio"
 msgstr "Suara"
 
-#: ../src/ui/category.vala:71 ../src/ui/category.vala:115
+#: ../src/ui/category.vala:70 ../src/ui/category.vala:115
 msgid "Applications"
 msgstr "Aplikasi-aplikasi"
 
-#: ../src/ui/category.vala:73 ../src/ui/category.vala:113
+#: ../src/ui/category.vala:72 ../src/ui/category.vala:113
 msgid "Places"
 msgstr "Tempat-tempat"
 
-#: ../src/ui/category.vala:74 ../src/ui/category.vala:116
+#: ../src/ui/category.vala:73 ../src/ui/category.vala:116
 msgid "Documents"
 msgstr "Dokumen-dokumen"
 
-#: ../src/ui/category.vala:75 ../src/ui/category.vala:117
+#: ../src/ui/category.vala:74 ../src/ui/category.vala:117
 msgid "Images"
 msgstr "Gambar-gambar"
 
-#: ../src/ui/category.vala:76 ../src/ui/category.vala:118
+#: ../src/ui/category.vala:75 ../src/ui/category.vala:118
 msgid "Video"
 msgstr "Video"
+
+#: ../src/ui/category.vala:76
+msgid "Contacts"
+msgstr ""
 
 #: ../src/ui/category.vala:77 ../src/ui/category.vala:119
 msgid "Internet"
@@ -120,150 +124,150 @@ msgstr "Matikan pengaya ini"
 msgid "About this plugin"
 msgstr "Tentang pengaya ini"
 
-#: ../src/ui/settings.vala:72 ../src/ui/settings.vala:211
+#: ../src/ui/settings.vala:71 ../src/ui/settings.vala:207
 msgid "Configure plugin"
 msgstr "Atur pengaya"
 
-#: ../src/ui/settings.vala:88 ../src/ui/settings.vala:465
+#: ../src/ui/settings.vala:86 ../src/ui/settings.vala:455
 msgid "Disabled"
 msgstr "Dimatikan"
 
-#: ../src/ui/settings.vala:92
+#: ../src/ui/settings.vala:90
 msgid "Enabled"
 msgstr "Dihidupkan"
 
-#: ../src/ui/settings.vala:146
+#: ../src/ui/settings.vala:144
 msgid "Synapse - Settings"
 msgstr "Synapse - Pengaturan"
 
-#: ../src/ui/settings.vala:168
+#: ../src/ui/settings.vala:169
 msgid "Default"
 msgstr "Bawaan"
 
-#: ../src/ui/settings.vala:169
+#: ../src/ui/settings.vala:170
 msgid "Essential"
 msgstr "Mendasar"
 
-#: ../src/ui/settings.vala:170
+#: ../src/ui/settings.vala:171
 msgid "Doish"
 msgstr "Seperti 'Do'"
 
-#: ../src/ui/settings.vala:171
+#: ../src/ui/settings.vala:172
 msgid "Side Doish"
 msgstr "Side Doish"
 
-#: ../src/ui/settings.vala:172
+#: ../src/ui/settings.vala:173
 msgid "Virgilio"
 msgstr "Virgilio"
 
-#: ../src/ui/settings.vala:245
+#: ../src/ui/settings.vala:241
 msgid "Execute"
 msgstr "Jalankan"
 
-#: ../src/ui/settings.vala:246
+#: ../src/ui/settings.vala:242
 msgid "Execute without hiding"
 msgstr "Jalankan tanpa penyembunyian"
 
-#: ../src/ui/settings.vala:247
+#: ../src/ui/settings.vala:243
 msgid "Alternative Delete"
 msgstr "Pilihan Menghapus"
 
-#: ../src/ui/settings.vala:248
+#: ../src/ui/settings.vala:244
 msgid "Next Result"
 msgstr "Hasil Selanjutnya"
 
-#: ../src/ui/settings.vala:249
+#: ../src/ui/settings.vala:245
 msgid "Previous Result"
 msgstr "Hasil Sebelumnya"
 
-#: ../src/ui/settings.vala:250
+#: ../src/ui/settings.vala:246
 msgid "First Result"
 msgstr "Hasil Pertama"
 
-#: ../src/ui/settings.vala:251
+#: ../src/ui/settings.vala:247
 msgid "Last Result"
 msgstr "Hasil Terakhir"
 
-#: ../src/ui/settings.vala:252
+#: ../src/ui/settings.vala:248
 msgid "Next 5 Results"
 msgstr "Lima Hasil Selanjutnya"
 
-#: ../src/ui/settings.vala:253
+#: ../src/ui/settings.vala:249
 msgid "Previous 5 Results"
 msgstr "Lima Hasil Sebelumnya"
 
-#: ../src/ui/settings.vala:254
+#: ../src/ui/settings.vala:250
 msgid "Next Category"
 msgstr "Kelompok Selanjutnya"
 
-#: ../src/ui/settings.vala:255
+#: ../src/ui/settings.vala:251
 msgid "Previous Category"
 msgstr "Kelompok Sebelumny"
 
-#: ../src/ui/settings.vala:256
+#: ../src/ui/settings.vala:252
 msgid "Next Pane"
 msgstr "Panel Selanjutnya"
 
-#: ../src/ui/settings.vala:257
+#: ../src/ui/settings.vala:253
 msgid "Previous Pane"
 msgstr "Panel Sebelumnya"
 
-#: ../src/ui/settings.vala:258
+#: ../src/ui/settings.vala:254
 msgid "Paste"
 msgstr "Tempel"
 
-#: ../src/ui/settings.vala:259
+#: ../src/ui/settings.vala:255
 msgid "Paste current selection"
 msgstr "Tempel pilihan kini"
 
-#: ../src/ui/settings.vala:260
-#: ../src/plugins/xnoise-media-player-plugin.vala:129
+#: ../src/ui/settings.vala:256
+#: ../src/plugins/xnoise-media-player-plugin.vala:94
 msgid "Quit"
 msgstr "Tinggalkan"
 
-#: ../src/ui/settings.vala:274
+#: ../src/ui/settings.vala:270
 msgid "Shortcut already in use"
 msgstr "Pintasan telah digunakan"
 
-#: ../src/ui/settings.vala:300
+#: ../src/ui/settings.vala:296
 msgid "General"
 msgstr "Umum"
 
-#: ../src/ui/settings.vala:301
+#: ../src/ui/settings.vala:297
 msgid "Plugins"
 msgstr "Pengaya-pengaya"
 
-#: ../src/ui/settings.vala:307
+#: ../src/ui/settings.vala:303
 msgid "Behavior & Look"
 msgstr "Kelakuan & Tampilan"
 
-#: ../src/ui/settings.vala:319
+#: ../src/ui/settings.vala:315
 msgid "Theme:"
 msgstr "Tema:"
 
 #. Autostart checkbox
-#: ../src/ui/settings.vala:324
+#: ../src/ui/settings.vala:320
 msgid "Startup on login"
 msgstr "Awali saat log masuk"
 
 #. Notification icon
-#: ../src/ui/settings.vala:330
+#: ../src/ui/settings.vala:326
 msgid "Show notification icon"
 msgstr "Tampilan ikon pemberitahuan"
 
-#: ../src/ui/settings.vala:345
+#: ../src/ui/settings.vala:340
 msgid "Shortcuts"
 msgstr "Pintasan-pintasan"
 
-#: ../src/ui/settings.vala:367
+#: ../src/ui/settings.vala:359
 msgid "Action"
 msgstr "Tindakan"
 
-#: ../src/ui/settings.vala:404
+#: ../src/ui/settings.vala:392
 msgid "Shortcut"
 msgstr "Pintasan"
 
-#: ../src/ui/settings.vala:423
+#: ../src/ui/settings.vala:411
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr "Klik pintasan mana yang ingin diubah dan tekan pintasan yang baru"
 
@@ -278,51 +282,51 @@ msgid "<b>1 of %d</b>"
 msgstr "<b>1 dari %d</b>"
 
 #. if is home dir
-#: ../src/ui/utils.vala:132
+#: ../src/ui/utils.vala:131
 msgid "Home"
 msgstr "Beranda"
 
-#: ../src/ui/utils.vala:146
+#: ../src/ui/utils.vala:145
 msgid "Root"
 msgstr "Pangkal"
 
-#: ../src/core/common-actions.vala:77
+#: ../src/core/common-actions.vala:60
 msgid "Run"
 msgstr "Jalankan"
 
-#: ../src/core/common-actions.vala:78
+#: ../src/core/common-actions.vala:61
 msgid "Run an application, action or script"
 msgstr "Jalankan suatu aplikasi, tindakan atau skrip"
 
-#: ../src/core/common-actions.vala:133
+#: ../src/core/common-actions.vala:113
 msgid "Run in Terminal"
 msgstr "Jalankan di terminal"
 
-#: ../src/core/common-actions.vala:134
+#: ../src/core/common-actions.vala:114
 msgid "Run application or command in terminal"
 msgstr "Jalankan aplikasi atau perintah di terminal"
 
-#: ../src/core/common-actions.vala:182
+#: ../src/core/common-actions.vala:153
 msgid "Open"
 msgstr "Buka"
 
-#: ../src/core/common-actions.vala:183
+#: ../src/core/common-actions.vala:154
 msgid "Open using default application"
 msgstr "Buka menggunakan aplikasi bawaan"
 
-#: ../src/core/common-actions.vala:252
+#: ../src/core/common-actions.vala:215
 msgid "Open folder"
 msgstr "Buka folder"
 
-#: ../src/core/common-actions.vala:253
+#: ../src/core/common-actions.vala:216
 msgid "Open folder containing this file"
 msgstr "Buka folder yang mengandungi berkas ini"
 
-#: ../src/core/common-actions.vala:293
+#: ../src/core/common-actions.vala:257
 msgid "Copy to Clipboard"
 msgstr "Salin ke Papan Klip"
 
-#: ../src/core/common-actions.vala:294
+#: ../src/core/common-actions.vala:258
 msgid "Copy selection to clipboard"
 msgstr "Salin pilihan ke papan klip"
 
@@ -335,72 +339,72 @@ msgstr "Kendalikan Banshee dan tambahkan butir ke daftar main."
 msgid "Banshee is not installed"
 msgstr "Banshee tidak terpasang"
 
-#: ../src/plugins/banshee-plugin.vala:141
-#: ../src/plugins/rhythmbox-plugin.vala:153
-#: ../src/plugins/xnoise-media-player-plugin.vala:179
+#: ../src/plugins/banshee-plugin.vala:113
+#: ../src/plugins/rhythmbox-plugin.vala:119
+#: ../src/plugins/xnoise-media-player-plugin.vala:140
 msgid "Play"
 msgstr "Putar"
 
-#: ../src/plugins/banshee-plugin.vala:142
+#: ../src/plugins/banshee-plugin.vala:114
 msgid "Start playback in Banshee"
 msgstr "Mulai pemutaran di Banshee"
 
-#: ../src/plugins/banshee-plugin.vala:169
-#: ../src/plugins/rhythmbox-plugin.vala:204
-#: ../src/plugins/xnoise-media-player-plugin.vala:234
+#: ../src/plugins/banshee-plugin.vala:140
+#: ../src/plugins/rhythmbox-plugin.vala:145
+#: ../src/plugins/xnoise-media-player-plugin.vala:191
 msgid "Pause"
 msgstr "Jeda"
 
-#: ../src/plugins/banshee-plugin.vala:170
+#: ../src/plugins/banshee-plugin.vala:141
 msgid "Pause playback in Banshee"
 msgstr "Jeda pemutaran di Banshee"
 
-#: ../src/plugins/banshee-plugin.vala:190
-#: ../src/plugins/rhythmbox-plugin.vala:220
-#: ../src/plugins/xnoise-media-player-plugin.vala:259
+#: ../src/plugins/banshee-plugin.vala:160
+#: ../src/plugins/rhythmbox-plugin.vala:171
+#: ../src/plugins/xnoise-media-player-plugin.vala:214
 msgid "Next"
 msgstr "Berikutnya"
 
-#: ../src/plugins/banshee-plugin.vala:191
+#: ../src/plugins/banshee-plugin.vala:161
 msgid "Plays the next song in Banshee's playlist"
 msgstr "Putar lagu berikutnya pada daftar putar Banshee"
 
-#: ../src/plugins/banshee-plugin.vala:213
-#: ../src/plugins/rhythmbox-plugin.vala:243
-#: ../src/plugins/xnoise-media-player-plugin.vala:285
+#: ../src/plugins/banshee-plugin.vala:182
+#: ../src/plugins/rhythmbox-plugin.vala:196
+#: ../src/plugins/xnoise-media-player-plugin.vala:238
 msgid "Previous"
 msgstr "Sebelumnya"
 
-#: ../src/plugins/banshee-plugin.vala:214
+#: ../src/plugins/banshee-plugin.vala:183
 msgid "Plays the previous song in Banshee's playlist"
 msgstr "Putar lagu sebelumnya pada daftar putar Banshee?"
 
-#: ../src/plugins/banshee-plugin.vala:236
+#: ../src/plugins/banshee-plugin.vala:204
 msgid "Enqueue in Banshee"
 msgstr "Antrikan di Banshee"
 
-#: ../src/plugins/banshee-plugin.vala:237
+#: ../src/plugins/banshee-plugin.vala:205
 msgid "Add the song to Banshee playlist"
 msgstr "Tambahkan lagu ke daftar putar Banshee"
 
-#: ../src/plugins/banshee-plugin.vala:279
+#: ../src/plugins/banshee-plugin.vala:241
 msgid "Play in Banshee"
 msgstr "Putar di Banshee"
 
-#: ../src/plugins/banshee-plugin.vala:280
-#: ../src/plugins/rhythmbox-plugin.vala:317
+#: ../src/plugins/banshee-plugin.vala:242
+#: ../src/plugins/rhythmbox-plugin.vala:265
 msgid "Clears the current playlist and plays the song"
 msgstr "Bersihkan daftar putar saat ini dan putar lagunya"
 
-#: ../src/plugins/calculator-plugin.vala:63
+#: ../src/plugins/calculator-plugin.vala:59
 msgid "Calculator"
 msgstr "Kalkulator"
 
-#: ../src/plugins/calculator-plugin.vala:64
+#: ../src/plugins/calculator-plugin.vala:60
 msgid "Calculate basic expressions."
 msgstr "Hitung ekspresi-ekspresi dasar."
 
-#: ../src/plugins/calculator-plugin.vala:68
+#: ../src/plugins/calculator-plugin.vala:64
 msgid "bc is not installed"
 msgstr "bc tidak terpasang"
 
@@ -412,143 +416,159 @@ msgstr "Buka obrolan"
 msgid "Open a chat with selected contact"
 msgstr "Buka obrolan dengan kontak yang dipilih"
 
-#: ../src/plugins/chat-actions-plugin.vala:66
+#: ../src/plugins/chat-actions-plugin.vala:65
 msgid "Send a message"
 msgstr "Kirim sebuah pesan"
 
-#: ../src/plugins/chat-actions-plugin.vala:67
+#: ../src/plugins/chat-actions-plugin.vala:66
 msgid "Send a message to the contact"
 msgstr "Kirim sebuah pesan ke kontak"
 
-#: ../src/plugins/chat-actions-plugin.vala:100
+#: ../src/plugins/chat-actions-plugin.vala:99
 msgid "Send message to.."
 msgstr "Kirim pesan ke.."
 
-#: ../src/plugins/chat-actions-plugin.vala:101
+#: ../src/plugins/chat-actions-plugin.vala:100
 msgid "Send a message to a contact"
 msgstr "Kirim sebuah pesan ke sebuah kontak"
 
-#: ../src/plugins/chat-actions-plugin.vala:136
+#: ../src/plugins/chat-actions-plugin.vala:134
 msgid "Chat actions"
 msgstr "Tindakan-tindakan obrolan"
 
-#: ../src/plugins/chat-actions-plugin.vala:137
+#: ../src/plugins/chat-actions-plugin.vala:135
 msgid "Open chat, or send a message with your favorite IM"
 msgstr "Buka obrolan, atau kirim sebuah pesan dengan IM kesayangan Anda"
 
-#: ../src/plugins/chromium-plugin.vala:79
+#: ../src/plugins/chromium-plugin.vala:65
 msgid "Chromium Plugin"
 msgstr "Pengaya Chromium"
 
-#: ../src/plugins/chromium-plugin.vala:80
+#: ../src/plugins/chromium-plugin.vala:66
 msgid "Browse and open Chromium bookmarks."
 msgstr "Jelajah dan buka penanda Chromium"
 
-#: ../src/plugins/chromium-plugin.vala:84
+#: ../src/plugins/chromium-plugin.vala:70
 msgid "Chromium is not installed"
 msgstr "Chromium tidak terpasang"
 
-#: ../src/plugins/command-plugin.vala:56
+#: ../src/plugins/command-plugin.vala:44
 msgid "Run command"
 msgstr "Jalankan perintah"
 
-#: ../src/plugins/command-plugin.vala:77
+#: ../src/plugins/command-plugin.vala:64
 msgid "Find and execute arbitrary commands."
 msgstr "Cari dan jalankan perintah-perintah semaunya"
 
-#: ../src/plugins/desktop-file-plugin.vala:90
+#: ../src/plugins/desktop-file-plugin.vala:70
 msgid "Search for and run applications on your computer."
 msgstr "Telusur dan jalankan aplikasi pada komputer Anda"
 
-#: ../src/plugins/desktop-file-plugin.vala:263
+#: ../src/plugins/desktop-file-plugin.vala:231
 #, c-format
 msgid "Open with %s"
 msgstr "Buka dengan %s"
 
-#: ../src/plugins/desktop-file-plugin.vala:265
+#: ../src/plugins/desktop-file-plugin.vala:233
 #, c-format
 msgid "Opens current selection using %s"
 msgstr "Buka pemilihan sekarang dengan %s"
 
-#: ../src/plugins/devhelp-search.vala:67
+#: ../src/plugins/devhelp-search.vala:59
 msgid "Search in Devhelp"
 msgstr "Telusur di Devhelp"
 
-#: ../src/plugins/devhelp-search.vala:68
+#: ../src/plugins/devhelp-search.vala:60
 msgid "Search documentation for this symbol"
 msgstr "Telusur dokumentasi untuk simbol ini"
 
-#: ../src/plugins/devhelp-search.vala:78
+#: ../src/plugins/devhelp-search.vala:70
 msgid "Search documentation using Devhelp."
 msgstr "Telusur dokumentasi menggunakan Devhelp"
 
-#: ../src/plugins/devhelp-search.vala:82
+#: ../src/plugins/devhelp-search.vala:74
 msgid "Devhelp is not installed"
 msgstr "Devhelp tidak terpasang"
 
-#: ../src/plugins/dictionary.vala:67
+#: ../src/plugins/dictionary.vala:59
 msgid "Define"
 msgstr "Tentukan"
 
-#: ../src/plugins/dictionary.vala:68
+#: ../src/plugins/dictionary.vala:60
 msgid "Look up definition in dictionary"
 msgstr "Lihat makna pada kamus"
 
-#: ../src/plugins/dictionary.vala:78
+#: ../src/plugins/dictionary.vala:70
 msgid "Look up definitions of words."
 msgstr "Lihat makna dari kata-kata"
 
-#: ../src/plugins/dictionary.vala:82
+#: ../src/plugins/dictionary.vala:74
 msgid "Gnome Dictionary is not installed"
 msgstr "Gnome Dictionary tidak terpasang"
 
-#: ../src/plugins/directory-plugin.vala:125
+#: ../src/plugins/directory-plugin.vala:111
 msgid "Open commonly used directories."
 msgstr "Buka direktor-direktori yang sering dipakai"
 
-#: ../src/plugins/file-op-plugin.vala:77
+#: ../src/plugins/file-op-plugin.vala:40
+msgid "Remove"
+msgstr ""
+
+#: ../src/plugins/file-op-plugin.vala:41
+msgid "Move to Trash"
+msgstr ""
+
+#: ../src/plugins/file-op-plugin.vala:72
 msgid "Rename to"
 msgstr "Ubah nama menjadi"
 
-#: ../src/plugins/file-op-plugin.vala:78
+#: ../src/plugins/file-op-plugin.vala:73
 msgid "Rename the file to..."
 msgstr "Ubah nama berkas menjadi..."
 
-#: ../src/plugins/file-op-plugin.vala:95 ../src/plugins/pidgin-plugin.vala:185
+#: ../src/plugins/file-op-plugin.vala:89 ../src/plugins/pidgin-plugin.vala:171
 #, c-format
 msgid "File \"%s\"does not exist."
 msgstr "Berkas \"%s\" tidak ada"
 
-#: ../src/plugins/file-op-plugin.vala:107
+#: ../src/plugins/file-op-plugin.vala:101
 #, c-format
 msgid "Cannot move \"%s\" to \"%s\""
 msgstr "Tidak bisa memindahkan \"%s\" ke \"%s\""
 
-#: ../src/plugins/file-op-plugin.vala:137
+#: ../src/plugins/file-op-plugin.vala:125
 msgid "File Operations"
 msgstr "Operasi-operasi Berkas"
 
-#: ../src/plugins/file-op-plugin.vala:138
+#: ../src/plugins/file-op-plugin.vala:126
 msgid "Copy, Cut, Paste and Delete files"
 msgstr "Salin, Comot, Tempel, dan Hapys berkas-berkas"
 
-#: ../src/plugins/gnome-screensaver-plugin.vala:59
+#: ../src/plugins/gnome-bookmarks-plugin.vala:61
+msgid "GNOME Bookmarks Plugin"
+msgstr ""
+
+#: ../src/plugins/gnome-bookmarks-plugin.vala:62
+msgid "Browse and open GNOME bookmarks."
+msgstr ""
+
+#: ../src/plugins/gnome-screensaver-plugin.vala:51
 msgid "Lock Screen"
 msgstr "Kunci Layar"
 
-#: ../src/plugins/gnome-screensaver-plugin.vala:60
+#: ../src/plugins/gnome-screensaver-plugin.vala:52
 msgid "Locks screen and starts screensaver."
 msgstr "Kunci layar dan mulai penyimpan layar"
 
-#: ../src/plugins/gnome-screensaver-plugin.vala:84
+#: ../src/plugins/gnome-screensaver-plugin.vala:80
 msgid "Lock screen of your computer."
 msgstr "Kunci layar komputer Anda"
 
-#: ../src/plugins/gnome-screensaver-plugin.vala:88
+#: ../src/plugins/gnome-screensaver-plugin.vala:84
 msgid "Gnome Screen Saver wasn't found"
 msgstr "Gnome Screen Saver tidak ditemukan"
 
-#: ../src/plugins/hybrid-search-plugin.vala:86
+#: ../src/plugins/hybrid-search-plugin.vala:62
 msgid ""
 "Improve results returned by the Zeitgeist plugin by looking for similar "
 "files on the filesystem."
@@ -564,39 +584,39 @@ msgstr "Unggah ke imgur"
 msgid "Upload selection to imgur image sharer"
 msgstr "Unggah pilihan ke pembagi gambar imgur"
 
-#: ../src/plugins/imgur-plugin.vala:164
-#: ../src/plugins/pastebin-plugin.vala:152
+#: ../src/plugins/imgur-plugin.vala:162
+#: ../src/plugins/pastebin-plugin.vala:151
 msgid ""
 "The selection was successfully uploaded and its URL was copied to clipboard."
 msgstr ""
 "Pilihan telah berhasil diunggah dan URLnya telah disalin ke papan klip."
 
-#: ../src/plugins/imgur-plugin.vala:168
-#: ../src/plugins/pastebin-plugin.vala:156
+#: ../src/plugins/imgur-plugin.vala:166
+#: ../src/plugins/pastebin-plugin.vala:155
 msgid ""
 "An error occurred during upload, please check the log for more information."
 msgstr ""
 "Terjadi kesalahan saat proses unggah, silahkan periksa catatan untuk "
 "keterangan lebih lanjut."
 
-#: ../src/plugins/imgur-plugin.vala:176
+#: ../src/plugins/imgur-plugin.vala:174
 msgid "Synapse - Imgur"
 msgstr "Synapse - Imgur"
 
-#: ../src/plugins/imgur-plugin.vala:232
+#: ../src/plugins/imgur-plugin.vala:229
 msgid "Upload to imgur to contact.."
 msgstr "Unggah ke imgur ke kontak..."
 
-#: ../src/plugins/imgur-plugin.vala:233
+#: ../src/plugins/imgur-plugin.vala:230
 msgid "Upload selection to imgur image sharer, and send the link to contact"
 msgstr ""
 "Unggah pilihan ke pembagi gambar imgur, dan kirim tautannya ke kontak"
 
-#: ../src/plugins/imgur-plugin.vala:266
+#: ../src/plugins/imgur-plugin.vala:263
 msgid "Imgur"
 msgstr "Imgur"
 
-#: ../src/plugins/imgur-plugin.vala:267
+#: ../src/plugins/imgur-plugin.vala:264
 msgid "Share images using imgur."
 msgstr "Bagikan gambar menggunakan imgur."
 
@@ -616,94 +636,102 @@ msgstr ""
 msgid "Finish authorization"
 msgstr "Selesai melakukan otorisasi"
 
-#: ../src/plugins/launchpad-plugin.vala:261
+#: ../src/plugins/launchpad-plugin.vala:240
 msgid "Find bugs and branches on Launchpad."
 msgstr "Cari awakutu dan cabang pada Launchpad."
 
 #. project link (lp:synapse)
-#: ../src/plugins/launchpad-plugin.vala:312
+#: ../src/plugins/launchpad-plugin.vala:291
 #, c-format
 msgid "Launchpad: Bazaar branches for %s"
 msgstr "Launchpad: cabang Bazaar untuk %s"
 
 #. series link (lp:synapse/0.3)
-#: ../src/plugins/launchpad-plugin.vala:319
+#: ../src/plugins/launchpad-plugin.vala:298
 #, c-format
 msgid "Launchpad: Series %s for Project %s"
 msgstr "Launchpad: Seri %s untuk Proyek %s"
 
 #. branch link (lp:~mhr3/synapse/lp-plugin)
-#: ../src/plugins/launchpad-plugin.vala:326
+#: ../src/plugins/launchpad-plugin.vala:305
 #, c-format
 msgid "Launchpad: Bazaar branch %s"
 msgstr "Launchpad: cabang Bazaar %s"
 
-#: ../src/plugins/launchpad-plugin.vala:341
+#: ../src/plugins/launchpad-plugin.vala:320
 #, c-format
 msgid "Launchpad: Bug #%s"
 msgstr "Launchpad: Awakutu #%s"
 
-#: ../src/plugins/locate-plugin.vala:95 ../src/plugins/locate-plugin.vala:105
+#: ../src/plugins/locate-plugin.vala:62 ../src/plugins/locate-plugin.vala:72
 msgid "Locate"
 msgstr "Locate"
 
-#: ../src/plugins/locate-plugin.vala:96
+#: ../src/plugins/locate-plugin.vala:63
 msgid "Locate files with this name on the filesystem"
 msgstr "Temukan berkas-berkas dengan nama ini pada sistem berkas"
 
-#: ../src/plugins/locate-plugin.vala:106
+#: ../src/plugins/locate-plugin.vala:73
 msgid "Runs locate command to find files on the filesystem."
 msgstr ""
 "Jalankan perintah \"locate\" untuk mencari berkas-berkas pada sistem berkas"
 
-#: ../src/plugins/locate-plugin.vala:110
+#: ../src/plugins/locate-plugin.vala:77
 msgid "Unable to find \"locate\" binary"
 msgstr "Tidak bisa menemukan binari \"locate\""
 
-#: ../src/plugins/opensearch.vala:252
+#: ../src/plugins/opensearch.vala:254
 msgid "Search the web."
 msgstr "Telusuri web."
 
 #. keep in sync with the internal XMLs!
-#: ../src/plugins/opensearch.vala:264
+#: ../src/plugins/opensearch.vala:266
+msgid "DuckDuckGo"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:267
+msgid "Search the web using duckduckgo.com"
+msgstr ""
+
+#: ../src/plugins/opensearch.vala:268
 msgid "Google"
 msgstr "Google"
 
-#: ../src/plugins/opensearch.vala:265
+#: ../src/plugins/opensearch.vala:269
 msgid "Search the web using google.com"
 msgstr "Telusur web menggunakan google.com"
 
-#: ../src/plugins/opensearch.vala:266
+#: ../src/plugins/opensearch.vala:270
 msgid "Google Maps"
 msgstr "Google Maps"
 
-#: ../src/plugins/opensearch.vala:267
+#: ../src/plugins/opensearch.vala:271
 msgid "Search using Google Maps"
 msgstr "Telsuru menggunakan Google Maps"
 
 #: ../src/plugins/pastebin-plugin.vala:42
-#: ../src/plugins/pastebin-plugin.vala:262
+#: ../src/plugins/pastebin-plugin.vala:261
 msgid "Pastebin"
 msgstr "Pastebin"
 
 #: ../src/plugins/pastebin-plugin.vala:43
-#: ../src/plugins/pastebin-plugin.vala:229
+#: ../src/plugins/pastebin-plugin.vala:228
 msgid "Pastebin selection"
 msgstr "Pilihan Pastebin"
 
-#: ../src/plugins/pastebin-plugin.vala:164
+#: ../src/plugins/pastebin-plugin.vala:163
 msgid "Synapse - Pastebin"
 msgstr "Synapse - Pastebin"
 
-#: ../src/plugins/pastebin-plugin.vala:228
+#: ../src/plugins/pastebin-plugin.vala:227
 msgid "Pastebin to contact.."
 msgstr "Pastebin ke kontak.."
 
-#: ../src/plugins/pastebin-plugin.vala:263
+#: ../src/plugins/pastebin-plugin.vala:262
 msgid "Upload files to pastebin."
 msgstr "Unggah berkas-berkas ke pastebin."
 
-#: ../src/plugins/pastebin-plugin.vala:267
+#: ../src/plugins/pastebin-plugin.vala:266
 msgid "Unable to find \"pastebinit\" program"
 msgstr "Tidak bisa menemukan program \"pastebin\""
 
@@ -723,39 +751,39 @@ msgstr "Kirim dalam obrolan ke..."
 msgid "Send selected file within Pidgin"
 msgstr "Kirim berkas yang dipilih di dalam Pidgin"
 
-#: ../src/plugins/rhythmbox-plugin.vala:84
+#: ../src/plugins/rhythmbox-plugin.vala:79
 msgid "Control Rhythmbox and add items to playlists."
 msgstr "Kendalikan Rhythmbox dan tambahkan butir ke daftar putar."
 
-#: ../src/plugins/rhythmbox-plugin.vala:88
+#: ../src/plugins/rhythmbox-plugin.vala:83
 msgid "Rhythmbox is not installed"
 msgstr "Rhythmbox tidak terpasang"
 
-#: ../src/plugins/rhythmbox-plugin.vala:154
+#: ../src/plugins/rhythmbox-plugin.vala:120
 msgid "Start playback in Rhythmbox"
 msgstr "Mulai pemutaran di Rhythmbox"
 
-#: ../src/plugins/rhythmbox-plugin.vala:205
+#: ../src/plugins/rhythmbox-plugin.vala:146
 msgid "Pause playback in Rhythmbox"
 msgstr "Jeda pemutaran di Rhythmbox"
 
-#: ../src/plugins/rhythmbox-plugin.vala:221
+#: ../src/plugins/rhythmbox-plugin.vala:172
 msgid "Plays the next song in Rhythmbox's playlist"
 msgstr "Putar lagu berikutnya di daftar putar Rhythmbox"
 
-#: ../src/plugins/rhythmbox-plugin.vala:244
+#: ../src/plugins/rhythmbox-plugin.vala:197
 msgid "Plays the previous song in Rhythmbox's playlist"
 msgstr "Putar lagu sebelumnya di daftar putar Rhythmbox"
 
-#: ../src/plugins/rhythmbox-plugin.vala:268
+#: ../src/plugins/rhythmbox-plugin.vala:222
 msgid "Enqueue in Rhythmbox"
 msgstr "Antrikan di Rhythmbox"
 
-#: ../src/plugins/rhythmbox-plugin.vala:269
+#: ../src/plugins/rhythmbox-plugin.vala:223
 msgid "Add the song to Rhythmbox playlist"
 msgstr "Tambahkan lagu ke daftar putar Rhythmbox"
 
-#: ../src/plugins/rhythmbox-plugin.vala:316
+#: ../src/plugins/rhythmbox-plugin.vala:264
 msgid "Play in Rhythmbox"
 msgstr "Putar di Rhythmbox"
 
@@ -768,7 +796,7 @@ msgstr "Pemilihan"
 msgid "Provides actions for currently selected text."
 msgstr "Sediakan tindakan untuk teks yang dipilih saat ini."
 
-#: ../src/plugins/selection-plugin.vala:81
+#: ../src/plugins/selection-plugin.vala:72
 msgid "Selected text"
 msgstr "Teks terpilih"
 
@@ -785,47 +813,47 @@ msgstr "Sambungkan ke host dengan SSH"
 msgid "ssh is not installed"
 msgstr "ssh tidak terpasang"
 
-#: ../src/plugins/ssh-plugin.vala:197
+#: ../src/plugins/ssh-plugin.vala:190
 msgid "Connect with SSH"
 msgstr "Sambungkan dengan SSH"
 
-#: ../src/plugins/system-management.vala:87
+#: ../src/plugins/system-management.vala:89
 msgid "Suspend"
 msgstr "Suspensi"
 
-#: ../src/plugins/system-management.vala:88
+#: ../src/plugins/system-management.vala:90
 msgid "Put your computer into suspend mode"
 msgstr "Simpan komputer Anda dalam modus suspensi"
 
-#: ../src/plugins/system-management.vala:158
+#: ../src/plugins/system-management.vala:189
 msgid "Hibernate"
 msgstr "Hibernasi"
 
-#: ../src/plugins/system-management.vala:159
+#: ../src/plugins/system-management.vala:190
 msgid "Put your computer into hibernation mode"
 msgstr "Simpan komputer Anda dalam modus hibernasi"
 
-#: ../src/plugins/system-management.vala:228
+#: ../src/plugins/system-management.vala:288
 msgid "Shut Down"
 msgstr "Matikan"
 
-#: ../src/plugins/system-management.vala:229
+#: ../src/plugins/system-management.vala:289
 msgid "Turn your computer off"
 msgstr "Matikan komputer Anda"
 
-#: ../src/plugins/system-management.vala:283
+#: ../src/plugins/system-management.vala:372
 msgid "Restart"
 msgstr "Nyalakan ulang"
 
-#: ../src/plugins/system-management.vala:284
+#: ../src/plugins/system-management.vala:373
 msgid "Restart your computer"
 msgstr "Nyalakan ulang komputer Anda"
 
-#: ../src/plugins/system-management.vala:339
+#: ../src/plugins/system-management.vala:457
 msgid "Suspend, hibernate, restart or shutdown your computer."
 msgstr "Suspensi, hibernasi, nyalakan ulang atau matikan komputer Anda."
 
-#: ../src/plugins/system-management.vala:343
+#: ../src/plugins/system-management.vala:462
 msgid "ConsoleKit wasn't found"
 msgstr "ConsoleKit tidak ditemukan"
 
@@ -837,112 +865,112 @@ msgstr "Kendalikan pemutar media Xnoise."
 msgid "Xnoise is not installed!"
 msgstr "Xnoise tidak terpasang!"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:130
+#: ../src/plugins/xnoise-media-player-plugin.vala:95
 msgid "Quit Xnoise"
 msgstr "Akhiri Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:154
+#: ../src/plugins/xnoise-media-player-plugin.vala:117
 msgid "Raise"
 msgstr "Naikkan"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:155
+#: ../src/plugins/xnoise-media-player-plugin.vala:118
 msgid "Show Xnoise"
 msgstr "Tampilkan Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:180
+#: ../src/plugins/xnoise-media-player-plugin.vala:141
 msgid "Start playback in Xnoise"
 msgstr "Mulai pemutaran di Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:204
+#: ../src/plugins/xnoise-media-player-plugin.vala:163
 msgid "TogglePlaying"
 msgstr ""
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:205
+#: ../src/plugins/xnoise-media-player-plugin.vala:164
 msgid "Start/Pause playback in Xnoise"
 msgstr "Mulai/Jeda pemutaran di Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:235
+#: ../src/plugins/xnoise-media-player-plugin.vala:192
 msgid "Pause playback in Xnoise"
 msgstr "Jeda pemutaran di Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:260
+#: ../src/plugins/xnoise-media-player-plugin.vala:215
 msgid "Plays the next song in Xnoise's playlist"
 msgstr "Putar lagu berikutnya di daftar putar Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:286
+#: ../src/plugins/xnoise-media-player-plugin.vala:239
 msgid "Plays the previous song in Xnoise's playlist"
 msgstr "Putar lagu sebelumnya di daftar putar Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:310
+#: ../src/plugins/xnoise-media-player-plugin.vala:261
 msgid "Stop"
 msgstr "Berhenti"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:311
+#: ../src/plugins/xnoise-media-player-plugin.vala:262
 msgid "Stops the playback of Xnoise"
 msgstr "Hentikan pemutaran Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:336
+#: ../src/plugins/xnoise-media-player-plugin.vala:285
 msgid "Play in Xnoise"
 msgstr "Putar pada Xnoise"
 
-#: ../src/plugins/xnoise-media-player-plugin.vala:337
+#: ../src/plugins/xnoise-media-player-plugin.vala:286
 msgid "Queues and plays the song"
 msgstr "Antrikan dan putar lagu"
 
-#: ../src/plugins/zeitgeist-plugin.vala:158
+#: ../src/plugins/zeitgeist-plugin.vala:162
 msgid "few moments ago"
 msgstr "Beberapa bulan yang lalu"
 
-#: ../src/plugins/zeitgeist-plugin.vala:163
+#: ../src/plugins/zeitgeist-plugin.vala:167
 #, c-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "%d menit yang lalu"
 
-#: ../src/plugins/zeitgeist-plugin.vala:168
+#: ../src/plugins/zeitgeist-plugin.vala:172
 #, c-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] "%d jam yang lalu"
 
-#: ../src/plugins/zeitgeist-plugin.vala:173
+#: ../src/plugins/zeitgeist-plugin.vala:177
 #, c-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] "%d hari yang lalu"
 
-#: ../src/plugins/zeitgeist-plugin.vala:178
+#: ../src/plugins/zeitgeist-plugin.vala:182
 #, c-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
 msgstr[0] "%d minggu lalu"
 
-#: ../src/plugins/zeitgeist-plugin.vala:182
+#: ../src/plugins/zeitgeist-plugin.vala:186
 msgid "long time ago"
 msgstr "Beberapa waktu lama yang lalu"
 
-#: ../src/plugins/zeitgeist-plugin.vala:192
+#: ../src/plugins/zeitgeist-plugin.vala:196
 msgid "Search various items logged by Zeitgeist."
 msgstr "Telusur berbagai but yang dicatat oleh Zeitgeist."
 
-#: ../src/plugins/zeitgeist-plugin.vala:196
-#: ../src/plugins/zeitgeist-related.vala:112
+#: ../src/plugins/zeitgeist-plugin.vala:200
+#: ../src/plugins/zeitgeist-related.vala:79
 msgid "Zeitgeist is not installed"
 msgstr "Zeitgeist tidak terpasang"
 
-#: ../src/plugins/zeitgeist-related.vala:97
+#: ../src/plugins/zeitgeist-related.vala:64
 msgid "Find related"
 msgstr "Cari yang berhubungan"
 
-#: ../src/plugins/zeitgeist-related.vala:98
+#: ../src/plugins/zeitgeist-related.vala:65
 msgid "Find resources related to this result"
 msgstr "Cari sumber daya yang berhubungan dengan hasil ini"
 
-#: ../src/plugins/zeitgeist-related.vala:107
+#: ../src/plugins/zeitgeist-related.vala:74
 msgid "Related files"
 msgstr "Berkas-berkas yang berhubungan"
 
-#: ../src/plugins/zeitgeist-related.vala:108
+#: ../src/plugins/zeitgeist-related.vala:75
 msgid "Finds files related to other search results using Zeitgeist."
 msgstr ""
 "Cari berkas-berkas yang berhubungan dengan hasil penelusuran lain "
