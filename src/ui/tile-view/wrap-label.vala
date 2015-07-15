@@ -38,8 +38,8 @@ namespace UI.Widgets
         this.max_width_chars = _wrap ? -1 : 10;
         this.set_ellipsize (_wrap ? Pango.EllipsizeMode.NONE :
                                     Pango.EllipsizeMode.END);
-        if (!_wrap) orig_yalign = this.yalign;
-        this.yalign = _wrap ? 0.0f : orig_yalign;
+        if (!_wrap) orig_yalign = ((Gtk.Misc) this).yalign;
+        ((Gtk.Misc) this).yalign = _wrap ? 0.0f : orig_yalign;
         this.queue_resize ();
       }
     }

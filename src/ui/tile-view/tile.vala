@@ -79,7 +79,7 @@ namespace UI.Widgets
                    0, 0);
 
       title = new Label ("");
-      title.xalign = 0.0f;
+      ((Gtk.Misc) title).xalign = 0.0f;
       title.margin_top = 5;
       this.attach (title, 1, 3, 0, 1,
                    AttachOptions.FILL | AttachOptions.EXPAND,
@@ -95,7 +95,7 @@ namespace UI.Widgets
       description.show ();
 
       sub_description = new Label ("");
-      sub_description.xalign = 0.0f;
+      ((Gtk.Misc) sub_description).xalign = 0.0f;
       this.attach (sub_description, 1, 2, 2, 3,
                    AttachOptions.FILL | AttachOptions.EXPAND,
                    AttachOptions.FILL | AttachOptions.EXPAND,
