@@ -36,28 +36,29 @@ libsynapsecore_la_CFLAGS += $(ZEITGEIST_CFLAGS)
 libsynapsecore_la_LIBADD += $(ZEITGEIST_LIBS)
 endif
 
-GENERATED_C_FILES = $(libsynapsecore_la_VALASOURCES:.vala=.c)
-libsynapsecore_la_SOURCES = \
+nodist_libsynapsecore_la_SOURCES = \
 	$(libsynapsecore_la_VALASOURCES:.vala=.c) \
 	$(NULL)
 
-synapse-core.vapi synapse-core.vala.stamp: $(libsynapsecore_la_VALASOURCES) Makefile
-	$(AM_V_VALA)$(VALAC) $(libsynapsecore_la_VALAFLAGS) -C -H synapse-core.h --library synapse-core $(filter %.vala %.c,$^)
-	touch $@
+synapse-core.h synapse-core.vapi: synapse-core.vala.stamp
 
-BUILT_SOURCES = synapse-core.vala.stamp
+synapse-core.vala.stamp: $(libsynapsecore_la_VALASOURCES) Makefile
+	$(AM_V_VALA)$(VALAC) $(libsynapsecore_la_VALAFLAGS) -C -H synapse-core.h --library synapse-core $(filter %.vala %.c,$^)
+	$(AM_V_at)touch $@
+
+BUILT_SOURCES = \
+	synapse-core.vala.stamp \
+	synapse-core.h \
+	$(NULL)
 
 EXTRA_DIST = \
 	$(libsynapsecore_la_VALASOURCES) \
 	$(NULL)
 
-DISTCLEANFILES = \
-	$(libsynapsecore_la_VALASOURCES:.vala=.c) \
+CLEANFILES = \
+	$(nodist_libsynapsecore_la_SOURCES) \
 	synapse-core.vala.stamp \
 	synapse-core.vapi \
 	synapse-core.h \
 	$(NULL)
-
-dist-hook:
-	rm -f $(addprefix $(distdir)/,$(GENERATED_C_FILES))
 

@@ -1,7 +1,6 @@
 # vim: set ft=automake ts=8 sts=8 sw=8 :
 include $(top_srcdir)/Makefile.common
 
-# these shouldn't actually be noinst... we'll fix that later
 noinst_LTLIBRARIES = libplugins.la
 
 VAPIDIR = $(top_srcdir)/vapi
@@ -69,29 +68,29 @@ libplugins_la_CFLAGS += $(REST_CFLAGS)
 libplugins_la_LIBADD += $(REST_LIBS)
 endif
 
-GENERATED_C_FILES = $(libplugins_la_VALASOURCES:.vala=.c)
-libplugins_la_SOURCES = \
+nodist_libplugins_la_SOURCES = \
 	$(libplugins_la_VALASOURCES:.vala=.c) \
 	$(NULL)
 
-plugins.vapi plugins.vala.stamp: $(libplugins_la_VALASOURCES) $(top_builddir)/src/core/synapse-core.vapi Makefile
-	$(AM_V_VALA)$(VALAC) $(libplugins_la_VALAFLAGS) -C -H plugins.h --library plugins $(filter %.vala %.c,$^)
-	touch $@
+plugins.h plugins.vapi: plugins.vala.stamp
 
-BUILT_SOURCES = plugins.vala.stamp
+plugins.vala.stamp: $(libplugins_la_VALASOURCES) $(top_builddir)/src/core/synapse-core.vapi Makefile
+	$(AM_V_VALA)$(VALAC) $(libplugins_la_VALAFLAGS) -C -H plugins.h --library plugins $(filter %.vala %.c,$^)
+	$(AM_V_at)touch $@
+
+BUILT_SOURCES = \
+	plugins.vala.stamp \
+	plugins.h \
+	$(NULL)
 
 EXTRA_DIST = \
 	$(libplugins_la_VALASOURCES) \
 	$(NULL)
 
-DISTCLEANFILES = \
-	$(libplugins_la_VALASOURCES:.vala=.c) \
+CLEANFILES = \
+	$(nodist_libplugins_la_SOURCES) \
 	plugins.vala.stamp \
 	plugins.vapi \
 	plugins.h \
 	$(NULL)
-
-# need to make sure the vala sources are rebuilt
-dist-hook:
-	rm -f $(addprefix $(distdir)/,$(GENERATED_C_FILES))
 
