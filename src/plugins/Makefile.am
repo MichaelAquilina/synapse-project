@@ -52,6 +52,7 @@ libplugins_la_VALASOURCES = \
 	test-slow-plugin.vala \
 	xnoise-media-player-plugin.vala \
 	system-management.vala \
+	zeal-plugin.vala \
 	$(NULL)
 
 if HAVE_ZEITGEIST

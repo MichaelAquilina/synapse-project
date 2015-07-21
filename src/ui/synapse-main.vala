@@ -179,6 +179,7 @@ namespace Synapse
         typeof (FileOpPlugin),
         typeof (PidginPlugin),
         typeof (ChatActions),
+        typeof (ZealPlugin),
 #if HAVE_ZEITGEIST
         typeof (ZeitgeistPlugin),
         typeof (ZeitgeistRelated),
