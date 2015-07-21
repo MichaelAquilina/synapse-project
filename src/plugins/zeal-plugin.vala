@@ -100,7 +100,7 @@ namespace Synapse
       PluginRegistry.get_default ().register_plugin (
         typeof (ZealPlugin),
         _("Zeal"),
-        _("Zeal offline documentation search yolo ! (zealdocs.org)"),
+        _("Zeal offline documentation (zealdocs.org)"),
         "zeal",
         register_plugin,
         Environment.find_program_in_path ("zeal") != null,

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-11 18:09+0200\n"
+"POT-Creation-Date: 2015-07-21 14:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -967,4 +967,20 @@ msgstr ""
 
 #: ../src/plugins/zeitgeist-related.vala:75
 msgid "Finds files related to other search results using Zeitgeist."
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:102
+msgid "Zeal"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:103
+msgid "Zeal offline documentation (zealdocs.org)"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:107
+msgid "zeal is not installed, please see zealdocs.org"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:167
+msgid "Zeal documentation research"
 msgstr ""
