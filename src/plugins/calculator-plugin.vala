@@ -48,7 +48,7 @@ namespace Synapse
 
       public override string get_text ()
       {
-        return description;
+        return title;
       }
     }
 
