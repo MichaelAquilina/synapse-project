@@ -39,13 +39,15 @@ namespace Synapse
     {
       public int default_relevancy { get; set; default = 0; }
 
+      public string dictionary_exec { get; construct; }
+
       public override void execute (Match match)
       {
         try
         {
           AppInfo ai = AppInfo.create_from_commandline (
-            "gnome-dictionary \"%s\"".printf (match.title),
-            "gnome-dictionary", 0);
+            "%s --look-up=\"%s\"".printf (dictionary_exec, match.title),
+            dictionary_exec, 0);
           ai.launch (null, null);
         }
         catch (Error err)
@@ -54,11 +56,12 @@ namespace Synapse
         }
       }
 
-      public Define ()
+      public Define (string dictionary_exec)
       {
         Object (title: _("Define"),
                 description: _("Look up definition in dictionary"),
-                has_thumbnail: false, icon_name: "accessories-dictionary");
+                has_thumbnail: false, icon_name: "accessories-dictionary",
+                dictionary_exec: dictionary_exec);
       }
     }
 
@@ -70,8 +73,9 @@ namespace Synapse
         _("Look up definitions of words."),
         "accessories-dictionary",
         register_plugin,
-        Environment.find_program_in_path ("gnome-dictionary") != null,
-        _("Gnome Dictionary is not installed")
+        Environment.find_program_in_path ("gnome-dictionary") != null
+          || Environment.find_program_in_path ("mate-dictionary") != null,
+        _("No compatible Dictionary installed")
       );
     }
 
@@ -85,9 +89,16 @@ namespace Synapse
 
     construct
     {
-      action = new Define ();
-      has_dictionary =
-        Environment.find_program_in_path ("gnome-dictionary") != null;
+      unowned string dictionary_exec;
+      if (Environment.find_program_in_path ("gnome-dictionary") != null)
+        dictionary_exec = "gnome-dictionary";
+      else if (Environment.find_program_in_path ("mate-dictionary") != null)
+        dictionary_exec = "mate-dictionary";
+      else
+        assert_not_reached ();
+
+      action = new Define (dictionary_exec);
+      has_dictionary = (dictionary_exec != null);
     }
 
     public bool handles_unknown ()
