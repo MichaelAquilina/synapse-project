@@ -263,12 +263,18 @@ namespace Synapse
       ibus_no_snooper = ibus_no_snooper + "synapse";
       GLib.Environment.set_variable ("IBUS_NO_SNOOPER_APPS", ibus_no_snooper, true);
     }
+
     public static int main (string[] argv)
     {
       Utils.Logger.initialize ();
       message ("Starting up...");
       ibus_fix ();
-      Intl.bindtextdomain ("synapse", Config.DATADIR + "/locale");
+
+      Intl.setlocale (LocaleCategory.ALL, "");
+      Intl.bindtextdomain (Config.GETTEXT_PACKAGE, Config.DATADIR + "/locale");
+      Intl.bind_textdomain_codeset (Config.GETTEXT_PACKAGE, "UTF-8");
+      Intl.textdomain (Config.GETTEXT_PACKAGE);
+
       var context = new OptionContext (" - Synapse");
       context.add_main_entries (options, null);
       context.add_group (Gtk.get_option_group (false));
