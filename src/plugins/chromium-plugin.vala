@@ -54,6 +54,7 @@ namespace Synapse
         Object (title: name,
                 description: url,
                 uri: url,
+                mime_type: "text/html",
                 has_thumbnail: false, icon_name: "text-html");
       }
     }
