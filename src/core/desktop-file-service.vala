@@ -91,6 +91,7 @@ namespace Synapse
     public bool is_hidden { get; private set; default = false; }
     public bool is_valid { get; private set; default = true; }
 
+    public string[] actions = null;
     public string[] mime_types = null;
 
     private string? name_folded = null;
@@ -179,6 +180,8 @@ namespace Synapse
                                              KeyFileDesktop.KEY_NOT_SHOW_IN));
           show_in = DesktopEnvironmentType.ALL ^ not_show;
         }
+        if (keyfile.has_key (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_ACTIONS))
+          actions = keyfile.get_string_list (KeyFileDesktop.GROUP, KeyFileDesktop.KEY_ACTIONS);
 
         // special case these, people are using them quite often and wonder
         // why they don't appear

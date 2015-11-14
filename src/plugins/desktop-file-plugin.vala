@@ -84,6 +84,7 @@ namespace Synapse
     {
       desktop_files = new Gee.ArrayList<DesktopFileMatch> ();
       mimetype_map = new Gee.HashMap<string, OpenWithAction> ();
+      actions_map = new Gee.HashMap<string, OpenAppAction> ();
 
       var dfs = DesktopFileService.get_default ();
       dfs.reload_started.connect (() => {
@@ -244,7 +245,7 @@ namespace Synapse
           var app_info = new DesktopAppInfo.from_filename (desktop_info.filename);
           List<File> files = new List<File> ();
           files.prepend (f);
-          app_info.launch (files, null);
+          app_info.launch (files, Gdk.Display.get_default ().get_app_launch_context ());
         }
         catch (Error err)
         {
@@ -258,39 +259,106 @@ namespace Synapse
       }
     }
 
+    private class OpenAppAction : Action
+    {
+      public DesktopFileInfo desktop_info { get; construct; }
+      public string action { get; construct; }
+
+      DesktopAppInfo app_info;
+
+      public OpenAppAction (DesktopFileInfo info, string action)
+      {
+        Object (desktop_info : info, action : action);
+      }
+
+      construct
+      {
+        app_info = new DesktopAppInfo.from_filename (desktop_info.filename);
+        var display_action = app_info.get_action_name (action);
+        title = display_action;
+        icon_name = desktop_info.icon_name;
+        description = _("Launch action '%s'").printf (display_action);
+      }
+
+      public override void do_execute (Match match, Match? target = null)
+      {
+          app_info.launch_action (action, Gdk.Display.get_default ().get_app_launch_context ());
+          RelevancyService.get_default ().application_launched (app_info);
+      }
+
+      public override bool valid_for_match (Match match)
+      {
+        return (match is ApplicationMatch);
+      }
+    }
+
     private Gee.Map<string, Gee.List<OpenWithAction>> mimetype_map;
+    private Gee.Map<string, Gee.List<OpenAppAction>> actions_map;
 
     public ResultSet? find_for_match (ref Query query, Match match)
     {
-      unowned UriMatch? uri_match = match as UriMatch;
-      if (uri_match == null || uri_match.mime_type == null) return null;
+      unowned UriMatch? uri_match = null;
+      unowned ApplicationMatch? app_match = null;
+      Gee.List<Action>? any_list = null;
 
-      Gee.List<OpenWithAction> ow_list = mimetype_map[uri_match.mime_type];
-      /* Query DesktopFileService only if is necessary */
-      if (ow_list == null)
+      if ((uri_match = match as UriMatch) != null)
       {
-        /* Initialize ow_list */
-        ow_list = new Gee.LinkedList<OpenWithAction> ();
-        mimetype_map[uri_match.mime_type] = ow_list;
         var dfs = DesktopFileService.get_default ();
         var list_for_mimetype = dfs.get_desktop_files_for_type (uri_match.mime_type);
         /* If there's more than one application, fill the ow list */
         if (list_for_mimetype.size > 1)
         {
-          foreach (var entry in list_for_mimetype)
+          /* Query DesktopFileService only if is necessary */
+          Gee.List<OpenWithAction>? ow_list = mimetype_map[uri_match.mime_type];
+          if (ow_list == null)
           {
-            ow_list.add (new OpenWithAction (entry));
+            ow_list = new Gee.LinkedList<OpenWithAction> ();
+            mimetype_map[uri_match.mime_type] = ow_list;
+
+            foreach (var entry in list_for_mimetype)
+            {
+              ow_list.add (new OpenWithAction (entry));
+            }
+          }
+
+          any_list = ow_list;
+        }
+      }
+      else if ((app_match = match as ApplicationMatch) != null)
+      {
+        Gee.List<OpenAppAction>? oa_list = actions_map[app_match.filename];
+        if (oa_list == null)
+        {
+          oa_list = new Gee.LinkedList<OpenAppAction> ();
+          actions_map[app_match.filename] = oa_list;
+
+          var dfs = DesktopFileService.get_default ();
+          var desktop_file_info = dfs.get_desktop_file_for_id (Path.get_basename (app_match.filename));
+
+          /* There should at a result here */
+          if (desktop_file_info != null)
+          {
+            foreach (var action in desktop_file_info.actions)
+            {
+              oa_list.add (new OpenAppAction (desktop_file_info, action));
+            }
+          }
+          else
+          {
+            warning ("No DesktopInfoFile for %s", app_match.filename);
           }
         }
-        else return null;
+
+        any_list = oa_list;
       }
-      else if (ow_list.size == 0) return null;
+
+      if (any_list == null || any_list.size == 0) return null;
 
       var rs = new ResultSet ();
 
       if (query.query_string == "")
       {
-        foreach (var action in ow_list)
+        foreach (var action in any_list)
         {
           rs.add (action, MatchScore.POOR);
         }
@@ -299,7 +367,7 @@ namespace Synapse
       {
         var matchers = Query.get_matchers_for_query (query.query_string, 0,
           RegexCompileFlags.OPTIMIZE | RegexCompileFlags.CASELESS);
-        foreach (var action in ow_list)
+        foreach (var action in any_list)
         {
           foreach (var matcher in matchers)
           {
