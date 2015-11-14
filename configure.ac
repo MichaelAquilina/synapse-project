@@ -35,7 +35,7 @@ LT_LIB_M
 dnl ==============================================
 dnl Check for Vala
 dnl ==============================================
-AM_PROG_VALAC([0.16.0])
+AM_PROG_VALAC([0.24.0])
 if test "x$VALAC" = "x"; then
 	AC_MSG_ERROR([You need Vala compiler])
 fi
@@ -45,7 +45,7 @@ AM_SILENT_RULES([yes])
 dnl ==============================================
 dnl Check that we meet the dependencies
 dnl ==============================================
-MIN_GLIB_VERSION=2.28.0
+MIN_GLIB_VERSION=2.40.0
 MIN_GTK_VERSION=3.0.0
 MIN_ZEITGEIST_VERSION=0.9.14
 MIN_GEE_VERSION=0.5.2
@@ -74,7 +74,7 @@ SYNAPSE_MODULES_VALAFLAGS=" --pkg gdk-x11-3.0 \
   --pkg libnotify"
 AC_SUBST(SYNAPSE_MODULES_VALAFLAGS)
 
-SYNAPSE_COMMON_VALAFLAGS=" --target-glib=2.28 --thread -g"
+SYNAPSE_COMMON_VALAFLAGS=" --target-glib=2.40 --thread -g"
 AC_SUBST(SYNAPSE_COMMON_VALAFLAGS)
 
 AC_ARG_ENABLE(librest,
