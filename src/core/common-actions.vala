@@ -92,6 +92,25 @@ namespace Synapse
         {
           ((Action) match).do_execute (match, target);
         }
+        else if (match is UriMatch)
+        {
+          try
+          {
+            unowned string uri = ((UriMatch) match).uri;
+            if (uri.has_prefix ("file:"))
+            {
+              File file = File.new_for_uri (uri);
+              AppInfo app = AppInfo.create_from_commandline (
+                file.get_path (), file.get_basename (),
+                AppInfoCreateFlags.NONE);
+              app.launch (null, Gdk.Display.get_default ().get_app_launch_context ());
+            }
+          }
+          catch (Error err)
+          {
+            warning ("%s", err.message);
+          }
+        }
         else
         {
           warning ("'%s' is not be handled here", match.title);
@@ -100,6 +119,16 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
+        if (match is UriMatch)
+        {
+          unowned string uri = ((UriMatch) match).uri;
+          if (uri.has_prefix ("file:"))
+          {
+            string path = File.new_for_uri (uri).get_path ();
+            return FileUtils.test (path, FileTest.IS_EXECUTABLE);
+          }
+        }
+
         return (match is Action ||
                 match is ActionMatch ||
                (match is ApplicationMatch && !(((ApplicationMatch) match).needs_terminal)));
@@ -138,10 +167,38 @@ namespace Synapse
             warning ("%s", err.message);
           }
         }
+        else if (match is UriMatch)
+        {
+          try
+          {
+            unowned string uri = ((UriMatch) match).uri;
+            if (uri.has_prefix ("file:"))
+            {
+              File file = File.new_for_uri (uri);
+              AppInfo app = AppInfo.create_from_commandline (
+                file.get_path (), file.get_basename (),
+                AppInfoCreateFlags.NEEDS_TERMINAL);
+              app.launch (null, Gdk.Display.get_default ().get_app_launch_context ());
+            }
+          }
+          catch (Error err)
+          {
+            warning ("%s", err.message);
+          }
+        }
       }
 
       public override bool valid_for_match (Match match)
       {
+        if (match is UriMatch)
+        {
+          unowned string uri = ((UriMatch) match).uri;
+          if (uri.has_prefix ("file:"))
+          {
+            string path = File.new_for_uri (uri).get_path ();
+            return FileUtils.test (path, FileTest.IS_EXECUTABLE);
+          }
+        }
         return (match is ApplicationMatch);
       }
     }
