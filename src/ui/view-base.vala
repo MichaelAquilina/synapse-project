@@ -320,16 +320,19 @@ namespace Synapse
 
     public override bool draw (Cairo.Context ctx)
     {
+      Gtk.Allocation allocation;
+      get_allocation (out allocation);
+
       ctx.set_operator (Cairo.Operator.CLEAR);
       ctx.paint ();
 
       /* Propagate Draw */
       this.propagate_draw (this.get_child(), ctx);
 
-      ctx.rectangle (0, 0, this.get_allocated_width (), this.get_allocated_height ());
+      ctx.rectangle (0, 0, allocation.width, allocation.height);
       ctx.clip ();
 
-      string key = "%dx%dx%d".printf (this.get_allocated_width (), this.get_allocated_height (), model.searching_for);
+      string key = "%dx%dx%d".printf (allocation.width, allocation.height, model.searching_for);
 
       if (cache_enabled)
       {
@@ -341,8 +344,8 @@ namespace Synapse
         {
           Cairo.Surface surf = new Cairo.Surface.similar (ctx.get_target (),
                                                           Cairo.Content.COLOR_ALPHA,
-                                                          this.get_allocated_width (),
-                                                          this.get_allocated_height ());
+                                                          allocation.width,
+                                                          allocation.height);
           Cairo.Context cr = new Cairo.Context (surf);
           paint_background (cr);
           bg_cache[key] = surf;
@@ -419,7 +422,12 @@ namespace Synapse
       Gui.Utils.move_window_to_center (this);
       this.set_list_visible (false);
       this.show ();
-      if (this.is_kwin) this.add_kde_compatibility (this, this.get_allocated_width (), this.get_allocated_height ());
+      if (this.is_kwin)
+      {
+        Gtk.Allocation allocation;
+        get_allocation (out allocation);
+        this.add_kde_compatibility (this, allocation.width, allocation.height);
+      }
       Gui.Utils.present_window (this);
       this.queue_draw ();
       this.summoned ();

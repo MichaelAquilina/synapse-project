@@ -264,8 +264,11 @@ namespace Synapse.Gui
 
     public override bool draw (Cairo.Context ctx)
     {
-      int w = this.get_allocated_width () - this.xpad * 2;
-      int h = this.get_allocated_height () - this.ypad * 2;
+      Gtk.Allocation allocation;
+      get_allocation (out allocation);
+
+      int w = allocation.width - this.xpad * 2;
+      int h = allocation.height - this.ypad * 2;
       ctx.translate (this.xpad, this.ypad);
       ctx.rectangle (0, 0, w, h);
       ctx.clip ();
@@ -731,16 +734,16 @@ namespace Synapse.Gui
       ctx.set_operator (Cairo.Operator.OVER);
 
       Gtk.Allocation allocation;
-      this.get_allocation (out allocation);
+      get_allocation (out allocation);
 
-      int w = this.get_allocated_width () - this.xpad * 2;
-      int h = this.get_allocated_height () - this.ypad * 2;
+      int w = allocation.width - this.xpad * 2;
+      int h = allocation.height - this.ypad * 2;
       ctx.translate (this.xpad, this.ypad);
       ctx.rectangle (0, 0, w, h);
       ctx.clip ();
 
       Gdk.Pixbuf icon_pixbuf = IconCacheService.get_default ().get_icon (
-            current, pixel_size <= 0 ? int.min (this.get_allocated_width (), this.get_allocated_height ()) : pixel_size);
+            current, pixel_size <= 0 ? int.min (allocation.width, allocation.height) : pixel_size);
 
       if (icon_pixbuf == null) return true;
 
@@ -814,19 +817,22 @@ namespace Synapse.Gui
     {
       if (draw_input)
       {
+        Gtk.Allocation allocation;
+        get_allocation (out allocation);
+
         ctx.save ();
         ctx.translate (1.5, 1.5);
         ctx.set_operator (Cairo.Operator.OVER);
         ctx.set_line_width (1.25);
 
-        Gdk.cairo_rectangle (ctx, {0, 0, this.get_allocated_width (), this.get_allocated_height ()});
+        Gdk.cairo_rectangle (ctx, {0, 0, allocation.width, allocation.height});
         ctx.clip ();
         ctx.save ();
 
         double x = this.left_padding,
                y = this.top_padding,
-               w = this.get_allocated_width () - this.left_padding - this.right_padding - 3.0,
-               h = this.get_allocated_height () - this.top_padding - this.bottom_padding - 3.0;
+               w = allocation.width - this.left_padding - this.right_padding - 3.0,
+               h = allocation.height - this.top_padding - this.bottom_padding - 3.0;
         Utils.cairo_rounded_rect (ctx, x, y, w, h, border_radius);
         if (!ch.is_dark_color (StyleType.FG, StateFlags.NORMAL))
           ch.set_source_rgba (ctx, input_alpha, StyleType.BG, StateFlags.NORMAL, Mod.DARKER);
@@ -947,11 +953,14 @@ namespace Synapse.Gui
 
       if (!active) return true;
 
+      Gtk.Allocation allocation;
+      get_allocation (out allocation);
+
       double r = 0.0, g = 0.0, b = 0.0;
       double SIZE = 0.5;
-      double size = button_scale * int.min (this.get_allocated_width (), this.get_allocated_height ()) - SIZE * 2;
+      double size = button_scale * int.min (allocation.width, allocation.height) - SIZE * 2;
       size *= 0.5;
-      double xc = this.get_allocated_width () - SIZE * 2 - size;
+      double xc = allocation.width - SIZE * 2 - size;
       double yc = size;
       double arc_start = Math.PI * 2 * progress;
       double arc_end = arc_start + Math.PI / 2.0;
@@ -1074,15 +1083,18 @@ namespace Synapse.Gui
 
     public override bool draw (Cairo.Context ctx)
     {
+      Gtk.Allocation allocation;
+      get_allocation (out allocation);
+
       double SIZE = 0.5;
       ctx.translate (SIZE, SIZE);
       ctx.set_operator (Cairo.Operator.OVER);
 
       double r = 0.0, g = 0.0, b = 0.0;
-      double size = button_scale * int.min (this.get_allocated_width (), this.get_allocated_height ()) - SIZE * 2;
+      double size = button_scale * int.min (allocation.width, allocation.height) - SIZE * 2;
 
       Pattern pat;
-      pat = new Pattern.linear (0, 0, 0, this.get_allocated_height ());
+      pat = new Pattern.linear (0, 0, 0, allocation.height);
       if (entered || this.get_state_flags () == StateFlags.SELECTED)
       {
         ch.get_rgb (out r, out g, out b, StyleType.BG, StateFlags.SELECTED);
@@ -1105,7 +1117,7 @@ namespace Synapse.Gui
                               double.min(b + 0.15, 1));
 
       size *= 0.5;
-      double xc = this.get_allocated_width () - SIZE * 2 - size;
+      double xc = allocation.width - SIZE * 2 - size;
       double yc = size;
       ctx.set_source (pat);
       ctx.arc (xc, yc, size, 0.0, Math.PI * 2);
@@ -1414,8 +1426,12 @@ namespace Synapse.Gui
     {
       if (texts.size == 0 || this.cached_surface == null)
         return true;
-      double w = this.get_allocated_width ();
-      double h = this.get_allocated_height ();
+
+      Gtk.Allocation allocation;
+      get_allocation (out allocation);
+
+      double w = allocation.width;
+      double h = allocation.height;
 
       ctx.set_operator (Cairo.Operator.OVER);
       double x, y;

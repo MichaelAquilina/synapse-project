@@ -573,7 +573,10 @@ namespace Synapse.Gui
 
     private void update_target_offsets ()
     {
-      int visible_items = this.get_allocated_height () / this.row_height;
+      Gtk.Allocation allocation;
+      get_allocation (out allocation);
+
+      int visible_items = allocation.height / this.row_height;
 
       switch (this.behavior)
       {
@@ -589,11 +592,11 @@ namespace Synapse.Gui
           }
           else if (this.goto_index >= ( this.items.size - 1 - (visible_items / 2) ))
           {
-            this.toffset = this.row_height * this.items.size - this.get_allocated_height ();
+            this.toffset = this.row_height * this.items.size - allocation.height;
           }
           else
           {
-            this.toffset = this.row_height * this.goto_index - this.get_allocated_height () / 2 + this.row_height / 2;
+            this.toffset = this.row_height * this.goto_index - allocation.height / 2 + this.row_height / 2;
           }
           break;
       }
@@ -628,8 +631,11 @@ namespace Synapse.Gui
 
     public override bool draw (Cairo.Context ctx)
     {
+      Gtk.Allocation allocation;
+      get_allocation (out allocation);
+
       /* Clip */
-      ctx.rectangle (0, 0, this.get_allocated_width (), this.get_allocated_height ());
+      ctx.rectangle (0, 0, allocation.width, allocation.height);
       ctx.clip ();
       ctx.set_operator (Cairo.Operator.OVER);
 
@@ -643,7 +649,7 @@ namespace Synapse.Gui
 
       ctx.set_font_options (this.get_screen().get_font_options());
 
-      int visible_items = this.get_allocated_height () / this.row_height + 2;
+      int visible_items = allocation.height / this.row_height + 2;
       int i = get_item_at_pos (0);
       visible_items += i;
 
@@ -651,17 +657,14 @@ namespace Synapse.Gui
 
       if (this.select_index >= 0 && this.selection_enabled)
       {
-        if (this.soffset > (-this.row_height) && this.soffset < this.get_allocated_height ())
+        if (this.soffset > (-this.row_height) && this.soffset < allocation.height)
         {
-          Gtk.Allocation allocation;
-          this.get_allocation (out allocation);
-
           ypos = int.max (this.soffset, 0);
           var context = get_style_context ();
           context.save ();
           context.set_state (Gtk.StateFlags.SELECTED);
           context.render_background (ctx, 0, ypos,
-                                     this.get_allocated_width (), this.row_height);
+                                     allocation.width, this.row_height);
           context.restore ();
         }
       }
@@ -669,10 +672,10 @@ namespace Synapse.Gui
       for (; i < visible_items && i < this.items.size; ++i)
       {
         ypos = i * this.row_height - this.offset;
-        if (ypos > this.get_allocated_height ()) break;
+        if (ypos > allocation.height) break;
         ctx.save ();
         ctx.translate (0, ypos);
-        ctx.rectangle (0, 0, this.get_allocated_width (), this.row_height);
+        ctx.rectangle (0, 0, allocation.width, this.row_height);
         ctx.clip ();
         pct = 1.0;
         if (this.selection_enabled && i == select_index)
@@ -682,7 +685,7 @@ namespace Synapse.Gui
           if (pct == 0.0) pct = (Math.fabs (this.tsoffset - this.soffset) / this.row_height);
           pct = 2.0 - double.min (1.0 , pct);
         }
-        renderer.render_match (ctx, this.items.get (i), this.get_allocated_width (), this.row_height, this.use_base_colors, pct);
+        renderer.render_match (ctx, this.items.get (i), allocation.width, this.row_height, this.use_base_colors, pct);
         ctx.restore ();
       }
 
