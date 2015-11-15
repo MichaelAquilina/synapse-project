@@ -493,8 +493,9 @@ namespace Synapse.Gui
       {
         if (alloc.length > i)
         {
-          req.width = int.max ((alloc[i].x+alloc[i].width)*_scale_size/100, req.width);
-          req.height = int.max ((alloc[i].y+alloc[i].height)*_scale_size/100, req.height);
+          var ca = alloc[i];
+          req = {int.max ((ca.x + ca.width) * _scale_size / 100, req.width),
+            int.max ((ca.y + ca.height) * _scale_size / 100, req.height)};
           child.visible = true;
         }
         else
@@ -548,12 +549,9 @@ namespace Synapse.Gui
         }
         else
         {
-          a = {
-            x + alloc[i].x * this._scale_size / 100,
-            y + alloc[i].y * this._scale_size / 100,
-            alloc[i].width * this._scale_size / 100,
-            alloc[i].height * this._scale_size / 100
-          };
+          var ca = alloc[i];
+          a = {x + ca.x * this._scale_size / 100, y + ca.y * this._scale_size / 100,
+            ca.width * this._scale_size / 100, ca.height * this._scale_size / 100};
         }
         if (rtl) a.x = 2 * allocation.x + allocation.width - a.x - a.width;
         child.size_allocate (a);
