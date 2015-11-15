@@ -135,7 +135,7 @@ namespace UI.Widgets
       Gtk.Allocation allocation;
       this.get_allocation (out allocation);
 
-      var context = this.get_style_context ();
+      unowned Gtk.StyleContext context = this.get_style_context ();
 
       if ((this.get_state_flags () & StateFlags.SELECTED) != 0)
       {

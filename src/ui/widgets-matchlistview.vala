@@ -661,7 +661,7 @@ namespace Synapse.Gui
         if (this.soffset > (-this.row_height) && this.soffset < allocation.height)
         {
           ypos = int.max (this.soffset, 0);
-          var context = get_style_context ();
+          unowned Gtk.StyleContext context = get_style_context ();
           context.save ();
           context.set_state (Gtk.StateFlags.SELECTED);
           context.render_background (ctx, 0, ypos,
