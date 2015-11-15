@@ -32,7 +32,9 @@ namespace Synapse
 
     private void update_wm ()
     {
-      string wmname = Gdk.X11Screen.get_window_manager_name (Gdk.Screen.get_default ()).down ();
+      unowned Gdk.X11.Screen? x11_screen = (Gdk.Screen.get_default () as Gdk.X11.Screen);
+      if (x11_screen == null) return;
+      string wmname = x11_screen.get_window_manager_name ().down ();
       this.is_kwin = wmname == "kwin";
     }
 
