@@ -127,7 +127,7 @@ namespace Synapse.Gui
     {
       layout = this.create_pango_layout ("");
       ch = Utils.ColorHelper.get_default ();
-      last_req = {0, 0};
+      last_req = {};
       this.set_has_window (false);
       this.notify["size"].connect (sizes_changed);
       this.notify["min-size"].connect (sizes_changed);
@@ -485,7 +485,7 @@ namespace Synapse.Gui
 
     public void size_request (out Gtk.Requisition req)
     {
-      req = {0, 0};
+      req = {};
       int i = 0;
       Allocation[] alloc = schemas.get (active_schema).positions;
 
@@ -544,9 +544,7 @@ namespace Synapse.Gui
         Gtk.Allocation a;
         if (alloc.length <= i)
         {
-          a = {
-            0, 0, 0, 0
-          };
+          a = {};
         }
         else
         {

@@ -241,7 +241,7 @@ namespace Synapse.Gui
       Gdk.Screen screen_for_pointer = null;
       display.get_device_manager ().get_client_pointer ().get_position (out screen_for_pointer, out x, out y);
 
-      Gdk.Rectangle rect = {0, 0};
+      Gdk.Rectangle rect = {};
       screen_for_pointer.get_monitor_geometry (screen_for_pointer.get_monitor_at_point (x, y), out rect);
 
       return rect;

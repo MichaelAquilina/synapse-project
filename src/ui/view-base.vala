@@ -147,8 +147,8 @@ namespace Synapse
       bg_cache = new Gee.HashMap<string, Cairo.Surface> ();
       bg_state = Gtk.StateFlags.SELECTED;
 
-      req_target = {0, 0};
-      req_current = {0, 0};
+      req_target = {};
+      req_current = {};
 
       style_get ("border-radius", out BORDER_RADIUS,
         "shadow-size", out SHADOW_SIZE);
