@@ -137,7 +137,7 @@ namespace UI.Widgets
 
       var context = this.get_style_context ();
 
-      if (this.get_state () == StateType.SELECTED)
+      if ((this.get_state_flags () & StateFlags.SELECTED) != 0)
       {
         context.render_background (cr, 0, 0, allocation.width, allocation.height);
       }
@@ -158,7 +158,7 @@ namespace UI.Widgets
     public void update_state ()
     {
       bool enabled = owned_object.enabled;
-      bool is_selected = this.get_state () == StateType.SELECTED;
+      bool is_selected = (this.get_state_flags () & StateType.SELECTED) != 0;
       bool sensitive = enabled || (!enabled && is_selected);
 
       set_image ();

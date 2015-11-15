@@ -21,7 +21,6 @@
 
 using Gtk;
 using Cairo;
-using Gee;
 
 namespace Synapse.Gui
 {
@@ -1095,7 +1094,7 @@ namespace Synapse.Gui
 
       Pattern pat;
       pat = new Pattern.linear (0, 0, 0, allocation.height);
-      if (entered || this.get_state_flags () == StateFlags.SELECTED)
+      if (entered || (this.get_state_flags () & StateFlags.SELECTED) != 0)
       {
         ch.get_rgb (out r, out g, out b, StyleType.BG, StateFlags.SELECTED);
       }
@@ -1371,7 +1370,7 @@ namespace Synapse.Gui
       /* Arrows */
       if (!this.show_arrows)
         return;
-      if (this.get_state_flags () == StateFlags.SELECTED)
+      if ((this.get_state_flags () & StateFlags.SELECTED) != 0)
         ch.set_source_rgba (ctx, 1.0, StyleType.BG, StateFlags.NORMAL);
       else
         ch.set_source_rgba (ctx, 1.0, StyleType.BG, StateFlags.SELECTED);
