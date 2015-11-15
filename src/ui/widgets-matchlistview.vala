@@ -132,7 +132,7 @@ namespace Synapse.Gui
     {
       string s = "%s\n%s".printf (title_markup, description_markup);
       Markup.printf_escaped (s, " &#21271;", " &#21271;");
-      var layout = this.get_layout ();
+      unowned Pango.Layout layout = this.get_layout ();
       layout.set_markup (s, -1);
       int width = 0, height = 0;
       layout.get_pixel_size (out width, out height);
@@ -199,7 +199,7 @@ namespace Synapse.Gui
       {
         s = Markup.printf_escaped (title_markup, m.title);
       }
-      var layout = this.get_layout ();
+      unowned Pango.Layout layout = this.get_layout ();
       layout.set_markup (s, -1);
       layout.set_ellipsize (Pango.EllipsizeMode.END);
       layout.set_width (Pango.SCALE * width);
@@ -400,8 +400,9 @@ namespace Synapse.Gui
       {
         // calculate here the new row height
         this.rtl = this.get_direction ();
-        Utils.update_layout_rtl (this.get_layout (), rtl);
-        this.get_layout ().set_ellipsize (Pango.EllipsizeMode.END);
+        unowned Pango.Layout layout = this.get_layout ();
+        Utils.update_layout_rtl (layout, rtl);
+        layout.set_ellipsize (Pango.EllipsizeMode.END);
         this.row_height_cached = calculate_row_height ();
         this.queue_resize (); // queue_resize, so MatchListView will query for new row_height_request
       }

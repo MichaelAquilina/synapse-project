@@ -54,7 +54,7 @@ namespace UI.Widgets
 
     protected override void size_allocate (Gtk.Allocation allocation)
     {
-      var layout = this.get_layout ();
+      unowned Pango.Layout layout = this.get_layout ();
       layout.set_width (allocation.width * Pango.SCALE);
 
       int lw, lh;

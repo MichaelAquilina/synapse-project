@@ -1041,7 +1041,7 @@ namespace Synapse.Gui
       menu.show_all ();
     }
 
-    public Gtk.Menu get_menu ()
+    public unowned Gtk.Menu get_menu ()
     {
       return menu;
     }
@@ -1307,7 +1307,7 @@ namespace Synapse.Gui
       string s;
       PangoReadyText txt = null;
       int lastx = 0;
-      var layout = this.label.get_layout ();
+      unowned Pango.Layout layout = this.label.get_layout ();
       for (int i = 0; i < texts.size; i++)
       {
         txt = texts.get (i);
@@ -1351,7 +1351,7 @@ namespace Synapse.Gui
       this.cached_surface = new Surface.similar (window_context.get_target (), Cairo.Content.COLOR_ALPHA, w, h);
       var ctx = new Cairo.Context (this.cached_surface);
 
-      var layout = this.label.get_layout ();
+      unowned Pango.Layout layout = this.label.get_layout ();
       Pango.cairo_update_context (ctx, layout.get_context ());
       ch.set_source_rgba (ctx, 1.0, StyleType.FG, this.get_state_flags ());
       ctx.set_operator (Cairo.Operator.OVER);
