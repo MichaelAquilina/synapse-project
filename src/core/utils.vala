@@ -78,8 +78,7 @@ namespace Synapse
         var app_info = f.query_default_handler (null);
         List<File> files = new List<File> ();
         files.prepend (f);
-        var display = Gdk.Display.get_default ();
-        app_info.launch (files, display.get_app_launch_context ());
+        app_info.launch (files, Gdk.Display.get_default ().get_app_launch_context ());
       }
       catch (Error err)
       {

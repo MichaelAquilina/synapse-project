@@ -74,8 +74,7 @@ namespace Synapse
 
           try
           {
-            var display = Gdk.Display.get_default ();
-            app.launch (null, display.get_app_launch_context ());
+            app.launch (null, Gdk.Display.get_default ().get_app_launch_context ());
 
             RelevancyService.get_default ().application_launched (app);
           }
@@ -159,8 +158,7 @@ namespace Synapse
             AppInfo app = AppInfo.create_from_commandline (
               original.get_commandline (), original.get_name (),
               AppInfoCreateFlags.NEEDS_TERMINAL);
-            var display = Gdk.Display.get_default ();
-            app.launch (null, display.get_app_launch_context ());
+            app.launch (null, Gdk.Display.get_default ().get_app_launch_context ());
           }
           catch (Error err)
           {
@@ -287,8 +285,7 @@ namespace Synapse
           var app_info = f.query_default_handler (null);
           List<File> files = new List<File> ();
           files.prepend (f);
-          var display = Gdk.Display.get_default ();
-          app_info.launch (files, display.get_app_launch_context ());
+          app_info.launch (files, Gdk.Display.get_default ().get_app_launch_context ());
         }
         catch (Error err)
         {
