@@ -125,6 +125,10 @@ namespace Synapse.Gui
       this.execute (true);
     }
 
+    public void fire_focus_context_switch_event ()
+    {
+      this.fetch_command (KeyComboConfig.Commands.NEXT_PANE);
+    }
 
     /* selected_index_changed should be fired when users clicks on an item in the list */
     /* Model.focus[Model.searching_for] will be changed */

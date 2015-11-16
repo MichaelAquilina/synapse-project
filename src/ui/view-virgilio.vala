@@ -119,6 +119,10 @@ namespace Synapse.Gui
       results_sources = new SpecificMatchList (controller, model, SearchingFor.SOURCES);
       results_actions = new SpecificMatchList (controller, model, SearchingFor.ACTIONS);
       results_targets = new SpecificMatchList (controller, model, SearchingFor.TARGETS);
+
+      connect_handlers (results_sources);
+      connect_handlers (results_actions);
+      connect_handlers (results_targets);
       results_sources.use_base_colors = false;
       results_actions.use_base_colors = false;
       results_targets.use_base_colors = false;

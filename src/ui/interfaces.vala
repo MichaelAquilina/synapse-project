@@ -57,6 +57,9 @@ namespace Synapse.Gui
     /* category_changed_event should be fired ie when user clicks on a category */
     public abstract void category_changed_event (int category_index);
 
+    /* fire_focus should be fired ie when user right click on a item in the list */
+    public abstract void fire_focus_context_switch_event ();
+
     /* fire_focus should be fired ie when user dblclicks on a item in the list */
     public abstract void fire_focus ();
 

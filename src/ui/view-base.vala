@@ -367,7 +367,17 @@ namespace Synapse
       return true;
     }
 
-    protected virtual void prepare_results_container (out SelectionContainer? results_container,
+    protected void connect_handlers (MatchListView view)
+    {
+      /* regrab mouse after drag */
+      view.drag_end.connect (drag_end_handler);
+      /* listen on scroll / click / dblclick */
+      view.selected_index_changed.connect (controller.selected_index_changed_event);
+      view.fire_item.connect (controller.fire_focus);
+      view.fire_item_context_switch.connect (controller.fire_focus_context_switch_event);
+    }
+
+    protected void prepare_results_container (out SelectionContainer? results_container,
                                                       out ResultBox results_sources,
                                                       out ResultBox results_actions,
                                                       out ResultBox results_targets,
@@ -377,17 +387,14 @@ namespace Synapse
       results_sources = new ResultBox (100);
       results_actions = new ResultBox (100);
       results_targets = new ResultBox (100);
-      /* regrab mouse after drag */
-      results_sources.get_match_list_view ().drag_end.connect (drag_end_handler);
-      results_actions.get_match_list_view ().drag_end.connect (drag_end_handler);
-      results_targets.get_match_list_view ().drag_end.connect (drag_end_handler);
-      /* listen on scroll / click / dblclick */
-      results_sources.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
-      results_actions.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
-      results_targets.get_match_list_view ().selected_index_changed.connect (controller.selected_index_changed_event);
-      results_sources.get_match_list_view ().fire_item.connect (controller.fire_focus);
-      results_actions.get_match_list_view ().fire_item.connect (controller.fire_focus);
-      results_targets.get_match_list_view ().fire_item.connect (controller.fire_focus);
+
+      var results_sources_view = results_sources.get_match_list_view ();
+      var results_actions_view = results_actions.get_match_list_view ();
+      var results_targets_view = results_targets.get_match_list_view ();
+
+      connect_handlers (results_sources_view);
+      connect_handlers (results_actions_view);
+      connect_handlers (results_targets_view);
 
       if (add_to_container)
       {

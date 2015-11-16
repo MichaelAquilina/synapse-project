@@ -713,6 +713,7 @@ namespace Synapse.Gui
     // Fired when user changes selection interacting with the list
     public signal void selected_index_changed (int new_index);
     public signal void fire_item ();
+    public signal void fire_item_context_switch ();
 
     private int dragdrop_target_item = 0;
     private string dragdrop_name = "";
@@ -734,11 +735,18 @@ namespace Synapse.Gui
 
       if (this.selection_enabled)
       {
-        if (event.type == Gdk.EventType.2BUTTON_PRESS &&
-            this.select_index == this.dragdrop_target_item)
+        if ((event.type == Gdk.EventType.BUTTON_PRESS || event.type == Gdk.EventType.2BUTTON_PRESS)
+          && this.select_index == this.dragdrop_target_item)
         {
           this.set_indexes (this.dragdrop_target_item, this.dragdrop_target_item);
-          this.fire_item ();
+          if (event.type == Gdk.EventType.2BUTTON_PRESS)
+          {
+            this.fire_item ();
+          }
+          else if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3)
+          {
+            this.fire_item_context_switch ();
+          }
           return true; //Fire item! So we don't need to drag things!
         }
         else
