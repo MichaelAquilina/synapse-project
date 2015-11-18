@@ -124,7 +124,7 @@ namespace Synapse
           if (uri.has_prefix ("file:"))
           {
             string path = File.new_for_uri (uri).get_path ();
-            return FileUtils.test (path, FileTest.IS_EXECUTABLE);
+            return (FileUtils.test (path, FileTest.IS_EXECUTABLE) && !FileUtils.test (path, FileTest.IS_DIR));
           }
         }
 
@@ -194,7 +194,7 @@ namespace Synapse
           if (uri.has_prefix ("file:"))
           {
             string path = File.new_for_uri (uri).get_path ();
-            return FileUtils.test (path, FileTest.IS_EXECUTABLE);
+            return (FileUtils.test (path, FileTest.IS_EXECUTABLE) && !FileUtils.test (path, FileTest.IS_DIR));
           }
         }
         return (match is ApplicationMatch);
