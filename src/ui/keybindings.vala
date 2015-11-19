@@ -31,6 +31,7 @@ namespace Synapse.Gui
       ACTIVATE,
       INVALID_COMMAND,
       SEARCH_DELETE_CHAR,
+      SEARCH_DELETE_WORD,
       NEXT_RESULT,
       PREV_RESULT,
       NEXT_CATEGORY,
@@ -55,6 +56,7 @@ namespace Synapse.Gui
     public string execute { get; set; default = "Return"; }
     public string execute_without_hide { get; set; default = "<Shift>Return"; }
     public string delete_char { get; set; default = "BackSpace"; }
+    public string delete_word { get; set; default = "<Control>BackSpace"; }
     public string alternative_delete_char { get; set; default = "Delete"; }
     public string next_match { get; set; default = "Down"; }
     public string prev_match { get; set; default = "Up"; }
@@ -168,6 +170,8 @@ namespace Synapse.Gui
       kcs.set_keycombo_command (keyval, mods, Commands.SEARCH_DELETE_CHAR);
       name_to_key_mod (alternative_delete_char, out keyval, out mods);
       kcs.set_keycombo_command (keyval, mods, Commands.SEARCH_DELETE_CHAR);
+      name_to_key_mod (delete_word, out keyval, out mods);
+      kcs.set_keycombo_command (keyval, mods, Commands.SEARCH_DELETE_WORD);
       name_to_key_mod (next_match, out keyval, out mods);
       kcs.set_keycombo_command (keyval, mods, Commands.NEXT_RESULT);
       name_to_key_mod (prev_match, out keyval, out mods);

@@ -54,6 +54,32 @@ namespace Synapse
       return input.substring (0, len);
     }
 
+    public static string remove_last_word (string input)
+    {
+      long char_count = input.char_count ();
+      int index = input.index_of_nth_char (char_count - 1);
+      unichar pchar = input.get_char (index);
+
+      while (pchar == ' ' && index > 0)
+      {
+        input.get_prev_char (ref index, out pchar);
+      }
+
+      int next_index = index;
+
+      do
+      {
+        index = next_index;
+        input.get_prev_char (ref next_index, out pchar);
+      }
+      while (pchar != ' ' && next_index > 0);
+
+      if (next_index <= 0)
+        return "";
+      else
+        return input.slice (0, index);
+    }
+
     public static async bool query_exists_async (GLib.File f)
     {
       bool exists;

@@ -231,6 +231,14 @@ namespace Synapse.Gui
       }
     }
 
+    protected void search_delete_word ()
+    {
+      if (model.query[model.searching_for] == "") return;
+      model.query[model.searching_for] = Synapse.Utils.remove_last_word (model.query[model.searching_for]);
+
+      search ();
+    }
+
     protected void search_add_delete_char (string? newchar = null)
     {
       if (newchar == null)
@@ -246,6 +254,12 @@ namespace Synapse.Gui
         model.query[model.searching_for] =
               model.query[model.searching_for] + newchar;
       }
+
+      search ();
+    }
+    
+    void search ()
+    {
       switch (model.searching_for)
       {
         case SearchingFor.SOURCES:
@@ -298,6 +312,9 @@ namespace Synapse.Gui
             break;
           case KeyComboConfig.Commands.SEARCH_DELETE_CHAR:
             search_add_delete_char ();
+            break;
+          case KeyComboConfig.Commands.SEARCH_DELETE_WORD:
+            search_delete_word ();
             break;
           case KeyComboConfig.Commands.CLEAR_SEARCH_OR_HIDE:
             clear_search_or_hide_pressed ();
