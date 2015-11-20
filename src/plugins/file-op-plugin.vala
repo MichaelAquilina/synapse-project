@@ -61,7 +61,7 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        return (match is UriMatch);
+        return (match is UriMatch && (((UriMatch) match).file_type & QueryFlags.FILES) != 0);
       }
     }
 
