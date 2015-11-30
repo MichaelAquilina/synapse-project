@@ -237,34 +237,38 @@ namespace Synapse.Gui
 
     protected void search_delete_word ()
     {
-      if (model.query[model.searching_for] == "") return;
-      model.query[model.searching_for] = Synapse.Utils.remove_last_word (model.query[model.searching_for]);
+      SearchingFor mode = model.searching_for;
+      unowned string needle = model.query[mode];
 
-      search ();
+      if (needle == "") return;
+      model.query[mode] = Synapse.Utils.remove_last_word (needle);
+
+      search (mode);
     }
 
     protected void search_add_delete_char (string? newchar = null)
     {
+      SearchingFor mode = model.searching_for;
+      unowned string needle = model.query[mode];
+
       if (newchar == null)
       {
         // delete
-        if (model.query[model.searching_for] == "") return;
-        model.query[model.searching_for] =
-          Synapse.Utils.remove_last_unichar (model.query[model.searching_for]);
+        if (needle == "") return;
+        model.query[mode] = Synapse.Utils.remove_last_unichar (needle);
       }
       else
       {
         // add
-        model.query[model.searching_for] =
-              model.query[model.searching_for] + newchar;
+        model.query[mode] = needle + newchar;
       }
 
-      search ();
+      search (mode);
     }
     
-    void search ()
+    void search (SearchingFor mode)
     {
-      switch (model.searching_for)
+      switch (mode)
       {
         case SearchingFor.SOURCES:
           search_for_matches (SearchingFor.SOURCES);
