@@ -136,11 +136,13 @@ namespace Synapse
        */
 
       var results = new Gee.HashMap<Regex, int> ();
+      var stripped_query = query.strip ();
+      var escaped_query = Regex.escape_string (stripped_query);
       Regex re;
 
       try
       {
-        re = new Regex ("^(%s)$".printf (Regex.escape_string (query)), flags);
+        re = new Regex ("^(%s)$".printf (escaped_query), flags);
         results[re] = MatchScore.HIGHEST;
       }
       catch (RegexError err)
@@ -149,7 +151,7 @@ namespace Synapse
 
       try
       {
-        re = new Regex ("^(%s)".printf (Regex.escape_string (query)), flags);
+        re = new Regex ("^(%s)".printf (escaped_query), flags);
         results[re] = MatchScore.EXCELLENT;
       }
       catch (RegexError err)
@@ -158,15 +160,15 @@ namespace Synapse
 
       try
       {
-        re = new Regex ("\\b(%s)".printf (Regex.escape_string (query)), flags);
+        re = new Regex ("\\b(%s)".printf (escaped_query), flags);
         results[re] = MatchScore.VERY_GOOD;
       }
       catch (RegexError err)
       {
       }
 
-      // split to individual chars
-      string[] individual_words = Regex.split_simple ("\\s+", query.strip ());
+      // split to individual words
+      string[] individual_words = Regex.split_simple ("\\s+", stripped_query);
       if (individual_words.length >= 2)
       {
         string[] escaped_words = {};
@@ -231,7 +233,7 @@ namespace Synapse
       {
         try
         {
-          re = new Regex ("(%s)".printf (Regex.escape_string (query)), flags);
+          re = new Regex ("(%s)".printf (escaped_query), flags);
           results[re] = MatchScore.BELOW_AVERAGE;
         }
         catch (RegexError err)
