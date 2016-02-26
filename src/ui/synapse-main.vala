@@ -164,7 +164,7 @@ namespace Synapse
         typeof (HybridSearchPlugin),
         typeof (GnomeBookmarksPlugin),
         typeof (GnomeSessionPlugin),
-        typeof (GnomeScreenSaverPlugin),
+        typeof (ScreenSaverPlugin),
         typeof (SystemManagementPlugin),
         typeof (CommandPlugin),
         typeof (RhythmboxActions),

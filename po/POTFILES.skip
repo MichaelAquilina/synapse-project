@@ -27,7 +27,6 @@ src/plugins/dictionary.c
 src/plugins/directory-plugin.c
 src/plugins/file-op-plugin.c
 src/plugins/gnome-bookmarks-plugin.c
-src/plugins/gnome-screensaver-plugin.c
 src/plugins/gnome-session-plugin.c
 src/plugins/hello-world-plugin.c
 src/plugins/hybrid-search-plugin.c
@@ -38,6 +37,7 @@ src/plugins/opensearch.c
 src/plugins/pastebin-plugin.c
 src/plugins/pidgin-plugin.c
 src/plugins/rhythmbox-plugin.c
+src/plugins/screensaver-plugin.c
 src/plugins/selection-plugin.c
 src/plugins/ssh-plugin.c
 src/plugins/system-management.c

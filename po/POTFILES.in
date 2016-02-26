@@ -28,7 +28,6 @@ src/plugins/dictionary.vala
 src/plugins/directory-plugin.vala
 src/plugins/file-op-plugin.vala
 src/plugins/gnome-bookmarks-plugin.vala
-src/plugins/gnome-screensaver-plugin.vala
 src/plugins/hybrid-search-plugin.vala
 src/plugins/imgur-plugin.vala
 src/plugins/launchpad-plugin.vala
@@ -37,6 +36,7 @@ src/plugins/opensearch.vala
 src/plugins/pastebin-plugin.vala
 src/plugins/pidgin-plugin.vala
 src/plugins/rhythmbox-plugin.vala
+src/plugins/screensaver-plugin.vala
 src/plugins/selection-plugin.vala
 src/plugins/ssh-plugin.vala
 src/plugins/system-management.vala

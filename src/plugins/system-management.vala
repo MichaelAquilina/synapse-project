@@ -163,7 +163,7 @@ namespace Synapse
           }
           catch (Error not_there_error) { }
           // yea kinda nasty
-          GnomeScreenSaverPlugin.lock_screen ();
+          ScreenSaverPlugin.lock_screen ();
           // wait 2 seconds
           Timeout.add (2000, do_suspend.callback);
           yield;
@@ -263,7 +263,7 @@ namespace Synapse
           }
           catch (Error not_there_error) { }
           // yea kinda nasty
-          GnomeScreenSaverPlugin.lock_screen ();
+          ScreenSaverPlugin.lock_screen ();
           // wait 2 seconds
           Timeout.add (2000, do_hibernate.callback);
           yield;

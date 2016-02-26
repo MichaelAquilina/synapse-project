@@ -22,7 +22,7 @@
 namespace Synapse
 {
   [DBus (name = "org.gnome.ScreenSaver")]
-  public interface GnomeScreenSaver : Object
+  interface GnomeScreenSaver : Object
   {
     public const string UNIQUE_NAME = "org.gnome.ScreenSaver";
     public const string OBJECT_PATH = "/org/gnome/ScreenSaver";
@@ -30,7 +30,16 @@ namespace Synapse
     public abstract async void lock () throws IOError;
   }
 
-  public class GnomeScreenSaverPlugin : Object, Activatable, ItemProvider
+  [DBus (name = "org.mate.ScreenSaver")]
+  interface MateScreenSaver : Object
+  {
+    public const string UNIQUE_NAME = "org.mate.ScreenSaver";
+    public const string OBJECT_PATH = "/org/mate/ScreenSaver";
+
+    public abstract async void lock () throws IOError;
+  }
+
+  public class ScreenSaverPlugin : Object, Activatable, ItemProvider
   {
     public bool enabled { get; set; default = true; }
 
@@ -55,11 +64,25 @@ namespace Synapse
 
       public override void do_action ()
       {
-        GnomeScreenSaverPlugin.lock_screen ();
+        ScreenSaverPlugin.lock_screen ();
       }
     }
 
     public static void lock_screen ()
+    {
+      switch (DesktopFileService.get_default ().get_environment ())
+      {
+        case DesktopEnvironmentType.MATE:
+          ScreenSaverPlugin.mate_lock_screen ();
+          break;
+        case DesktopEnvironmentType.GNOME:
+        default:
+          ScreenSaverPlugin.gnome_lock_screen ();
+          break;
+      }
+    }
+
+    static void gnome_lock_screen ()
     {
       try {
         GnomeScreenSaver dbus_interface = Bus.get_proxy_sync (BusType.SESSION,
@@ -72,16 +95,41 @@ namespace Synapse
       }
     }
 
+    static void mate_lock_screen ()
+    {
+      try {
+        MateScreenSaver dbus_interface = Bus.get_proxy_sync (BusType.SESSION,
+                                                 MateScreenSaver.UNIQUE_NAME,
+                                                 MateScreenSaver.OBJECT_PATH);
+        // we need the async variant cause Screensaver doesn't send the reply
+        dbus_interface.lock.begin ();
+      } catch (IOError err) {
+        warning ("%s", err.message);
+      }
+    }
+
     static void register_plugin ()
     {
+      bool is_supported = false;
+
+      switch (DesktopFileService.get_default ().get_environment ())
+      {
+        case DesktopEnvironmentType.MATE:
+          is_supported = DBusService.get_default ().name_is_activatable (MateScreenSaver.UNIQUE_NAME);
+          break;
+        case DesktopEnvironmentType.GNOME:
+          is_supported = DBusService.get_default ().name_is_activatable (GnomeScreenSaver.UNIQUE_NAME);
+          break;
+      }
+
       PluginRegistry.get_default ().register_plugin (
-        typeof (GnomeScreenSaverPlugin),
-        "Gnome screensaver plugin",
+        typeof (ScreenSaverPlugin),
+        "Screensaver plugin",
         _("Lock screen of your computer."),
         "system-lock-screen",
         register_plugin,
-        DBusService.get_default ().name_is_activatable (GnomeScreenSaver.UNIQUE_NAME),
-        _("Gnome Screen Saver wasn't found")
+        is_supported || DBusService.get_default ().name_is_activatable (GnomeScreenSaver.UNIQUE_NAME),
+        _("Screensaver wasn't found")
       );
     }
 

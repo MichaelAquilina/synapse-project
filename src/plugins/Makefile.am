@@ -39,7 +39,7 @@ libplugins_la_VALASOURCES = \
 	directory-plugin.vala \
 	gnome-bookmarks-plugin.vala \
 	gnome-session-plugin.vala \
-	gnome-screensaver-plugin.vala \
+	screensaver-plugin.vala \
 	hello-world-plugin.vala \
 	hybrid-search-plugin.vala \
 	launchpad-plugin.vala \
