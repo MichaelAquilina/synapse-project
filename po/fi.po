@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: synapse-project\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-01-28 19:17+0000\n"
+"POT-Creation-Date: 2015-11-30 14:48+0000\n"
 "PO-Revision-Date: 2011-09-26 06:42+0000\n"
 "Last-Translator: Jiri Grönroos <Unknown>\n"
 "Language-Team: Finnish <fi@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-01-29 05:12+0000\n"
-"X-Generator: Launchpad (build 17306)\n"
+"X-Launchpad-Export-Date: 2015-12-01 05:19+0000\n"
+"X-Generator: Launchpad (build 17850)\n"
 
 #: ../data/synapse.desktop.in.h:1
 msgid "Synapse"
@@ -99,11 +99,11 @@ msgstr "Viimeisimpiä aktiviteetteja ei löytynyt."
 msgid "Type to search..."
 msgstr "Etsi kirjoittamalla..."
 
-#: ../src/ui/controller.vala:517
+#: ../src/ui/controller.vala:542
 msgid "...or press down key to browse recent activities"
 msgstr "...tai selaa viimeisimpiä aktiviteetteja painamalla nuolinäppäintä"
 
-#: ../src/ui/view-virgilio.vala:204 ../src/ui/widgets-matchlistview.vala:936
+#: ../src/ui/view-virgilio.vala:208 ../src/ui/widgets-matchlistview.vala:948
 #, c-format
 msgid "<b>%d of %d</b>"
 msgstr "<b>%d / %d</b>"
@@ -271,12 +271,12 @@ msgstr "Näppäinyhdistelmä"
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr "Vaihda näppäinyhdistelmä napsauttamalla sitä ja antamalla uusi."
 
-#: ../src/ui/widgets-matchlistview.vala:909
-#: ../src/ui/widgets-matchlistview.vala:923
+#: ../src/ui/widgets-matchlistview.vala:921
+#: ../src/ui/widgets-matchlistview.vala:935
 msgid "No results."
 msgstr "Ei tuloksia."
 
-#: ../src/ui/widgets-matchlistview.vala:928
+#: ../src/ui/widgets-matchlistview.vala:940
 #, c-format
 msgid "<b>1 of %d</b>"
 msgstr "<b>1 / %d</b>"
@@ -298,35 +298,35 @@ msgstr "Suorita"
 msgid "Run an application, action or script"
 msgstr "Suorita sovellus, toiminto tai komentosarja"
 
-#: ../src/core/common-actions.vala:113
+#: ../src/core/common-actions.vala:141
 msgid "Run in Terminal"
 msgstr "Suorita päätteessä"
 
-#: ../src/core/common-actions.vala:114
+#: ../src/core/common-actions.vala:142
 msgid "Run application or command in terminal"
 msgstr "Suorita sovellus tai käsky päätteessä"
 
-#: ../src/core/common-actions.vala:153
+#: ../src/core/common-actions.vala:208
 msgid "Open"
 msgstr "Avaa"
 
-#: ../src/core/common-actions.vala:154
+#: ../src/core/common-actions.vala:209
 msgid "Open using default application"
 msgstr "Avaa käyttäen oletussovellusta"
 
-#: ../src/core/common-actions.vala:215
+#: ../src/core/common-actions.vala:270
 msgid "Open folder"
 msgstr "Avaa kansio"
 
-#: ../src/core/common-actions.vala:216
+#: ../src/core/common-actions.vala:271
 msgid "Open folder containing this file"
 msgstr "Avaa tämän tiedoston sisältävä kansio"
 
-#: ../src/core/common-actions.vala:257
+#: ../src/core/common-actions.vala:311
 msgid "Copy to Clipboard"
 msgstr "Kopioi leikepöydälle"
 
-#: ../src/core/common-actions.vala:258
+#: ../src/core/common-actions.vala:312
 msgid "Copy selection to clipboard"
 msgstr "Kopioi valinta leikepöydälle"
 
@@ -441,15 +441,15 @@ msgstr "Keskustelutoiminnot"
 msgid "Open chat, or send a message with your favorite IM"
 msgstr "Avaa keskustelu tai lähetä viesti käyttäen suosimaasi pikaviestintä"
 
-#: ../src/plugins/chromium-plugin.vala:65
+#: ../src/plugins/chromium-plugin.vala:66
 msgid "Chromium Plugin"
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:66
+#: ../src/plugins/chromium-plugin.vala:67
 msgid "Browse and open Chromium bookmarks."
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:70
+#: ../src/plugins/chromium-plugin.vala:71
 msgid "Chromium is not installed"
 msgstr ""
 
@@ -465,15 +465,20 @@ msgstr "Etsi ja suorita komentoja."
 msgid "Search for and run applications on your computer."
 msgstr "Etsi ja suorita koneelle asennettuja sovelluksia."
 
-#: ../src/plugins/desktop-file-plugin.vala:231
+#: ../src/plugins/desktop-file-plugin.vala:232
 #, c-format
 msgid "Open with %s"
 msgstr "Avaa sovelluksella %s"
 
-#: ../src/plugins/desktop-file-plugin.vala:233
+#: ../src/plugins/desktop-file-plugin.vala:234
 #, c-format
 msgid "Opens current selection using %s"
 msgstr "Avaa nykyisen valinnan sovelluksessa %s"
+
+#: ../src/plugins/desktop-file-plugin.vala:280
+#, c-format
+msgid "Launch action '%s'"
+msgstr ""
 
 #: ../src/plugins/devhelp-search.vala:59
 msgid "Search in Devhelp"
@@ -491,21 +496,21 @@ msgstr "Etsi dokumentaatiota käyttäen Devhelpiä."
 msgid "Devhelp is not installed"
 msgstr "Devhelpiä ei ole asennettu"
 
-#: ../src/plugins/dictionary.vala:59
+#: ../src/plugins/dictionary.vala:61
 msgid "Define"
 msgstr "Määritä"
 
-#: ../src/plugins/dictionary.vala:60
+#: ../src/plugins/dictionary.vala:62
 msgid "Look up definition in dictionary"
 msgstr "Etsi määritelmää sanakirjasta"
 
-#: ../src/plugins/dictionary.vala:70
+#: ../src/plugins/dictionary.vala:73
 msgid "Look up definitions of words."
 msgstr "Etsi sanojen merkityksiä."
 
-#: ../src/plugins/dictionary.vala:74
-msgid "Gnome Dictionary is not installed"
-msgstr "Gnomen sanakirjaa ei ole asennettu"
+#: ../src/plugins/dictionary.vala:78
+msgid "No compatible Dictionary installed"
+msgstr ""
 
 #: ../src/plugins/directory-plugin.vala:111
 msgid "Open commonly used directories."
@@ -974,4 +979,20 @@ msgstr ""
 
 #: ../src/plugins/zeitgeist-related.vala:75
 msgid "Finds files related to other search results using Zeitgeist."
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:102
+msgid "Zeal"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:103
+msgid "Zeal offline documentation (zealdocs.org)"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:107
+msgid "zeal is not installed, please see zealdocs.org"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:167
+msgid "Zeal documentation research"
 msgstr ""

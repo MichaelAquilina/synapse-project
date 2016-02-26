@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: synapse-project\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-01-28 19:17+0000\n"
-"PO-Revision-Date: 2013-04-25 16:07+0000\n"
-"Last-Translator: Neliton Pereira Jr. <nelitonpjr@gmail.com>\n"
+"POT-Creation-Date: 2015-11-30 14:48+0000\n"
+"PO-Revision-Date: 2015-11-25 15:23+0000\n"
+"Last-Translator: Cleiton Floss <cleitonfloss@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2015-01-29 05:13+0000\n"
-"X-Generator: Launchpad (build 17306)\n"
+"X-Launchpad-Export-Date: 2015-12-01 05:19+0000\n"
+"X-Generator: Launchpad (build 17850)\n"
 
 #: ../data/synapse.desktop.in.h:1
 msgid "Synapse"
@@ -67,7 +67,7 @@ msgstr "Vídeo"
 
 #: ../src/ui/category.vala:76
 msgid "Contacts"
-msgstr ""
+msgstr "Contatos"
 
 #: ../src/ui/category.vala:77 ../src/ui/category.vala:119
 msgid "Internet"
@@ -99,11 +99,11 @@ msgstr "Nenhuma atividade recente encontrada."
 msgid "Type to search..."
 msgstr "Digite para pesquisar..."
 
-#: ../src/ui/controller.vala:517
+#: ../src/ui/controller.vala:542
 msgid "...or press down key to browse recent activities"
 msgstr "...ou pressione a tecla  \"↓\" para navegar nas atividades recentes"
 
-#: ../src/ui/view-virgilio.vala:204 ../src/ui/widgets-matchlistview.vala:936
+#: ../src/ui/view-virgilio.vala:208 ../src/ui/widgets-matchlistview.vala:948
 #, c-format
 msgid "<b>%d of %d</b>"
 msgstr "<b>%d de %d</b>"
@@ -271,12 +271,12 @@ msgstr "Atalho"
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr "Clique no atalho que você deseja modificar e pressione o novo atalho"
 
-#: ../src/ui/widgets-matchlistview.vala:909
-#: ../src/ui/widgets-matchlistview.vala:923
+#: ../src/ui/widgets-matchlistview.vala:921
+#: ../src/ui/widgets-matchlistview.vala:935
 msgid "No results."
 msgstr "Não há resultados."
 
-#: ../src/ui/widgets-matchlistview.vala:928
+#: ../src/ui/widgets-matchlistview.vala:940
 #, c-format
 msgid "<b>1 of %d</b>"
 msgstr "<b>1 de %d</b>"
@@ -298,35 +298,35 @@ msgstr "Executar"
 msgid "Run an application, action or script"
 msgstr "Executar uma aplicação, ação ou script"
 
-#: ../src/core/common-actions.vala:113
+#: ../src/core/common-actions.vala:141
 msgid "Run in Terminal"
 msgstr "Executar no terminal"
 
-#: ../src/core/common-actions.vala:114
+#: ../src/core/common-actions.vala:142
 msgid "Run application or command in terminal"
 msgstr "Executar uma aplicação ou comando no terminal"
 
-#: ../src/core/common-actions.vala:153
+#: ../src/core/common-actions.vala:208
 msgid "Open"
 msgstr "Abrir"
 
-#: ../src/core/common-actions.vala:154
+#: ../src/core/common-actions.vala:209
 msgid "Open using default application"
 msgstr "Abrir usando aplicação padrão"
 
-#: ../src/core/common-actions.vala:215
+#: ../src/core/common-actions.vala:270
 msgid "Open folder"
 msgstr "Abrir pasta"
 
-#: ../src/core/common-actions.vala:216
+#: ../src/core/common-actions.vala:271
 msgid "Open folder containing this file"
 msgstr "Abrir pasta que contém este arquivo"
 
-#: ../src/core/common-actions.vala:257
+#: ../src/core/common-actions.vala:311
 msgid "Copy to Clipboard"
 msgstr "Copiar para a área de transferência"
 
-#: ../src/core/common-actions.vala:258
+#: ../src/core/common-actions.vala:312
 msgid "Copy selection to clipboard"
 msgstr "Copiar seleção para a área de transferência"
 
@@ -442,15 +442,15 @@ msgstr ""
 "Abrir bate-papo ou enviar uma mensagem com seu mensageiro instantâneo "
 "favorito"
 
-#: ../src/plugins/chromium-plugin.vala:65
+#: ../src/plugins/chromium-plugin.vala:66
 msgid "Chromium Plugin"
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:66
+#: ../src/plugins/chromium-plugin.vala:67
 msgid "Browse and open Chromium bookmarks."
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:70
+#: ../src/plugins/chromium-plugin.vala:71
 msgid "Chromium is not installed"
 msgstr ""
 
@@ -466,15 +466,20 @@ msgstr "Procure e execute comandos arbitrários."
 msgid "Search for and run applications on your computer."
 msgstr "Procure e execute aplicações no seu computador."
 
-#: ../src/plugins/desktop-file-plugin.vala:231
+#: ../src/plugins/desktop-file-plugin.vala:232
 #, c-format
 msgid "Open with %s"
 msgstr "Abrir com %s"
 
-#: ../src/plugins/desktop-file-plugin.vala:233
+#: ../src/plugins/desktop-file-plugin.vala:234
 #, c-format
 msgid "Opens current selection using %s"
 msgstr "Abrir seleção atual usando %s"
+
+#: ../src/plugins/desktop-file-plugin.vala:280
+#, c-format
+msgid "Launch action '%s'"
+msgstr ""
 
 #: ../src/plugins/devhelp-search.vala:59
 msgid "Search in Devhelp"
@@ -492,21 +497,21 @@ msgstr "Procurar documentação usando Devhelp."
 msgid "Devhelp is not installed"
 msgstr "DevHelp não está instalado"
 
-#: ../src/plugins/dictionary.vala:59
+#: ../src/plugins/dictionary.vala:61
 msgid "Define"
 msgstr "Definir"
 
-#: ../src/plugins/dictionary.vala:60
+#: ../src/plugins/dictionary.vala:62
 msgid "Look up definition in dictionary"
 msgstr "Procure a definição no dicionário"
 
-#: ../src/plugins/dictionary.vala:70
+#: ../src/plugins/dictionary.vala:73
 msgid "Look up definitions of words."
 msgstr "Procurar definições de palavras."
 
-#: ../src/plugins/dictionary.vala:74
-msgid "Gnome Dictionary is not installed"
-msgstr "Dicionário do Gnome não está instalado"
+#: ../src/plugins/dictionary.vala:78
+msgid "No compatible Dictionary installed"
+msgstr ""
 
 #: ../src/plugins/directory-plugin.vala:111
 msgid "Open commonly used directories."
@@ -518,7 +523,7 @@ msgstr ""
 
 #: ../src/plugins/file-op-plugin.vala:41
 msgid "Move to Trash"
-msgstr ""
+msgstr "Mover para a lixeira"
 
 #: ../src/plugins/file-op-plugin.vala:72
 msgid "Rename to"
@@ -693,7 +698,7 @@ msgstr ""
 
 #: ../src/plugins/opensearch.vala:267
 msgid "Search the web using duckduckgo.com"
-msgstr ""
+msgstr "Pesquisar na internet usando o duckduckgo.com"
 
 #: ../src/plugins/opensearch.vala:268
 msgid "Google"
@@ -981,3 +986,19 @@ msgid "Finds files related to other search results using Zeitgeist."
 msgstr ""
 "Encontra arquivos relacionados com outros resultados de pesquisa usando o "
 "Zeitgeist."
+
+#: ../src/plugins/zeal-plugin.vala:102
+msgid "Zeal"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:103
+msgid "Zeal offline documentation (zealdocs.org)"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:107
+msgid "zeal is not installed, please see zealdocs.org"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:167
+msgid "Zeal documentation research"
+msgstr ""

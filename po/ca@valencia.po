@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: synapse-project\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-01-28 19:17+0000\n"
+"POT-Creation-Date: 2015-11-30 14:48+0000\n"
 "PO-Revision-Date: 2011-04-28 21:54+0000\n"
 "Last-Translator: Pau Iranzo <Unknown>\n"
 "Language-Team: Catalan <ca@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-01-29 05:13+0000\n"
-"X-Generator: Launchpad (build 17306)\n"
+"X-Launchpad-Export-Date: 2015-12-01 05:20+0000\n"
+"X-Generator: Launchpad (build 17850)\n"
 
 #: ../data/synapse.desktop.in.h:1
 msgid "Synapse"
@@ -99,13 +99,13 @@ msgstr "No s'ha trobat cap activitat recent"
 msgid "Type to search..."
 msgstr "Escriviu per cercar..."
 
-#: ../src/ui/controller.vala:517
+#: ../src/ui/controller.vala:542
 msgid "...or press down key to browse recent activities"
 msgstr ""
 "... o premeu la tecla de cursor cap avall per navegar per les activitats "
 "recents"
 
-#: ../src/ui/view-virgilio.vala:204 ../src/ui/widgets-matchlistview.vala:936
+#: ../src/ui/view-virgilio.vala:208 ../src/ui/widgets-matchlistview.vala:948
 #, c-format
 msgid "<b>%d of %d</b>"
 msgstr "<b>%d de %d</b>"
@@ -273,12 +273,12 @@ msgstr "Drecera"
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr "Feu clic a la drecera que voleu canviar i premeu la drecera nova."
 
-#: ../src/ui/widgets-matchlistview.vala:909
-#: ../src/ui/widgets-matchlistview.vala:923
+#: ../src/ui/widgets-matchlistview.vala:921
+#: ../src/ui/widgets-matchlistview.vala:935
 msgid "No results."
 msgstr "Cap resultat."
 
-#: ../src/ui/widgets-matchlistview.vala:928
+#: ../src/ui/widgets-matchlistview.vala:940
 #, c-format
 msgid "<b>1 of %d</b>"
 msgstr "<b>1 de %d</b>"
@@ -300,35 +300,35 @@ msgstr "Executa"
 msgid "Run an application, action or script"
 msgstr "Executa una aplicació, una acció o un script"
 
-#: ../src/core/common-actions.vala:113
+#: ../src/core/common-actions.vala:141
 msgid "Run in Terminal"
 msgstr "Executa a un terminal"
 
-#: ../src/core/common-actions.vala:114
+#: ../src/core/common-actions.vala:142
 msgid "Run application or command in terminal"
 msgstr "Executa l'orde o aplicació a un terminal"
 
-#: ../src/core/common-actions.vala:153
+#: ../src/core/common-actions.vala:208
 msgid "Open"
 msgstr "Obri"
 
-#: ../src/core/common-actions.vala:154
+#: ../src/core/common-actions.vala:209
 msgid "Open using default application"
 msgstr "Obri fent servir l'aplicació per defecte"
 
-#: ../src/core/common-actions.vala:215
+#: ../src/core/common-actions.vala:270
 msgid "Open folder"
 msgstr "Obri la carpeta"
 
-#: ../src/core/common-actions.vala:216
+#: ../src/core/common-actions.vala:271
 msgid "Open folder containing this file"
 msgstr "Obri la carpeta que conté este fitxer"
 
-#: ../src/core/common-actions.vala:257
+#: ../src/core/common-actions.vala:311
 msgid "Copy to Clipboard"
 msgstr "Copia al porta-retalls"
 
-#: ../src/core/common-actions.vala:258
+#: ../src/core/common-actions.vala:312
 msgid "Copy selection to clipboard"
 msgstr "Copia la selecció al porta-retalls"
 
@@ -442,15 +442,15 @@ msgstr ""
 msgid "Open chat, or send a message with your favorite IM"
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:65
+#: ../src/plugins/chromium-plugin.vala:66
 msgid "Chromium Plugin"
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:66
+#: ../src/plugins/chromium-plugin.vala:67
 msgid "Browse and open Chromium bookmarks."
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:70
+#: ../src/plugins/chromium-plugin.vala:71
 msgid "Chromium is not installed"
 msgstr ""
 
@@ -466,15 +466,20 @@ msgstr "Trobeu i executeu ordes arbitràries."
 msgid "Search for and run applications on your computer."
 msgstr "Cerqueu i executeu aplicacions al vostre ordinador."
 
-#: ../src/plugins/desktop-file-plugin.vala:231
+#: ../src/plugins/desktop-file-plugin.vala:232
 #, c-format
 msgid "Open with %s"
 msgstr "Obri amb %s"
 
-#: ../src/plugins/desktop-file-plugin.vala:233
+#: ../src/plugins/desktop-file-plugin.vala:234
 #, c-format
 msgid "Opens current selection using %s"
 msgstr "Obri la selecció actual fent servir %s"
+
+#: ../src/plugins/desktop-file-plugin.vala:280
+#, c-format
+msgid "Launch action '%s'"
+msgstr ""
 
 #: ../src/plugins/devhelp-search.vala:59
 msgid "Search in Devhelp"
@@ -492,21 +497,21 @@ msgstr "Cerca a la documentació fent servir el Devhelp."
 msgid "Devhelp is not installed"
 msgstr "El Devhelp no està instal·lat"
 
-#: ../src/plugins/dictionary.vala:59
+#: ../src/plugins/dictionary.vala:61
 msgid "Define"
 msgstr "Defineix"
 
-#: ../src/plugins/dictionary.vala:60
+#: ../src/plugins/dictionary.vala:62
 msgid "Look up definition in dictionary"
 msgstr "Cerca la definició al diccionari"
 
-#: ../src/plugins/dictionary.vala:70
+#: ../src/plugins/dictionary.vala:73
 msgid "Look up definitions of words."
 msgstr "Cerca definicions de paraules"
 
-#: ../src/plugins/dictionary.vala:74
-msgid "Gnome Dictionary is not installed"
-msgstr "El diccionari del GNOME no està instal·lat"
+#: ../src/plugins/dictionary.vala:78
+msgid "No compatible Dictionary installed"
+msgstr ""
 
 #: ../src/plugins/directory-plugin.vala:111
 msgid "Open commonly used directories."
@@ -975,4 +980,20 @@ msgstr ""
 
 #: ../src/plugins/zeitgeist-related.vala:75
 msgid "Finds files related to other search results using Zeitgeist."
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:102
+msgid "Zeal"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:103
+msgid "Zeal offline documentation (zealdocs.org)"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:107
+msgid "zeal is not installed, please see zealdocs.org"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:167
+msgid "Zeal documentation research"
 msgstr ""

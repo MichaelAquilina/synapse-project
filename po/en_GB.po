@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: synapse-project\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-01-28 19:17+0000\n"
-"PO-Revision-Date: 2012-01-25 11:54+0000\n"
-"Last-Translator: Jeet <Unknown>\n"
+"POT-Creation-Date: 2015-11-30 14:48+0000\n"
+"PO-Revision-Date: 2016-01-28 11:59+0000\n"
+"Last-Translator: Andi Chandler <Unknown>\n"
 "Language-Team: English (United Kingdom) <en_GB@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-01-29 05:13+0000\n"
-"X-Generator: Launchpad (build 17306)\n"
+"X-Launchpad-Export-Date: 2016-01-29 05:23+0000\n"
+"X-Generator: Launchpad (build 17902)\n"
 
 #: ../data/synapse.desktop.in.h:1
 msgid "Synapse"
@@ -35,27 +35,27 @@ msgstr "Activate"
 #: ../src/ui/category.vala:31 ../src/ui/category.vala:71
 #: ../src/ui/category.vala:135
 msgid "All"
-msgstr ""
+msgstr "All"
 
 #: ../src/ui/category.vala:68 ../src/ui/category.vala:112
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 #: ../src/ui/category.vala:69 ../src/ui/category.vala:114
 msgid "Audio"
-msgstr ""
+msgstr "Audio"
 
 #: ../src/ui/category.vala:70 ../src/ui/category.vala:115
 msgid "Applications"
-msgstr ""
+msgstr "Applications"
 
 #: ../src/ui/category.vala:72 ../src/ui/category.vala:113
 msgid "Places"
-msgstr ""
+msgstr "Places"
 
 #: ../src/ui/category.vala:73 ../src/ui/category.vala:116
 msgid "Documents"
-msgstr ""
+msgstr "Documents"
 
 #: ../src/ui/category.vala:74 ../src/ui/category.vala:117
 msgid "Images"
@@ -67,7 +67,7 @@ msgstr ""
 
 #: ../src/ui/category.vala:76
 msgid "Contacts"
-msgstr ""
+msgstr "Contacts"
 
 #: ../src/ui/category.vala:77 ../src/ui/category.vala:119
 msgid "Internet"
@@ -76,16 +76,16 @@ msgstr "Internet"
 #. _labels.set (QueryFlags.ALL, _("All")); // Do not remove!
 #: ../src/ui/category.vala:111
 msgid "Include remote content"
-msgstr ""
+msgstr "Include remote content"
 
 #. _labels.set (QueryFlags.FILES, _("Files"));
 #: ../src/ui/category.vala:121
 msgid "Uncategorized"
-msgstr ""
+msgstr "Uncategorised"
 
 #: ../src/ui/controller.vala:30
 msgid "Searching..."
-msgstr ""
+msgstr "Searching..."
 
 #: ../src/ui/controller.vala:31
 msgid "No results found."
@@ -93,80 +93,80 @@ msgstr "No results found."
 
 #: ../src/ui/controller.vala:32
 msgid "No recent activities found."
-msgstr ""
+msgstr "No recent activities found."
 
 #: ../src/ui/controller.vala:33
 msgid "Type to search..."
-msgstr ""
+msgstr "Type to search..."
 
-#: ../src/ui/controller.vala:517
+#: ../src/ui/controller.vala:542
 msgid "...or press down key to browse recent activities"
-msgstr ""
+msgstr "...or press down key to browse recent activities"
 
-#: ../src/ui/view-virgilio.vala:204 ../src/ui/widgets-matchlistview.vala:936
+#: ../src/ui/view-virgilio.vala:208 ../src/ui/widgets-matchlistview.vala:948
 #, c-format
 msgid "<b>%d of %d</b>"
-msgstr ""
+msgstr "<b>%d of %d</b>"
 
 #: ../src/ui/settings.vala:48
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: ../src/ui/settings.vala:50
 msgid "Enable this plugin"
-msgstr ""
+msgstr "Enable this plugin"
 
 #: ../src/ui/settings.vala:51
 msgid "Disable this plugin"
-msgstr ""
+msgstr "Disable this plugin"
 
 #: ../src/ui/settings.vala:57
 msgid "About this plugin"
-msgstr ""
+msgstr "About this plugin"
 
 #: ../src/ui/settings.vala:71 ../src/ui/settings.vala:207
 msgid "Configure plugin"
-msgstr ""
+msgstr "Configure plugin"
 
 #: ../src/ui/settings.vala:86 ../src/ui/settings.vala:455
 msgid "Disabled"
-msgstr ""
+msgstr "Disabled"
 
 #: ../src/ui/settings.vala:90
 msgid "Enabled"
-msgstr ""
+msgstr "Enabled"
 
 #: ../src/ui/settings.vala:144
 msgid "Synapse - Settings"
-msgstr ""
+msgstr "Synapse - Settings"
 
 #: ../src/ui/settings.vala:169
 msgid "Default"
-msgstr ""
+msgstr "Default"
 
 #: ../src/ui/settings.vala:170
 msgid "Essential"
-msgstr ""
+msgstr "Essential"
 
 #: ../src/ui/settings.vala:171
 msgid "Doish"
-msgstr ""
+msgstr "Doish"
 
 #: ../src/ui/settings.vala:172
 msgid "Side Doish"
-msgstr ""
+msgstr "Side Doish"
 
 #: ../src/ui/settings.vala:173
 msgid "Virgilio"
-msgstr ""
+msgstr "Virgilio"
 
 #: ../src/ui/settings.vala:241
 msgid "Execute"
-msgstr ""
+msgstr "Execute"
 
 #: ../src/ui/settings.vala:242
 msgid "Execute without hiding"
-msgstr ""
+msgstr "Execute without hiding"
 
 #: ../src/ui/settings.vala:243
 msgid "Alternative Delete"
@@ -271,12 +271,12 @@ msgstr ""
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr ""
 
-#: ../src/ui/widgets-matchlistview.vala:909
-#: ../src/ui/widgets-matchlistview.vala:923
+#: ../src/ui/widgets-matchlistview.vala:921
+#: ../src/ui/widgets-matchlistview.vala:935
 msgid "No results."
 msgstr ""
 
-#: ../src/ui/widgets-matchlistview.vala:928
+#: ../src/ui/widgets-matchlistview.vala:940
 #, c-format
 msgid "<b>1 of %d</b>"
 msgstr ""
@@ -298,35 +298,35 @@ msgstr ""
 msgid "Run an application, action or script"
 msgstr ""
 
-#: ../src/core/common-actions.vala:113
+#: ../src/core/common-actions.vala:141
 msgid "Run in Terminal"
 msgstr ""
 
-#: ../src/core/common-actions.vala:114
+#: ../src/core/common-actions.vala:142
 msgid "Run application or command in terminal"
 msgstr ""
 
-#: ../src/core/common-actions.vala:153
+#: ../src/core/common-actions.vala:208
 msgid "Open"
 msgstr ""
 
-#: ../src/core/common-actions.vala:154
+#: ../src/core/common-actions.vala:209
 msgid "Open using default application"
 msgstr ""
 
-#: ../src/core/common-actions.vala:215
+#: ../src/core/common-actions.vala:270
 msgid "Open folder"
 msgstr ""
 
-#: ../src/core/common-actions.vala:216
+#: ../src/core/common-actions.vala:271
 msgid "Open folder containing this file"
 msgstr ""
 
-#: ../src/core/common-actions.vala:257
+#: ../src/core/common-actions.vala:311
 msgid "Copy to Clipboard"
 msgstr ""
 
-#: ../src/core/common-actions.vala:258
+#: ../src/core/common-actions.vala:312
 msgid "Copy selection to clipboard"
 msgstr ""
 
@@ -440,15 +440,15 @@ msgstr ""
 msgid "Open chat, or send a message with your favorite IM"
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:65
+#: ../src/plugins/chromium-plugin.vala:66
 msgid "Chromium Plugin"
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:66
+#: ../src/plugins/chromium-plugin.vala:67
 msgid "Browse and open Chromium bookmarks."
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:70
+#: ../src/plugins/chromium-plugin.vala:71
 msgid "Chromium is not installed"
 msgstr ""
 
@@ -464,14 +464,19 @@ msgstr ""
 msgid "Search for and run applications on your computer."
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.vala:231
+#: ../src/plugins/desktop-file-plugin.vala:232
 #, c-format
 msgid "Open with %s"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.vala:233
+#: ../src/plugins/desktop-file-plugin.vala:234
 #, c-format
 msgid "Opens current selection using %s"
+msgstr ""
+
+#: ../src/plugins/desktop-file-plugin.vala:280
+#, c-format
+msgid "Launch action '%s'"
 msgstr ""
 
 #: ../src/plugins/devhelp-search.vala:59
@@ -490,20 +495,20 @@ msgstr ""
 msgid "Devhelp is not installed"
 msgstr ""
 
-#: ../src/plugins/dictionary.vala:59
+#: ../src/plugins/dictionary.vala:61
 msgid "Define"
 msgstr ""
 
-#: ../src/plugins/dictionary.vala:60
+#: ../src/plugins/dictionary.vala:62
 msgid "Look up definition in dictionary"
 msgstr ""
 
-#: ../src/plugins/dictionary.vala:70
+#: ../src/plugins/dictionary.vala:73
 msgid "Look up definitions of words."
 msgstr ""
 
-#: ../src/plugins/dictionary.vala:74
-msgid "Gnome Dictionary is not installed"
+#: ../src/plugins/dictionary.vala:78
+msgid "No compatible Dictionary installed"
 msgstr ""
 
 #: ../src/plugins/directory-plugin.vala:111
@@ -967,4 +972,20 @@ msgstr ""
 
 #: ../src/plugins/zeitgeist-related.vala:75
 msgid "Finds files related to other search results using Zeitgeist."
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:102
+msgid "Zeal"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:103
+msgid "Zeal offline documentation (zealdocs.org)"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:107
+msgid "zeal is not installed, please see zealdocs.org"
+msgstr ""
+
+#: ../src/plugins/zeal-plugin.vala:167
+msgid "Zeal documentation research"
 msgstr ""
