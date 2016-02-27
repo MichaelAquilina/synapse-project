@@ -71,7 +71,6 @@ namespace Synapse.Gui
     private Gtk.Box target_box;
 
     private SmartLabel status;
-    private SmartLabel logo;
     private SmartLabel search;
 
     private SpecificMatchList results_sources;
@@ -85,18 +84,14 @@ namespace Synapse.Gui
       container = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
       status = new SmartLabel ();
-      logo = new SmartLabel ();
       search = new SmartLabel ();
       search.set_animation_enabled (true);
       search.xalign = 0.5f;
-      logo.xalign = 1.0f;
       status.xalign = 0.0f;
-      logo.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
       var hb_status = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
       hb_status.homogeneous = true;
       hb_status.pack_start (status);
       hb_status.pack_start (search);
-      hb_status.pack_start (logo);
 
       /* Categories - Throbber and menu */
       var categories_hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);

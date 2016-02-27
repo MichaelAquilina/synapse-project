@@ -1146,7 +1146,7 @@ namespace Synapse.Gui
                    copyright : "Copyright (C) 2010-2015 " + string.joinv ("\n", devs),
                    program_name: "Synapse",
                    logo_icon_name : "synapse",
-                   version: Config.VERSION,
+                   version: Config.VERSION + "\n" + Config.RELEASE_NAME,
                    website: "http://launchpad.net/synapse-project");
     }
   }

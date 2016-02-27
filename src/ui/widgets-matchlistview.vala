@@ -849,13 +849,11 @@ namespace Synapse.Gui
     private MatchListView view;
     private MatchViewRenderer rend;
     private Gtk.Label status;
-    private Gtk.Label logo;
 
     public new void set_state (Gtk.StateFlags state)
     {
       base.set_state_flags (state, false);
       status.set_state_flags (Gtk.StateFlags.NORMAL, true);
-      logo.set_state_flags (Gtk.StateFlags.NORMAL, true);
     }
 
     public override bool draw (Cairo.Context ctx)
@@ -915,12 +913,8 @@ namespace Synapse.Gui
       status = new Gtk.Label (null);
       status.set_alignment (0, 0);
       status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
-      logo = new Gtk.Label (null);
-      logo.set_alignment (1, 0);
-      logo.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
       status_box.pack_start (status, false, false, 10);
       status_box.pack_start (new Gtk.Label (null), true, false);
-      status_box.pack_start (logo, false, false, 10);
     }
 
     public void update_matches (Gee.List<Synapse.Match>? rs)
