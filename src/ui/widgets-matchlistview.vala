@@ -19,7 +19,6 @@
  *
  */
 
-using Gtk;
 using Cairo;
 
 namespace Synapse.Gui
@@ -721,7 +720,7 @@ namespace Synapse.Gui
     {
       if (this.tid != 0) return true;
       this.dragdrop_target_item = get_item_at_pos ((int)event.y);
-      var tl = new TargetList ({});
+      var tl = new Gtk.TargetList ({});
 
       if (this.items == null || this.items.size <= this.dragdrop_target_item)
       {
@@ -796,7 +795,7 @@ namespace Synapse.Gui
       return true;
     }
 
-    public override void drag_data_get (Gdk.DragContext context, SelectionData selection_data, uint info, uint time_)
+    public override void drag_data_get (Gdk.DragContext context, Gtk.SelectionData selection_data, uint info, uint time_)
     {
       /* Called at drop time */
       selection_data.set_text (dragdrop_name, -1);
@@ -804,15 +803,15 @@ namespace Synapse.Gui
     }
   }
 
-  public class ResultBox : EventBox
+  public class ResultBox : Gtk.EventBox
   {
     private const int VISIBLE_RESULTS = 5;
     private const int ICON_SIZE = 36;
     private int mwidth;
     private int nrows;
 
-    private Box vbox;
-    private Box status_box;
+    private Gtk.Box vbox;
+    private Gtk.Box status_box;
 
     private Utils.ColorHelper ch;
 
@@ -851,8 +850,8 @@ namespace Synapse.Gui
 
     private MatchListView view;
     private MatchViewRenderer rend;
-    private Label status;
-    private Label logo;
+    private Gtk.Label status;
+    private Gtk.Label logo;
 
     public new void set_state (Gtk.StateFlags state)
     {
@@ -873,7 +872,7 @@ namespace Synapse.Gui
         /* Prepare bg's colors using GtkStyleContext */
         Pattern pat = new Pattern.linear(0, 0, 0, status.get_allocated_height ());
 
-        StateFlags t = this.get_state_flags ();
+        Gtk.StateFlags t = this.get_state_flags ();
         ch.add_color_stop_rgba (pat, 0.0, 0.95, StyleType.BG, t);
         ch.add_color_stop_rgba (pat, 1.0, 0.95, StyleType.BG, t, Mod.DARKER);
         /* Prepare and draw top bg's rect */
@@ -908,21 +907,21 @@ namespace Synapse.Gui
       view = new MatchListView (rend);
       view.min_visible_rows = this.nrows;
 
-      vbox = new Box (Gtk.Orientation.VERTICAL, 0);
+      vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
       vbox.border_width = 0;
       this.add (vbox);
       vbox.pack_start (view);
-      status_box = new Box (Gtk.Orientation.HORIZONTAL, 0);
+      status_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
       status_box.set_size_request (-1, 15);
       vbox.pack_start (status_box, false);
-      status = new Label (null);
+      status = new Gtk.Label (null);
       status.set_alignment (0, 0);
       status.set_markup (Markup.printf_escaped ("<b>%s</b>", _("No results.")));
-      logo = new Label (null);
+      logo = new Gtk.Label (null);
       logo.set_alignment (1, 0);
       logo.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
       status_box.pack_start (status, false, false, 10);
-      status_box.pack_start (new Label (null), true, false);
+      status_box.pack_start (new Gtk.Label (null), true, false);
       status_box.pack_start (logo, false, false, 10);
     }
 

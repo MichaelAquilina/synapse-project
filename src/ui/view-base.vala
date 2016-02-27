@@ -19,8 +19,6 @@
  *
  */
 
-using Gtk;
-
 namespace Synapse
 {
   /* Gtk+-3.0 base class */
@@ -38,14 +36,14 @@ namespace Synapse
       this.is_kwin = wmname == "kwin";
     }
 
-    private Requisition req_target;
-    private Requisition req_current;
+    private Gtk.Requisition req_target;
+    private Gtk.Requisition req_current;
 
     protected Gui.Utils.ColorHelper ch;
     protected HTextSelector flag_selector;
     protected MenuButton menu;
 
-    protected Label spacer;
+    protected Gtk.Label spacer;
 
     protected int BORDER_RADIUS;
     protected int SHADOW_SIZE;
@@ -136,7 +134,7 @@ namespace Synapse
       install_style_property (shadow_size);
     }
 
-    private Requisition old_alloc;
+    private Gtk.Requisition old_alloc;
 
     construct
     {
@@ -194,7 +192,7 @@ namespace Synapse
       /* Use the spacer to separate the list from the main section of the window
        * the spacer will fill up the space equal to the rounded border plus the shadow
        */
-      spacer = new Label (null);
+      spacer = new Gtk.Label (null);
       spacer.set_size_request (1, SHADOW_SIZE + BORDER_RADIUS);
 
       menu = null;
@@ -274,7 +272,7 @@ namespace Synapse
       bool bgselected;
       style_get ("use-selected-color", out bgselected, "selected-category-size", out dmax,
         "unselected-category-size", out dmin);
-      this.bg_state = bgselected ? StateFlags.SELECTED : StateFlags.NORMAL;
+      this.bg_state = bgselected ? Gtk.StateFlags.SELECTED : Gtk.StateFlags.NORMAL;
       flag_selector.selected_markup = "<span size=\"%s\"><b>%s</b></span>".printf (
                                                       SmartLabel.size_to_string[SmartLabel.string_to_size (dmax)], "%s");
       flag_selector.unselected_markup = "<span size=\"%s\">%s</span>".printf (
@@ -415,7 +413,7 @@ namespace Synapse
 
     protected virtual void paint_background (Cairo.Context ctx)
     {
-      ch.set_source_rgba (ctx, 0.9, StyleType.BG, StateFlags.NORMAL);
+      ch.set_source_rgba (ctx, 0.9, StyleType.BG, Gtk.StateFlags.NORMAL);
       ctx.set_operator (Cairo.Operator.SOURCE);
       ctx.paint ();
     }
@@ -461,7 +459,7 @@ namespace Synapse
     private string dragdrop_name = "";
     private string dragdrop_uri = "";
 
-    protected void make_draggable (EventBox obj)
+    protected void make_draggable (Gtk.EventBox obj)
     {
       obj.set_events (obj.get_events () | Gdk.EventMask.BUTTON_PRESS_MASK);
       // D&D
@@ -476,12 +474,12 @@ namespace Synapse
       //TODO: drag data recieved => vanish
     }
 
-    protected void drag_end_handler (Widget w, Gdk.DragContext context)
+    protected void drag_end_handler (Gtk.Widget w, Gdk.DragContext context)
     {
       this.force_grab ();
     }
 
-    private void draggable_get (Widget w, Gdk.DragContext context, SelectionData selection_data, uint info, uint time_)
+    private void draggable_get (Gtk.Widget w, Gdk.DragContext context, Gtk.SelectionData selection_data, uint info, uint time_)
     {
       /* Called at drop time */
       selection_data.set_text (dragdrop_name, -1);
@@ -490,7 +488,7 @@ namespace Synapse
 
     private bool draggable_clicked (Gtk.Widget w, Gdk.EventButton event)
     {
-      var tl = new TargetList ({});
+      var tl = new Gtk.TargetList ({});
       var sf = model.searching_for;
       if (sf == SearchingFor.ACTIONS) sf = SearchingFor.SOURCES;
       if (model.focus[sf].value == null)

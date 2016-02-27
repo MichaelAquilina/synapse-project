@@ -19,7 +19,6 @@
  *
  */
 
-using Gtk;
 using Cairo;
 
 namespace Synapse.Gui
@@ -109,15 +108,15 @@ namespace Synapse.Gui
 
     private MenuThrobber menuthrobber;
 
-    private Box target_container;
-    private Box container;
+    private Gtk.Box target_container;
+    private Gtk.Box container;
 
-    private Box spane; //source and action panes
-    private Box apane;
-    private Box tpane;
+    private Gtk.Box spane; //source and action panes
+    private Gtk.Box apane;
+    private Gtk.Box tpane;
 
-    private Label sp1;
-    private Label sp2;
+    private Gtk.Label sp1;
+    private Gtk.Label sp2;
 
     protected override void build_ui ()
     {
@@ -125,7 +124,7 @@ namespace Synapse.Gui
       source_icon = new NamedIcon ();
       action_icon = new NamedIcon ();
       target_icon = new NamedIcon ();
-      source_icon.set_icon_name ("search", IconSize.DND);
+      source_icon.set_icon_name ("search", Gtk.IconSize.DND);
       action_icon.clear ();
       target_icon.set_icon_name ("");
 
@@ -141,31 +140,31 @@ namespace Synapse.Gui
       source_label.set_ellipsize (Pango.EllipsizeMode.END);
       source_label.size = SmartLabel.Size.MEDIUM;
       source_label.min_size = SmartLabel.Size.SMALL;
-      source_label.set_state_flags (StateFlags.SELECTED, false);
+      source_label.set_state_flags (Gtk.StateFlags.SELECTED, false);
       source_label.xalign = 0.5f;
       action_label = new SmartLabel ();
       action_label.set_ellipsize (Pango.EllipsizeMode.END);
       action_label.size = SmartLabel.Size.MEDIUM;
       action_label.min_size = SmartLabel.Size.SMALL;
-      action_label.set_state_flags (StateFlags.SELECTED, false);
+      action_label.set_state_flags (Gtk.StateFlags.SELECTED, false);
       action_label.xalign = 0.5f;
       target_label = new SmartLabel ();
       target_label.set_ellipsize (Pango.EllipsizeMode.END);
       target_label.size = SmartLabel.Size.MEDIUM;
       target_label.min_size = SmartLabel.Size.SMALL;
-      target_label.set_state_flags (StateFlags.SELECTED, false);
+      target_label.set_state_flags (Gtk.StateFlags.SELECTED, false);
       target_label.xalign = 0.5f;
       description_label = new SmartLabel ();
       description_label.size = SmartLabel.Size.SMALL;
       description_label.set_animation_enabled (true);
-      description_label.set_state_flags (StateFlags.SELECTED, false);
+      description_label.set_state_flags (Gtk.StateFlags.SELECTED, false);
       description_label.xalign = 0.5f;
 
       /* Categories - Throbber and menu */ //#0C71D6
-      var categories_hbox = new Box (Gtk.Orientation.HORIZONTAL, 0);
+      var categories_hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 
       menuthrobber = new MenuThrobber ();
-      menuthrobber.set_state_flags (StateFlags.SELECTED, false);
+      menuthrobber.set_state_flags (Gtk.StateFlags.SELECTED, false);
       menu = (MenuButton) menuthrobber;
       menuthrobber.set_size_request (14, 14);
 
@@ -174,16 +173,16 @@ namespace Synapse.Gui
 
       flag_selector.selected_markup = "<span size=\"small\"><b>%s</b></span>";
       flag_selector.unselected_markup = "<span size=\"x-small\">%s</span>";
-      flag_selector.set_state_flags (StateFlags.SELECTED, false);
+      flag_selector.set_state_flags (Gtk.StateFlags.SELECTED, false);
 
-      var hbox_panes = new Box (Gtk.Orientation.HORIZONTAL, 0);
+      var hbox_panes = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 
       /* PANES */
-      sp1 = new Label (null);
-      sp2 = new Label (null);
+      sp1 = new Gtk.Label (null);
+      sp2 = new Gtk.Label (null);
 
       /* Source Pane */
-      spane = new Box (Gtk.Orientation.VERTICAL, 0);
+      spane = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
       spane.border_width = 5;
       var sensitive = new SensitiveWidget (source_icon);
       this.make_draggable (sensitive);
@@ -191,7 +190,7 @@ namespace Synapse.Gui
       spane.pack_start (source_label, false);
 
       /* Action Pane */
-      apane = new Box (Gtk.Orientation.VERTICAL, 0);
+      apane = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
       apane.border_width = 5;
       apane.pack_start (action_icon, false);
       apane.pack_start (action_label, false);
@@ -201,33 +200,33 @@ namespace Synapse.Gui
       hbox_panes.pack_start (apane, true);
 
       /* Target Pane */
-      tpane = new Box (Gtk.Orientation.VERTICAL, 0);
+      tpane = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
       tpane.border_width = 5;
       sensitive = new SensitiveWidget (target_icon);
       this.make_draggable (sensitive);
       tpane.pack_start (sensitive, false);
       tpane.pack_start (target_label, false);
 
-      target_container = new Box (Gtk.Orientation.VERTICAL, 0);
-      var hb = new Box (Gtk.Orientation.HORIZONTAL, 0);
+      target_container = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+      var hb = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
       hb.pack_start (sp2, false);
       hb.pack_start (tpane, false, false);
       target_container.pack_start (new CloneWidget (categories_hbox), false);
       target_container.pack_start (hb, false, true, 5);
-      target_container.pack_start (new Label (null), true);
+      target_container.pack_start (new Gtk.Label (null), true);
 
       /* list */
       this.prepare_results_container (out results_container, out results_sources,
-                                      out results_actions, out results_targets, StateFlags.SELECTED);
+                                      out results_actions, out results_targets, Gtk.StateFlags.SELECTED);
 
-      container = new Box (Gtk.Orientation.VERTICAL, 0);
+      container = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
       container.pack_start (categories_hbox, false);
       container.pack_start (hbox_panes, false, true, 5);
       container.pack_start (description_label, false);
       container.pack_start (spacer, false);
       container.pack_start (results_container, false);
 
-      var main_container = new Box (Gtk.Orientation.HORIZONTAL, 0);
+      var main_container = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
       main_container.pack_start (container, false);
       main_container.pack_start (target_container, false);
 
@@ -303,10 +302,10 @@ namespace Synapse.Gui
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
       r = g = b = 0.12;
-      ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, StateFlags.SELECTED);
+      ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, Gtk.StateFlags.SELECTED);
       pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
       r = g = b = 0.4;
-      ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, StateFlags.SELECTED);
+      ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, Gtk.StateFlags.SELECTED);
       pat.add_color_stop_rgba (1.0, r, g, b, 1.0);
 
       r = g = b = 0.0;
@@ -344,7 +343,7 @@ namespace Synapse.Gui
                                          tpane_allocation.height,
                                          15);
           ch.set_source_rgba (ctx, 0.3,
-                              StyleType.FG, StateFlags.SELECTED);
+                              StyleType.FG, Gtk.StateFlags.SELECTED);
           ctx.clip ();
           ctx.paint ();
         }
@@ -397,7 +396,7 @@ namespace Synapse.Gui
                                      spane_allocation.height,
                                      15);
       ch.set_source_rgba (ctx, model.searching_for == SearchingFor.SOURCES ? 0.3 : 0.08,
-                          StyleType.FG, StateFlags.SELECTED);
+                          StyleType.FG, Gtk.StateFlags.SELECTED);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();
@@ -409,7 +408,7 @@ namespace Synapse.Gui
                                      apane_allocation.height,
                                      15);
       ch.set_source_rgba (ctx, model.searching_for == SearchingFor.ACTIONS ? 0.3 : 0.08,
-                          StyleType.FG, StateFlags.SELECTED);
+                          StyleType.FG, Gtk.StateFlags.SELECTED);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();

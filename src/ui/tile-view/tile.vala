@@ -19,21 +19,19 @@
  *
  */
 
-using Gtk;
-
 namespace UI.Widgets
 {
-  public class Tile : Table
+  public class Tile : Gtk.Table
   {
-    private Button add_remove_button;
-    private Box button_box;
+    private Gtk.Button add_remove_button;
+    private Gtk.Box button_box;
 
-    private Label title;
-    private Image tile_image;
+    private Gtk.Label title;
+    private Gtk.Image tile_image;
     private WrapLabel description;
-    private Label sub_description;
-    private Image add_image;
-    private Image remove_image;
+    private Gtk.Label sub_description;
+    private Gtk.Image add_image;
+    private Gtk.Image remove_image;
 
     private int icon_size;
 
@@ -47,9 +45,8 @@ namespace UI.Widgets
     {
       GLib.Object (n_rows: 3, n_columns: 3, homogeneous: false);
 
-      IconSize isz = IconSize.SMALL_TOOLBAR;
-      add_image = new Image.from_stock (obj.add_button_stock, isz);
-      remove_image = new Image.from_stock (obj.remove_button_stock, isz);
+      add_image = new Gtk.Image.from_stock (obj.add_button_stock, Gtk.IconSize.SMALL_TOOLBAR);
+      remove_image = new Gtk.Image.from_stock (obj.remove_button_stock, Gtk.IconSize.SMALL_TOOLBAR);
 
       owned_object = obj;
       owned_object.icon_updated.connect (this.set_image);
@@ -67,56 +64,56 @@ namespace UI.Widgets
       this.row_spacing = 1;
       this.column_spacing = 5;
 
-      tile_image = new Image ();
+      tile_image = new Gtk.Image ();
       tile_image.margin_left = 5;
       tile_image.margin_top = 5;
       tile_image.margin_bottom = 10;
 
       tile_image.yalign = 0.0f;
       this.attach (tile_image, 0, 1, 0, 3,
-                   AttachOptions.SHRINK,
-                   AttachOptions.FILL | AttachOptions.EXPAND,
+                   Gtk.AttachOptions.SHRINK,
+                   Gtk.AttachOptions.FILL | Gtk.AttachOptions.EXPAND,
                    0, 0);
 
-      title = new Label ("");
+      title = new Gtk.Label ("");
       ((Gtk.Misc) title).xalign = 0.0f;
       title.margin_top = 5;
       this.attach (title, 1, 3, 0, 1,
-                   AttachOptions.FILL | AttachOptions.EXPAND,
-                   AttachOptions.FILL | AttachOptions.EXPAND,
+                   Gtk.AttachOptions.FILL | Gtk.AttachOptions.EXPAND,
+                   Gtk.AttachOptions.FILL | Gtk.AttachOptions.EXPAND,
                    0, 0);
       title.show ();
 
       description = new WrapLabel ();
       this.attach (description, 1, 3, 1, 2,
-                   AttachOptions.FILL | AttachOptions.EXPAND,
-                   AttachOptions.FILL | AttachOptions.EXPAND,
+                   Gtk.AttachOptions.FILL | Gtk.AttachOptions.EXPAND,
+                   Gtk.AttachOptions.FILL | Gtk.AttachOptions.EXPAND,
                    0, 0);
       description.show ();
 
-      sub_description = new Label ("");
+      sub_description = new Gtk.Label ("");
       ((Gtk.Misc) sub_description).xalign = 0.0f;
       this.attach (sub_description, 1, 2, 2, 3,
-                   AttachOptions.FILL | AttachOptions.EXPAND,
-                   AttachOptions.FILL | AttachOptions.EXPAND,
+                   Gtk.AttachOptions.FILL | Gtk.AttachOptions.EXPAND,
+                   Gtk.AttachOptions.FILL | Gtk.AttachOptions.EXPAND,
                    0, 4);
       sub_description.show ();
 
       set_text ();
 
-      button_box = new Box (Gtk.Orientation.HORIZONTAL, 3);
+      button_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 3);
       button_box.homogeneous = false;
       button_box.margin_bottom = 5;
 
-      add_remove_button = new Button ();
+      add_remove_button = new Gtk.Button ();
       // FIXME: could cause leak!
       add_remove_button.clicked.connect (() => { this.active_changed (); });
 
       update_buttons ();
 
       this.attach (button_box, 2, 3, 2, 3,
-                   AttachOptions.SHRINK,
-                   AttachOptions.FILL | AttachOptions.EXPAND,
+                   Gtk.AttachOptions.SHRINK,
+                   Gtk.AttachOptions.FILL | Gtk.AttachOptions.EXPAND,
                    0, 0);
 
       this.show ();
@@ -137,7 +134,7 @@ namespace UI.Widgets
 
       unowned Gtk.StyleContext context = this.get_style_context ();
 
-      if ((this.get_state_flags () & StateFlags.SELECTED) != 0)
+      if ((this.get_state_flags () & Gtk.StateFlags.SELECTED) != 0)
       {
         context.render_background (cr, 0, 0, allocation.width, allocation.height);
       }
@@ -158,7 +155,7 @@ namespace UI.Widgets
     public void update_state ()
     {
       bool enabled = owned_object.enabled;
-      bool is_selected = (this.get_state_flags () & StateFlags.SELECTED) != 0;
+      bool is_selected = (this.get_state_flags () & Gtk.StateFlags.SELECTED) != 0;
       bool sensitive = enabled || (!enabled && is_selected);
 
       set_image ();
@@ -175,7 +172,7 @@ namespace UI.Widgets
 
     public void set_selected (bool selected)
     {
-      this.set_state_flags (selected ? StateFlags.SELECTED : StateFlags.NORMAL, true);
+      this.set_state_flags (selected ? Gtk.StateFlags.SELECTED : Gtk.StateFlags.NORMAL, true);
 
       if (selected)
       {
@@ -187,11 +184,11 @@ namespace UI.Widgets
       }
 
       // need to reset those to prevent multiple overlapping backgrounds
-      button_box.set_state_flags (StateFlags.NORMAL, true);
-      tile_image.set_state_flags (StateFlags.NORMAL, true);
-      description.set_state_flags (StateFlags.NORMAL, true);
-      sub_description.set_state_flags (StateFlags.NORMAL, true);
-      title.set_state_flags (StateFlags.NORMAL, true);
+      button_box.set_state_flags (Gtk.StateFlags.NORMAL, true);
+      tile_image.set_state_flags (Gtk.StateFlags.NORMAL, true);
+      description.set_state_flags (Gtk.StateFlags.NORMAL, true);
+      sub_description.set_state_flags (Gtk.StateFlags.NORMAL, true);
+      title.set_state_flags (Gtk.StateFlags.NORMAL, true);
 
       this.update_state ();
       this.queue_resize ();
@@ -215,18 +212,18 @@ namespace UI.Widgets
         try
         {
           Gdk.Pixbuf temp_pb;
-          unowned IconTheme it = IconTheme.get_default ();
+          unowned Gtk.IconTheme it = Gtk.IconTheme.get_default ();
           try
           {
             temp_pb = it.load_icon (owned_object.icon,
                                     icon_size,
-                                    IconLookupFlags.FORCE_SIZE);
+                                    Gtk.IconLookupFlags.FORCE_SIZE);
           }
           catch (GLib.Error err)
           {
             temp_pb = it.load_icon (Gtk.Stock.FILE,
                                     icon_size,
-                                    IconLookupFlags.FORCE_SIZE);
+                                    Gtk.IconLookupFlags.FORCE_SIZE);
           }
           pixbuf = temp_pb.copy ();
         }
@@ -261,13 +258,13 @@ namespace UI.Widgets
 
     private void update_buttons ()
     {
-      List<weak Widget> children = button_box.get_children ();
-      foreach (weak Widget w in children)
+      List<weak Gtk.Widget> children = button_box.get_children ();
+      foreach (weak Gtk.Widget w in children)
       {
         button_box.remove (w);
       }
 
-      foreach (weak Widget w in owned_object.get_extra_buttons ())
+      foreach (weak Gtk.Widget w in owned_object.get_extra_buttons ())
       {
         button_box.pack_start (w, false, false, 0);
         w.show ();

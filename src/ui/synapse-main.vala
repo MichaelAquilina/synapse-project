@@ -19,7 +19,6 @@
  *
  */
 
-using Gtk;
 using Synapse.Gui;
 using UI;
 
@@ -48,7 +47,7 @@ namespace Synapse
 #if HAVE_INDICATOR
     private AppIndicator.Indicator indicator;
 #else
-    private StatusIcon status_icon;
+    private Gtk.StatusIcon status_icon;
 #endif
     private Gui.IController controller;
 
@@ -103,19 +102,19 @@ namespace Synapse
     private void init_indicator ()
     {
       var indicator_menu = new Gtk.Menu ();
-      var activate_item = new ImageMenuItem.with_label (_("Activate"));
+      var activate_item = new Gtk.ImageMenuItem.with_label (_("Activate"));
       activate_item.set_image (new Gtk.Image.from_stock (Gtk.Stock.EXECUTE, Gtk.IconSize.MENU));
       activate_item.activate.connect (() => {
         show_ui ();
       });
       indicator_menu.append (activate_item);
-      var settings_item = new ImageMenuItem.from_stock (Gtk.Stock.PREFERENCES, null);
+      var settings_item = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.PREFERENCES, null);
       settings_item.activate.connect (() => {
         settings.show ();
       });
       indicator_menu.append (settings_item);
-      indicator_menu.append (new SeparatorMenuItem ());
-      var quit_item = new ImageMenuItem.from_stock (Gtk.Stock.QUIT, null);
+      indicator_menu.append (new Gtk.SeparatorMenuItem ());
+      var quit_item = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.QUIT, null);
       quit_item.activate.connect (Gtk.main_quit);
       indicator_menu.append (quit_item);
       indicator_menu.show_all ();
@@ -134,7 +133,7 @@ namespace Synapse
           AppIndicator.IndicatorStatus.ACTIVE : AppIndicator.IndicatorStatus.PASSIVE);
       });
 #else
-      status_icon = new StatusIcon.from_icon_name ("synapse");
+      status_icon = new Gtk.StatusIcon.from_icon_name ("synapse");
 
       status_icon.popup_menu.connect ((icon, button, event_time) => {
         indicator_menu.popup (null, null, status_icon.position_menu, button, event_time);

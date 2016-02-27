@@ -19,7 +19,6 @@
  *
  */
 
-using Gtk;
 using Cairo;
 
 namespace Synapse.Gui
@@ -69,9 +68,9 @@ namespace Synapse.Gui
       fix_listview_size (results_targets.get_match_renderer (), icon_size, tmax, dmax);
     }
 
-    private Box container;
-    private Box action_box;
-    private Box target_box;
+    private Gtk.Box container;
+    private Gtk.Box action_box;
+    private Gtk.Box target_box;
 
     private SmartLabel status;
     private SmartLabel logo;
@@ -85,7 +84,7 @@ namespace Synapse.Gui
 
     protected override void build_ui ()
     {
-      container = new Box (Gtk.Orientation.VERTICAL, 0);
+      container = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
       status = new SmartLabel ();
       logo = new SmartLabel ();
@@ -95,14 +94,14 @@ namespace Synapse.Gui
       logo.xalign = 1.0f;
       status.xalign = 0.0f;
       logo.set_markup (Markup.printf_escaped ("<i>%s</i>", Config.RELEASE_NAME));
-      var hb_status = new Box (Gtk.Orientation.HORIZONTAL, 0);
+      var hb_status = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
       hb_status.homogeneous = true;
       hb_status.pack_start (status);
       hb_status.pack_start (search);
       hb_status.pack_start (logo);
 
       /* Categories - Throbber and menu */
-      var categories_hbox = new Box (Gtk.Orientation.HORIZONTAL, 0);
+      var categories_hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 
       menuthrobber = new MenuThrobber ();
       menu = (MenuButton) menuthrobber;
@@ -132,12 +131,12 @@ namespace Synapse.Gui
       container.pack_start (results_sources);
       container.pack_start (create_separator (), false);
 
-      action_box = new Box (Gtk.Orientation.VERTICAL, 0);
+      action_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
       action_box.pack_start (results_actions, false);
       action_box.pack_start (create_separator (), false);
       container.pack_start (action_box, false);
 
-      target_box = new Box (Gtk.Orientation.VERTICAL, 0);
+      target_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
       target_box.pack_start (results_targets, false);
       target_box.pack_start (create_separator (), false);
       container.pack_start (target_box, false);
@@ -237,9 +236,9 @@ namespace Synapse.Gui
       ctx.save ();
       // pattern
       Pattern pat = new Pattern.linear(0, 0, 0, height);
-      ch.add_color_stop_rgba (pat, 0.0, 0.95, StyleType.BG, StateFlags.NORMAL, Mod.LIGHTER);
-      ch.add_color_stop_rgba (pat, 0.2, 1.0, StyleType.BG, StateFlags.NORMAL, Mod.NORMAL);
-      ch.add_color_stop_rgba (pat, 1.0, 1.0, StyleType.BG, StateFlags.NORMAL, Mod.DARKER);
+      ch.add_color_stop_rgba (pat, 0.0, 0.95, StyleType.BG, Gtk.StateFlags.NORMAL, Mod.LIGHTER);
+      ch.add_color_stop_rgba (pat, 0.2, 1.0, StyleType.BG, Gtk.StateFlags.NORMAL, Mod.NORMAL);
+      ch.add_color_stop_rgba (pat, 1.0, 1.0, StyleType.BG, Gtk.StateFlags.NORMAL, Mod.DARKER);
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
       ctx.set_source (pat);
       ctx.set_operator (Operator.SOURCE);
