@@ -19,9 +19,6 @@
  *
  */
 
-using Synapse.Gui;
-using UI;
-
 namespace Synapse
 {
   public class UILauncher : GLib.Object
@@ -38,7 +35,7 @@ namespace Synapse
       }
     };
 
-    private SettingsWindow settings;
+    private Gui.SettingsWindow settings;
     private DataSink data_sink;
     private Gui.KeyComboConfig key_combo_config;
     private Gui.CategoryConfig category_config;
@@ -59,7 +56,7 @@ namespace Synapse
       category_config = (Gui.CategoryConfig) config.get_config ("ui", "categories", typeof (Gui.CategoryConfig));
       key_combo_config.update_bindings ();
       register_plugins ();
-      settings = new SettingsWindow (data_sink, key_combo_config);
+      settings = new Gui.SettingsWindow (data_sink, key_combo_config);
       settings.keybinding_changed.connect (this.change_keyboard_shortcut);
 
       Keybinder.init ();
