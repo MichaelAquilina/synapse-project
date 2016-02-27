@@ -19,8 +19,6 @@
  *
  */
 
-using Cairo;
-
 namespace Synapse.Gui
 {
   public class ViewSideDoish : Synapse.Gui.View
@@ -290,7 +288,7 @@ namespace Synapse.Gui
           Gtk.Allocation results_container_allocation;
           results_container.get_allocation (out results_container_allocation);
           ctx.translate (0.5, 0.5);
-          ctx.set_operator (Operator.OVER);
+          ctx.set_operator (Cairo.Operator.OVER);
           Utils.cairo_make_shadow_for_rect (ctx, results_container_allocation.x,
                                                  results_container_allocation.y,
                                                  results_container_allocation.width - 1,
@@ -298,7 +296,7 @@ namespace Synapse.Gui
                                                  0, r, g, b, SHADOW_SIZE);
           ctx.translate (-0.5, -0.5);
         }
-        ctx.set_operator (Operator.SOURCE);
+        ctx.set_operator (Cairo.Operator.SOURCE);
         ch.set_source_rgba (ctx, 1.0, StyleType.BASE, Gtk.StateFlags.NORMAL);
         ctx.rectangle (spacer_allocation.x, spacer_allocation.y + BORDER_RADIUS, spacer_allocation.width, SHADOW_SIZE);
         ctx.fill ();
@@ -308,7 +306,7 @@ namespace Synapse.Gui
       int height = spacer_allocation.y + BORDER_RADIUS + SHADOW_SIZE;
 
       // pattern
-      Pattern pat = new Pattern.linear(0, 0, 0, height);
+      Cairo.Pattern pat = new Cairo.Pattern.linear(0, 0, 0, height);
       r = g = b = 0.12;
       ch.get_color_colorized (ref r, ref g, ref b, StyleType.BG, Gtk.StateFlags.SELECTED);
       pat.add_color_stop_rgba (0.0, r, g, b, 0.95);
@@ -324,7 +322,7 @@ namespace Synapse.Gui
         // draw background
         ctx.save ();
         ctx.translate (0.5, 0.5);
-        ctx.set_operator (Operator.OVER);
+        ctx.set_operator (Cairo.Operator.OVER);
         Utils.cairo_make_shadow_for_rect (ctx, target_container_allocation.x - BORDER_RADIUS,
                                                tpane_allocation.y,
                                                target_container_allocation.width - 1 + BORDER_RADIUS,
@@ -334,7 +332,7 @@ namespace Synapse.Gui
                                        tpane_allocation.y,
                                        target_container_allocation.width + BORDER_RADIUS,
                                        tpane_allocation.height, 15);
-        ctx.set_operator (Operator.SOURCE);
+        ctx.set_operator (Cairo.Operator.SOURCE);
         ctx.set_source (pat);
         ctx.clip ();
         ctx.paint ();
@@ -363,25 +361,25 @@ namespace Synapse.Gui
       height -= SHADOW_SIZE + delta;
       // shadow
       ctx.translate (0.5, 0.5);
-      ctx.set_operator (Operator.OVER);
+      ctx.set_operator (Cairo.Operator.OVER);
       Utils.cairo_make_shadow_for_rect (ctx, 0, 0, width - 1, height - 1, BORDER_RADIUS, r, g, b, SHADOW_SIZE);
       ctx.translate (-0.5, -0.5);
 
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
       ctx.set_source (pat);
-      ctx.set_operator (Operator.SOURCE);
+      ctx.set_operator (Cairo.Operator.SOURCE);
       ctx.clip ();
       ctx.paint ();
 
       // reflection
-      ctx.set_operator (Operator.OVER);
+      ctx.set_operator (Cairo.Operator.OVER);
       ctx.new_path ();
       ctx.move_to (0, 0);
       ctx.rel_line_to (0.0, height / 2.0);
       ctx.rel_curve_to (width / 4.0, -height / 10.0, width / 4.0 * 3.0, -height / 10.0, width, 0.0);
       ctx.rel_line_to (0.0, -height / 2.0);
       ctx.close_path ();
-      pat = new Pattern.linear (0, height / 10.0, 0, height / 2.0);
+      pat = new Cairo.Pattern.linear (0, height / 10.0, 0, height / 2.0);
       pat.add_color_stop_rgba (0.0, 1.0, 1.0, 1.0, 0.0);
       pat.add_color_stop_rgba (0.7, 1.0, 1.0, 1.0, 0.1);
       pat.add_color_stop_rgba (1.0, 1.0, 1.0, 1.0, 0.3);
@@ -392,7 +390,7 @@ namespace Synapse.Gui
       ctx.restore ();
 
       // icon bgs
-      ctx.set_operator (Operator.OVER);
+      ctx.set_operator (Cairo.Operator.OVER);
       ctx.save ();
       Utils.cairo_rounded_rect (ctx, spane_allocation.x - spane.border_width,
                                      spane_allocation.y - spane.border_width,

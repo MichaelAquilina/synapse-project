@@ -19,8 +19,6 @@
  *
  */
 
-using Cairo;
-
 namespace Synapse.Gui
 {
   public errordomain WidgetError
@@ -1087,8 +1085,7 @@ namespace Synapse.Gui
       double r = 0.0, g = 0.0, b = 0.0;
       double size = button_scale * int.min (allocation.width, allocation.height) - SIZE * 2;
 
-      Pattern pat;
-      pat = new Pattern.linear (0, 0, 0, allocation.height);
+      Cairo.Pattern pat = new Cairo.Pattern.linear (0, 0, 0, allocation.height);
       if (entered || (this.get_state_flags () & Gtk.StateFlags.SELECTED) != 0)
       {
         ch.get_rgb (out r, out g, out b, StyleType.BG, Gtk.StateFlags.SELECTED);
@@ -1342,7 +1339,7 @@ namespace Synapse.Gui
       w = txt.offset + txt.width;
       h = hmax * 3; //triple h for nice vertical placement
       var window_context = Gdk.cairo_create (this.get_window ());
-      this.cached_surface = new Surface.similar (window_context.get_target (), Cairo.Content.COLOR_ALPHA, w, h);
+      this.cached_surface = new Cairo.Surface.similar (window_context.get_target (), Cairo.Content.COLOR_ALPHA, w, h);
       var ctx = new Cairo.Context (this.cached_surface);
 
       unowned Pango.Layout layout = this.label.get_layout ();
@@ -1434,7 +1431,7 @@ namespace Synapse.Gui
       ctx.set_source_surface (this.cached_surface, x, y);
       ctx.rectangle (0, 0, w, h);
       ctx.clip ();
-      var pat = new Pattern.linear (0, 0, w, h);
+      var pat = new Cairo.Pattern.linear (0, 0, w, h);
       double fadepct = wmax / (double)w;
       if (w / 3 < wmax)
         fadepct = (w - wmax) / 2 / (double)w;

@@ -19,8 +19,6 @@
  *
  */
 
-using Cairo;
-
 namespace Synapse.Gui
 {
   public class MatchViewRenderer : MatchListView.MatchViewRendererBase
@@ -870,7 +868,7 @@ namespace Synapse.Gui
 
         ctx.set_operator (Cairo.Operator.OVER);
         /* Prepare bg's colors using GtkStyleContext */
-        Pattern pat = new Pattern.linear(0, 0, 0, status.get_allocated_height ());
+        Cairo.Pattern pat = new Cairo.Pattern.linear(0, 0, 0, status.get_allocated_height ());
 
         Gtk.StateFlags t = this.get_state_flags ();
         ch.add_color_stop_rgba (pat, 0.0, 0.95, StyleType.BG, t);

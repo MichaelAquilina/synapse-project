@@ -19,8 +19,6 @@
  *
  */
 
-using Cairo;
-
 namespace Synapse.Gui
 {
   public class ViewVirgilio : Synapse.Gui.View
@@ -228,20 +226,20 @@ namespace Synapse.Gui
       if (this.is_composited ())
       {
         ctx.translate (0.5, 0.5);
-        ctx.set_operator (Operator.OVER);
+        ctx.set_operator (Cairo.Operator.OVER);
         Utils.cairo_make_shadow_for_rect (ctx, 0, 0, width - 1, height - 1,
                                                BORDER_RADIUS, 0, 0, 0, SHADOW_SIZE);
         ctx.translate (-0.5, -0.5);
       }
       ctx.save ();
       // pattern
-      Pattern pat = new Pattern.linear(0, 0, 0, height);
+      Cairo.Pattern pat = new Cairo.Pattern.linear(0, 0, 0, height);
       ch.add_color_stop_rgba (pat, 0.0, 0.95, StyleType.BG, Gtk.StateFlags.NORMAL, Mod.LIGHTER);
       ch.add_color_stop_rgba (pat, 0.2, 1.0, StyleType.BG, Gtk.StateFlags.NORMAL, Mod.NORMAL);
       ch.add_color_stop_rgba (pat, 1.0, 1.0, StyleType.BG, Gtk.StateFlags.NORMAL, Mod.DARKER);
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
       ctx.set_source (pat);
-      ctx.set_operator (Operator.SOURCE);
+      ctx.set_operator (Cairo.Operator.SOURCE);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();

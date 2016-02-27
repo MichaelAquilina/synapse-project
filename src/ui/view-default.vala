@@ -19,8 +19,6 @@
  *
  */
 
-using Cairo;
-
 namespace Synapse.Gui
 {
   public class ViewDefault : Synapse.Gui.View
@@ -239,7 +237,7 @@ namespace Synapse.Gui
           Gtk.Allocation results_container_allocation;
           results_container.get_allocation (out results_container_allocation);
           ctx.translate (0.5, 0.5);
-          ctx.set_operator (Operator.OVER);
+          ctx.set_operator (Cairo.Operator.OVER);
           Utils.cairo_make_shadow_for_rect (ctx, results_container_allocation.x,
                                                  results_container_allocation.y,
                                                  results_container_allocation.width - 1,
@@ -247,7 +245,7 @@ namespace Synapse.Gui
                                                  0, r, g, b, SHADOW_SIZE);
           ctx.translate (-0.5, -0.5);
         }
-        ctx.set_operator (Operator.SOURCE);
+        ctx.set_operator (Cairo.Operator.SOURCE);
         ch.set_source_rgba (ctx, 1.0, StyleType.BASE, Gtk.StateFlags.NORMAL);
         ctx.rectangle (spacer_allocation.x, spacer_allocation.y + BORDER_RADIUS, spacer_allocation.width, SHADOW_SIZE);
         ctx.fill ();
@@ -265,13 +263,13 @@ namespace Synapse.Gui
       height -= SHADOW_SIZE + delta;
       // shadow
       ctx.translate (0.5, 0.5);
-      ctx.set_operator (Operator.OVER);
+      ctx.set_operator (Cairo.Operator.OVER);
       Utils.cairo_make_shadow_for_rect (ctx, 0, 0, width - 1, height - 1, BORDER_RADIUS, r, g, b, SHADOW_SIZE);
       ctx.translate (-0.5, -0.5);
 
       ctx.save ();
       // pattern
-      Pattern pat = new Pattern.linear(0, 0, 0, height);
+      Cairo.Pattern pat = new Cairo.Pattern.linear(0, 0, 0, height);
       if (this.bg_state == Gtk.StateFlags.SELECTED)
       {
         r = g = b = 0.5;
@@ -289,7 +287,7 @@ namespace Synapse.Gui
       }
       Utils.cairo_rounded_rect (ctx, 0, 0, width, height, BORDER_RADIUS);
       ctx.set_source (pat);
-      ctx.set_operator (Operator.SOURCE);
+      ctx.set_operator (Cairo.Operator.SOURCE);
       ctx.clip ();
       ctx.paint ();
       ctx.restore ();
