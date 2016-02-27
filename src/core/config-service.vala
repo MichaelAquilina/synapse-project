@@ -18,8 +18,6 @@
  *
  */
 
-using Json;
-
 namespace Synapse
 {
   public abstract class ConfigObject : GLib.Object
@@ -54,7 +52,7 @@ namespace Synapse
     {
       instance = this;
 
-      var parser = new Parser ();
+      var parser = new Json.Parser ();
       config_file_name =
         GLib.Path.build_filename (Environment.get_user_config_dir (), "synapse",
                              "config.json");
@@ -62,15 +60,15 @@ namespace Synapse
       {
         parser.load_from_file (config_file_name);
         root_node = parser.get_root ().copy ();
-        if (root_node.get_node_type () != NodeType.OBJECT)
+        if (root_node.get_node_type () != Json.NodeType.OBJECT)
         {
-          root_node = new Json.Node (NodeType.OBJECT);
+          root_node = new Json.Node (Json.NodeType.OBJECT);
           root_node.take_object (new Json.Object ());
         }
       }
       catch (Error err)
       {
-        root_node = new Json.Node (NodeType.OBJECT);
+        root_node = new Json.Node (Json.NodeType.OBJECT);
         root_node.take_object (new Json.Object ());
       }
     }
@@ -91,11 +89,11 @@ namespace Synapse
       unowned Json.Node group_node = obj.get_member (group);
       if (group_node != null)
       {
-        if (group_node.get_node_type () == NodeType.OBJECT)
+        if (group_node.get_node_type () == Json.NodeType.OBJECT)
         {
           unowned Json.Object group_obj = group_node.get_object ();
           unowned Json.Node key_node = group_obj.get_member (key);
-          if (key_node != null && key_node.get_node_type () == NodeType.OBJECT)
+          if (key_node != null && key_node.get_node_type () == Json.NodeType.OBJECT)
           {
             var result = Json.gobject_deserialize (config_type, key_node);
             return result as ConfigObject;
@@ -138,7 +136,7 @@ namespace Synapse
     {
       unowned Json.Object obj = root_node.get_object ();
       if (!obj.has_member (group) ||
-          obj.get_member (group).get_node_type () != NodeType.OBJECT)
+          obj.get_member (group).get_node_type () != Json.NodeType.OBJECT)
       {
         // why set_object_member works, but set_member doesn't ?!
         obj.set_object_member (group, new Json.Object ());
@@ -175,7 +173,7 @@ namespace Synapse
         save_timer_id = 0;
       }
 
-      var generator = new Generator ();
+      var generator = new Json.Generator ();
       generator.pretty = true;
       generator.set_root (root_node);
 
