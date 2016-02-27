@@ -19,8 +19,6 @@
  *
  */
 
-using Zeitgeist;
-
 namespace Synapse
 {
   public class ZeitgeistRelated : Object, Activatable, ActionProvider
@@ -96,22 +94,22 @@ namespace Synapse
 
     public async ResultSet? find_related (Query q, Match m) throws SearchError
     {
-      Event e;
-      Subject s;
+      Zeitgeist.Event e;
+      Zeitgeist.Subject s;
       if (!(m is UriMatch) && !(m is ApplicationMatch)) return null;
 
-      GenericArray<Event> templates = new GenericArray<Event> ();
-      GenericArray<Event> event_templates = new GenericArray<Event> ();
-      GenericArray<Event> result_templates = new GenericArray<Event> ();
+      GenericArray<Zeitgeist.Event> templates = new GenericArray<Zeitgeist.Event> ();
+      GenericArray<Zeitgeist.Event> event_templates = new GenericArray<Zeitgeist.Event> ();
+      GenericArray<Zeitgeist.Event> result_templates = new GenericArray<Zeitgeist.Event> ();
 
       if (m is UriMatch)
       {
         unowned UriMatch um = (UriMatch) m;
         debug ("searching for items related to %s", um.uri);
 
-        s = new Subject ();
+        s = new Zeitgeist.Subject ();
         s.uri = um.uri;
-        e = new Event ();
+        e = new Zeitgeist.Event ();
         e.add_subject (s);
       }
       else if (m is ApplicationMatch)
@@ -142,7 +140,7 @@ namespace Synapse
         app_id = "application://" + app_id;
         debug ("searching for items related to %s", app_id);
 
-        e = new Event ();
+        e = new Zeitgeist.Event ();
         e.actor = app_id;
       }
       else return null;
@@ -155,9 +153,9 @@ namespace Synapse
         string[] uris;
         int64 end = new DateTime.now_local ().to_unix () * 1000;
         int64 start = end - Zeitgeist.Timestamp.WEEK * 8;
-        uris = yield zg_log.find_related_uris (new TimeRange (start, end),
+        uris = yield zg_log.find_related_uris (new Zeitgeist.TimeRange (start, end),
             event_templates, result_templates,
-            StorageState.ANY, q.max_results, RelevantResultType.RECENT,
+            Zeitgeist.StorageState.ANY, q.max_results, Zeitgeist.RelevantResultType.RECENT,
             q.cancellable);
 
         if (uris == null || uris.length == 0)
@@ -166,25 +164,25 @@ namespace Synapse
           return null;
         }
 
-        templates = new GenericArray<Event> ();
-        event_templates = new GLib.GenericArray<Event> ();
+        templates = new GenericArray<Zeitgeist.Event> ();
+        event_templates = new GLib.GenericArray<Zeitgeist.Event> ();
 
         foreach (unowned string uri in uris)
         {
-          s = new Subject ();
+          s = new Zeitgeist.Subject ();
           s.uri = uri;
-          e = new Event ();
+          e = new Zeitgeist.Event ();
           e.add_subject (s);
 
           event_templates.add (e);
           templates.add (e);
         }
 
-        var rs = yield zg_log.find_events (new TimeRange.anytime (),
+        var rs = yield zg_log.find_events (new Zeitgeist.TimeRange.anytime (),
                                            event_templates,
-                                           StorageState.ANY,
+                                           Zeitgeist.StorageState.ANY,
                                            q.max_results,
-                                           ResultType.MOST_RECENT_SUBJECTS,
+                                           Zeitgeist.ResultType.MOST_RECENT_SUBJECTS,
                                            q.cancellable);
 
         ResultSet results = new ResultSet ();
