@@ -20,7 +20,6 @@
  */
 
 using Gtk;
-using Gee;
 
 namespace Synapse.Gui
 {

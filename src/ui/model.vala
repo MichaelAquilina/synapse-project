@@ -19,8 +19,6 @@
  *
  */
 
-using Gee;
-
 namespace Synapse.Gui
 {
   public class Model : Object

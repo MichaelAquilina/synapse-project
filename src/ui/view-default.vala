@@ -19,7 +19,6 @@
  *
  */
 
-using Gee;
 using Gtk;
 using Cairo;
 

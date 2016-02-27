@@ -21,7 +21,6 @@
 
 using Gtk;
 using Cairo;
-using Gee;
 
 namespace Synapse.Gui
 {

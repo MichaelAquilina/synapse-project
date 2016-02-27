@@ -20,7 +20,6 @@
  *
  */
 
-using Gee;
 namespace Synapse.Gui
 {
   public class IconCacheService : GLib.Object

@@ -19,14 +19,12 @@
  *
  */
 
-using Gee;
-
 namespace Synapse
 {
   public class SshPlugin : Object, Activatable, ItemProvider
   {
     public  bool      enabled { get; set; default = true; }
-    private HashMap<string, SshHost> hosts;
+    private Gee.HashMap<string, SshHost> hosts;
 
     protected File config_file;
     protected FileMonitor monitor;
@@ -38,7 +36,7 @@ namespace Synapse
 
     construct
     {
-      hosts = new HashMap<string, SshHost> ();
+      hosts = new Gee.HashMap<string, SshHost> ();
     }
 
     public void activate ()
