@@ -288,7 +288,7 @@ namespace Synapse
 
       public override bool valid_for_match (Match match)
       {
-        return (match is ApplicationMatch);
+        return (match is DesktopFileMatch);
       }
     }
 
@@ -298,7 +298,7 @@ namespace Synapse
     public ResultSet? find_for_match (ref Query query, Match match)
     {
       unowned UriMatch? uri_match = null;
-      unowned ApplicationMatch? app_match = null;
+      unowned DesktopFileMatch? app_match = null;
       Gee.List<Action>? any_list = null;
 
       if ((uri_match = match as UriMatch) != null)
@@ -324,7 +324,7 @@ namespace Synapse
           any_list = ow_list;
         }
       }
-      else if ((app_match = match as ApplicationMatch) != null)
+      else if ((app_match = match as DesktopFileMatch) != null)
       {
         Gee.List<OpenAppAction>? oa_list = actions_map[app_match.filename];
         if (oa_list == null)
