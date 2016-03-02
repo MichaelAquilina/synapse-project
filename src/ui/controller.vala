@@ -45,15 +45,14 @@ namespace Synapse.Gui
       if (!view_type.is_a (typeof (IView))) return;
       if (this.view != null) this.view.vanish ();
       IconCacheService.get_default ().clear_cache ();
-      this.view = GLib.Object.new (view_type, "controller-model", this.model,
-                                              "controller", this) as IView;
+      this.view = (IView) GLib.Object.new (view_type, "controller-model", this.model,
+                                           "controller", this);
       reset_search (true, true);
 
       // Input Method Fix
-      if (this.view is Gtk.Window) //this has to be true, otherwise im_context will not work well
+      unowned Gtk.Window? v = (this.view as Gtk.Window);
+      if (v != null) //this has to be true, otherwise im_context will not work well
       {
-        Gtk.Window v = this.view as Gtk.Window;
-
         message ("Using %s input method.", im_context.get_context_id ());
 
         v.focus_in_event.connect (() => {
@@ -67,7 +66,16 @@ namespace Synapse.Gui
           return false;
         });
       }
+
+      this.view.summoned.connect ((view) => {
+        unowned Gtk.Window? window = (view as Gtk.Window);
+        warn_if_fail (window != null);
+        im_context.set_client_window (window.get_window ());
+        reset_search (true, true);
+      });
+
       this.view.vanished.connect (() => {
+        im_context.set_client_window (null);
         reset_search (true, true);
       });
     }
