@@ -28,7 +28,7 @@ namespace Synapse
     {
       {
         "startup", 's', 0, OptionArg.NONE,
-        out is_startup, "Startup mode (hide the UI until activated).", ""
+        out is_startup, "Startup mode (hide the UI until activated).", null
       },
       {
         null
