@@ -34,6 +34,7 @@ src/plugins/imgur-plugin.c
 src/plugins/launchpad-plugin.c
 src/plugins/locate-plugin.c
 src/plugins/opensearch.c
+src/plugins/pass-plugin.c
 src/plugins/pastebin-plugin.c
 src/plugins/pidgin-plugin.c
 src/plugins/rhythmbox-plugin.c

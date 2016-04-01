@@ -33,6 +33,7 @@ src/plugins/imgur-plugin.vala
 src/plugins/launchpad-plugin.vala
 src/plugins/locate-plugin.vala
 src/plugins/opensearch.vala
+src/plugins/pass-plugin.vala
 src/plugins/pastebin-plugin.vala
 src/plugins/pidgin-plugin.vala
 src/plugins/rhythmbox-plugin.vala

@@ -45,6 +45,7 @@ libplugins_la_VALASOURCES = \
 	launchpad-plugin.vala \
 	locate-plugin.vala \
 	opensearch.vala \
+	pass-plugin.vala \
 	pastebin-plugin.vala \
 	pidgin-plugin.vala \
 	rhythmbox-plugin.vala \
