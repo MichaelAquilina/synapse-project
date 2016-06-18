@@ -47,12 +47,64 @@ namespace Synapse
     public bool enabled { get; set; default = true; }
 
     Gee.List<ZealDoc> doclist;
+    string docsets_path;
+    FileMonitor docsets_monitor;
+    List<FileMonitor> meta_monitors;
 
     public void activate ()
     {
-      string docsets_path = "%s/Zeal/Zeal/docsets/".printf (Environment.get_user_data_dir ());
-      doclist = new Gee.ArrayList<ZealDoc>();
+      docsets_path = "%s/Zeal/Zeal/docsets/".printf (Environment.get_user_data_dir ());
+      File docsets_folder = File.new_for_path(docsets_path);
 
+      meta_monitors = new List<FileMonitor>();
+
+      docsets_monitor = docsets_folder.monitor (FileMonitorFlags.NONE, null);
+      docsets_monitor.changed.connect( (src, dest, event) => {
+        var meta_monitor = src.monitor (FileMonitorFlags.NONE, null);
+        meta_monitor.changed.connect ( (src, dest, event) => {
+          if (event == FileMonitorEvent.CREATED || event == FileMonitorEvent.DELETED) {
+            if (src.get_path ().has_suffix ("meta.json")) {
+              message ("Meta monitor found %s - %s", src.get_path(), event.to_string());
+              update_doclist ();
+            }
+          }
+        });
+        meta_monitors.append (meta_monitor);
+      });
+
+      update_doclist ();
+    }
+
+    public void deactivate ()
+    {
+      doclist = null;
+    }
+
+    static construct
+    {
+      register_plugin ();
+    }
+
+    static void register_plugin ()
+    {
+      PluginRegistry.get_default ().register_plugin (
+        typeof (ZealPlugin),
+        _("Zeal"),
+        _("Zeal offline documentation (zealdocs.org)"),
+        "zeal",
+        register_plugin,
+        Environment.find_program_in_path ("zeal") != null,
+        _("zeal is not installed, please see zealdocs.org")
+      );
+    }
+
+    public bool handles_query (Query query)
+    {
+      return (QueryFlags.ACTIONS in query.query_type && doclist.size > 0);
+    }
+
+    public void update_doclist() {
+      doclist = new Gee.ArrayList<ZealDoc>();
       try
       {
         Dir dir = Dir.open (docsets_path, 0);
@@ -83,34 +135,6 @@ namespace Synapse
       {
         warning ("%s", e.message);
       }
-    }
-
-    public void deactivate ()
-    {
-      doclist = null;
-    }
-
-    static construct
-    {
-      register_plugin ();
-    }
-
-    static void register_plugin ()
-    {
-      PluginRegistry.get_default ().register_plugin (
-        typeof (ZealPlugin),
-        _("Zeal"),
-        _("Zeal offline documentation (zealdocs.org)"),
-        "zeal",
-        register_plugin,
-        Environment.find_program_in_path ("zeal") != null,
-        _("zeal is not installed, please see zealdocs.org")
-      );
-    }
-
-    public bool handles_query (Query query)
-    {
-      return (QueryFlags.ACTIONS in query.query_type && doclist.size > 0);
     }
 
     public async ResultSet? search (Query q) throws SearchError
