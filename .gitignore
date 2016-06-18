@@ -30,6 +30,7 @@ Makefile.in
 *.lo
 *.la
 *.gmo
+*~
 .deps
 .dirstamp
 .libs
