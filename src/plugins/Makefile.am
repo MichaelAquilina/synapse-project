@@ -46,6 +46,7 @@ libplugins_la_VALASOURCES = \
 	locate-plugin.vala \
 	opensearch.vala \
 	pass-plugin.vala \
+  tomboy-notes-plugin.vala \
 	pastebin-plugin.vala \
 	pidgin-plugin.vala \
 	rhythmbox-plugin.vala \
@@ -95,4 +96,3 @@ CLEANFILES = \
 	plugins.vapi \
 	plugins.h \
 	$(NULL)
-

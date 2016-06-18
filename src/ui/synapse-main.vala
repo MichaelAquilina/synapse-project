@@ -175,6 +175,7 @@ namespace Synapse
         typeof (FileOpPlugin),
         typeof (PidginPlugin),
         typeof (PassPlugin),
+        typeof (TomboyNotesPlugin),
         typeof (ChatActions),
         typeof (ZealPlugin),
 #if HAVE_ZEITGEIST
