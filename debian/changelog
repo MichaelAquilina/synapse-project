@@ -1,3 +1,11 @@
+synapse (0.2.100-1) wily; urgency=low
+
+  * Add pass plugin
+  * Add tomboy plugin
+  * Add FileMonitor to current zeal plugin
+
+ -- Michael Aquilina <michaelaquilina@gmail.com>  Sun, 19 Jun 2016 18:02:00 +0100
+
 synapse (0.2.99-1) UNRELEASED; urgency=medium
 
   [ Julien Lavergne ]
