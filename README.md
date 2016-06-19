@@ -1,4 +1,4 @@
-This version of Synapse officially supports only Vala 0.16 and later.
+This version of Synapse officially supports only Vala 0.24 and later.
 
 Building
 --------
