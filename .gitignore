@@ -49,3 +49,12 @@ data/synapse.desktop
 build-aux
 m4
 src/core/SynapseCore-1.0.gir
+debian/autoreconf.*
+debian/files
+debian/synapse-dbg*
+debian/synapse.debhelper.log
+debian/*.debhelper
+debian/tmp
+debian/synapse.substvars
+debian/synapse
+*.swp
