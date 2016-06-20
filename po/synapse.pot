@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-21 14:51+0200\n"
+"POT-Creation-Date: 2016-06-20 22:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,256 +27,256 @@ msgid "Search everything you do."
 msgstr ""
 
 #. activate has to stay in first position!
-#: ../src/ui/synapse-main.vala:106 ../src/ui/settings.vala:240
+#: ../src/ui/synapse-main.vala:102 ../src/ui/settings.vala:237
 msgid "Activate"
 msgstr ""
 
 #. Whooot?! This cannot be true!
-#: ../src/ui/category.vala:31 ../src/ui/category.vala:71
-#: ../src/ui/category.vala:135
+#: ../src/ui/category.vala:29 ../src/ui/category.vala:69
+#: ../src/ui/category.vala:133
 msgid "All"
 msgstr ""
 
-#: ../src/ui/category.vala:68 ../src/ui/category.vala:112
+#: ../src/ui/category.vala:66 ../src/ui/category.vala:110
 msgid "Actions"
 msgstr ""
 
-#: ../src/ui/category.vala:69 ../src/ui/category.vala:114
+#: ../src/ui/category.vala:67 ../src/ui/category.vala:112
 msgid "Audio"
 msgstr ""
 
-#: ../src/ui/category.vala:70 ../src/ui/category.vala:115
+#: ../src/ui/category.vala:68 ../src/ui/category.vala:113
 msgid "Applications"
 msgstr ""
 
-#: ../src/ui/category.vala:72 ../src/ui/category.vala:113
+#: ../src/ui/category.vala:70 ../src/ui/category.vala:111
 msgid "Places"
 msgstr ""
 
-#: ../src/ui/category.vala:73 ../src/ui/category.vala:116
+#: ../src/ui/category.vala:71 ../src/ui/category.vala:114
 msgid "Documents"
 msgstr ""
 
-#: ../src/ui/category.vala:74 ../src/ui/category.vala:117
+#: ../src/ui/category.vala:72 ../src/ui/category.vala:115
 msgid "Images"
 msgstr ""
 
-#: ../src/ui/category.vala:75 ../src/ui/category.vala:118
+#: ../src/ui/category.vala:73 ../src/ui/category.vala:116
 msgid "Video"
 msgstr ""
 
-#: ../src/ui/category.vala:76
+#: ../src/ui/category.vala:74
 msgid "Contacts"
 msgstr ""
 
-#: ../src/ui/category.vala:77 ../src/ui/category.vala:119
+#: ../src/ui/category.vala:75 ../src/ui/category.vala:117
 msgid "Internet"
 msgstr ""
 
 #. _labels.set (QueryFlags.ALL, _("All")); // Do not remove!
-#: ../src/ui/category.vala:111
+#: ../src/ui/category.vala:109
 msgid "Include remote content"
 msgstr ""
 
 #. _labels.set (QueryFlags.FILES, _("Files"));
-#: ../src/ui/category.vala:121
+#: ../src/ui/category.vala:119
 msgid "Uncategorized"
 msgstr ""
 
-#: ../src/ui/controller.vala:30
+#: ../src/ui/controller.vala:28
 msgid "Searching..."
 msgstr ""
 
-#: ../src/ui/controller.vala:31
+#: ../src/ui/controller.vala:29
 msgid "No results found."
 msgstr ""
 
-#: ../src/ui/controller.vala:32
+#: ../src/ui/controller.vala:30
 msgid "No recent activities found."
 msgstr ""
 
-#: ../src/ui/controller.vala:33
+#: ../src/ui/controller.vala:31
 msgid "Type to search..."
 msgstr ""
 
-#: ../src/ui/controller.vala:517
+#: ../src/ui/controller.vala:548
 msgid "...or press down key to browse recent activities"
 msgstr ""
 
-#: ../src/ui/view-virgilio.vala:204 ../src/ui/widgets-matchlistview.vala:936
+#: ../src/ui/view-virgilio.vala:199 ../src/ui/widgets-matchlistview.vala:938
 #, c-format
 msgid "<b>%d of %d</b>"
 msgstr ""
 
-#: ../src/ui/settings.vala:48
+#: ../src/ui/settings.vala:45
 msgid "Status"
 msgstr ""
 
-#: ../src/ui/settings.vala:50
+#: ../src/ui/settings.vala:47
 msgid "Enable this plugin"
 msgstr ""
 
-#: ../src/ui/settings.vala:51
+#: ../src/ui/settings.vala:48
 msgid "Disable this plugin"
 msgstr ""
 
-#: ../src/ui/settings.vala:57
+#: ../src/ui/settings.vala:54
 msgid "About this plugin"
 msgstr ""
 
-#: ../src/ui/settings.vala:71 ../src/ui/settings.vala:207
+#: ../src/ui/settings.vala:68 ../src/ui/settings.vala:204
 msgid "Configure plugin"
 msgstr ""
 
-#: ../src/ui/settings.vala:86 ../src/ui/settings.vala:455
+#: ../src/ui/settings.vala:83 ../src/ui/settings.vala:452
 msgid "Disabled"
 msgstr ""
 
-#: ../src/ui/settings.vala:90
+#: ../src/ui/settings.vala:87
 msgid "Enabled"
 msgstr ""
 
-#: ../src/ui/settings.vala:144
+#: ../src/ui/settings.vala:141
 msgid "Synapse - Settings"
 msgstr ""
 
-#: ../src/ui/settings.vala:169
+#: ../src/ui/settings.vala:166
 msgid "Default"
 msgstr ""
 
-#: ../src/ui/settings.vala:170
+#: ../src/ui/settings.vala:167
 msgid "Essential"
 msgstr ""
 
-#: ../src/ui/settings.vala:171
+#: ../src/ui/settings.vala:168
 msgid "Doish"
 msgstr ""
 
-#: ../src/ui/settings.vala:172
+#: ../src/ui/settings.vala:169
 msgid "Side Doish"
 msgstr ""
 
-#: ../src/ui/settings.vala:173
+#: ../src/ui/settings.vala:170
 msgid "Virgilio"
 msgstr ""
 
-#: ../src/ui/settings.vala:241
+#: ../src/ui/settings.vala:238
 msgid "Execute"
 msgstr ""
 
-#: ../src/ui/settings.vala:242
+#: ../src/ui/settings.vala:239
 msgid "Execute without hiding"
 msgstr ""
 
-#: ../src/ui/settings.vala:243
+#: ../src/ui/settings.vala:240
 msgid "Alternative Delete"
 msgstr ""
 
-#: ../src/ui/settings.vala:244
+#: ../src/ui/settings.vala:241
 msgid "Next Result"
 msgstr ""
 
-#: ../src/ui/settings.vala:245
+#: ../src/ui/settings.vala:242
 msgid "Previous Result"
 msgstr ""
 
-#: ../src/ui/settings.vala:246
+#: ../src/ui/settings.vala:243
 msgid "First Result"
 msgstr ""
 
-#: ../src/ui/settings.vala:247
+#: ../src/ui/settings.vala:244
 msgid "Last Result"
 msgstr ""
 
-#: ../src/ui/settings.vala:248
+#: ../src/ui/settings.vala:245
 msgid "Next 5 Results"
 msgstr ""
 
-#: ../src/ui/settings.vala:249
+#: ../src/ui/settings.vala:246
 msgid "Previous 5 Results"
 msgstr ""
 
-#: ../src/ui/settings.vala:250
+#: ../src/ui/settings.vala:247
 msgid "Next Category"
 msgstr ""
 
-#: ../src/ui/settings.vala:251
+#: ../src/ui/settings.vala:248
 msgid "Previous Category"
 msgstr ""
 
-#: ../src/ui/settings.vala:252
+#: ../src/ui/settings.vala:249
 msgid "Next Pane"
 msgstr ""
 
-#: ../src/ui/settings.vala:253
+#: ../src/ui/settings.vala:250
 msgid "Previous Pane"
 msgstr ""
 
-#: ../src/ui/settings.vala:254
+#: ../src/ui/settings.vala:251
 msgid "Paste"
 msgstr ""
 
-#: ../src/ui/settings.vala:255
+#: ../src/ui/settings.vala:252
 msgid "Paste current selection"
 msgstr ""
 
-#: ../src/ui/settings.vala:256
+#: ../src/ui/settings.vala:253
 #: ../src/plugins/xnoise-media-player-plugin.vala:94
 msgid "Quit"
 msgstr ""
 
-#: ../src/ui/settings.vala:270
+#: ../src/ui/settings.vala:267
 msgid "Shortcut already in use"
 msgstr ""
 
-#: ../src/ui/settings.vala:296
+#: ../src/ui/settings.vala:293
 msgid "General"
 msgstr ""
 
-#: ../src/ui/settings.vala:297
+#: ../src/ui/settings.vala:294
 msgid "Plugins"
 msgstr ""
 
-#: ../src/ui/settings.vala:303
+#: ../src/ui/settings.vala:300
 msgid "Behavior & Look"
 msgstr ""
 
-#: ../src/ui/settings.vala:315
+#: ../src/ui/settings.vala:312
 msgid "Theme:"
 msgstr ""
 
 #. Autostart checkbox
-#: ../src/ui/settings.vala:320
+#: ../src/ui/settings.vala:317
 msgid "Startup on login"
 msgstr ""
 
 #. Notification icon
-#: ../src/ui/settings.vala:326
+#: ../src/ui/settings.vala:323
 msgid "Show notification icon"
 msgstr ""
 
-#: ../src/ui/settings.vala:340
+#: ../src/ui/settings.vala:337
 msgid "Shortcuts"
 msgstr ""
 
-#: ../src/ui/settings.vala:359
+#: ../src/ui/settings.vala:356
 msgid "Action"
 msgstr ""
 
-#: ../src/ui/settings.vala:392
+#: ../src/ui/settings.vala:389
 msgid "Shortcut"
 msgstr ""
 
-#: ../src/ui/settings.vala:411
+#: ../src/ui/settings.vala:408
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr ""
 
-#: ../src/ui/widgets-matchlistview.vala:909
-#: ../src/ui/widgets-matchlistview.vala:923
+#: ../src/ui/widgets-matchlistview.vala:915
+#: ../src/ui/widgets-matchlistview.vala:925
 msgid "No results."
 msgstr ""
 
-#: ../src/ui/widgets-matchlistview.vala:928
+#: ../src/ui/widgets-matchlistview.vala:930
 #, c-format
 msgid "<b>1 of %d</b>"
 msgstr ""
@@ -298,35 +298,35 @@ msgstr ""
 msgid "Run an application, action or script"
 msgstr ""
 
-#: ../src/core/common-actions.vala:113
+#: ../src/core/common-actions.vala:141
 msgid "Run in Terminal"
 msgstr ""
 
-#: ../src/core/common-actions.vala:114
+#: ../src/core/common-actions.vala:142
 msgid "Run application or command in terminal"
 msgstr ""
 
-#: ../src/core/common-actions.vala:153
+#: ../src/core/common-actions.vala:208
 msgid "Open"
 msgstr ""
 
-#: ../src/core/common-actions.vala:154
+#: ../src/core/common-actions.vala:209
 msgid "Open using default application"
 msgstr ""
 
-#: ../src/core/common-actions.vala:215
+#: ../src/core/common-actions.vala:270
 msgid "Open folder"
 msgstr ""
 
-#: ../src/core/common-actions.vala:216
+#: ../src/core/common-actions.vala:271
 msgid "Open folder containing this file"
 msgstr ""
 
-#: ../src/core/common-actions.vala:257
+#: ../src/core/common-actions.vala:311
 msgid "Copy to Clipboard"
 msgstr ""
 
-#: ../src/core/common-actions.vala:258
+#: ../src/core/common-actions.vala:312
 msgid "Copy selection to clipboard"
 msgstr ""
 
@@ -440,15 +440,15 @@ msgstr ""
 msgid "Open chat, or send a message with your favorite IM"
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:65
+#: ../src/plugins/chromium-plugin.vala:66
 msgid "Chromium Plugin"
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:66
+#: ../src/plugins/chromium-plugin.vala:67
 msgid "Browse and open Chromium bookmarks."
 msgstr ""
 
-#: ../src/plugins/chromium-plugin.vala:70
+#: ../src/plugins/chromium-plugin.vala:71
 msgid "Chromium is not installed"
 msgstr ""
 
@@ -464,14 +464,19 @@ msgstr ""
 msgid "Search for and run applications on your computer."
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.vala:231
+#: ../src/plugins/desktop-file-plugin.vala:232
 #, c-format
 msgid "Open with %s"
 msgstr ""
 
-#: ../src/plugins/desktop-file-plugin.vala:233
+#: ../src/plugins/desktop-file-plugin.vala:234
 #, c-format
 msgid "Opens current selection using %s"
+msgstr ""
+
+#: ../src/plugins/desktop-file-plugin.vala:280
+#, c-format
+msgid "Launch action '%s'"
 msgstr ""
 
 #: ../src/plugins/devhelp-search.vala:59
@@ -490,20 +495,20 @@ msgstr ""
 msgid "Devhelp is not installed"
 msgstr ""
 
-#: ../src/plugins/dictionary.vala:59
+#: ../src/plugins/dictionary.vala:61
 msgid "Define"
 msgstr ""
 
-#: ../src/plugins/dictionary.vala:60
+#: ../src/plugins/dictionary.vala:62
 msgid "Look up definition in dictionary"
 msgstr ""
 
-#: ../src/plugins/dictionary.vala:70
+#: ../src/plugins/dictionary.vala:73
 msgid "Look up definitions of words."
 msgstr ""
 
-#: ../src/plugins/dictionary.vala:74
-msgid "Gnome Dictionary is not installed"
+#: ../src/plugins/dictionary.vala:78
+msgid "No compatible Dictionary installed"
 msgstr ""
 
 #: ../src/plugins/directory-plugin.vala:111
@@ -550,22 +555,6 @@ msgstr ""
 
 #: ../src/plugins/gnome-bookmarks-plugin.vala:62
 msgid "Browse and open GNOME bookmarks."
-msgstr ""
-
-#: ../src/plugins/gnome-screensaver-plugin.vala:51
-msgid "Lock Screen"
-msgstr ""
-
-#: ../src/plugins/gnome-screensaver-plugin.vala:52
-msgid "Locks screen and starts screensaver."
-msgstr ""
-
-#: ../src/plugins/gnome-screensaver-plugin.vala:80
-msgid "Lock screen of your computer."
-msgstr ""
-
-#: ../src/plugins/gnome-screensaver-plugin.vala:84
-msgid "Gnome Screen Saver wasn't found"
 msgstr ""
 
 #: ../src/plugins/hybrid-search-plugin.vala:62
@@ -700,6 +689,52 @@ msgstr ""
 msgid "Search using Google Maps"
 msgstr ""
 
+#: ../src/plugins/pass-plugin.vala:31
+msgid "Copy decrypted PGP password to clipboard"
+msgstr ""
+
+#: ../src/plugins/pass-plugin.vala:56
+#, c-format
+msgid "Copied %s password to clipboard"
+msgstr ""
+
+#: ../src/plugins/pass-plugin.vala:59
+#, c-format
+msgid "Unable to decrypt %s password"
+msgstr ""
+
+#: ../src/plugins/pass-plugin.vala:65
+msgid "Synapse - Pass"
+msgstr ""
+
+#: ../src/plugins/pass-plugin.vala:105
+msgid "Pass Integration"
+msgstr ""
+
+#: ../src/plugins/pass-plugin.vala:106
+msgid "Quickly place passwords from your password store in the clipboard."
+msgstr ""
+
+#: ../src/plugins/pass-plugin.vala:110
+msgid "pass is not installed"
+msgstr ""
+
+#: ../src/plugins/tomboy-notes-plugin.vala:66
+msgid "Tomboy Notes"
+msgstr ""
+
+#: ../src/plugins/tomboy-notes-plugin.vala:67
+msgid "Search for tomboy notes."
+msgstr ""
+
+#: ../src/plugins/tomboy-notes-plugin.vala:71
+msgid "Tomboy Notes is not installed"
+msgstr ""
+
+#: ../src/plugins/tomboy-notes-plugin.vala:170
+msgid "Open Tomboy Note"
+msgstr ""
+
 #: ../src/plugins/pastebin-plugin.vala:42
 #: ../src/plugins/pastebin-plugin.vala:261
 msgid "Pastebin"
@@ -778,6 +813,22 @@ msgstr ""
 msgid "Play in Rhythmbox"
 msgstr ""
 
+#: ../src/plugins/screensaver-plugin.vala:60
+msgid "Lock Screen"
+msgstr ""
+
+#: ../src/plugins/screensaver-plugin.vala:61
+msgid "Locks screen and starts screensaver."
+msgstr ""
+
+#: ../src/plugins/screensaver-plugin.vala:128
+msgid "Lock screen of your computer."
+msgstr ""
+
+#: ../src/plugins/screensaver-plugin.vala:132
+msgid "Screensaver wasn't found"
+msgstr ""
+
 #: ../src/plugins/selection-plugin.vala:55
 msgid "Selection"
 msgstr ""
@@ -792,7 +843,7 @@ msgid "Selected text"
 msgstr ""
 
 #. Plugin title
-#: ../src/plugins/ssh-plugin.vala:67
+#: ../src/plugins/ssh-plugin.vala:65
 msgid "Connect to host with SSH"
 msgstr ""
 
@@ -800,11 +851,11 @@ msgstr ""
 #. icon name
 #. reference to this function
 #. true if user's system has all required components which the plugin needs
-#: ../src/plugins/ssh-plugin.vala:72
+#: ../src/plugins/ssh-plugin.vala:70
 msgid "ssh is not installed"
 msgstr ""
 
-#: ../src/plugins/ssh-plugin.vala:190
+#: ../src/plugins/ssh-plugin.vala:188
 msgid "Connect with SSH"
 msgstr ""
 
@@ -949,38 +1000,38 @@ msgid "Search various items logged by Zeitgeist."
 msgstr ""
 
 #: ../src/plugins/zeitgeist-plugin.vala:200
-#: ../src/plugins/zeitgeist-related.vala:79
+#: ../src/plugins/zeitgeist-related.vala:77
 msgid "Zeitgeist is not installed"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-related.vala:64
+#: ../src/plugins/zeitgeist-related.vala:62
 msgid "Find related"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-related.vala:65
+#: ../src/plugins/zeitgeist-related.vala:63
 msgid "Find resources related to this result"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-related.vala:74
+#: ../src/plugins/zeitgeist-related.vala:72
 msgid "Related files"
 msgstr ""
 
-#: ../src/plugins/zeitgeist-related.vala:75
+#: ../src/plugins/zeitgeist-related.vala:73
 msgid "Finds files related to other search results using Zeitgeist."
 msgstr ""
 
-#: ../src/plugins/zeal-plugin.vala:102
+#: ../src/plugins/zeal-plugin.vala:92
 msgid "Zeal"
 msgstr ""
 
-#: ../src/plugins/zeal-plugin.vala:103
+#: ../src/plugins/zeal-plugin.vala:93
 msgid "Zeal offline documentation (zealdocs.org)"
 msgstr ""
 
-#: ../src/plugins/zeal-plugin.vala:107
+#: ../src/plugins/zeal-plugin.vala:97
 msgid "zeal is not installed, please see zealdocs.org"
 msgstr ""
 
-#: ../src/plugins/zeal-plugin.vala:167
+#: ../src/plugins/zeal-plugin.vala:191
 msgid "Zeal documentation research"
 msgstr ""
