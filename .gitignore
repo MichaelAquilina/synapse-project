@@ -3,6 +3,7 @@ INSTALL
 aclocal.m4
 ChangeLog
 bin
+build
 compile
 config.guess
 config.h
