@@ -33,7 +33,7 @@ All you need to do now is run the following command in the root project director
 debuild -b -us -uc
 ```
 
-Two `*.deb` files will be created in the parent directory of the project. 
+Two `*.deb` files will be created in the parent directory of the project.
 
-One will be a production debian file and the other will be a debug version. 
+One will be a production debian file and the other will be a debug version.
 The version number should be correctly included as part of the name of the files.
