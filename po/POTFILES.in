@@ -35,6 +35,7 @@ src/plugins/locate-plugin.vala
 src/plugins/opensearch.vala
 src/plugins/pass-plugin.vala
 src/plugins/tomboy-notes-plugin.vala
+src/plugins/gnote-plugin.vala
 src/plugins/pastebin-plugin.vala
 src/plugins/pidgin-plugin.vala
 src/plugins/rhythmbox-plugin.vala

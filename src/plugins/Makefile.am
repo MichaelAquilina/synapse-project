@@ -47,6 +47,7 @@ libplugins_la_VALASOURCES = \
 	opensearch.vala \
 	pass-plugin.vala \
   tomboy-notes-plugin.vala \
+  gnote-plugin.vala \
 	pastebin-plugin.vala \
 	pidgin-plugin.vala \
 	rhythmbox-plugin.vala \
