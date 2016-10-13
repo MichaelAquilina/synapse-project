@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-20 22:26+0100\n"
+"POT-Creation-Date: 2016-10-13 16:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -571,14 +571,12 @@ msgstr ""
 msgid "Upload selection to imgur image sharer"
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:162
-#: ../src/plugins/pastebin-plugin.vala:151
+#: ../src/plugins/imgur-plugin.vala:162 ../src/plugins/pastebin-plugin.vala:151
 msgid ""
 "The selection was successfully uploaded and its URL was copied to clipboard."
 msgstr ""
 
-#: ../src/plugins/imgur-plugin.vala:166
-#: ../src/plugins/pastebin-plugin.vala:155
+#: ../src/plugins/imgur-plugin.vala:166 ../src/plugins/pastebin-plugin.vala:155
 msgid ""
 "An error occurred during upload, please check the log for more information."
 msgstr ""
@@ -733,6 +731,22 @@ msgstr ""
 
 #: ../src/plugins/tomboy-notes-plugin.vala:170
 msgid "Open Tomboy Note"
+msgstr ""
+
+#: ../src/plugins/gnote-plugin.vala:66
+msgid "GNote"
+msgstr ""
+
+#: ../src/plugins/gnote-plugin.vala:67
+msgid "Search for GNote notes."
+msgstr ""
+
+#: ../src/plugins/gnote-plugin.vala:71
+msgid "GNote is not installed"
+msgstr ""
+
+#: ../src/plugins/gnote-plugin.vala:170
+msgid "Open GNote Note"
 msgstr ""
 
 #: ../src/plugins/pastebin-plugin.vala:42
