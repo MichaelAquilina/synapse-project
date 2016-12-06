@@ -48,3 +48,4 @@ src/plugins/xnoise-media-player-plugin.c
 src/plugins/zeitgeist-plugin.c
 src/plugins/zeitgeist-related.c
 src/plugins/zeal-plugin.c
+src/plugins/zim-plugin.c
