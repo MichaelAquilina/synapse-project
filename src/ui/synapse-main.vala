@@ -175,6 +175,7 @@ namespace Synapse
         typeof (FileOpPlugin),
         typeof (PidginPlugin),
         typeof (PassPlugin),
+        typeof (ZimPlugin),
         typeof (TomboyNotesPlugin),
         typeof (GNotePlugin),
         typeof (ChatActions),

@@ -47,3 +47,4 @@ src/plugins/xnoise-media-player-plugin.vala
 src/plugins/zeitgeist-plugin.vala
 src/plugins/zeitgeist-related.vala
 src/plugins/zeal-plugin.vala
+src/plugins/zim-plugin.vala
