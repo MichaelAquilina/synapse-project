@@ -1,4 +1,4 @@
-AC_INIT([synapse], [0.3.0])
+AC_INIT([synapse], [0.4.0])
 AC_DEFINE(RELEASE_NAME, "Cholecystokinin", "Codename of this release")
 
 AC_PREREQ([2.65])
@@ -168,4 +168,3 @@ EOF
 if test "x$enable_zeitgeist" != "xyes" ; then
 	AC_MSG_WARN([Zeitgeist is disabled, building without relevancy backend!])
 fi
-
