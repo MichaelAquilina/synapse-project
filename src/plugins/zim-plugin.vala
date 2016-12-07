@@ -34,7 +34,7 @@ namespace Synapse
         "%s/Notebooks".printf (Environment.get_home_dir ())
       );
       try {
-        notes = list_all_zim_pages (note_storage);
+        notes = list_notebooks (note_storage);
       } catch (Error err) {
         warning ("%s", err.message);
       }
@@ -46,7 +46,7 @@ namespace Synapse
         if (src_path.has_suffix (".note")) {
           message ("Reloading notes due to change in %s (%s)", src_path, event.to_string ());
           try {
-            notes = list_all_zim_pages (note_storage);
+            notes = list_notebooks (note_storage);
           } catch (Error err) {
             warning ("Unable to list zim notes: %s", err.message);
           }
@@ -77,7 +77,7 @@ namespace Synapse
       register_plugin ();
     }
 
-    private List<ZimPageMatch> list_zim_note_pages (File directory) throws Error {
+    private List<ZimPageMatch> list_notebooks(File directory) throws Error {
       List<ZimPageMatch> result = new List<ZimPageMatch> ();
 
       FileEnumerator enumerator = directory.enumerate_children (
@@ -89,24 +89,16 @@ namespace Synapse
 
       FileInfo? info = null;
       while ((info = enumerator.next_file (null)) != null) {
-        string file_name = info.get_name ();
-
-        if (file_name.has_suffix (".txt") && info.get_file_type () == FileType.REGULAR) {
-          try {
-            var match = new ZimPageMatch(
-              directory.get_basename (),
-              file_name.replace("_", " ").replace(".txt", "")
-            );
-            result.append (match);
-          } catch (Error err) {
-            warning ("%s", err.message);
-          }
+        if (info.get_file_type () == FileType.DIRECTORY) {
+          string file_name = info.get_name ();
+          File notebook = directory.get_child (file_name);
+          result.concat(list_all_zim_pages(notebook, notebook));
         }
       }
       return result;
     }
 
-    private List<ZimPageMatch> list_all_zim_pages (File directory) throws Error {
+    private List<ZimPageMatch> list_all_zim_pages (File notebook, File directory, string prefix="") throws Error {
       List<ZimPageMatch> result = new List<ZimPageMatch> ();
 
       FileEnumerator enumerator = directory.enumerate_children (
@@ -119,11 +111,22 @@ namespace Synapse
       FileInfo? info = null;
       while ((info = enumerator.next_file (null)) != null) {
         string file_name = info.get_name ();
-        File note_file = directory.get_child (file_name);
 
         if (info.get_file_type () == FileType.DIRECTORY) {
+          File sub_page_directory = directory.get_child (file_name);
+          result.concat (
+            list_all_zim_pages (notebook, sub_page_directory, "%s:".printf(file_name))
+          );
+
+        } else if (info.get_file_type() == FileType.REGULAR && file_name.has_suffix (".txt")) {
           try {
-            result.concat (list_zim_note_pages (note_file));
+            string page = file_name.replace("_", " ").replace(".txt", "");
+
+            var match = new ZimPageMatch(
+              notebook.get_basename (),
+              "%s%s".printf(prefix, page)
+            );
+            result.append (match);
           } catch (Error err) {
             warning ("%s", err.message);
           }
