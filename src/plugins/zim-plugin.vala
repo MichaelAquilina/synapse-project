@@ -115,7 +115,7 @@ namespace Synapse
         if (info.get_file_type () == FileType.DIRECTORY) {
           File sub_page_directory = directory.get_child (file_name);
           result.concat (
-            list_all_zim_pages (notebook, sub_page_directory, "%s:".printf(file_name))
+            list_all_zim_pages (notebook, sub_page_directory, "%s:%s".printf(prefix, file_name))
           );
 
         } else if (info.get_file_type() == FileType.REGULAR && file_name.has_suffix (".txt")) {
@@ -124,7 +124,7 @@ namespace Synapse
 
             var match = new ZimPageMatch(
               notebook.get_basename (),
-              "%s%s".printf(prefix, page)
+              "%s:%s".printf(prefix, page)
             );
             result.append (match);
           } catch (Error err) {
