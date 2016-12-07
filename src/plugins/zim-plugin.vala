@@ -26,7 +26,7 @@ namespace Synapse
     public bool enabled { get; set; default = true; }
 
     private List<ZimPageMatch> notes;
-    private FileMonitor tomboy_monitor;
+    private FileMonitor zim_monitor;
 
     public void activate ()
     {
@@ -39,11 +39,11 @@ namespace Synapse
         warning ("%s", err.message);
       }
 
-      tomboy_monitor = note_storage.monitor (FileMonitorFlags.SEND_MOVED, null);
-      tomboy_monitor.set_rate_limit (500);
-      tomboy_monitor.changed.connect ( (src, dest, event) => {
+      zim_monitor = note_storage.monitor (FileMonitorFlags.SEND_MOVED, null);
+      zim_monitor.set_rate_limit (500);
+      zim_monitor.changed.connect ( (src, dest, event) => {
         string src_path = src.get_path ();
-        if (src_path.has_suffix (".note")) {
+        if (src_path.has_suffix (".txt")) {
           message ("Reloading notes due to change in %s (%s)", src_path, event.to_string ());
           try {
             notes = list_notebooks (note_storage);
@@ -56,7 +56,7 @@ namespace Synapse
 
     public void deactivate ()
     {
-      tomboy_monitor.cancel();
+      zim_monitor.cancel();
     }
 
     static void register_plugin ()
