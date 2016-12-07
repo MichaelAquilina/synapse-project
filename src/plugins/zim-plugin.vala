@@ -114,18 +114,22 @@ namespace Synapse
 
         if (info.get_file_type () == FileType.DIRECTORY) {
           File sub_page_directory = directory.get_child (file_name);
+          string page = file_name;
+          if (prefix != "") {
+            page = "%s:%s".printf(prefix, page);
+          }
           result.concat (
-            list_all_zim_pages (notebook, sub_page_directory, "%s:%s".printf(prefix, file_name))
+            list_all_zim_pages (notebook, sub_page_directory, page)
           );
 
         } else if (info.get_file_type() == FileType.REGULAR && file_name.has_suffix (".txt")) {
           try {
             string page = file_name.replace("_", " ").replace(".txt", "");
+            if (prefix != "") {
+              page = "%s:%s".printf(prefix, page);
+            }
 
-            var match = new ZimPageMatch(
-              notebook.get_basename (),
-              "%s:%s".printf(prefix, page)
-            );
+            var match = new ZimPageMatch(notebook.get_basename (), page);
             result.append (match);
           } catch (Error err) {
             warning ("%s", err.message);
