@@ -1,10 +1,16 @@
-synapse (0.4.1) yakkety; urgency=low
+synapse (0.4.2) UNRELEASED; urgency=low
+
+  * Bug fixes for Zim plugin
+
+ -- Michael Aquilina <michaelaquilina@gmail.com>  Wed, 7 Dec 2016 14:44:00 +0100
+
+synapse (0.4.1) UNRELEASED; urgency=low
 
   * Support sub pages in Zim plugin
 
  -- Michael Aquilina <michaelaquilina@gmail.com>  Wed, 7 Dec 2016 11:28:00 +0100
 
-synapse (0.4.0) yakkety; urgency=low
+synapse (0.4.0) UNRELEASED; urgency=low
 
   * Add zim plugin
 
