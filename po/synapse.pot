@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-07 14:51+0000\n"
+"POT-Creation-Date: 2016-12-15 23:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -103,7 +103,7 @@ msgstr ""
 msgid "...or press down key to browse recent activities"
 msgstr ""
 
-#: ../src/ui/view-virgilio.vala:199 ../src/ui/widgets-matchlistview.vala:938
+#: ../src/ui/view-virgilio.vala:199 ../src/ui/widgets-matchlistview.vala:936
 #, c-format
 msgid "<b>%d of %d</b>"
 msgstr ""
@@ -271,12 +271,12 @@ msgstr ""
 msgid "Click the shortcut you wish to change and press the new shortcut."
 msgstr ""
 
-#: ../src/ui/widgets-matchlistview.vala:915
-#: ../src/ui/widgets-matchlistview.vala:925
+#: ../src/ui/widgets-matchlistview.vala:913
+#: ../src/ui/widgets-matchlistview.vala:923
 msgid "No results."
 msgstr ""
 
-#: ../src/ui/widgets-matchlistview.vala:930
+#: ../src/ui/widgets-matchlistview.vala:928
 #, c-format
 msgid "<b>1 of %d</b>"
 msgstr ""
@@ -1062,11 +1062,11 @@ msgstr ""
 msgid "Zim is not installed"
 msgstr ""
 
-#: ../src/plugins/zim-plugin.vala:178
+#: ../src/plugins/zim-plugin.vala:182
 #, c-format
 msgid "%s - %s"
 msgstr ""
 
-#: ../src/plugins/zim-plugin.vala:179
+#: ../src/plugins/zim-plugin.vala:183
 msgid "Open Zim Page"
 msgstr ""
