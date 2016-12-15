@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-13 16:28+0100\n"
+"POT-Creation-Date: 2016-12-07 14:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1048,4 +1048,25 @@ msgstr ""
 
 #: ../src/plugins/zeal-plugin.vala:191
 msgid "Zeal documentation research"
+msgstr ""
+
+#: ../src/plugins/zim-plugin.vala:66
+msgid "Zim"
+msgstr ""
+
+#: ../src/plugins/zim-plugin.vala:67
+msgid "Search for Zim pages."
+msgstr ""
+
+#: ../src/plugins/zim-plugin.vala:71
+msgid "Zim is not installed"
+msgstr ""
+
+#: ../src/plugins/zim-plugin.vala:178
+#, c-format
+msgid "%s - %s"
+msgstr ""
+
+#: ../src/plugins/zim-plugin.vala:179
+msgid "Open Zim Page"
 msgstr ""

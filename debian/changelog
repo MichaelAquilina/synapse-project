@@ -1,3 +1,27 @@
+synapse (0.4.3) UNRELEASED; urgency=low
+
+  * Remove prepended : on page names for zim plugin
+
+ -- Michael Aquilina <michaelaquilina@gmail.com>  Wed, 7 Dec 2016 15:16:00 +0100
+
+synapse (0.4.2) UNRELEASED; urgency=low
+
+  * Bug fixes for Zim plugin
+
+ -- Michael Aquilina <michaelaquilina@gmail.com>  Wed, 7 Dec 2016 14:44:00 +0100
+
+synapse (0.4.1) UNRELEASED; urgency=low
+
+  * Support sub pages in Zim plugin
+
+ -- Michael Aquilina <michaelaquilina@gmail.com>  Wed, 7 Dec 2016 11:28:00 +0100
+
+synapse (0.4.0) UNRELEASED; urgency=low
+
+  * Add zim plugin
+
+ -- Michael Aquilina <michaelaquilina@gmail.com>  Tue, 6 Dec 2016 23:43:00 +0100
+
 synapse (0.3.0) wily; urgency=low
 
   * Add gnote plugin
@@ -29,7 +53,7 @@ synapse (0.2.99-1) UNRELEASED; urgency=medium
 
 synapse (0.2.10-2ubuntu3) saucy; urgency=low
 
-  * Add dependency on consolekit and upower, since we use their D-Bus APIs. 
+  * Add dependency on consolekit and upower, since we use their D-Bus APIs.
 
  -- Iain Lane <iain@orangesquash.org.uk>  Wed, 01 May 2013 00:58:45 +0100
 
