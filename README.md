@@ -11,12 +11,15 @@ I [release deb files](https://github.com/MichaelAquilina/synapse-project/release
 
 In the meanwhile I have added numerous plugins that I myself use on a daily occassion:
 
-* password store plugin
-* Zim plugin
-* tomboy notes plugin
-* Gnote plugin
-* Improvements to file change detection in Zeal plugin
+* [password store](https://www.passwordstore.org/) plugin
+* [Zim](http://www.zim-wiki.org/) plugin
+* [Tomboy Notes](https://wiki.gnome.org/Apps/Tomboy) plugin
+* [Gnote](https://wiki.gnome.org/Apps/Gnote) plugin
+* Improvements to file change detection in [Zeal](https://zealdocs.org/) plugin
 * fixes for Ubuntu 16.10
+
+I am in no way an expert in Vala (or GTK for that matter) so most of the changes I make tend to be hackish in nature.
+This will hopefully improve as I grow accustomed to the codebase and learn more about Valas libraries and build tools.
 
 Feel free to contribute and add any of your own plugins if you wish.
 
