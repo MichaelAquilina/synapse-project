@@ -1,3 +1,9 @@
+synapse (0.4.6) yakkety; urgency=low
+
+  * Fix bug where _ would be displayed instead of space in Zim search results
+
+ -- Michael Aquilina <michaelaquilina@gmail.com>  Tue, 3 Jan 2017 22:05:00 +0100
+
 synapse (0.4.5) yakkety; urgency=low
 
   * Detect file changes in Zim notebook directory and update accordingly.

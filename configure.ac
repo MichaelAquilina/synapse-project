@@ -1,4 +1,4 @@
-AC_INIT([synapse], [0.4.5])
+AC_INIT([synapse], [0.4.6])
 AC_DEFINE(RELEASE_NAME, "Cholecystokinin", "Codename of this release")
 
 AC_PREREQ([2.65])
