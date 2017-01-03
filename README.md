@@ -11,7 +11,7 @@ I [release deb files](https://github.com/MichaelAquilina/synapse-project/release
 
 In the meanwhile I have added numerous plugins that I myself use on a daily occassion:
 
-* [password store](https://www.passwordstore.org/) plugin
+* [password store](https://www.passwordstore.org/) plugin (see an example of this in action [here](https://i.imgur.com/pMjck1o.gif))
 * [Zim](http://www.zim-wiki.org/) plugin
 * [Tomboy Notes](https://wiki.gnome.org/Apps/Tomboy) plugin
 * [Gnote](https://wiki.gnome.org/Apps/Gnote) plugin
