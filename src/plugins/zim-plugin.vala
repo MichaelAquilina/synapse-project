@@ -162,7 +162,7 @@ namespace Synapse
           try {
             string page = file_name.replace("_", " ").replace(".txt", "");
             if (prefix != "") {
-              page = "%s:%s".printf(prefix, page);
+              page = "%s:%s".printf(prefix.replace("_", " "), page);
             }
 
             var match = new ZimPageMatch(notebook.get_basename (), page);
