@@ -1,3 +1,9 @@
+synapse (0.4.5) yakkety; urgency=low
+
+  * Detect file changes in Zim notebook directory and update accordingly.
+
+ -- Michael Aquilina <michaelaquilina@gmail.com>  Tue, 3 Jan 2017 12:35:00 +0100
+
 synapse (0.4.4) yakkety; urgency=low
 
   * Fix Result List Rendering Issue on Ubuntu 16.10
