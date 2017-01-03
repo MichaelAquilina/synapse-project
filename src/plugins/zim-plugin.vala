@@ -26,37 +26,23 @@ namespace Synapse
     public bool enabled { get; set; default = true; }
 
     private List<ZimPageMatch> notes;
-    private FileMonitor zim_monitor;
+    private List<FileMonitor> monitors;
+    private File note_storage;
 
     public void activate ()
     {
-      File note_storage = File.new_for_path (
+      note_storage = File.new_for_path (
         "%s/Notebooks".printf (Environment.get_home_dir ())
       );
-      try {
-        notes = list_notebooks (note_storage);
-      } catch (Error err) {
-        warning ("%s", err.message);
-      }
 
-      zim_monitor = note_storage.monitor (FileMonitorFlags.SEND_MOVED, null);
-      zim_monitor.set_rate_limit (500);
-      zim_monitor.changed.connect ( (src, dest, event) => {
-        string src_path = src.get_path ();
-        if (src_path.has_suffix (".txt")) {
-          message ("Reloading notes due to change in %s (%s)", src_path, event.to_string ());
-          try {
-            notes = list_notebooks (note_storage);
-          } catch (Error err) {
-            warning ("Unable to list zim notes: %s", err.message);
-          }
-        }
-      });
+      update_notes ();
     }
 
     public void deactivate ()
     {
-      zim_monitor.cancel();
+      foreach (unowned FileMonitor monitor in monitors) {
+        monitor.cancel ();
+      }
     }
 
     static void register_plugin ()
@@ -75,6 +61,56 @@ namespace Synapse
     static construct
     {
       register_plugin ();
+    }
+
+    private void update_notes () {
+      foreach (unowned FileMonitor monitor in monitors) {
+        monitor.cancel ();
+      }
+      monitors = null;
+
+      try {
+        monitors = activate_monitors (note_storage);
+      } catch (Error err) {
+        warning ("Unable to monitor note storage: %s", err.message);
+      }
+      try {
+        notes = list_notebooks (note_storage);
+      } catch (Error err) {
+        warning ("Unable to list notebooks: %s", err.message);
+      }
+    }
+
+    private List<FileMonitor> activate_monitors (File directory) throws Error {
+      List<FileMonitor> result = new List<FileMonitor> ();
+
+      FileEnumerator enumerator = directory.enumerate_children (
+        FileAttribute.STANDARD_NAME + "," +
+        FileAttribute.STANDARD_TYPE + "," +
+        FileAttribute.STANDARD_IS_HIDDEN,
+        FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
+        null
+      );
+
+      FileMonitor monitor = directory.monitor_directory (FileMonitorFlags.NONE, null);
+      monitor.set_rate_limit (500);
+      monitor.changed.connect ((src, dest, event) => {
+        message ("Detected a change (%s) in zim Notebooks directory. Reloading", event.to_string ());
+        update_notes ();
+      });
+      result.append (monitor);
+
+      FileInfo? info = null;
+      while ((info = enumerator.next_file (null)) != null) {
+        if (info.get_is_hidden ()) continue;
+
+        File target_file = directory.get_child (info.get_name ());
+        if (info.get_file_type () == FileType.DIRECTORY) {
+          result.concat (activate_monitors (target_file));
+        }
+      }
+
+      return result;
     }
 
     private List<ZimPageMatch> list_notebooks(File directory) throws Error {
