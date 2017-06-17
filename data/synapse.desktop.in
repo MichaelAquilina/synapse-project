@@ -4,4 +4,4 @@ _Name=Synapse
 _Comment=Search everything you do.
 Exec=synapse
 Icon=synapse
-Categories=GNOME;Utility;
+Categories=Utility;TextEditor;
