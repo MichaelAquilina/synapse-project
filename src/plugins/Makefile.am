@@ -32,7 +32,6 @@ libplugins_la_VALASOURCES = \
 	chromium-plugin.vala \
 	command-plugin.vala \
 	file-op-plugin.vala \
-	desktop-file-plugin.vala \
 	devhelp-search.vala \
 	ssh-plugin.vala \
 	dictionary.vala \
@@ -41,7 +40,6 @@ libplugins_la_VALASOURCES = \
 	gnome-session-plugin.vala \
 	screensaver-plugin.vala \
 	hello-world-plugin.vala \
-	hybrid-search-plugin.vala \
 	launchpad-plugin.vala \
 	locate-plugin.vala \
 	opensearch.vala \
