@@ -83,8 +83,8 @@ namespace Synapse
     construct
     {
       desktop_files = new Gee.ArrayList<DesktopFileMatch> ();
-      mimetype_map = new Gee.HashMap<string, OpenWithAction> ();
-      actions_map = new Gee.HashMap<string, OpenAppAction> ();
+      mimetype_map = new Gee.HashMap<string, Gee.List<OpenWithAction>> ();
+      actions_map = new Gee.HashMap<string, Gee.List<OpenAppAction>> ();
 
       var dfs = DesktopFileService.get_default ();
       dfs.reload_started.connect (() => {

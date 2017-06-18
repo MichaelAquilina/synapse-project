@@ -74,7 +74,7 @@ namespace Synapse
     construct
     {
       directory_hits = new Gee.HashMap<string, int> ();
-      directory_contents = new Gee.HashMap<string, Utils.FileInfo?> ();
+      directory_contents = new Gee.HashMap<string, DirectoryInfo> ();
 
       analyze_recent_documents.begin ();
     }
