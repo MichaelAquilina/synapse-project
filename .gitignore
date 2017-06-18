@@ -30,6 +30,7 @@ Makefile.in
 *.o
 *.lo
 *.la
+*.lock
 *.gmo
 *~
 .deps
