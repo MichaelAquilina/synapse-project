@@ -35,11 +35,11 @@ Building
 * Run `make`
 * Run `make install`
 
-By default synapse is installed to `/usr` but you may specify a different location during `./autogen.sh` setup using the `--prefix` option.
+By default synapse is installed to `/usr` but you may specify a different location during `make install` using the `prefix` option.
 
 For example:
 
-`./autogen.sh --prefix ~/builds/synapse`
+`make install prefix=$HOME/builds/synapse`
 
 Creating a DEB
 --------------
