@@ -30,7 +30,7 @@ See the [Releases](https://github.com/MichaelAquilina/synapse-project/releases) 
 
 Alternatively, if you are using OpenSUSE you can use the following build service repo:
 
-http://download.opensuse.org/repositories/home:/MichaelAquilina/
+https://download.opensuse.org/repositories/home:/MichaelAquilina/
 
 About Synapse
 -------------
