@@ -23,6 +23,15 @@ This will hopefully improve as I grow accustomed to the codebase and learn more 
 
 Feel free to contribute and add any of your own plugins if you wish.
 
+Installing Synpase
+------------------
+
+See the [Releases](https://github.com/MichaelAquilina/synapse-project/releases) page for rpm and deb packages.
+
+Alternatively, if you are using OpenSUSE you can use the following build service repo:
+
+http://download.opensuse.org/repositories/home:/MichaelAquilina/
+
 About Synapse
 -------------
 
