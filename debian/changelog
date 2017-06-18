@@ -1,3 +1,7 @@
+synapse (0.4.7) yakkety; urgency=low
+
+  * Fix compilation issues with new released vala 0.3.6.3
+
 synapse (0.4.6) yakkety; urgency=low
 
   * Fix bug where _ would be displayed instead of space in Zim search results
