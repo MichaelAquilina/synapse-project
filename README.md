@@ -32,6 +32,13 @@ Alternatively, if you are using OpenSUSE you can use the following build service
 
 https://download.opensuse.org/repositories/home:/MichaelAquilina/
 
+For example on Tumbleweed:
+```
+$ zypper addrepo https://download.opensuse.org/repositories/home:/MichaelAquilina/openSUSE_Tumbleweed MichaelAquilina
+$ zypper refresh
+$ zypper install synapse
+```
+
 About Synapse
 -------------
 
