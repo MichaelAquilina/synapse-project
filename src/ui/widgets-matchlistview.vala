@@ -868,7 +868,6 @@ namespace Synapse.Gui
         /* Prepare bg's colors using GtkStyleContext */
         Cairo.Pattern pat = new Cairo.Pattern.linear(0, 0, 0, status.get_allocated_height ());
 
-        Gtk.StateFlags t = this.get_state_flags ();
         /* Prepare and draw top bg's rect */
         ctx.set_source (pat);
         ctx.paint ();
