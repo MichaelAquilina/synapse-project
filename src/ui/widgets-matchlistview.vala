@@ -249,8 +249,8 @@ namespace Synapse.Gui
   {
     /* Animation stuffs */
     private uint tid;
-    private static const int ANIM_TIMEOUT = 1000 / 25;
-    private static const int ANIM_STEPS = 180 / ANIM_TIMEOUT;
+    private const int ANIM_TIMEOUT = 1000 / 25;
+    private const int ANIM_STEPS = 180 / ANIM_TIMEOUT;
     public bool animation_enabled {
       get; set; default = true;
     }
@@ -868,7 +868,6 @@ namespace Synapse.Gui
         /* Prepare bg's colors using GtkStyleContext */
         Cairo.Pattern pat = new Cairo.Pattern.linear(0, 0, 0, status.get_allocated_height ());
 
-        Gtk.StateFlags t = this.get_state_flags ();
         /* Prepare and draw top bg's rect */
         ctx.set_source (pat);
         ctx.paint ();

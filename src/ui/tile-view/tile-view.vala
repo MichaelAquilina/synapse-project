@@ -130,8 +130,6 @@ namespace UI.Widgets
       return null;
     }
 
-    private bool changing_style = false;
-
     protected override void style_updated ()
     {
       /*if (changing_style) return;

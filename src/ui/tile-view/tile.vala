@@ -37,7 +37,7 @@ namespace UI.Widgets
 
     public unowned TileView owner { get; set; }
     public AbstractTileObject owned_object { get; private set; }
-    public bool last { get; private set; }
+    public bool last_flag { get; private set; }
 
     public signal void active_changed ();
 
@@ -139,7 +139,7 @@ namespace UI.Widgets
         context.render_background (cr, 0, 0, allocation.width, allocation.height);
       }
 
-      if (!last)
+      if (!last_flag)
       {
         context.save ();
         // this gives us a lighter stroke

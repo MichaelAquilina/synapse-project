@@ -159,17 +159,13 @@ namespace Synapse
           );
 
         } else if (info.get_file_type() == FileType.REGULAR && file_name.has_suffix (".txt")) {
-          try {
-            string page = file_name.replace("_", " ").replace(".txt", "");
-            if (prefix != "") {
-              page = "%s:%s".printf(prefix.replace("_", " "), page);
-            }
-
-            var match = new ZimPageMatch(notebook.get_basename (), page);
-            result.append (match);
-          } catch (Error err) {
-            warning ("%s", err.message);
+          string page = file_name.replace("_", " ").replace(".txt", "");
+          if (prefix != "") {
+            page = "%s:%s".printf(prefix.replace("_", " "), page);
           }
+
+          var match = new ZimPageMatch(notebook.get_basename (), page);
+          result.append (match);
         }
       }
       return result;
