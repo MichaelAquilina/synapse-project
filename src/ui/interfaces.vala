@@ -44,8 +44,8 @@ namespace Synapse.Gui
     public abstract KeyComboConfig key_combo_config { get; construct set; }
     public abstract CategoryConfig category_config { get; construct set; }
 
-    public static const int RESULTS_PER_PAGE = 5;
-    public static const int PARTIAL_RESULT_TIMEOUT = 120;
+    public const int RESULTS_PER_PAGE = 5;
+    public const int PARTIAL_RESULT_TIMEOUT = 120;
 
     /* Events called by View */
 
