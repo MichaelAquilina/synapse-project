@@ -96,11 +96,6 @@ namespace Synapse
         bool rb_running = DBusService.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
         return rb_running ? default_relevancy + MatchScore.INCREMENT_LARGE : default_relevancy;
       }
-
-      public virtual bool action_available ()
-      {
-        return DBusService.get_default ().name_has_owner (RhythmboxPlayer.UNIQUE_NAME);
-      }
     }
 
     private abstract class RhythmboxControlMatch : ActionMatch
@@ -181,7 +176,7 @@ namespace Synapse
                                            RhythmboxPlayer.OBJECT_PATH);
 
           player.next ();
-        } 
+        }
         catch (IOError e)
         {
           warning ("Rythmbox is not available.\n%s", e.message);
@@ -207,7 +202,7 @@ namespace Synapse
 
           player.previous ();
           player.previous ();
-        } 
+        }
         catch (IOError e)
         {
           warning ("Rythmbox is not available.\n%s", e.message);
@@ -244,7 +239,7 @@ namespace Synapse
           shell.add_to_queue (uri.uri);
           if (!(player.playback_status == "Playing"))
             player.play ();
-        } 
+        }
         catch (IOError e)
         {
           warning ("Rythmbox is not available.\n%s", e.message);
@@ -282,7 +277,7 @@ namespace Synapse
           if (!(player.playback_status == "Playing"))
             player.play ();
           player.open_uri (uri.uri);
-        } 
+        }
         catch (IOError e)
         {
           warning ("Rythmbox is not available.\n%s", e.message);

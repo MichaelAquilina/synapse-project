@@ -89,11 +89,6 @@ namespace Synapse
         bool banshee_running = DBusService.get_default ().name_has_owner (BansheePlayerEngine.UNIQUE_NAME);
         return banshee_running ? default_relevancy + MatchScore.INCREMENT_LARGE : default_relevancy;
       }
-
-      public virtual bool action_available ()
-      {
-        return DBusService.get_default ().name_has_owner (BansheePlayerEngine.UNIQUE_NAME);
-      }
     }
 
     private abstract class BansheeControlMatch : ActionMatch
