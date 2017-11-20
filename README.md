@@ -1,6 +1,8 @@
 Notes about this Fork
 ---------------------
 
+[![Build Status](https://travis-ci.org/MichaelAquilina/synapse-project.svg?branch=master)](https://travis-ci.org/MichaelAquilina/synapse-project)
+
 Unofficial fork of the [Synapse project](https://launchpad.net/synapse-project).
 
 I am big fan of synapse and a lot of my productivity stems from its use. Unfurtunately the official project seems
