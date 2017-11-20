@@ -39,19 +39,23 @@ namespace Synapse
         warning ("%s", err.message);
       }
 
-      tomboy_monitor = note_storage.monitor (FileMonitorFlags.SEND_MOVED, null);
-      tomboy_monitor.set_rate_limit (500);
-      tomboy_monitor.changed.connect ( (src, dest, event) => {
-        string src_path = src.get_path ();
-        if (src_path.has_suffix (".note")) {
-          message ("Reloading notes due to change in %s (%s)", src_path, event.to_string ());
-          try {
-            notes = list_tomboy_notes (note_storage);
-          } catch (Error err) {
-            warning ("Unable to list tomboy notes: %s", err.message);
+      try {
+        tomboy_monitor = note_storage.monitor (FileMonitorFlags.SEND_MOVED, null);
+        tomboy_monitor.set_rate_limit (500);
+        tomboy_monitor.changed.connect ( (src, dest, event) => {
+          string src_path = src.get_path ();
+          if (src_path.has_suffix (".note")) {
+            message ("Reloading notes due to change in %s (%s)", src_path, event.to_string ());
+            try {
+              notes = list_tomboy_notes (note_storage);
+            } catch (Error err) {
+              warning ("Unable to list tomboy notes: %s", err.message);
+            }
           }
-        }
-      });
+        });
+      } catch (Error err) {
+          warning ("%s", err.message);
+      }
     }
 
     public void deactivate ()

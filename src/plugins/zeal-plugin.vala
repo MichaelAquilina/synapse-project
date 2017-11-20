@@ -58,19 +58,23 @@ namespace Synapse
 
       meta_monitors = new List<FileMonitor>();
 
-      docsets_monitor = docsets_folder.monitor (FileMonitorFlags.NONE, null);
-      docsets_monitor.changed.connect( (src, dest, event) => {
-        var meta_monitor = src.monitor (FileMonitorFlags.NONE, null);
-        meta_monitor.changed.connect ( (src, dest, event) => {
-          if (event == FileMonitorEvent.CREATED || event == FileMonitorEvent.DELETED) {
-            if (src.get_path ().has_suffix ("meta.json")) {
-              message ("Meta monitor found %s - %s", src.get_path(), event.to_string());
-              update_doclist ();
+      try {
+        docsets_monitor = docsets_folder.monitor (FileMonitorFlags.NONE, null);
+        docsets_monitor.changed.connect( (src, dest, event) => {
+          var meta_monitor = src.monitor (FileMonitorFlags.NONE, null);
+          meta_monitor.changed.connect ( (src, dest, event) => {
+            if (event == FileMonitorEvent.CREATED || event == FileMonitorEvent.DELETED) {
+              if (src.get_path ().has_suffix ("meta.json")) {
+                message ("Meta monitor found %s - %s", src.get_path(), event.to_string());
+                update_doclist ();
+              }
             }
-          }
+          });
+          meta_monitors.append (meta_monitor);
         });
-        meta_monitors.append (meta_monitor);
-      });
+      } catch (Error err) {
+          warning ("%s", err.message);
+      }
 
       update_doclist ();
     }
