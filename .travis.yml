@@ -1,0 +1,15 @@
+---
+
+sudo: true
+dist: trusty
+
+language: generic
+
+service:
+  - docker
+
+install:
+  - docker build . -t ubuntu:synapse
+
+script:
+  - docker run ubuntu:synapse synapse --help
