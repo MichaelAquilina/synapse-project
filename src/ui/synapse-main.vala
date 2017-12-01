@@ -180,6 +180,7 @@ namespace Synapse
         typeof (GNotePlugin),
         typeof (ChatActions),
         typeof (ZealPlugin),
+        typeof (RolldicePlugin),
 #if HAVE_ZEITGEIST
         typeof (ZeitgeistPlugin),
         typeof (ZeitgeistRelated),
