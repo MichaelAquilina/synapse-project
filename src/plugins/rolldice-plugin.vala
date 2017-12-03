@@ -42,7 +42,7 @@ namespace Synapse
           title: "%s".printf (result),
           description: "%s : %s".printf (match_string, result),
           has_thumbnail: false,
-          icon_name: "applications-boardgames"
+          icon_name: "applications-games"
         );
       }
 
@@ -58,7 +58,7 @@ namespace Synapse
         typeof (RolldicePlugin),
         _("Rolldice"),
         _("Rolls virtual dice."),
-        "applications-boardgames",
+        "applications-games",
         register_plugin,
         Environment.find_program_in_path ("rolldice") != null,
         _("rolldice is not installed")
