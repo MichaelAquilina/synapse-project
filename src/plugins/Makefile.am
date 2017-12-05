@@ -57,6 +57,7 @@ libplugins_la_VALASOURCES = \
 	system-management.vala \
 	zeal-plugin.vala \
   zim-plugin.vala \
+	rolldice-plugin.vala \
 	$(NULL)
 
 if HAVE_ZEITGEIST
