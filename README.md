@@ -11,6 +11,9 @@ to fork the project to host on github and make changes quickly myself.
 
 I [release deb files](https://github.com/MichaelAquilina/synapse-project/releases/) for every significant change I make.
 
+I also have an [OpenSUSE repository](https://download.opensuse.org/repositories/home:/MichaelAquilina/) which you can use
+for Leap and Tumbleweed.
+
 In the meanwhile I have added numerous plugins that I myself use on a daily occassion:
 
 * [password store](https://www.passwordstore.org/) plugin (see an example of this in action [here](https://i.imgur.com/pMjck1o.gif))
