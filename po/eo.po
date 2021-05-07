@@ -24,38 +24,38 @@ msgstr "Synapse"
 
 #: ../data/synapse.desktop.in.h:2
 msgid "Search everything you do."
-msgstr ""
+msgstr "Serĉi ĉion kion vi faras."
 
 #. activate has to stay in first position!
 #: ../src/ui/synapse-main.vala:106 ../src/ui/settings.vala:240
 msgid "Activate"
-msgstr ""
+msgstr "Aktivigi"
 
 #. Whooot?! This cannot be true!
 #: ../src/ui/category.vala:31 ../src/ui/category.vala:71
 #: ../src/ui/category.vala:135
 msgid "All"
-msgstr ""
+msgstr "Ĉio"
 
 #: ../src/ui/category.vala:68 ../src/ui/category.vala:112
 msgid "Actions"
-msgstr ""
+msgstr "Agoj"
 
 #: ../src/ui/category.vala:69 ../src/ui/category.vala:114
 msgid "Audio"
-msgstr ""
+msgstr "Aŭdaĵoj"
 
 #: ../src/ui/category.vala:70 ../src/ui/category.vala:115
 msgid "Applications"
-msgstr ""
+msgstr "Aplikaĵoj"
 
 #: ../src/ui/category.vala:72 ../src/ui/category.vala:113
 msgid "Places"
-msgstr ""
+msgstr "Ejoj"
 
 #: ../src/ui/category.vala:73 ../src/ui/category.vala:116
 msgid "Documents"
-msgstr ""
+msgstr "Dokumentoj"
 
 #: ../src/ui/category.vala:74 ../src/ui/category.vala:117
 msgid "Images"
@@ -63,15 +63,15 @@ msgstr "Bildoj"
 
 #: ../src/ui/category.vala:75 ../src/ui/category.vala:118
 msgid "Video"
-msgstr ""
+msgstr "Vidaĵoj"
 
 #: ../src/ui/category.vala:76
 msgid "Contacts"
-msgstr ""
+msgstr "Kontaktoj"
 
 #: ../src/ui/category.vala:77 ../src/ui/category.vala:119
 msgid "Internet"
-msgstr ""
+msgstr "Interreto"
 
 #. _labels.set (QueryFlags.ALL, _("All")); // Do not remove!
 #: ../src/ui/category.vala:111
@@ -81,15 +81,15 @@ msgstr ""
 #. _labels.set (QueryFlags.FILES, _("Files"));
 #: ../src/ui/category.vala:121
 msgid "Uncategorized"
-msgstr ""
+msgstr "Senkategoriaj"
 
 #: ../src/ui/controller.vala:30
 msgid "Searching..."
-msgstr ""
+msgstr "Serĉas..."
 
 #: ../src/ui/controller.vala:31
 msgid "No results found."
-msgstr ""
+msgstr "Neniu rezulto trovita."
 
 #: ../src/ui/controller.vala:32
 msgid "No recent activities found."
@@ -97,52 +97,52 @@ msgstr ""
 
 #: ../src/ui/controller.vala:33
 msgid "Type to search..."
-msgstr ""
+msgstr "Tajpu por serĉi..."
 
 #: ../src/ui/controller.vala:542
 msgid "...or press down key to browse recent activities"
-msgstr ""
+msgstr "...aŭ alklaku malsupra klavo por foliumi aktivaĵojn"
 
 #: ../src/ui/view-virgilio.vala:208 ../src/ui/widgets-matchlistview.vala:948
 #, c-format
 msgid "<b>%d of %d</b>"
-msgstr ""
+msgstr "<b>%d de %d</b>"
 
 #: ../src/ui/settings.vala:48
 msgid "Status"
-msgstr ""
+msgstr "Statuso"
 
 #: ../src/ui/settings.vala:50
 msgid "Enable this plugin"
-msgstr ""
+msgstr "Ŝalti ĉi tiun kromprogramon"
 
 #: ../src/ui/settings.vala:51
 msgid "Disable this plugin"
-msgstr ""
+msgstr "Malŝalti ĉi tiun kromprogramon"
 
 #: ../src/ui/settings.vala:57
 msgid "About this plugin"
-msgstr ""
+msgstr "Pri ĉi tiu kromprogramo"
 
 #: ../src/ui/settings.vala:71 ../src/ui/settings.vala:207
 msgid "Configure plugin"
-msgstr ""
+msgstr "Agordi kromprogramon"
 
 #: ../src/ui/settings.vala:86 ../src/ui/settings.vala:455
 msgid "Disabled"
-msgstr ""
+msgstr "Malŝaltita"
 
 #: ../src/ui/settings.vala:90
 msgid "Enabled"
-msgstr ""
+msgstr "Ŝaltita"
 
 #: ../src/ui/settings.vala:144
 msgid "Synapse - Settings"
-msgstr ""
+msgstr "Synapse - Agordoj"
 
 #: ../src/ui/settings.vala:169
 msgid "Default"
-msgstr ""
+msgstr "Defaŭlte"
 
 #: ../src/ui/settings.vala:170
 msgid "Essential"
@@ -162,11 +162,11 @@ msgstr ""
 
 #: ../src/ui/settings.vala:241
 msgid "Execute"
-msgstr ""
+msgstr "Plenumi"
 
 #: ../src/ui/settings.vala:242
 msgid "Execute without hiding"
-msgstr ""
+msgstr "Plenumi sen kaŝado"
 
 #: ../src/ui/settings.vala:243
 msgid "Alternative Delete"
@@ -174,60 +174,60 @@ msgstr ""
 
 #: ../src/ui/settings.vala:244
 msgid "Next Result"
-msgstr ""
+msgstr "Sekva rezulto"
 
 #: ../src/ui/settings.vala:245
 msgid "Previous Result"
-msgstr ""
+msgstr "Antaŭa rezulto"
 
 #: ../src/ui/settings.vala:246
 msgid "First Result"
-msgstr ""
+msgstr "La unua rezulto"
 
 #: ../src/ui/settings.vala:247
 msgid "Last Result"
-msgstr ""
+msgstr "La lasta rezulto"
 
 #: ../src/ui/settings.vala:248
 msgid "Next 5 Results"
-msgstr ""
+msgstr "Sekvaj 5 rezultoj"
 
 #: ../src/ui/settings.vala:249
 msgid "Previous 5 Results"
-msgstr ""
+msgstr "Antaŭaj 5 rezultoj"
 
 #: ../src/ui/settings.vala:250
 msgid "Next Category"
-msgstr ""
+msgstr "Sekva kategorio"
 
 #: ../src/ui/settings.vala:251
 msgid "Previous Category"
-msgstr ""
+msgstr "Antaŭa kategorio"
 
 #: ../src/ui/settings.vala:252
 msgid "Next Pane"
-msgstr ""
+msgstr "Sekva panelo"
 
 #: ../src/ui/settings.vala:253
 msgid "Previous Pane"
-msgstr ""
+msgstr "Antaŭa panelo"
 
 #: ../src/ui/settings.vala:254
 msgid "Paste"
-msgstr ""
+msgstr "Algui"
 
 #: ../src/ui/settings.vala:255
 msgid "Paste current selection"
-msgstr ""
+msgstr "Algui nunan elektaĵon"
 
 #: ../src/ui/settings.vala:256
 #: ../src/plugins/xnoise-media-player-plugin.vala:94
 msgid "Quit"
-msgstr ""
+msgstr "Eliri"
 
 #: ../src/ui/settings.vala:270
 msgid "Shortcut already in use"
-msgstr ""
+msgstr "Jam uzas ĉi-fulmoklavon"
 
 #: ../src/ui/settings.vala:296
 msgid "General"
@@ -235,20 +235,20 @@ msgstr ""
 
 #: ../src/ui/settings.vala:297
 msgid "Plugins"
-msgstr ""
+msgstr "Kromprogramoj"
 
 #: ../src/ui/settings.vala:303
 msgid "Behavior & Look"
-msgstr ""
+msgstr "Agado kaj apero"
 
 #: ../src/ui/settings.vala:315
 msgid "Theme:"
-msgstr ""
+msgstr "Etoso:"
 
 #. Autostart checkbox
 #: ../src/ui/settings.vala:320
 msgid "Startup on login"
-msgstr ""
+msgstr "Starti je ensaluto"
 
 #. Notification icon
 #: ../src/ui/settings.vala:326
@@ -257,15 +257,15 @@ msgstr ""
 
 #: ../src/ui/settings.vala:340
 msgid "Shortcuts"
-msgstr ""
+msgstr "Fulmoklavoj"
 
 #: ../src/ui/settings.vala:359
 msgid "Action"
-msgstr ""
+msgstr "Agado"
 
 #: ../src/ui/settings.vala:392
 msgid "Shortcut"
-msgstr ""
+msgstr "Fulmoklavo"
 
 #: ../src/ui/settings.vala:411
 msgid "Click the shortcut you wish to change and press the new shortcut."
@@ -274,41 +274,41 @@ msgstr ""
 #: ../src/ui/widgets-matchlistview.vala:921
 #: ../src/ui/widgets-matchlistview.vala:935
 msgid "No results."
-msgstr ""
+msgstr "Sen rezultoj."
 
 #: ../src/ui/widgets-matchlistview.vala:940
 #, c-format
 msgid "<b>1 of %d</b>"
-msgstr ""
+msgstr "<b>1 de %d</b>"
 
 #. if is home dir
 #: ../src/ui/utils.vala:131
 msgid "Home"
-msgstr ""
+msgstr "Hejmo"
 
 #: ../src/ui/utils.vala:145
 msgid "Root"
-msgstr ""
+msgstr "Radiko"
 
 #: ../src/core/common-actions.vala:60
 msgid "Run"
-msgstr ""
+msgstr "Lanĉi"
 
 #: ../src/core/common-actions.vala:61
 msgid "Run an application, action or script"
-msgstr ""
+msgstr "Lanĉi aplikaĵon, agadon, aŭ skripton"
 
 #: ../src/core/common-actions.vala:141
 msgid "Run in Terminal"
-msgstr ""
+msgstr "Lanĉi en terminalo"
 
 #: ../src/core/common-actions.vala:142
 msgid "Run application or command in terminal"
-msgstr ""
+msgstr "Lanĉi aplikaĵon aŭ komandon en terminalo"
 
 #: ../src/core/common-actions.vala:208
 msgid "Open"
-msgstr ""
+msgstr "Malfermi"
 
 #: ../src/core/common-actions.vala:209
 msgid "Open using default application"
@@ -316,7 +316,7 @@ msgstr ""
 
 #: ../src/core/common-actions.vala:270
 msgid "Open folder"
-msgstr ""
+msgstr "Malfermi dosierujon"
 
 #: ../src/core/common-actions.vala:271
 msgid "Open folder containing this file"
@@ -324,7 +324,7 @@ msgstr ""
 
 #: ../src/core/common-actions.vala:311
 msgid "Copy to Clipboard"
-msgstr ""
+msgstr "Kopii al tondejo"
 
 #: ../src/core/common-actions.vala:312
 msgid "Copy selection to clipboard"
@@ -343,7 +343,7 @@ msgstr ""
 #: ../src/plugins/rhythmbox-plugin.vala:119
 #: ../src/plugins/xnoise-media-player-plugin.vala:140
 msgid "Play"
-msgstr ""
+msgstr "Ludi"
 
 #: ../src/plugins/banshee-plugin.vala:114
 msgid "Start playback in Banshee"
@@ -353,7 +353,7 @@ msgstr ""
 #: ../src/plugins/rhythmbox-plugin.vala:145
 #: ../src/plugins/xnoise-media-player-plugin.vala:191
 msgid "Pause"
-msgstr ""
+msgstr "Paŭzi"
 
 #: ../src/plugins/banshee-plugin.vala:141
 msgid "Pause playback in Banshee"
@@ -363,7 +363,7 @@ msgstr ""
 #: ../src/plugins/rhythmbox-plugin.vala:171
 #: ../src/plugins/xnoise-media-player-plugin.vala:214
 msgid "Next"
-msgstr ""
+msgstr "Sekva"
 
 #: ../src/plugins/banshee-plugin.vala:161
 msgid "Plays the next song in Banshee's playlist"
@@ -373,7 +373,7 @@ msgstr ""
 #: ../src/plugins/rhythmbox-plugin.vala:196
 #: ../src/plugins/xnoise-media-player-plugin.vala:238
 msgid "Previous"
-msgstr ""
+msgstr "Antaŭa"
 
 #: ../src/plugins/banshee-plugin.vala:183
 msgid "Plays the previous song in Banshee's playlist"
@@ -389,7 +389,7 @@ msgstr ""
 
 #: ../src/plugins/banshee-plugin.vala:241
 msgid "Play in Banshee"
-msgstr ""
+msgstr "Ludi per Banshee"
 
 #: ../src/plugins/banshee-plugin.vala:242
 #: ../src/plugins/rhythmbox-plugin.vala:265
@@ -398,7 +398,7 @@ msgstr ""
 
 #: ../src/plugins/calculator-plugin.vala:59
 msgid "Calculator"
-msgstr ""
+msgstr "Kalkulilo"
 
 #: ../src/plugins/calculator-plugin.vala:60
 msgid "Calculate basic expressions."
@@ -406,11 +406,11 @@ msgstr ""
 
 #: ../src/plugins/calculator-plugin.vala:64
 msgid "bc is not installed"
-msgstr ""
+msgstr "bc ne estas instalita"
 
 #: ../src/plugins/chat-actions-plugin.vala:42
 msgid "Open chat"
-msgstr ""
+msgstr "Malfermi babilejon"
 
 #: ../src/plugins/chat-actions-plugin.vala:43
 msgid "Open a chat with selected contact"
@@ -418,23 +418,23 @@ msgstr ""
 
 #: ../src/plugins/chat-actions-plugin.vala:65
 msgid "Send a message"
-msgstr ""
+msgstr "Sendi mesaĝon"
 
 #: ../src/plugins/chat-actions-plugin.vala:66
 msgid "Send a message to the contact"
-msgstr ""
+msgstr "Sendi mesaĝon al la kontakto"
 
 #: ../src/plugins/chat-actions-plugin.vala:99
 msgid "Send message to.."
-msgstr ""
+msgstr "Sendi mesaĝon al..."
 
 #: ../src/plugins/chat-actions-plugin.vala:100
 msgid "Send a message to a contact"
-msgstr ""
+msgstr "Sendi mesaĝon al kontatko"
 
 #: ../src/plugins/chat-actions-plugin.vala:134
 msgid "Chat actions"
-msgstr ""
+msgstr "Agadoj de babilejo"
 
 #: ../src/plugins/chat-actions-plugin.vala:135
 msgid "Open chat, or send a message with your favorite IM"
@@ -442,7 +442,7 @@ msgstr ""
 
 #: ../src/plugins/chromium-plugin.vala:66
 msgid "Chromium Plugin"
-msgstr ""
+msgstr "Na Chromium kromprogramo"
 
 #: ../src/plugins/chromium-plugin.vala:67
 msgid "Browse and open Chromium bookmarks."
@@ -450,11 +450,11 @@ msgstr ""
 
 #: ../src/plugins/chromium-plugin.vala:71
 msgid "Chromium is not installed"
-msgstr ""
+msgstr "Chromium ne estas instalita"
 
 #: ../src/plugins/command-plugin.vala:44
 msgid "Run command"
-msgstr ""
+msgstr "Lanĉi komandon"
 
 #: ../src/plugins/command-plugin.vala:64
 msgid "Find and execute arbitrary commands."
@@ -467,21 +467,21 @@ msgstr ""
 #: ../src/plugins/desktop-file-plugin.vala:232
 #, c-format
 msgid "Open with %s"
-msgstr ""
+msgstr "Malfermi per %s"
 
 #: ../src/plugins/desktop-file-plugin.vala:234
 #, c-format
 msgid "Opens current selection using %s"
-msgstr ""
+msgstr "Malfermi aktualan elektaĵon per %s"
 
 #: ../src/plugins/desktop-file-plugin.vala:280
 #, c-format
 msgid "Launch action '%s'"
-msgstr ""
+msgstr "Lanĉi agadon '%s'"
 
 #: ../src/plugins/devhelp-search.vala:59
 msgid "Search in Devhelp"
-msgstr ""
+msgstr "Serĉi en Devhelp"
 
 #: ../src/plugins/devhelp-search.vala:60
 msgid "Search documentation for this symbol"
@@ -493,7 +493,7 @@ msgstr ""
 
 #: ../src/plugins/devhelp-search.vala:74
 msgid "Devhelp is not installed"
-msgstr ""
+msgstr "Devhelp ne estas instalita"
 
 #: ../src/plugins/dictionary.vala:61
 msgid "Define"
@@ -517,7 +517,7 @@ msgstr ""
 
 #: ../src/plugins/file-op-plugin.vala:40
 msgid "Remove"
-msgstr ""
+msgstr "Forigi"
 
 #: ../src/plugins/file-op-plugin.vala:41
 msgid "Move to Trash"
@@ -525,29 +525,29 @@ msgstr ""
 
 #: ../src/plugins/file-op-plugin.vala:72
 msgid "Rename to"
-msgstr ""
+msgstr "Alinomi al"
 
 #: ../src/plugins/file-op-plugin.vala:73
 msgid "Rename the file to..."
-msgstr ""
+msgstr "Alinomi la dosieron al..."
 
 #: ../src/plugins/file-op-plugin.vala:89 ../src/plugins/pidgin-plugin.vala:171
 #, c-format
 msgid "File \"%s\"does not exist."
-msgstr ""
+msgstr "Dosiero \"%s\" ne ekzistas"
 
 #: ../src/plugins/file-op-plugin.vala:101
 #, c-format
 msgid "Cannot move \"%s\" to \"%s\""
-msgstr ""
+msgstr "Ne povas movi \"%s\ al \"%s\""
 
 #: ../src/plugins/file-op-plugin.vala:125
 msgid "File Operations"
-msgstr ""
+msgstr "Operacioj de dosiero"
 
 #: ../src/plugins/file-op-plugin.vala:126
 msgid "Copy, Cut, Paste and Delete files"
-msgstr ""
+msgstr "Kopii, tondi, lagui kaj forigi dosierojn"
 
 #: ../src/plugins/gnome-bookmarks-plugin.vala:61
 msgid "GNOME Bookmarks Plugin"
@@ -559,7 +559,7 @@ msgstr ""
 
 #: ../src/plugins/gnome-screensaver-plugin.vala:51
 msgid "Lock Screen"
-msgstr ""
+msgstr "Ŝlosi ekranon"
 
 #: ../src/plugins/gnome-screensaver-plugin.vala:52
 msgid "Locks screen and starts screensaver."
@@ -581,7 +581,7 @@ msgstr ""
 
 #: ../src/plugins/imgur-plugin.vala:51
 msgid "Upload to imgur"
-msgstr ""
+msgstr "Alŝuti al imgur"
 
 #: ../src/plugins/imgur-plugin.vala:52
 msgid "Upload selection to imgur image sharer"
@@ -601,7 +601,7 @@ msgstr ""
 
 #: ../src/plugins/imgur-plugin.vala:174
 msgid "Synapse - Imgur"
-msgstr ""
+msgstr "Synapse - Imgur"
 
 #: ../src/plugins/imgur-plugin.vala:229
 msgid "Upload to imgur to contact.."
@@ -613,11 +613,11 @@ msgstr ""
 
 #: ../src/plugins/imgur-plugin.vala:263
 msgid "Imgur"
-msgstr ""
+msgstr "Imgur"
 
 #: ../src/plugins/imgur-plugin.vala:264
 msgid "Share images using imgur."
-msgstr ""
+msgstr "Konigi bildojn per imgur."
 
 #: ../src/plugins/launchpad-plugin.vala:45
 msgid "Authorize with Launchpad"
@@ -662,7 +662,7 @@ msgstr ""
 
 #: ../src/plugins/locate-plugin.vala:62 ../src/plugins/locate-plugin.vala:72
 msgid "Locate"
-msgstr ""
+msgstr "Loki"
 
 #: ../src/plugins/locate-plugin.vala:63
 msgid "Locate files with this name on the filesystem"
@@ -674,41 +674,41 @@ msgstr ""
 
 #: ../src/plugins/locate-plugin.vala:77
 msgid "Unable to find \"locate\" binary"
-msgstr ""
+msgstr "Ne povas trovi \"locate\" komandon"
 
 #: ../src/plugins/opensearch.vala:254
 msgid "Search the web."
-msgstr ""
+msgstr "Serĉi en la retejo"
 
 #. keep in sync with the internal XMLs!
 #: ../src/plugins/opensearch.vala:266
 msgid "DuckDuckGo"
-msgstr ""
+msgstr "DuckDuckGo"
 
 #: ../src/plugins/opensearch.vala:267
 msgid "Search the web using duckduckgo.com"
-msgstr ""
+msgstr "Serĉi en la retejo per duckduckgo.com"
 
 #: ../src/plugins/opensearch.vala:268
 msgid "Google"
-msgstr ""
+msgstr "Google"
 
 #: ../src/plugins/opensearch.vala:269
 msgid "Search the web using google.com"
-msgstr ""
+msgstr "Serĉi en la retejo per google.com"
 
 #: ../src/plugins/opensearch.vala:270
 msgid "Google Maps"
-msgstr ""
+msgstr "Google Maps"
 
 #: ../src/plugins/opensearch.vala:271
 msgid "Search using Google Maps"
-msgstr ""
+msgstr "Serĉi per Google Maps"
 
 #: ../src/plugins/pastebin-plugin.vala:42
 #: ../src/plugins/pastebin-plugin.vala:261
 msgid "Pastebin"
-msgstr ""
+msgstr "Pastebin"
 
 #: ../src/plugins/pastebin-plugin.vala:43
 #: ../src/plugins/pastebin-plugin.vala:228
@@ -717,7 +717,7 @@ msgstr ""
 
 #: ../src/plugins/pastebin-plugin.vala:163
 msgid "Synapse - Pastebin"
-msgstr ""
+msgstr "Synapse - Pastebin"
 
 #: ../src/plugins/pastebin-plugin.vala:227
 msgid "Pastebin to contact.."
@@ -807,7 +807,7 @@ msgstr ""
 #. true if user's system has all required components which the plugin needs
 #: ../src/plugins/ssh-plugin.vala:72
 msgid "ssh is not installed"
-msgstr ""
+msgstr "ssh ne estas instalita"
 
 #: ../src/plugins/ssh-plugin.vala:190
 msgid "Connect with SSH"
@@ -815,7 +815,7 @@ msgstr ""
 
 #: ../src/plugins/system-management.vala:89
 msgid "Suspend"
-msgstr ""
+msgstr "Halteti"
 
 #: ../src/plugins/system-management.vala:90
 msgid "Put your computer into suspend mode"
@@ -823,7 +823,7 @@ msgstr ""
 
 #: ../src/plugins/system-management.vala:189
 msgid "Hibernate"
-msgstr ""
+msgstr "Pasivumi"
 
 #: ../src/plugins/system-management.vala:190
 msgid "Put your computer into hibernation mode"
@@ -831,7 +831,7 @@ msgstr ""
 
 #: ../src/plugins/system-management.vala:288
 msgid "Shut Down"
-msgstr ""
+msgstr "Elŝalti"
 
 #: ../src/plugins/system-management.vala:289
 msgid "Turn your computer off"
@@ -839,7 +839,7 @@ msgstr ""
 
 #: ../src/plugins/system-management.vala:372
 msgid "Restart"
-msgstr ""
+msgstr "Restarti"
 
 #: ../src/plugins/system-management.vala:373
 msgid "Restart your computer"
@@ -921,33 +921,33 @@ msgstr ""
 #, c-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "antaŭ %d minuto"
+msgstr[1] "antaŭ %d minutoj"
 
 #: ../src/plugins/zeitgeist-plugin.vala:172
 #, c-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "antaŭ %d horo"
+msgstr[1] "antaŭ %d horoj"
 
 #: ../src/plugins/zeitgeist-plugin.vala:177
 #, c-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "antaŭ %d tago"
+msgstr[1] "antaŭ %d tagoj"
 
 #: ../src/plugins/zeitgeist-plugin.vala:182
 #, c-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "antaŭ %d semajno"
+msgstr[1] "antaŭ %d semajnoj"
 
 #: ../src/plugins/zeitgeist-plugin.vala:186
 msgid "long time ago"
-msgstr ""
+msgstr "antaŭ longa tempo"
 
 #: ../src/plugins/zeitgeist-plugin.vala:196
 msgid "Search various items logged by Zeitgeist."
@@ -956,7 +956,7 @@ msgstr ""
 #: ../src/plugins/zeitgeist-plugin.vala:200
 #: ../src/plugins/zeitgeist-related.vala:79
 msgid "Zeitgeist is not installed"
-msgstr ""
+msgstr "Zeitgeist ne estas instalita"
 
 #: ../src/plugins/zeitgeist-related.vala:64
 msgid "Find related"
