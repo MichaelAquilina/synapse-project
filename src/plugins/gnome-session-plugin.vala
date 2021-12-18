@@ -27,10 +27,10 @@ namespace Synapse
     public const string UNIQUE_NAME = "org.gnome.SessionManager";
     public const string OBJECT_PATH = "/org/gnome/SessionManager";
 
-    public abstract bool can_shutdown () throws IOError;
-    public abstract void shutdown () throws IOError;
-    public abstract void request_reboot () throws IOError;
-    public abstract void logout (uint32 mode = 0) throws IOError;
+    public abstract bool can_shutdown () throws GLib.Error;
+    public abstract void shutdown () throws GLib.Error;
+    public abstract void request_reboot () throws GLib.Error;
+    public abstract void logout (uint32 mode = 0) throws GLib.Error;
   }
 
   public class GnomeSessionPlugin : Object, Activatable, ItemProvider
@@ -66,7 +66,7 @@ namespace Synapse
 
           dbus_interface.shutdown ();
         }
-        catch (IOError err)
+        catch (GLib.Error err)
         {
           warning ("%s", err.message);
         }
@@ -92,7 +92,7 @@ namespace Synapse
 
           dbus_interface.request_reboot ();
         }
-        catch (IOError err)
+        catch (GLib.Error err)
         {
           warning ("%s", err.message);
         }
@@ -123,7 +123,7 @@ namespace Synapse
            */
           dbus_interface.logout (1);
         }
-        catch (IOError err)
+        catch (GLib.Error err)
         {
           warning ("%s", err.message);
         }

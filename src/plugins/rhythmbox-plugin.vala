@@ -27,9 +27,9 @@ namespace Synapse
       public const string UNIQUE_NAME = "org.gnome.Rhythmbox3";
       public const string OBJECT_PATH = "/org/gnome/Rhythmbox3/PlayQueue";
 
-      public abstract void add_to_queue (string uri) throws IOError;
-      //public abstract void clear_queue () throws IOError;
-      //public abstract void remove_from_queue (string uri) throws IOError;
+      public abstract void add_to_queue (string uri) throws GLib.Error;
+      //public abstract void clear_queue () throws GLib.Error;
+      //public abstract void remove_from_queue (string uri) throws GLib.Error;
   }
 
   [DBus (name = "org.mpris.MediaPlayer2.Player")]
@@ -39,13 +39,13 @@ namespace Synapse
 
       public abstract string playback_status { owned get; }
 
-      public abstract void next () throws IOError;
-      public abstract void open_uri (string uri) throws IOError;
-      public abstract void pause () throws IOError;
-      public abstract void play () throws IOError;
-      //public abstract void play_pause () throws IOError;
-      public abstract void previous () throws IOError;
-      //public abstract void stop () throws IOError;
+      public abstract void next () throws GLib.Error;
+      public abstract void open_uri (string uri) throws GLib.Error;
+      public abstract void pause () throws GLib.Error;
+      public abstract void play () throws GLib.Error;
+      //public abstract void play_pause () throws GLib.Error;
+      public abstract void previous () throws GLib.Error;
+      //public abstract void stop () throws GLib.Error;
   }
 
   public class RhythmboxActions : Object, Activatable, ItemProvider, ActionProvider
@@ -126,7 +126,7 @@ namespace Synapse
 
           player.play ();
         }
-        catch (IOError e)
+        catch (GLib.Error e)
         {
           warning ("Rythmbox is not available.\n%s", e.message);
         }
@@ -152,7 +152,7 @@ namespace Synapse
 
           player.pause ();
         }
-        catch (IOError e)
+        catch (GLib.Error e)
         {
           warning ("Rythmbox is not available.\n%s", e.message);
         }
@@ -177,7 +177,7 @@ namespace Synapse
 
           player.next ();
         }
-        catch (IOError e)
+        catch (GLib.Error e)
         {
           warning ("Rythmbox is not available.\n%s", e.message);
         }
@@ -203,7 +203,7 @@ namespace Synapse
           player.previous ();
           player.previous ();
         }
-        catch (IOError e)
+        catch (GLib.Error e)
         {
           warning ("Rythmbox is not available.\n%s", e.message);
         }
@@ -240,7 +240,7 @@ namespace Synapse
           if (!(player.playback_status == "Playing"))
             player.play ();
         }
-        catch (IOError e)
+        catch (GLib.Error e)
         {
           warning ("Rythmbox is not available.\n%s", e.message);
         }
@@ -278,7 +278,7 @@ namespace Synapse
             player.play ();
           player.open_uri (uri.uri);
         }
-        catch (IOError e)
+        catch (GLib.Error e)
         {
           warning ("Rythmbox is not available.\n%s", e.message);
         }

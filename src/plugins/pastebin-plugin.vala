@@ -82,7 +82,7 @@ namespace Synapse
             throw new IOError.INVALID_DATA (complete_output);
           }
         }
-        catch (Error err)
+        catch (IOError err)
         {
           warning ("%s", err.message);
         }
@@ -132,7 +132,7 @@ namespace Synapse
             throw new IOError.INVALID_DATA (complete_output);
           }
         }
-        catch (Error err)
+        catch (IOError err)
         {
           warning ("%s", err.message);
         }
