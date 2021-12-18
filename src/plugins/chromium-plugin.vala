@@ -176,7 +176,7 @@ namespace Synapse
       UNWANTED_SCHEME.add ("place");
       UNWANTED_SCHEME.add ("javascript");
 
-      List<unowned Json.Node> folders = new List<Json.Node> ();
+      List<unowned Json.Node> folders = new List<unowned Json.Node> ();
 
       try
       {

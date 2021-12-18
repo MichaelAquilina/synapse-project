@@ -27,7 +27,7 @@ namespace Synapse
     public const string UNIQUE_NAME = "org.gnome.ScreenSaver";
     public const string OBJECT_PATH = "/org/gnome/ScreenSaver";
 
-    public abstract async void lock () throws IOError;
+    public abstract async void lock () throws GLib.Error;
   }
 
   [DBus (name = "org.mate.ScreenSaver")]
@@ -36,7 +36,7 @@ namespace Synapse
     public const string UNIQUE_NAME = "org.mate.ScreenSaver";
     public const string OBJECT_PATH = "/org/mate/ScreenSaver";
 
-    public abstract async void lock () throws IOError;
+    public abstract async void lock () throws GLib.Error;
   }
 
   public class ScreenSaverPlugin : Object, Activatable, ItemProvider
@@ -90,7 +90,7 @@ namespace Synapse
                                                  GnomeScreenSaver.OBJECT_PATH);
         // we need the async variant cause Screensaver doesn't send the reply
         dbus_interface.lock.begin ();
-      } catch (IOError err) {
+      } catch (GLib.Error err) {
         warning ("%s", err.message);
       }
     }
@@ -103,7 +103,7 @@ namespace Synapse
                                                  MateScreenSaver.OBJECT_PATH);
         // we need the async variant cause Screensaver doesn't send the reply
         dbus_interface.lock.begin ();
-      } catch (IOError err) {
+      } catch (GLib.Error err) {
         warning ("%s", err.message);
       }
     }

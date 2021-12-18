@@ -27,16 +27,16 @@ namespace Synapse
     public const string UNIQUE_NAME = "org.gtk.xnoise.PlayerEngine";
     public const string OBJECT_PATH = "/PlayerEngine";
 
-    public abstract void quit ()              throws IOError;
-    public abstract void raise ()             throws IOError;
+    public abstract void quit ()              throws GLib.Error;
+    public abstract void raise ()             throws GLib.Error;
 
-    public abstract void next ()              throws IOError;
-    public abstract void previous ()          throws IOError;
-    public abstract void pause ()             throws IOError;
-    public abstract void toggle_playing ()     throws IOError;
-    public abstract void stop ()              throws IOError;
-    public abstract void play ()              throws IOError;
-    public abstract void open_uri (string uri) throws IOError;
+    public abstract void next ()              throws GLib.Error;
+    public abstract void previous ()          throws GLib.Error;
+    public abstract void pause ()             throws GLib.Error;
+    public abstract void toggle_playing ()     throws GLib.Error;
+    public abstract void stop ()              throws GLib.Error;
+    public abstract void play ()              throws GLib.Error;
+    public abstract void open_uri (string uri) throws GLib.Error;
   }
 
   public class XnoiseActions : Object, Activatable, ItemProvider, ActionProvider
@@ -104,7 +104,7 @@ namespace Synapse
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.quit ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           warning ("Xnoise is not available.\n%s", e.message);
         }
       }
@@ -127,7 +127,7 @@ namespace Synapse
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.raise ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           warning ("Xnoise is not available.\n%s", e.message);
         }
       }
@@ -150,7 +150,7 @@ namespace Synapse
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.play ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           warning ("Xnoise is not available.\n%s", e.message);
         }
       }
@@ -173,7 +173,7 @@ namespace Synapse
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.toggle_playing ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           warning ("Xnoise is not available.\n%s", e.message);
         }
       }
@@ -201,7 +201,7 @@ namespace Synapse
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.pause ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           warning ("Xnoise is not available.\n%s", e.message);
         }
       }
@@ -225,7 +225,7 @@ namespace Synapse
                                            XnoisePlayerEngine.OBJECT_PATH);
 
           player.next ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           warning ("Xnoise is not available.\n%s", e.message);
         }
       }
@@ -248,7 +248,7 @@ namespace Synapse
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.previous ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           warning ("Xnoise is not available.\n%s", e.message);
         }
       }
@@ -271,7 +271,7 @@ namespace Synapse
                                            XnoisePlayerEngine.UNIQUE_NAME,
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.stop ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           warning ("Xnoise is not available.\n%s", e.message);
         }
       }
@@ -303,7 +303,7 @@ namespace Synapse
                                            XnoisePlayerEngine.OBJECT_PATH);
           player.open_uri (uri.uri);
           player.play ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           warning ("Xnoise is not available.\n%s", e.message);
         }
       }

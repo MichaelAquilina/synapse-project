@@ -49,7 +49,7 @@ namespace Synapse
         this.monitor = config_file.monitor_file (FileMonitorFlags.NONE);
         this.monitor.changed.connect (this.handle_ssh_config_update);
       }
-      catch (IOError e)
+      catch (GLib.Error e)
       {
         warning ("Failed to start monitoring changes of ssh client config file");
       }

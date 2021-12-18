@@ -27,21 +27,21 @@ namespace Synapse
       public const string UNIQUE_NAME = "im.pidgin.purple.PurpleService";
       public const string OBJECT_PATH = "/im/pidgin/purple/PurpleObject";
 
-      public abstract string purple_account_get_protocol_name (int account) throws IOError;
-      public abstract int purple_buddy_get_account (int buddy) throws IOError;
-      public abstract string purple_buddy_get_name (int buddy) throws IOError;
-      public abstract string purple_buddy_get_alias (int buddy) throws IOError;
-      public abstract string purple_buddy_icon_get_full_path (int icon) throws IOError;
-      public abstract int purple_buddy_get_icon (int buddy) throws IOError;
-      public abstract int purple_buddy_is_online (int buddy) throws IOError;
+      public abstract string purple_account_get_protocol_name (int account) throws GLib.Error;
+      public abstract int purple_buddy_get_account (int buddy) throws GLib.Error;
+      public abstract string purple_buddy_get_name (int buddy) throws GLib.Error;
+      public abstract string purple_buddy_get_alias (int buddy) throws GLib.Error;
+      public abstract string purple_buddy_icon_get_full_path (int icon) throws GLib.Error;
+      public abstract int purple_buddy_get_icon (int buddy) throws GLib.Error;
+      public abstract int purple_buddy_is_online (int buddy) throws GLib.Error;
 
-      public abstract int[] purple_accounts_get_all_active () throws IOError;
-      public abstract int[] purple_find_buddies (int account, string pattern = "") throws IOError;
+      public abstract int[] purple_accounts_get_all_active () throws GLib.Error;
+      public abstract int[] purple_find_buddies (int account, string pattern = "") throws GLib.Error;
 
-      public abstract int purple_conversation_new (int type, int account, string name) throws IOError;
-      public abstract void purple_conversation_present (int conv) throws IOError;
-      public abstract int purple_conv_im (int conv) throws IOError;
-      public abstract void purple_conv_im_send (int im, string mess) throws IOError;
+      public abstract int purple_conversation_new (int type, int account, string name) throws GLib.Error;
+      public abstract void purple_conversation_present (int conv) throws GLib.Error;
+      public abstract int purple_conv_im (int conv) throws GLib.Error;
+      public abstract void purple_conv_im_send (int im, string mess) throws GLib.Error;
 
       public abstract signal void account_added (int acc);
       public abstract signal void account_removed (int acc);
@@ -51,8 +51,8 @@ namespace Synapse
       public abstract signal void buddy_signed_off (int buddy);
       public abstract signal void buddy_icon_changed (int buddy);
 
-      public abstract void serv_send_file (int conn, string who, string file) throws IOError;
-      public abstract int purple_account_get_connection (int account) throws IOError;
+      public abstract void serv_send_file (int conn, string who, string file) throws GLib.Error;
+      public abstract int purple_account_get_connection (int account) throws GLib.Error;
   }
 
   public class PidginPlugin : Object, Activatable, ItemProvider, ActionProvider
@@ -180,7 +180,7 @@ namespace Synapse
           return;
         }
         p.serv_send_file (conn, contact.name, path);
-      } catch (IOError err)
+      } catch (GLib.Error err)
       {
         warning ("Cannot send file to %s", contact.title);
       }
@@ -196,7 +196,7 @@ namespace Synapse
           p.purple_conv_im_send (im, message);
         }
         if (present) p.purple_conversation_present (conv);
-      } catch (IOError err)
+      } catch (GLib.Error err)
       {
         warning ("Cannot open chat for %s", contact.title);
       }
@@ -340,7 +340,7 @@ namespace Synapse
       return results;
     }
 
-    private async void get_contact (int buddy, int account = -1, string? protocol = null) throws IOError
+    private async void get_contact (int buddy, int account = -1, string? protocol = null) throws GLib.Error
     {
       if (p == null) return;
       string prot = protocol;
@@ -383,7 +383,7 @@ namespace Synapse
           }
         }
 
-      } catch (IOError err) {
+      } catch (GLib.Error err) {
         warning ("Cannot load Pidgin contacts");
       }
     }

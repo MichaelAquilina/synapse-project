@@ -26,9 +26,9 @@ namespace Synapse
       public const string UNIQUE_NAME = "org.bansheeproject.Banshee";
       public const string OBJECT_PATH = "/org/bansheeproject/Banshee/PlayerEngine";
 
-      public abstract void play () throws IOError;
-      public abstract void pause () throws IOError;
-      public abstract void open (string uri) throws IOError;
+      public abstract void play () throws GLib.Error;
+      public abstract void pause () throws GLib.Error;
+      public abstract void open (string uri) throws GLib.Error;
   }
 
   [DBus (name = "org.bansheeproject.Banshee.PlaybackController")]
@@ -36,8 +36,8 @@ namespace Synapse
       public const string UNIQUE_NAME = "org.bansheeproject.Banshee";
       public const string OBJECT_PATH = "/org/bansheeproject/Banshee/PlaybackController";
 
-      public abstract void next (bool restart) throws IOError;
-      public abstract void previous (bool restart) throws IOError;
+      public abstract void next (bool restart) throws GLib.Error;
+      public abstract void previous (bool restart) throws GLib.Error;
   }
 
   [DBus (name = "org.bansheeproject.Banshee.PlayQueue")]
@@ -45,7 +45,7 @@ namespace Synapse
       public const string UNIQUE_NAME = "org.bansheeproject.Banshee";
       public const string OBJECT_PATH = "/org/bansheeproject/Banshee/SourceManager/PlayQueue";
 
-      public abstract void enqueue_uri (string uri, bool prepend) throws IOError;
+      public abstract void enqueue_uri (string uri, bool prepend) throws GLib.Error;
   }
 
   public class BansheeActions : Object, Activatable, ItemProvider, ActionProvider
@@ -118,7 +118,7 @@ namespace Synapse
                                            BansheePlayerEngine.OBJECT_PATH);
 
           player.play ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
@@ -143,7 +143,7 @@ namespace Synapse
                                            BansheePlayerEngine.UNIQUE_NAME,
                                            BansheePlayerEngine.OBJECT_PATH);
           player.pause ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
@@ -165,7 +165,7 @@ namespace Synapse
                                            BansheePlaybackController.OBJECT_PATH);
 
           player.next (false);
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
@@ -186,7 +186,7 @@ namespace Synapse
                                            BansheePlaybackController.UNIQUE_NAME,
                                            BansheePlaybackController.OBJECT_PATH);
           player.previous (false);
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
@@ -214,7 +214,7 @@ namespace Synapse
                                            BansheePlayQueue.OBJECT_PATH);
 
           player.enqueue_uri (uri.uri, false);
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
@@ -251,7 +251,7 @@ namespace Synapse
                                            BansheePlayerEngine.OBJECT_PATH);
           player.open (uri.uri);
           player.play ();
-        } catch (IOError e) {
+        } catch (GLib.Error e) {
           stderr.printf ("Banshee is not available.\n%s", e.message);
         }
       }
